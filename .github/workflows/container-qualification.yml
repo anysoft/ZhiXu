@@ -42,7 +42,7 @@ jobs:
       - name: Install archive promotion tool
         run: sudo apt-get update && sudo apt-get install -y --no-install-recommends skopeo
       - name: Validate release harness
-        run: node --test tests/phase16b/release.test.cjs
+        run: node --test tests/phase16b/release.test.cjs tests/phase16b/qualification.test.cjs
       - name: Build target-native OCI image with SBOM and provenance
         run: node scripts/release/build.cjs
       - name: Real container acceptance
@@ -71,6 +71,9 @@ jobs:
           if-no-files-found: error
           path: release-output/
   summary:
+    permissions:
+      contents: read
+      actions: read
     needs: [linux, container]
     if: always()
     runs-on: ubuntu-24.04
@@ -78,10 +81,37 @@ jobs:
       - uses: actions/checkout@v6
         with:
           persist-credentials: false
-      - uses: actions/download-artifact@v7
+      - name: Select receipts from this run and commit
+        id: receipts
+        uses: actions/github-script@v8
         with:
-          pattern: container-gates-*-${{ github.run_id }}-${{ github.run_attempt }}-${{ github.sha }}
-          path: qualification-input
+          script: |
+            const fs = require('node:fs');
+            const { selectReceipts } = require('./scripts/release/qualification-receipts.cjs');
+            const artifacts = await github.paginate(github.rest.actions.listWorkflowRunArtifacts, {
+              ...context.repo, run_id: context.runId, per_page: 100
+            });
+            const receipts = selectReceipts(artifacts, process.env);
+            fs.mkdirSync('qualification-input', { recursive: true });
+            fs.writeFileSync('qualification-input/receipts.json', JSON.stringify(receipts));
+            for (const receipt of receipts) {
+              core.info(`${receipt.architecture}: ${receipt.artifact_name} (ID ${receipt.artifact_id})`);
+              core.setOutput(receipt.architecture, String(receipt.artifact_id));
+            }
+      - name: Download amd64 receipt
+        uses: actions/download-artifact@v7
+        with:
+          artifact-ids: ${{ steps.receipts.outputs.amd64 }}
+          github-token: ${{ github.token }}
+          path: qualification-input/amd64
+          merge-multiple: true
+      - name: Download arm64 receipt
+        uses: actions/download-artifact@v7
+        with:
+          artifact-ids: ${{ steps.receipts.outputs.arm64 }}
+          github-token: ${{ github.token }}
+          path: qualification-input/arm64
+          merge-multiple: true
       - name: Enforce every job and both architecture receipts
         env:
           NEEDS: ${{ toJSON(needs) }}
