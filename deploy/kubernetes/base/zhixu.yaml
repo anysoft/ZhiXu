@@ -42,7 +42,7 @@ spec:
         fsGroupChangePolicy: OnRootMismatch
       containers:
         - name: zhixu
-          image: anysoft/zhixu:1.0.0-rc.4
+          image: anysoft/zhixu:1.0.0-rc.5
           imagePullPolicy: IfNotPresent
           env:
             - name: DATA_DIR

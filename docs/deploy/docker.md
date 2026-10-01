@@ -1,6 +1,6 @@
 # Docker deployment — ZhiXu 1.0 RC
 
-ZhiXu 1.0 RC packages the Git-native scheduling platform as a non-root, read-only-root container for Linux AMD64 and ARM64. The previous platform source at `505c0bac15b18e403ae59fabb2841caa4f53f367` passed native hosted qualification on both architectures. The Phase 17 branding commit must pass the same workflow before `v1.0.0-rc.4` is tagged or published.
+ZhiXu 1.0 RC packages the Git-native scheduling platform as a non-root, read-only-root container for Linux AMD64 and ARM64. The previous platform source at `505c0bac15b18e403ae59fabb2841caa4f53f367` passed native hosted qualification on both architectures. The Phase 17 branding commit must pass the same workflow before `v1.0.0-rc.5` is tagged or published.
 
 No public RC image has been published yet. Use only the image digest and release assets recorded in a completed ZhiXu GitHub Release.
 

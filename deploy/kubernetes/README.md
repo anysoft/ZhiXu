@@ -10,7 +10,7 @@ kubectl -n zhixu port-forward svc/zhixu 5700:5700
 
 Visit <http://127.0.0.1:5700>.
 
-The committed overlay uses `anysoft/zhixu:1.0.0-rc.4` as an example. Before deployment, replace it with the exact image and digest from a verified release manifest. Keep `replicas: 1`; multiple replicas must never share the live SQLite data directory.
+The committed overlay uses `anysoft/zhixu:1.0.0-rc.5` as an example. Before deployment, replace it with the exact image and digest from a verified release manifest. Keep `replicas: 1`; multiple replicas must never share the live SQLite data directory.
 
 The base manifest gives `/data` a persistent `ReadWriteOnce` PVC. `/backup` is an ephemeral example volume: production deployments must replace it with durable storage and copy encrypted exports outside the cluster. Do not delete the data PVC during routine upgrades.
 
