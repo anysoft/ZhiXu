@@ -34,7 +34,7 @@ const Other = ({
   SharedContext,
   'reloadSystemConfig' | 'reloadTheme' | 'systemInfo'
 >) => {
-  const defaultTheme = localStorage.getItem('qinglong_dark_theme') || 'auto';
+  const defaultTheme = localStorage.getItem('zhixu_dark_theme') || 'auto';
   const [systemConfig, setSystemConfig] = useState<{
     panelTitle?: string | null;
     logRemoveFrequency?: number | null;
@@ -53,7 +53,7 @@ const Other = ({
 
   const themeChange = (e: any) => {
     const _theme = e.target.value;
-    localStorage.setItem('qinglong_dark_theme', e.target.value);
+    localStorage.setItem('zhixu_dark_theme', e.target.value);
     setFetchMethod(fetch);
 
     if (_theme === 'dark') {
@@ -202,14 +202,14 @@ const Other = ({
         <Form.Item
           label={intl.get('面板标题')}
           name="panelTitle"
-          tooltip={intl.get('自定义面板的站点标题，留空使用默认值“青龙”')}
+          tooltip={intl.get('自定义面板的站点标题，留空使用默认值“枝序”')}
         >
           <Input.Group compact>
             <Input
               style={{ width: 180 }}
               maxLength={100}
               value={systemConfig?.panelTitle || ''}
-              placeholder={intl.get('留空使用默认值“青龙”')}
+              placeholder={intl.get('留空使用默认值“枝序”')}
               onChange={(e) => {
                 setSystemConfig({
                   ...systemConfig,

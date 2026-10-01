@@ -14,7 +14,7 @@ notify_done() {
   local message="$1"
   printf '[%s] %s\n' "$(timestamp)" "$message"
   if command -v osascript >/dev/null 2>&1; then
-    osascript -e "display notification \"${message//\"/\\\"}\" with title \"QingLong Phase16B\"" >/dev/null 2>&1 || true
+    osascript -e "display notification \"${message//\"/\\\"}\" with title \"ZhiXu Phase17\"" >/dev/null 2>&1 || true
   fi
 }
 cleanup() { :; }

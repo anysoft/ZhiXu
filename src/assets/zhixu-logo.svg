@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title">
+  <title id="title">ZhiXu</title>
+  <defs>
+    <linearGradient id="g" x1="20" y1="108" x2="108" y2="20" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#1677ff"/>
+      <stop offset="1" stop-color="#16a36a"/>
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" rx="30" fill="#f4fbf8"/>
+  <path d="M64 104V29M64 48 40 32M64 61l27-21M64 77 42 63M64 88l25-17" fill="none" stroke="url(#g)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="40" cy="32" r="8" fill="#1677ff"/>
+  <circle cx="91" cy="40" r="8" fill="#16a36a"/>
+  <circle cx="42" cy="63" r="8" fill="#1677ff"/>
+  <circle cx="89" cy="71" r="8" fill="#16a36a"/>
+</svg>

@@ -148,7 +148,7 @@ const ClientIp = () => {
             <div>
               <Paragraph>
                 {intl.get(
-                  '系统从离青龙最近的一跳开始，由右向左检查代理链，并把第一个不可信地址作为客户端 IP。',
+                  '系统从离枝序最近的一跳开始，由右向左检查代理链，并把第一个不可信地址作为客户端 IP。',
                 )}
               </Paragraph>
               <Paragraph style={{ marginBottom: 0 }}>
@@ -263,7 +263,7 @@ const ClientIp = () => {
                 dataSource={diagnostic.hops}
                 columns={[
                   {
-                    title: intl.get('距离青龙'),
+                    title: intl.get('距离枝序'),
                     dataIndex: 'hop',
                     width: 120,
                     render: (value) => `${value} ${intl.get('跳')}`,

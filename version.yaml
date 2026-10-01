@@ -1,5 +1,5 @@
-version: 1.0.0
-changeLogLink: https://github.com/anysoft/qinglong/releases
+version: 1.0.0-rc.1
+changeLogLink: https://github.com/anysoft/ZhiXu/releases
 publishTime: ""
 changeLog: |
-  Platform 1.0: Git-native tasks, managed runtimes, isolated environments and portable recovery.
+  ZhiXu 1.0 RC1: Git-native tasks, managed runtimes, isolated environments and portable recovery.

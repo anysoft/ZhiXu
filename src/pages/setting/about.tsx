@@ -4,6 +4,7 @@ import { Typography, Input, Form, Button, message, Descriptions } from 'antd';
 import styles from './index.less';
 import { SharedContext } from '@/layouts';
 import dayjs from 'dayjs';
+import logo from '@/assets/zhixu-logo.svg';
 
 const { Link } = Typography;
 
@@ -13,10 +14,10 @@ const About = ({ systemInfo }: { systemInfo: SharedContext['systemInfo'] }) => {
       <img
         alt="logo"
         style={{ width: 140, marginRight: 20 }}
-        src="https://qn.whyour.cn/logo.png"
+        src={logo}
       />
       <div className={styles.right}>
-        <span className={styles.title}>{intl.get('青龙')}</span>
+        <span className={styles.title}>{intl.get('枝序')}</span>
         <span className={styles.desc}>
           {intl.get(
             '支持python3、javascript、shell、typescript 的定时任务管理面板',
@@ -34,7 +35,7 @@ const About = ({ systemInfo }: { systemInfo: SharedContext['systemInfo'] }) => {
           </Descriptions.Item>
           <Descriptions.Item label={intl.get('更新日志')} span={3}>
             <Link
-              href={`https://qn.whyour.cn/version.yaml?t=${Date.now()}`}
+              href={`https://raw.githubusercontent.com/anysoft/ZhiXu/develop/version.yaml?t=${Date.now()}`}
               target="_blank"
             >
               {intl.get('查看')}
@@ -43,7 +44,7 @@ const About = ({ systemInfo }: { systemInfo: SharedContext['systemInfo'] }) => {
         </Descriptions>
         <div>
           <Link
-            href="https://github.com/whyour/qinglong"
+            href="https://github.com/anysoft/ZhiXu"
             target="_blank"
             style={{ marginRight: 15 }}
           >
@@ -57,7 +58,7 @@ const About = ({ systemInfo }: { systemInfo: SharedContext['systemInfo'] }) => {
             {intl.get('Telegram频道')}
           </Link>
           <Link
-            href="https://github.com/whyour/qinglong/issues"
+            href="https://github.com/anysoft/ZhiXu/issues"
             target="_blank"
           >
             {intl.get('提交BUG')}

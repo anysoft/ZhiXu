@@ -59,8 +59,8 @@ export default class SystemService {
     const code = Math.random().toString().slice(-6);
     const isSuccess = await this.notificationService.testNotify(
       notificationInfo,
-      t('青龙'),
-      t('【蛟龙】测试通知 https://t.me/jiao_long'),
+      t('枝序'),
+      t('ZhiXu 测试通知 https://github.com/anysoft/ZhiXu'),
     );
     if (isSuccess) {
       const result = await this.updateAuthDb({

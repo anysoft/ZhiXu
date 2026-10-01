@@ -1,16 +1,16 @@
 {
-  "name": "@whyour/qinglong",
+  "name": "@anysoft/zhixu",
   "packageManager": "pnpm@8.3.1",
-  "version": "1.0.0",
-  "description": "Timed task management platform supporting Python3, JavaScript, Shell, Typescript",
+  "version": "1.0.0-rc.1",
+  "description": "ZhiXu — Git-native automation and task execution platform",
   "repository": {
     "type": "git",
-    "url": "https://github.com/whyour/qinglong.git"
+    "url": "https://github.com/anysoft/ZhiXu.git"
   },
-  "author": "whyour",
+  "author": "anysoft",
   "license": "Apache License 2.0",
   "bugs": {
-    "url": "https://github.com/whyour/qinglong/issues"
+    "url": "https://github.com/anysoft/ZhiXu/issues"
   },
   "scripts": {
     "start": "concurrently -n w: npm:start:back npm:start:front",

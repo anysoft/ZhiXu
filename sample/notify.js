@@ -697,7 +697,7 @@ function do_qywxamNotify(text, desp) {
               textcard: {
                 title: `${text}`,
                 description: `${desp}`,
-                url: 'https://github.com/whyour/qinglong',
+                url: 'https://github.com/anysoft/ZhiXu',
                 btntxt: '更多',
               },
             };
@@ -961,7 +961,7 @@ function aibotkNotify(text, desp) {
             roomName: `${AIBOTK_NAME}`,
             message: {
               type: 1,
-              content: `【青龙快讯】\n\n${text}\n${desp}`,
+              content: `【枝序通知】\n\n${text}\n${desp}`,
             },
           };
           break;
@@ -972,7 +972,7 @@ function aibotkNotify(text, desp) {
             name: `${AIBOTK_NAME}`,
             message: {
               type: 1,
-              content: `【青龙快讯】\n\n${text}\n${desp}`,
+              content: `【枝序通知】\n\n${text}\n${desp}`,
             },
           };
           break;
@@ -1334,7 +1334,7 @@ function ntfyNotify(text, desp) {
         headers: {
           Title: `${encodeRFC2047(text)}`,
           Priority: NTFY_PRIORITY || '3',
-          Icon: 'https://qn.whyour.cn/logo.png',
+          Icon: '',
         },
         timeout,
       };

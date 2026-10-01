@@ -13,6 +13,7 @@ import config from '@/utils/config';
 import { history } from '@umijs/max';
 import styles from './index.less';
 import { request } from '@/utils/http';
+import logo from '@/assets/zhixu-logo.svg';
 
 const FormItem = Form.Item;
 const { Step } = Steps;
@@ -55,7 +56,7 @@ const Initialization = () => {
       content: (
         <div className={styles.top} style={{ marginTop: 30 }}>
           <div className={styles.header}>
-            <span className={styles.title}>{intl.get('欢迎使用青龙')}</span>
+            <span className={styles.title}>{intl.get('欢迎使用枝序')}</span>
             <span className={styles.desc}>
               {intl.get(
                 '支持python3、javascript、shell、typescript 的定时任务管理面板',
@@ -138,7 +139,7 @@ const Initialization = () => {
         <div className={styles.top} style={{ marginTop: 80 }}>
           <div className={styles.header}>
             <span className={styles.title}>{intl.get('恭喜安装完成！')}</span>
-            <Link href="https://github.com/whyour/qinglong" target="_blank">
+            <Link href="https://github.com/anysoft/ZhiXu" target="_blank">
               Github
             </Link>
             <Link href="https://t.me/jiao_long" target="_blank">
@@ -167,7 +168,7 @@ const Initialization = () => {
           <img
             alt="logo"
             className={styles.logo}
-            src="https://qn.whyour.cn/logo.png"
+            src={logo}
           />
           <span className={styles.title}>{intl.get('初始化配置')}</span>
         </div>

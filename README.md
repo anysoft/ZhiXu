@@ -1,102 +1,67 @@
 <div align="center">
-<img width="100" src="https://user-images.githubusercontent.com/22700758/191449379-f9f56204-0e31-4a16-be5a-331f52696a73.png">
+<img width="100" src="./src/assets/zhixu-logo.svg" alt="枝序 ZhiXu">
 
-<h1 align="center">青龙</h1>
+# 枝序 · ZhiXu
 
 简体中文 | [English](./README-en.md)
 
-支持 Python3、JavaScript、Shell、Typescript 的定时任务管理平台
+**Git 原生的自动化与任务执行平台**
 
-Timed task management platform supporting Python3, JavaScript, Shell, Typescript
-
-[![npm version][npm-version-image]][npm-version-url] [![docker pulls][docker-pulls-image]][docker-pulls-url] [![docker stars][docker-stars-image]][docker-stars-url] [![docker image size][docker-image-size-image]][docker-image-size-url]
-
-[npm-version-image]: https://img.shields.io/npm/v/@whyour/qinglong?style=flat
-[npm-version-url]: https://www.npmjs.com/package/@whyour/qinglong?activeTab=readme
-[docker-pulls-image]: https://img.shields.io/docker/pulls/whyour/qinglong?style=flat
-[docker-pulls-url]: https://hub.docker.com/r/whyour/qinglong
-[docker-stars-image]: https://img.shields.io/docker/stars/whyour/qinglong?style=flat
-[docker-stars-url]: https://hub.docker.com/r/whyour/qinglong
-[docker-image-size-image]: https://img.shields.io/docker/image-size/whyour/qinglong?style=flat
-[docker-image-size-url]: https://hub.docker.com/r/whyour/qinglong
-
-[Demo](http://demo.qinglong.online:4433/) / [Issues](https://github.com/whyour/qinglong/issues) / [Telegram Channel](https://t.me/jiao_long) / [Buy Me a Coffee](https://www.buymeacoffee.com/qinglong)
-
-[演示](http://demo.qinglong.online:4433/) / [反馈](https://github.com/whyour/qinglong/issues) / [Telegram 频道](https://t.me/jiao_long) / [打赏开发者](https://user-images.githubusercontent.com/22700758/244744295-29cd0cd1-c8bb-4ea1-adf6-29bd390ad4dd.jpg)
+[问题反馈](https://github.com/anysoft/ZhiXu/issues) · [安全策略](./SECURITY.md) · [Docker 部署](./docs/deploy/docker.md)
 </div>
 
-![cover](https://user-images.githubusercontent.com/22700758/244847235-8dc1ca21-e03f-4606-9458-0541fab60413.png)
+## 核心能力
 
-## 功能
+- Repository、Worktree 与 Git 原生代码工作区
+- Shell、Python、JavaScript 和 TypeScript 任务
+- 受管 Python/Node Runtime 与隔离依赖环境
+- Cron、Webhook 与 Git 更新触发器
+- 任务运行、实时日志、重试、通知与恢复
+- 配置资产、Hooks 和 Global/Repository/Task 作用域环境变量
+- 一致性备份、加密导出、恢复与灾难恢复基础
+- `linux/amd64` 与 `linux/arm64` 容器资格验证
 
-- 支持多种脚本语言（python3、javaScript、shell、typescript）
-- 支持在线管理脚本、环境变量、配置文件
-- 支持在线查看任务日志
-- 支持秒级任务设置
-- 支持系统级通知
-- 支持暗黑模式
-- 支持手机端操作
+## Release Candidate
 
-## Platform 1.0 Docker（资格验证中）
+当前版本为 `v1.0.0-rc.1` 候选源码。Qualified source `505c0bac` 已通过 [Container Qualification #6](https://github.com/anysoft/ZhiXu/actions/runs/36816777711)；品牌迁移后的提交仍需重新完成同一资格流程，之后才会创建 RC tag 和发布产物。
 
-本分支采用 Git-native Task / Managed Runtime 架构。Phase16B 镜像尚未发布；实际状态见 [Phase16B 报告](PHASE16B_REPORT.md)。上方徽章及上游链接保留用于项目归属说明，不代表本分支已有正式镜像。
-
-正式发布后，从同一个已验证 Release 下载 `compose.yaml` 和 `.env.example`，复制后者为 `.env`，按 `release-manifest.json` 配置镜像名称和精确版本，再运行：
+从同一个已验证 GitHub Release 下载 `compose.yaml`、`.env.example`、`release-manifest.json` 和 `SHA256SUMS`。校验后运行：
 
 ```bash
+cp .env.example .env
+# 按 release-manifest.json 设置 DOCKERHUB_IMAGE 和 PLATFORM_VERSION
 docker compose config --quiet
 docker compose pull
 docker compose up -d --wait
 ```
 
-- 访问 `http://127.0.0.1:5700` 创建管理员；默认只监听本机端口。
-- 数据卷挂载 `/data`，实际 `DATA_DIR=/data/state`；备份卷挂载 `/backup`。
-- 镜像以 UID/GID 10001 运行，Task 使用正式 Managed Python/Node 与 Dependency Environment。
-- 升级前创建备份及加密导出，并保存到 Docker 主机以外；不要使用 `down --volumes` 删除持久数据。
-- 目标平台为 `linux/amd64`、`linux/arm64`，支持声明以真实 Hosted Container Qualification 结果为准。
+默认访问地址为 <http://127.0.0.1:5700>。数据卷挂载到 `/data`，实际 `DATA_DIR=/data/state`；备份卷挂载到 `/backup`。镜像使用 UID/GID `10001`，只读根文件系统且不需要 Docker socket 或特权模式。
 
-完整步骤、恢复和权限说明见 [Docker 部署](docs/deploy/docker.md)。
+完整说明见 [Docker 部署文档](./docs/deploy/docker.md)。
 
-## 内置 API
-
-[查看文档](https://qinglong.online/guide/user-guide/built-in-api)
-
-## 内置命令
-
-[查看文档](https://qinglong.online/guide/user-guide/basic-explanation)
-
-## 开发
+## 本地开发
 
 ```bash
-git clone https://github.com/whyour/qinglong.git
-cd qinglong
-cp .env.example .env
-# 推荐使用 pnpm https://pnpm.io/zh/installation
+git clone https://github.com/anysoft/ZhiXu.git
+cd ZhiXu
 npm install -g pnpm@8.3.1
 pnpm install
 pnpm start
 ```
 
-打开你的浏览器，访问 <http://127.0.0.1:5700>
+打开 <http://127.0.0.1:5700>。
 
-## 链接
+## 项目状态
 
-- [nevinee](https://gitee.com/evine)
-- [crontab-ui](https://github.com/alseambusher/crontab-ui)
-- [Ant Design](https://ant.design)
-- [Ant Design Pro](https://pro.ant.design/)
-- [Umijs](https://umijs.org)
-- [darkreader](https://github.com/darkreader/darkreader)
-- [admin-server](https://github.com/sunpu007/admin-server)
+- 功能架构基线：[Platform 1.0 freeze](./docs/architecture/21-platform-1.0-freeze.md)
+- Linux 资格：[Phase 15](./PHASE15_REPORT.md)
+- 容器与发布工程：[Phase 16B](./PHASE16B_REPORT.md)
+- 品牌迁移与 RC：[Phase 17](./PHASE17_REPORT.md)
 
-## 名称来源
+## 名称
 
-青龙，又名苍龙，在中国传统文化中是四象之一、[天之四灵](https://zh.wikipedia.org/wiki/%E5%A4%A9%E4%B9%8B%E5%9B%9B%E7%81%B5)之一，根据五行学说，它是代表东方的灵兽，为青色的龙，五行属木，代表的季节是春季，八卦主震。苍龙与应龙一样，都是身具羽翼。《张果星宗》称“又有辅翼，方为真龙”。
+“枝”代表 Git 分支、Repository 与 Worktree；“序”代表任务编排、执行顺序和可靠恢复。ZhiXu 是从零构建的 Git-native 自动化平台；旧项目名称仅保留在历史记录、上游归属与明确的兼容性说明中。
 
-《后汉书·律历志下》记载：日周于天，一寒一暑，四时备成，万物毕改，摄提迁次，青龙移辰，谓之岁。
+## License
 
-在中国[二十八宿](https://zh.wikipedia.org/wiki/%E4%BA%8C%E5%8D%81%E5%85%AB%E5%AE%BF)中，青龙是东方七宿（角、亢、氐、房、心、尾、箕）的总称。 在早期星宿信仰中，祂是最尊贵的天神。 但被道教信仰吸纳入其神系后，神格大跌，道教将其称为“孟章”，在不同的道经中有“帝君”、“圣将”、“神将”和“捕鬼将”等称呼，与白虎监兵神君一起，是道教的护卫天神。
-
-## Linux CI
-
-Ubuntu 24.04 CI 的入口、手工 full 运行及诊断 artifact 说明见 [本地复现与 GitHub Actions](docs/refactor/phase16a/09-local-reproduction.md)。CI 测试逻辑位于 `scripts/ci/`，不要求 Docker；Linux 最终资格结论另由 Phase15 给出。
+[Apache License 2.0](./LICENSE)

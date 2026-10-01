@@ -674,14 +674,14 @@ def aibotk(title: str, content: str) -> None:
         data = {
             "apiKey": push_config.get("AIBOTK_KEY"),
             "roomName": push_config.get("AIBOTK_NAME"),
-            "message": {"type": 1, "content": f"【青龙快讯】\n\n{title}\n{content}"},
+            "message": {"type": 1, "content": f"【枝序通知】\n\n{title}\n{content}"},
         }
     else:
         url = "https://api-bot.aibotk.com/openapi/v1/chat/contact"
         data = {
             "apiKey": push_config.get("AIBOTK_KEY"),
             "name": push_config.get("AIBOTK_NAME"),
-            "message": {"type": 1, "content": f"【青龙快讯】\n\n{title}\n{content}"},
+            "message": {"type": 1, "content": f"【枝序通知】\n\n{title}\n{content}"},
         }
     body = json.dumps(data).encode(encoding="utf-8")
     headers = {"Content-Type": "application/json"}
@@ -841,7 +841,7 @@ def ntfy(title: str, content: str) -> None:
     encoded_title = encode_rfc2047(title)
 
     data = content.encode(encoding="utf-8")
-    headers = {"Title": encoded_title, "Priority": priority, "Icon": "https://qn.whyour.cn/logo.png"}  # 使用编码后的 title
+    headers = {"Title": encoded_title, "Priority": priority, "Icon": ""}  # 使用编码后的 title
     if push_config.get("NTFY_TOKEN"):
         headers['Authorization'] = "Bearer " + push_config.get("NTFY_TOKEN")
     elif push_config.get("NTFY_USERNAME") and push_config.get("NTFY_PASSWORD"):

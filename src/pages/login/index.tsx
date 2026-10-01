@@ -17,6 +17,7 @@ import { useTheme } from '@/utils/hooks';
 import { MobileOutlined } from '@ant-design/icons';
 import { SharedContext } from '@/layouts';
 import dayjs from 'dayjs';
+import logo from '@/assets/zhixu-logo.svg';
 
 const FormItem = Form.Item;
 const { Countdown } = Statistic;
@@ -147,7 +148,7 @@ const Login = () => {
           <img
             alt="logo"
             className={styles.logo}
-            src="https://qn.whyour.cn/logo.png"
+            src={logo}
           />
           <span className={styles.title}>
             {twoFactor ? intl.get('两步验证') : config.siteName}

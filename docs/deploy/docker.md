@@ -1,10 +1,12 @@
-# Docker deployment — Platform 1.0 candidate
+# Docker deployment — ZhiXu 1.0 RC
 
-This packaging is under Phase16B qualification. No Platform 1.0 image has been published by this task. Read PHASE16B_REPORT.md for actual qualification status. Do not substitute an upstream QingLong image: its storage and execution contracts differ.
+ZhiXu 1.0 RC packages the Git-native scheduling platform as a non-root, read-only-root container for Linux AMD64 and ARM64. The previous platform source at `505c0bac15b18e403ae59fabb2841caa4f53f367` passed native hosted qualification on both architectures. The Phase 17 branding commit must pass the same workflow before `v1.0.0-rc.1` is tagged or published.
+
+No public RC image has been published yet. Use only the image digest and release assets recorded in a completed ZhiXu GitHub Release.
 
 ## Start from a verified release
 
-Download compose.yaml and .env.example from the same verified GitHub Release. Check SHA256SUMS before use. Copy .env.example to .env, set DOCKERHUB_IMAGE from release-manifest.json, and select its exact PLATFORM_VERSION. Then:
+Download `compose.yaml` and `.env.example` from the same verified release. Check `SHA256SUMS`, copy `.env.example` to `.env`, set `DOCKERHUB_IMAGE` from `release-manifest.json`, and select the exact `PLATFORM_VERSION`. Then run:
 
 ```sh
 docker compose config --quiet
@@ -13,37 +15,37 @@ docker compose up -d --wait
 docker compose ps
 ```
 
-Open http://127.0.0.1:5700 and create the first administrator. The port is loopback-only by default. Configure an authenticated TLS reverse proxy if remote access is required. Internal gRPC is loopback-only inside the container and is not published.
+Open <http://127.0.0.1:5700> and create the first administrator. The port is loopback-only by default. Use an authenticated TLS reverse proxy for remote access. Internal gRPC stays inside the container and is not published.
 
 ## Storage and identity
 
 | Path | Responsibility |
 |---|---|
-| /app | Immutable application and production dependencies |
-| /data | Persistent named volume; owned by UID/GID 10001 |
-| /data/state | DATA_DIR; database, repositories, worktrees, managed runtimes and environments |
-| /data/state.platform-control | Restore staging, journals and recovery control |
-| /data/home | HOME; controlled Git/runtime home |
-| /data/.platform-jwt | Persisted private JWT signing secret, mode 0600 |
-| /backup | BACKUP_DIR; separate persistent backup volume |
-| /tmp | Temporary writable tmpfs, removed with container |
+| `/app` | Immutable application and production dependencies |
+| `/data` | Persistent named volume owned by UID/GID 10001 |
+| `/data/state` | `DATA_DIR`: database, repositories, worktrees, managed runtimes and environments |
+| `/data/state.platform-control` | Restore staging, journals and recovery control |
+| `/data/home` | Controlled Git/runtime home |
+| `/data/.platform-jwt` | Persisted private JWT signing secret, mode 0600 |
+| `/backup` | Separate persistent `BACKUP_DIR` volume |
+| `/tmp` | Temporary writable `tmpfs` removed with the container |
 
-The /data/state layout was explicitly approved during resume. Restore atomically renames the live data directory. Mounting a volume directly at DATA_DIR would prevent that operation; mount the parent /data instead. Run exactly one active instance per data volume. Never share a live SQLite data directory between replicas.
+Restore atomically renames the live data directory, so the volume mounts at `/data` while `DATA_DIR` is `/data/state`. Run one active instance per data volume. Never share a live SQLite directory between replicas.
 
-Named volumes inherit the image's non-root directory ownership. For administrator-provided bind mounts, prepare UID/GID 10001 access yourself; startup deliberately does not recursively chown user data. The platform process runs as 10001:10001 with all capabilities dropped, no-new-privileges and read-only root. Docker socket, privileged mode, host PID and host networking are unnecessary.
+Named volumes inherit the image's non-root ownership. Prepare UID/GID 10001 access for administrator-provided bind mounts. Startup deliberately avoids recursively changing ownership of user data. The platform runs as `10001:10001`, drops all capabilities, enables `no-new-privileges`, and uses a read-only root filesystem. It does not require a Docker socket, privileged mode, host PID, or host networking.
 
 ## Managed tasks
 
-App Node runs the platform only. Task Python and Node must use installed Managed Runtimes and built Dependency Environments. System Python exists for platform filesystem/process helpers and compilation, not as a Task fallback. Install the provider/runtime, create and build an environment, bind it to a Task, and check readiness before executing. Compiler and development libraries remain in the image so CPython and native dependencies can build as non-root.
+The application Node runtime runs the platform only. Tasks use explicitly installed Managed Runtimes and built Dependency Environments. Install a provider/runtime, create and build an environment, bind it to a Task, and verify readiness before execution. Host runtimes are deliberately fail-closed.
 
 ## Stop, upgrade and recover
 
-Use docker compose stop (30-second grace period) before maintenance. Before upgrades, create a platform backup and encrypted portable export, copy it outside the Docker host, and retain its passphrase separately. A backup volume alone is not protection against host loss. Avoid docker compose down --volumes: it deletes data.
+Use `docker compose stop` and allow the 30-second grace period before maintenance. Before an upgrade, create a platform backup and encrypted portable export, copy it outside the Docker host, and store its passphrase separately. A backup volume alone does not protect against host loss. Do not run `docker compose down --volumes` unless permanent data deletion is intended.
 
-For an upgrade, stop, preserve backup/export, pull the exact qualified version, and start against the existing volumes. Schema v9 is unchanged by this packaging. Arbitrary downgrade is not guaranteed; use a compatible image and a separate verified restore if rollback is needed.
+For upgrades, stop the service, retain the backup/export, pull the exact qualified version, and start against the existing volumes. Arbitrary downgrade is not guaranteed; restore a verified compatible backup into a separate installation when rollback is required.
 
-Portable restore imports logical runtime/environment records but deliberately excludes physical runtime installations. Complete the restore/restart procedure, verify tasks are not ready, then explicitly rebuild runtimes/environments before executing. Keep exported backups outside the source data volume.
+Portable restore imports logical runtime/environment records but excludes physical runtime installations. After restore and restart, rebuild runtimes and environments before executing tasks.
 
 ## Verification and platforms
 
-The target matrix is native linux/amd64 and linux/arm64. Hosted qualification for both architectures is required before advertising multiarch release support. Colima on Apple Silicon can validate native arm64 locally; emulated amd64 cannot replace hosted native results. HEALTHCHECK calls /api/health; first startup may take up to the configured health start period. Inspect docker compose logs for startup failures, taking care not to publish user task output or credentials.
+The supported RC matrix is native `linux/amd64` and `linux/arm64`. Each release SHA must pass the hosted Container Qualification workflow before multi-architecture publication. `HEALTHCHECK` calls `/api/health`; initial startup may take up to the configured health start period.

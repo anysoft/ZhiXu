@@ -8,7 +8,7 @@ const releaseVersion = yaml.load(fs.readFileSync('version.yaml','utf8'));
 if (releaseVersion.version !== version) throw Error('VERSION_FILE_MISMATCH');
 releaseVersion.publishTime = process.env.BUILD_CREATED;
 fs.writeFileSync('version.yaml', yaml.dump(releaseVersion));
-fs.writeFileSync('static/build-info.json', JSON.stringify({version, sourceCommit:process.env.SOURCE_COMMIT, created:process.env.BUILD_CREATED, source:'https://github.com/anysoft/qinglong',lockfileSha256:crypto.createHash('sha256').update(fs.readFileSync('pnpm-lock.yaml')).digest('hex')},null,2)+'\n');
+fs.writeFileSync('static/build-info.json', JSON.stringify({version, sourceCommit:process.env.SOURCE_COMMIT, created:process.env.BUILD_CREATED, source:'https://github.com/anysoft/ZhiXu',lockfileSha256:crypto.createHash('sha256').update(fs.readFileSync('pnpm-lock.yaml')).digest('hex')},null,2)+'\n');
 // Source maps embed developer paths/source; production does not need them.
 function clean(dir) { for(const e of fs.readdirSync(dir,{withFileTypes:true})) { const p=dir+'/'+e.name;if(e.isDirectory())clean(p);else if(e.name.endsWith('.map'))fs.unlinkSync(p); } }
 clean('static');

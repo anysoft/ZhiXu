@@ -382,7 +382,7 @@ export default class NotificationService {
           textcard: {
             title: `${this.title}`,
             description: `${this.content}`,
-            url: 'https://github.com/whyour/qinglong',
+            url: 'https://github.com/anysoft/ZhiXu',
             btntxt: t('更多'),
           },
         };
@@ -434,7 +434,7 @@ export default class NotificationService {
           roomName: `${aibotkName}`,
           message: {
             type: 1,
-            content: `【${t('青龙快讯')}】\n\n${this.title}\n${this.content}`,
+            content: `【${t('枝序通知')}】\n\n${this.title}\n${this.content}`,
           },
         };
         break;
@@ -445,7 +445,7 @@ export default class NotificationService {
           name: `${aibotkName}`,
           message: {
             type: 1,
-            content: `【${t('青龙快讯')}】\n\n${this.title}\n${this.content}`,
+            content: `【${t('枝序通知')}】\n\n${this.title}\n${this.content}`,
           },
         };
         break;
@@ -616,7 +616,7 @@ export default class NotificationService {
       });
 
       const info = await transporter.sendMail({
-        from: `"${t('青龙快讯')}" <${emailUser}>`,
+        from: `"${t('枝序通知')}" <${emailUser}>`,
         to: recipients,
         subject: `${this.title}`,
         html: `${this.content.replace(/\n/g, '<br/>')}`,
@@ -676,7 +676,7 @@ export default class NotificationService {
       const headers: Record<string, string> = {
         Title: encodeRfc2047(this.title),
         Priority: `${ntfyPriority || '3'}`,
-        Icon: 'https://qn.whyour.cn/logo.png',
+        Icon: '',
       };
       if (ntfyToken) {
         headers['Authorization'] = `Bearer ${ntfyToken}`;

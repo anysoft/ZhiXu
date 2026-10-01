@@ -1,5 +1,5 @@
 ## Reporting a Vulnerability
 
-To report a vulnerability, please open a private vulnerability report at <https://github.com/whyour/qinglong/security>.
+To report a vulnerability, please open a private vulnerability report at <https://github.com/anysoft/ZhiXu/security>.
 
-While the discovery of new vulnerabilities is rare, we also recommend always using the latest versions of Qinglong to ensure your application remains as secure as possible.
+While the discovery of new vulnerabilities is rare, we also recommend always using the latest versions of ZhiXu to ensure your application remains as secure as possible.

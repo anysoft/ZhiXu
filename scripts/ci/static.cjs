@@ -91,6 +91,26 @@ function audit() {
     'utf8',
   );
   assert.ok(!/\bskip\b/.test(formalEnvironmentTest));
+  const releaseSurfaceFiles = [
+    'package.json', 'version.yaml', 'Dockerfile', 'compose.yaml', 'README.md',
+    'README-en.md', 'SECURITY.md', '.umirc.ts',
+    'scripts/release/build-info.cjs',
+    ...['src', 'deploy/kubernetes', '.github/ISSUE_TEMPLATE'].flatMap((root) =>
+      fs.readdirSync(root, { recursive: true, withFileTypes: true })
+        .filter((entry) => entry.isFile())
+        .map((entry) => path.join(entry.parentPath || entry.path, entry.name))
+        .filter((name) => !name.split(path.sep).some((part) => part.startsWith('.umi')))
+        .filter((name) => /\.(?:c?js|tsx?|json|ya?ml|md|svg)$/.test(name))),
+  ];
+  const retiredBrand = /QingLong|Qinglong|青龙|whyour\/qinglong|anysoft\/qinglong|@whyour\/qinglong|qn\.whyour\.cn/;
+  for (const releaseFile of releaseSurfaceFiles)
+    assert.doesNotMatch(fs.readFileSync(releaseFile, 'utf8'), retiredBrand,
+      `LEGACY_BRAND_ON_RELEASE_SURFACE:${releaseFile}`);
+  const packageInfo = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+  assert.equal(packageInfo.name, '@anysoft/zhixu');
+  assert.equal(packageInfo.version, '1.0.0-rc.1');
+  assert.equal(packageInfo.repository.url, 'https://github.com/anysoft/ZhiXu.git');
+  assert.match(fs.readFileSync('Dockerfile', 'utf8'), /org\.opencontainers\.image\.title="ZhiXu"/);
   for (const file of ['shell/task.sh', 'shell/otask.sh', 'back/taskExecution.ts', 'tests/phase5/snapshot-main.cjs'])
     assert.equal(fs.existsSync(file), false, 'LEGACY_EXECUTION_SOURCE_REMAINS');
   const scripts = fs.readdirSync('scripts/ci').filter((f) => f.endsWith('.sh'));
@@ -125,6 +145,8 @@ function audit() {
     job_summary_paths: 'PASS',
     formal_environment_invariants: 'PASS',
     legacy_execution_source_absent: true,
+    brand_identity: 'ZhiXu',
+    legacy_brand_release_surfaces: 0,
   };
 }
 if (require.main === module) {

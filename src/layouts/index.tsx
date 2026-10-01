@@ -18,6 +18,7 @@ import defaultProps from './defaultProps';
 import './index.less';
 import { init } from '../utils/init';
 import WebSocketManager from '../utils/websocket';
+import logo from '@/assets/zhixu-logo.svg';
 
 export interface SharedContext {
   headerStyle: React.CSSProperties;
@@ -48,7 +49,7 @@ export default function () {
   const [loading, setLoading] = useState<boolean>(true);
   const [systemInfo, setSystemInfo] = useState<TSystemInfo>();
   const [siteTitle, setSiteTitle] = useState(
-    () => localStorage.getItem('qinglong_panel_title')?.trim() || intl.get('青龙'),
+    () => localStorage.getItem('zhixu_panel_title')?.trim() || intl.get('枝序'),
   );
   const [collapsed, setCollapsed] = useState(false);
   const [initLoading, setInitLoading] = useState<boolean>(true);
@@ -136,10 +137,10 @@ export default function () {
         const panelTitle = data?.info?.panelTitle?.trim();
         if (panelTitle) {
           setSiteTitle(panelTitle);
-          localStorage.setItem('qinglong_panel_title', panelTitle);
+          localStorage.setItem('zhixu_panel_title', panelTitle);
         } else {
-          setSiteTitle(intl.get('青龙'));
-          localStorage.removeItem('qinglong_panel_title');
+          setSiteTitle(intl.get('枝序'));
+          localStorage.removeItem('zhixu_panel_title');
         }
         if (!data?.info?.lang) {
           const browserLang =
@@ -188,7 +189,7 @@ export default function () {
   useEffect(() => {
     vhCheck();
 
-    const _theme = localStorage.getItem('qinglong_dark_theme') || 'auto';
+    const _theme = localStorage.getItem('zhixu_dark_theme') || 'auto';
     if (typeof window === 'undefined') return;
     if (typeof window.matchMedia === 'undefined') return;
     if (!DarkReader) {
@@ -290,9 +291,9 @@ export default function () {
       loading={loading}
       logo={
         <>
-          <Image preview={false} src="https://qn.whyour.cn/logo.png" />
+          <Image preview={false} src={logo} />
           <div className="title">
-            <span className="title">{intl.get('青龙')}</span>
+            <span className="title">{intl.get('枝序')}</span>
             <span
               onClick={(e) => {
                 e.stopPropagation();

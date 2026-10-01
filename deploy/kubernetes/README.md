@@ -1,81 +1,19 @@
-# Kubernetes deployment
+# ZhiXu Kubernetes deployment
 
-This deploys Qinglong as a single-replica `StatefulSet` with persistent data at `/ql/data`.
-
-```bash
-kubectl apply -k deploy/kubernetes/overlays/local
-kubectl -n qinglong rollout status statefulset/qinglong
-```
-
-Open the panel locally:
+This example deploys one ZhiXu `StatefulSet` in the `zhixu` namespace. The container runs as UID/GID 10001 with a read-only root filesystem and mounts its persistent parent directory at `/data`, while the live state remains at `/data/state` so atomic restore can rename it.
 
 ```bash
-kubectl -n qinglong port-forward svc/qinglong 5700:5700
+kubectl apply -k deploy/kubernetes/overlays/example
+kubectl -n zhixu rollout status statefulset/zhixu
+kubectl -n zhixu port-forward svc/zhixu 5700:5700
 ```
 
-Then visit <http://127.0.0.1:5700>.
+Visit <http://127.0.0.1:5700>.
 
-## Image registry overlays
+The committed overlay uses `anysoft/zhixu:1.0.0-rc.1` as an example. Before deployment, replace it with the exact image and digest from a verified release manifest. Keep `replicas: 1`; multiple replicas must never share the live SQLite data directory.
 
-Use `overlays/example` as the committed template for registry customization:
-
-```yaml
-whyour/qinglong:debian -> registry.example.com/whyour/qinglong:debian
-```
-
-Create `overlays/local/kustomization.yaml` for the actual cluster image. The `local` overlay is ignored by git so private registry names, digests, and credentials-related references stay local.
-
-## Storage
-
-The manifest creates a 5 GiB `ReadWriteOnce` PVC from the cluster's default `StorageClass`.
-If your cluster has no default storage class, add `storageClassName` under:
-
-```yaml
-volumeClaimTemplates:
-  - metadata:
-      name: data
-    spec:
-      storageClassName: your-storage-class
-```
-
-Keep `replicas: 1`. Qinglong stores state in the persistent data directory, including SQLite files, so multiple replicas should not share the same data volume.
-
-## Ingress example
-
-If you expose Qinglong through an Ingress path other than `/`, set `QlBaseUrl` to the same path with leading and trailing slashes.
-
-```yaml
-env:
-  - name: QlBaseUrl
-    value: "/qinglong/"
-```
-
-Example Ingress:
-
-```yaml
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: qinglong
-  namespace: qinglong
-spec:
-  rules:
-    - host: qinglong.example.com
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: qinglong
-                port:
-                  number: 5700
-```
-
-## Maintenance commands
+The base manifest gives `/data` a persistent `ReadWriteOnce` PVC. `/backup` is an ephemeral example volume: production deployments must replace it with durable storage and copy encrypted exports outside the cluster. Do not delete the data PVC during routine upgrades.
 
 ```bash
-kubectl -n qinglong logs -f statefulset/qinglong
-kubectl -n qinglong exec -it statefulset/qinglong -- ql check
-kubectl -n qinglong exec -it statefulset/qinglong -- ql update
+kubectl -n zhixu logs -f statefulset/zhixu
 ```

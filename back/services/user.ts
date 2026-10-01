@@ -400,7 +400,7 @@ export default class UserService {
     if (authInfo.twoFactorActivated) {
       throw new Error(t('请先关闭两步验证'));
     }
-    const otpauth = authenticator.keyuri(authInfo.username, 'qinglong', secret);
+    const otpauth = authenticator.keyuri(authInfo.username, 'ZhiXu', secret);
     await this.updateAuthInfo(authInfo, { twoFactorSecret: secret });
     return { secret, url: otpauth };
   }
@@ -546,8 +546,8 @@ export default class UserService {
     const code = Math.random().toString().slice(-6);
     const isSuccess = await this.notificationService.testNotify(
       notificationInfo,
-      t('青龙'),
-      t('【蛟龙】测试通知 https://t.me/jiao_long'),
+      t('枝序'),
+      t('ZhiXu 测试通知 https://github.com/anysoft/ZhiXu'),
     );
     if (isSuccess) {
       const result = await this.updateAuthDb({

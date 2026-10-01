@@ -44,7 +44,7 @@ export const useTheme = () => {
 
   const reloadTheme = () => {
     const media = window.matchMedia('(prefers-color-scheme: dark)');
-    const storageTheme = localStorage.getItem('qinglong_dark_theme');
+    const storageTheme = localStorage.getItem('zhixu_dark_theme');
     const isDark =
       (media.matches && storageTheme !== 'light') || storageTheme === 'dark';
     setTheme(isDark ? 'vs-dark' : 'vs');
@@ -52,7 +52,7 @@ export const useTheme = () => {
 
   useEffect(() => {
     const media = window.matchMedia('(prefers-color-scheme: dark)');
-    const storageTheme = localStorage.getItem('qinglong_dark_theme');
+    const storageTheme = localStorage.getItem('zhixu_dark_theme');
     const isDark =
       (media.matches && storageTheme !== 'light') || storageTheme === 'dark';
     setTheme(isDark ? 'vs-dark' : 'vs');

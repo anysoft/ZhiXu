@@ -55,9 +55,9 @@ export class synologyChatNotification extends NotificationBaseInfo {
 
 export class BarkNotification extends NotificationBaseInfo {
   public barkPush = '';
-  public barkIcon = 'https://qn.whyour.cn/logo.png';
+  public barkIcon = '';
   public barkSound = '';
-  public barkGroup = 'qinglong';
+  public barkGroup = 'zhixu';
   public barkLevel = 'active';
   public barkUrl = '';
   public barkArchive = '';

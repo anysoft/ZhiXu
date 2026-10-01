@@ -2,7 +2,7 @@ import intl from 'react-intl-universal';
 const baseUrl = window.__ENV__QlBaseUrl || '/';
 
 export default {
-  siteName: intl.get('青龙'),
+  siteName: intl.get('枝序'),
   baseUrl,
   apiPrefix: `${baseUrl}api/`,
   authKey: 'token',
@@ -159,7 +159,7 @@ export default {
       },
       {
         label: 'barkGroup',
-        tip: intl.get('BARK推送消息的分组，默认为qinglong'),
+        tip: intl.get('BARK推送消息的分组，默认为zhixu'),
       },
       {
         label: 'barkLevel',
@@ -232,7 +232,7 @@ export default {
       {
         label: 'weWorkAppKey',
         tip: intl.get(
-          'corpid、corpsecret、touser(注:多个成员ID使用|隔开)、agentid、消息类型(选填，不填默认文本消息类型) 注意用,号隔开(英文输入法的逗号)，例如：wwcfrs,B-76WERQ,qinglong,1000001,2COat',
+          'corpid、corpsecret、touser(注:多个成员ID使用|隔开)、agentid、消息类型(选填，不填默认文本消息类型) 注意用,号隔开(英文输入法的逗号)，例如：wwcfrs,B-76WERQ,zhixu,1000001,2COat',
         ),
         required: true,
       },

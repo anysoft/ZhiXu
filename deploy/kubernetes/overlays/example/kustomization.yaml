@@ -5,6 +5,6 @@ resources:
   - ../../base
 
 images:
-  - name: whyour/qinglong
-    newName: registry.example.com/whyour/qinglong
-    newTag: debian
+  - name: anysoft/zhixu
+    newName: registry.example.com/anysoft/zhixu
+    newTag: 1.0.0-rc.1

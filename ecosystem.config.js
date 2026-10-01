@@ -3,7 +3,7 @@ const isContainer = process.env.QL_CONTAINER === 'true';
 module.exports = {
   apps: [
     {
-      name: 'qinglong',
+      name: 'zhixu',
       // Keep process supervision; enable injected diagnostics only on demand
       // in containers. Standalone installs retain PM2's monitoring default.
       pmx: !isContainer || process.env.QL_PRIMARY_APM === 'true',

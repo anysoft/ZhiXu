@@ -13,7 +13,7 @@ export default defineConfig({
   },
   outputPath: 'static/dist',
   fastRefresh: true,
-  favicons: [`https://qn.whyour.cn/favicon.svg`],
+  favicons: ['/favicon.svg'],
   publicPath: process.env.NODE_ENV === 'production' ? './' : '/',
   proxy: {
     [`${baseUrl}api`]: {

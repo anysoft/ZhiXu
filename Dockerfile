@@ -38,11 +38,11 @@ COPY --from=build /build/scripts/release/entrypoint.cjs /build/scripts/release/h
 ARG SOURCE_COMMIT
 ARG BUILD_CREATED
 ARG APP_VERSION
-LABEL org.opencontainers.image.title="qinglong" \
+LABEL org.opencontainers.image.title="ZhiXu" \
       org.opencontainers.image.description="Git-native script automation platform" \
       org.opencontainers.image.version=$APP_VERSION \
       org.opencontainers.image.revision=$SOURCE_COMMIT \
-      org.opencontainers.image.source="https://github.com/anysoft/qinglong" \
+      org.opencontainers.image.source="https://github.com/anysoft/ZhiXu" \
       org.opencontainers.image.created=$BUILD_CREATED \
       org.opencontainers.image.licenses="Apache-2.0"
 ENV NODE_ENV=production DATA_DIR=/data/state BACKUP_DIR=/backup HOME=/data/home \

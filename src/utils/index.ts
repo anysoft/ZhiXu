@@ -169,7 +169,7 @@ export default function browserType() {
     'color: yellow;font-size: 18px;',
   );
   console.log(
-    `%c青龙运行环境:\n\n系统：${result.system}/${result.systemVs}\n浏览器：${result.supporter}/${result.supporterVs}\n内核：${result.engine}/${result.engineVs}`,
+    `%c枝序运行环境:\n\n系统：${result.system}/${result.systemVs}\n浏览器：${result.supporter}/${result.supporterVs}\n内核：${result.engine}/${result.engineVs}`,
     'color: green;font-size: 14px;font-weight: bold;',
   );
 

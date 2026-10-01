@@ -89,7 +89,7 @@ const Error = () => {
                   {intl.get(
                     '3. 如果无法解决，容器内执行 ql log，拷贝执行结果',
                   )}
-                  <Typography.Link href="https://github.com/whyour/qinglong/issues/new?assignees=&labels=&template=bug_report.yml">
+                  <Typography.Link href="https://github.com/anysoft/ZhiXu/issues/new?assignees=&labels=&template=bug_report.yml">
                     {intl.get('提交 issue')}
                   </Typography.Link>
                 </div>
