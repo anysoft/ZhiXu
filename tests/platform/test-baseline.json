@@ -587,6 +587,10 @@
     "classification": "PLATFORM_CORE"
   },
   {
+    "path": "tests/phase14/operation-read.test.cjs",
+    "classification": "PLATFORM_CORE"
+  },
+  {
     "path": "tests/phase14/barrier.test.cjs",
     "classification": "PLATFORM_CORE"
   },

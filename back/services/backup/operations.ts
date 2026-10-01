@@ -96,7 +96,11 @@ export class BackupOperations {
     return { id, status: 'QUEUED' };
   }
   async get(id: string) {
-    return readJson(await this.paths.bucket('operations', backupId(id)));
+    return readJson(
+      await this.paths.bucket('operations', backupId(id)),
+      undefined,
+      true, // Progress updates atomically replace this operation's JSON file.
+    );
   }
   async recover() {
     await this.exclusive(async () => {

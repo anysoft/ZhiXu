@@ -62,25 +62,39 @@ export async function privateDirectory(directory: string, create = false) {
     fail('BACKUP_PERMISSION_INVALID');
   return absolute;
 }
-export async function openRegular(file: string, privateFile = true) {
-  const handle = await fs.open(
-    file,
-    constants.O_RDONLY | constants.O_NOFOLLOW | constants.O_NONBLOCK,
-  );
-  try {
-    const stat = await handle.stat();
-    if (
-      !stat.isFile() ||
-      stat.nlink !== 1 ||
-      (process.getuid && stat.uid !== process.getuid()) ||
-      (privateFile && stat.mode & 0o077)
-    )
-      fail('BACKUP_FILE_INVALID');
-    return handle;
-  } catch (e) {
-    await handle.close();
-    throw e;
+export async function openRegular(
+  file: string,
+  privateFile = true,
+  reopenReplaced = false,
+) {
+  // Operation progress is published with rename. An inode opened just before
+  // replacement can have nlink=0 at fstat; close it and validate the new path.
+  // Other consumers retain strict single-open semantics.
+  for (let attempt = 0; attempt < (reopenReplaced ? 3 : 1); attempt++) {
+    const handle = await fs.open(
+      file,
+      constants.O_RDONLY | constants.O_NOFOLLOW | constants.O_NONBLOCK,
+    );
+    try {
+      const stat = await handle.stat();
+      if (
+        !stat.isFile() ||
+        (process.getuid && stat.uid !== process.getuid()) ||
+        (privateFile && stat.mode & 0o077)
+      )
+        fail('BACKUP_FILE_INVALID');
+      if (stat.nlink === 0 && reopenReplaced) {
+        await handle.close();
+        continue;
+      }
+      if (stat.nlink !== 1) fail('BACKUP_FILE_INVALID');
+      return handle;
+    } catch (e) {
+      await handle.close();
+      throw e;
+    }
   }
+  return fail('BACKUP_FILE_INVALID');
 }
 export async function syncDirectory(directory: string) {
   const handle = await fs.open(
@@ -112,8 +126,12 @@ export async function privateJson(file: string, data: unknown) {
     });
   }
 }
-export async function readJson(file: string, max = 1024 * 1024) {
-  const handle = await openRegular(file);
+export async function readJson(
+  file: string,
+  max = 1024 * 1024,
+  reopenReplaced = false,
+) {
+  const handle = await openRegular(file, true, reopenReplaced);
   try {
     if ((await handle.stat()).size > max) fail('BACKUP_LIMIT');
     return JSON.parse(await handle.readFile('utf8'));

@@ -42,7 +42,7 @@ jobs:
       - name: Install archive promotion tool
         run: sudo apt-get update && sudo apt-get install -y --no-install-recommends skopeo
       - name: Validate release harness
-        run: node --test tests/phase16b/release.test.cjs tests/phase16b/qualification.test.cjs
+        run: node --test tests/phase16b/release.test.cjs tests/phase16b/qualification.test.cjs tests/phase16b/backup-operation.test.cjs
       - name: Build target-native OCI image with SBOM and provenance
         run: node scripts/release/build.cjs
       - name: Real container acceptance

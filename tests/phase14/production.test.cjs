@@ -108,3 +108,18 @@ test('failed managed resource remains visible and prevents a false successful re
 test('runtime restore invalidates physical Python provider while retaining logical Node catalog provider',async t=>{
  const h=await fixture(t),db=await backupDatabase(path.join(h.data,'db/database.sqlite'),true);await db.all("INSERT INTO RuntimeProviders(id,language,provider_type,state,install_root,createdAt,updatedAt) VALUES(1,'PYTHON','PYENV','READY','runtime/python/pyenv',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP),(2,'NODE','NODE_DISTRIBUTION','READY','runtime/node',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP)");await db.close();await new(require('../../back/services/backup/runtimeRestore.ts').RuntimeRestoreReconciler)().reconcile(h.data);const restored=await backupDatabase(path.join(h.data,'db/database.sqlite'));assert.deepEqual((await restored.all('SELECT state FROM RuntimeProviders ORDER BY id')).map(r=>r.state),['MISSING','READY']);await restored.close();
 });
+
+test('operation status endpoint reader survives progress publication between open and fstat', async t => {
+ const h=await fixture(t),{BackupOperations}=require('../../back/services/backup/operations.ts'),{privateJson}=require('../../back/services/backup/files.ts');
+ await h.paths.initialize();
+ const id=require('node:crypto').randomUUID(),file=await h.paths.bucket('operations',id);
+ await privateJson(file,{id,kind:'REBUILD',status:'RUNNING'});
+ const original=fs.open;let reads=0;const handles=[];
+ t.mock.method(fs,'open',async function(name,...args){
+  const handle=await original.call(fs,name,...args);
+  if(name===file){handles.push(handle);if(++reads===1)await privateJson(file,{id,kind:'REBUILD',status:'SUCCESS',result:{rebuilt:true}});}
+  return handle;
+ });
+ assert.deepEqual(await new BackupOperations(h.paths).get(id),{id,kind:'REBUILD',status:'SUCCESS',result:{rebuilt:true}});
+ assert.equal(reads,2);assert.ok(handles.every(handle=>handle.fd===-1));
+});
