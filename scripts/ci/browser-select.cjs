@@ -7,7 +7,10 @@ async function chooseSelect(page, scope, label, text, { timeout = 20000 } = {}) 
   const remaining = () => Math.max(1, deadline - Date.now());
   const input = scope.getByRole('combobox', { name: label, exact: true });
   await input.waitFor({ state: 'visible', timeout: remaining() });
-  await input.click({ trial: true, timeout: remaining() });
+  // The selected label intentionally covers rc-select's readonly input.
+  // Test pointer actionability on the same wrapper used for the real click.
+  await input.locator('xpath=ancestor::div[contains(@class,"ant-select-selector")]')
+    .click({ trial: true, timeout: remaining() });
   const handle = await input.elementHandle();
   try {
     await page.waitForFunction(el => {
