@@ -1,5 +1,9 @@
 [
   {
+    "path": "tests/phase16b/bump-version.test.cjs",
+    "classification": "PLATFORM_CORE"
+  },
+  {
     "path": "tests/phase15/convergence.test.cjs",
     "classification": "PLATFORM_CORE"
   },

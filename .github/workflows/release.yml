@@ -24,6 +24,9 @@ jobs:
           RELEASE_BRANCH: ${{ vars.RELEASE_BRANCH }}
         run: node scripts/release/metadata.cjs
   qualification:
+    permissions:
+      contents: read
+      actions: read
     needs: policy
     uses: ./.github/workflows/container-qualification.yml
   publish:
@@ -32,6 +35,7 @@ jobs:
     timeout-minutes: 45
     permissions:
       contents: write
+      actions: read
     env:
       RELEASE_BRANCH: ${{ vars.RELEASE_BRANCH }}
       DOCKERHUB_IMAGE: ${{ vars.DOCKERHUB_IMAGE }}
@@ -46,14 +50,36 @@ jobs:
           node-version: '22.23.2'
           package-manager-cache: false
       - uses: docker/setup-buildx-action@v4
+      - name: Select qualified image artifacts
+        id: images
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const assert = require('node:assert/strict');
+            const { selectReceipts } = require('./scripts/release/qualification-receipts.cjs');
+            const artifacts = await github.paginate(github.rest.actions.listWorkflowRunArtifacts, {
+              ...context.repo, run_id: context.runId, per_page: 100
+            });
+            for (const receipt of selectReceipts(artifacts, process.env)) {
+              const name = receipt.artifact_name.replace(/^container-gates-/, 'container-');
+              const matches = artifacts.filter(artifact => artifact.name === name);
+              assert.equal(matches.length, 1, `MISSING_OR_AMBIGUOUS_IMAGE:${name}`);
+              assert.equal(matches[0].expired, false, `EXPIRED_IMAGE:${name}`);
+              core.info(`${receipt.architecture}: ${name} (ID ${matches[0].id})`);
+              core.setOutput(receipt.architecture, String(matches[0].id));
+            }
       - uses: actions/download-artifact@v7
         with:
-          name: container-amd64-${{ github.run_id }}-${{ github.run_attempt }}-${{ github.sha }}
+          artifact-ids: ${{ steps.images.outputs.amd64 }}
+          github-token: ${{ github.token }}
           path: release-input/amd64
+          merge-multiple: true
       - uses: actions/download-artifact@v7
         with:
-          name: container-arm64-${{ github.run_id }}-${{ github.run_attempt }}-${{ github.sha }}
+          artifact-ids: ${{ steps.images.outputs.arm64 }}
+          github-token: ${{ github.token }}
           path: release-input/arm64
+          merge-multiple: true
       - name: Install exact-image promotion tool
         run: sudo apt-get update && sudo apt-get install -y --no-install-recommends skopeo
       - uses: docker/login-action@v4

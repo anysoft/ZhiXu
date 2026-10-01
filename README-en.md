@@ -23,7 +23,7 @@
 
 ## Release candidate
 
-The current source prepares `v1.0.0-rc.1`. Qualified source `505c0bac` passed [Container Qualification #6](https://github.com/anysoft/ZhiXu/actions/runs/36816777711). The branding commit must pass the same qualification before an RC tag or release is created.
+The current source prepares `v1.0.0-rc.3`. Qualified source `505c0bac` passed [Container Qualification #6](https://github.com/anysoft/ZhiXu/actions/runs/36816777711). The branding commit must pass the same qualification before an RC tag or release is created.
 
 Download `compose.yaml`, `.env.example`, `release-manifest.json`, and `SHA256SUMS` from the same verified GitHub Release. After checking the hashes:
 

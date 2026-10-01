@@ -108,7 +108,8 @@ function audit() {
       `LEGACY_BRAND_ON_RELEASE_SURFACE:${releaseFile}`);
   const packageInfo = JSON.parse(fs.readFileSync('package.json', 'utf8'));
   assert.equal(packageInfo.name, '@anysoft/zhixu');
-  assert.equal(packageInfo.version, '1.0.0-rc.1');
+  const versions = require('../release/bump-version.cjs');
+  versions.validateSources(versions.readSources(process.cwd()), packageInfo.version);
   assert.equal(packageInfo.repository.url, 'https://github.com/anysoft/ZhiXu.git');
   assert.match(fs.readFileSync('Dockerfile', 'utf8'), /org\.opencontainers\.image\.title="ZhiXu"/);
   for (const file of ['shell/task.sh', 'shell/otask.sh', 'back/taskExecution.ts', 'tests/phase5/snapshot-main.cjs'])

@@ -23,7 +23,7 @@
 
 ## Release Candidate
 
-当前版本为 `v1.0.0-rc.1` 候选源码。Qualified source `505c0bac` 已通过 [Container Qualification #6](https://github.com/anysoft/ZhiXu/actions/runs/36816777711)；品牌迁移后的提交仍需重新完成同一资格流程，之后才会创建 RC tag 和发布产物。
+当前版本为 `v1.0.0-rc.3` 候选源码。Qualified source `505c0bac` 已通过 [Container Qualification #6](https://github.com/anysoft/ZhiXu/actions/runs/36816777711)；品牌迁移后的提交仍需重新完成同一资格流程，之后才会创建 RC tag 和发布产物。
 
 从同一个已验证 GitHub Release 下载 `compose.yaml`、`.env.example`、`release-manifest.json` 和 `SHA256SUMS`。校验后运行：
 
