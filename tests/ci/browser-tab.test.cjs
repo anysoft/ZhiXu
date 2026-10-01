@@ -3,6 +3,7 @@ const { test, before, after } = require('node:test');
 const assert = require('node:assert/strict');
 const path = require('node:path');
 const { activateTab } = require('../../scripts/ci/browser-tab.cjs');
+const { chooseSelect } = require('../../scripts/ci/browser-select.cjs');
 const { chromium } = require(path.join(process.env.QL_BROWSER_RUNTIME || '/tmp/qinglong-phase45b-browser/node_modules', 'playwright'));
 let browser;
 before(async () => { browser = await chromium.launch({ headless: true,
@@ -80,6 +81,43 @@ test('real Ant Design modal with overflowing tabs switches Source, Runtime and S
         const pane = await activateTab(page.getByRole('dialog'), name, {timeout: 5000});
         assert.equal(await pane.innerText(), name + ' content');
       }
+    }
+  } finally { await page.close(); }
+});
+
+test('select in animated nested Ant Design modal picks its own option and fails for missing options', async () => {
+  const page = await browser.newPage();
+  try {
+    await page.setContent('<div id="root"></div>');
+    await page.addStyleTag({path: require.resolve('antd/dist/antd.css')});
+    for (const file of ['react/umd/react.development.js', 'react-dom/umd/react-dom.development.js', 'moment/min/moment.min.js', 'antd/dist/antd.min.js']) {
+      const parts = file.split('/');
+      await page.addScriptTag({path: path.join(path.dirname(require.resolve(parts.shift() + '/package.json')), ...parts)});
+    }
+    await page.evaluate(() => {
+      const h = React.createElement;
+      function Fixture() {
+        const [open, setOpen] = React.useState(false);
+        return h(antd.Modal, {open: true, title: 'Task'},
+          h('button', {onClick: () => setOpen(true)}, 'Add binding'),
+          h(antd.Modal, {open, title: 'Config Binding', destroyOnClose: true, onCancel: () => setOpen(false)},
+            h(antd.Form, {layout: 'vertical'},
+              h(antd.Form.Item, {name: 'asset', label: 'Config Asset'},
+                h(antd.Select, {options: [{value: 42, label: 'Task Config'}]})))));
+      }
+      ReactDOM.createRoot(document.getElementById('root')).render(h(Fixture));
+    });
+    for (let round = 0; round < 5; round++) {
+      await page.getByRole('button', {name: 'Add binding'}).click();
+      const modal = page.getByRole('dialog', {name: 'Config Binding', exact: true});
+      await chooseSelect(page, modal, 'Config Asset', 'Task Config', {timeout: 5000});
+      assert.equal(await modal.locator('.ant-select-selection-item').innerText(), 'Task Config');
+      if (round === 4) {
+        await assert.rejects(chooseSelect(page, modal, 'Config Asset', 'Missing option', {timeout: 700}));
+        break;
+      }
+      await modal.getByRole('button', {name: 'Close', exact: true}).click();
+      await modal.waitFor({state: 'hidden'});
     }
   } finally { await page.close(); }
 });
