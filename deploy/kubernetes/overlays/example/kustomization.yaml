@@ -7,4 +7,4 @@ resources:
 images:
   - name: anysoft/zhixu
     newName: registry.example.com/anysoft/zhixu
-    newTag: 1.0.0-rc.3
+    newTag: 1.0.0-rc.4
