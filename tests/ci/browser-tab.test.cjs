@@ -102,6 +102,8 @@ test('select in animated nested Ant Design modal picks its own option and fails 
           h('button', {onClick: () => setOpen(true)}, 'Add binding'),
           h(antd.Modal, {open, title: 'Config Binding', destroyOnClose: true, onCancel: () => setOpen(false)},
             h(antd.Form, {layout: 'vertical', initialValues: {auth: 'anonymous'}},
+              h(antd.Form.Item, {name: 'entry', label: 'Entrypoint', rules: [{required: true}]},
+                h(antd.Select, {showSearch: true, options: [{value: 'job.py', label: 'job.py'}]})),
               h(antd.Form.Item, {name: 'auth', label: '认证方式'},
                 h(antd.Select, {options: [{value: 'anonymous', label: 'anonymous'}, {value: 'ssh_key', label: 'ssh_key'}]})),
               h(antd.Form.Item, {name: 'asset', label: 'Config Asset'},
@@ -112,10 +114,11 @@ test('select in animated nested Ant Design modal picks its own option and fails 
     for (let round = 0; round < 5; round++) {
       await page.getByRole('button', {name: 'Add binding'}).click();
       const modal = page.getByRole('dialog', {name: 'Config Binding', exact: true});
+      await chooseSelect(page, modal, 'Entrypoint', 'job.py', {timeout: 5000});
       await chooseSelect(page, modal, 'Config Asset', 'Task Config', {timeout: 5000});
       await chooseSelect(page, modal, '认证方式', 'ssh_key', {timeout: 5000});
       await chooseSelect(page, modal, '认证方式', 'anonymous', {timeout: 5000});
-      assert.deepEqual(await modal.locator('.ant-select-selection-item').allInnerTexts(), ['anonymous', 'Task Config']);
+      assert.deepEqual(await modal.locator('.ant-select-selection-item').allInnerTexts(), ['job.py', 'anonymous', 'Task Config']);
       if (round === 4) {
         await assert.rejects(chooseSelect(page, modal, 'Config Asset', 'Missing option', {timeout: 700}));
         break;

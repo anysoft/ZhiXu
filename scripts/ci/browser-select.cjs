@@ -5,7 +5,9 @@
 async function chooseSelect(page, scope, label, text, { timeout = 20000 } = {}) {
   const deadline = Date.now() + timeout;
   const remaining = () => Math.max(1, deadline - Date.now());
-  const input = scope.getByRole('combobox', { name: label, exact: true });
+  // Ant Design's required-marker CSS can alter the accessible name used by
+  // getByRole. Resolve the associated form label instead, as the UI exposes it.
+  const input = scope.getByLabel(label, { exact: true });
   await input.waitFor({ state: 'visible', timeout: remaining() });
   // The selected label intentionally covers rc-select's readonly input.
   // Test pointer actionability on the same wrapper used for the real click.
