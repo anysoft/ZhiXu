@@ -102,7 +102,7 @@ jobs:
         run: |
           prerelease=()
           if [[ "$GITHUB_REF_NAME" == *-* ]]; then prerelease=(--prerelease); fi
-          gh release create "$GITHUB_REF_NAME" --verify-tag --title "$GITHUB_REF_NAME" --notes-file release-output/release-notes.md "${prerelease[@]}" release-output/*.json release-output/compose.yaml release-output/.env.example release-output/SHA256SUMS release-output/release-notes.md
+          gh release create "$GITHUB_REF_NAME" --verify-tag --title "$GITHUB_REF_NAME" --notes-file release-output/release-notes.md "${prerelease[@]}" release-output/*.json release-output/compose.yaml release-output/container.env.example release-output/SHA256SUMS release-output/release-notes.md
       - name: Verify published release flags and assets
         run: |
           gh release view "$GITHUB_REF_NAME" --json tagName,isDraft,isPrerelease,assets > release-output/github-release.json

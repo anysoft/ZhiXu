@@ -6,7 +6,7 @@ No public RC image has been published yet. Use only the image digest and release
 
 ## Start from a verified release
 
-Download `compose.yaml` and `.env.example` from the same verified release. Check `SHA256SUMS`, copy `.env.example` to `.env`, set `DOCKERHUB_IMAGE` from `release-manifest.json`, and select the exact `PLATFORM_VERSION`. Then run:
+Download `compose.yaml` and `container.env.example` from the same verified release. Check `SHA256SUMS`, copy `container.env.example` to `.env`, set `DOCKERHUB_IMAGE` from `release-manifest.json`, and select the exact `PLATFORM_VERSION`. Then run:
 
 ```sh
 docker compose config --quiet
