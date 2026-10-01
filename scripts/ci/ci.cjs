@@ -340,7 +340,7 @@ async function managed(s) {
   }
 }
 async function browser(s) {
-  let failure;
+  let failure, failureDetail;
   try {
     await build(s);
     await provision(s);
@@ -365,6 +365,7 @@ async function browser(s) {
         {},
         1200,
       );
+    await run(s, 'browser-tab-tests', [process.execPath, '--test', 'tests/ci/browser-tab.test.cjs'], extra, 120);
     for (const [phase, file] of [
       ['phase12', 'browser-e2e.cjs'],
       ['phase14', 'platform-e2e.cjs'],
@@ -378,11 +379,23 @@ async function browser(s) {
       );
   } catch (e) {
     failure = e;
+    if (e.stage === 'browser-phase14') {
+      try {
+        const detail = JSON.parse(fs.readFileSync(path.join(s.output, 'browser/phase14/platform-e2e.json')));
+        const match = /^Error: BROWSER_TAB_ACTIVATION_FAILED:([A-Za-z ]{1,40}):stage=(visible|focus|click|selected|panel):state=/.exec(detail.error || '');
+        if (match) {
+          failureDetail = { code: 'BROWSER_TAB_ACTIVATION_FAILED', tab: match[1], stage: match[2] };
+          console.error(`${failureDetail.code}: tab=${failureDetail.tab}, stage=${failureDetail.stage}; see browser/phase14/platform-e2e.json`);
+        }
+      } catch {} // Diagnostics must not replace the original failing stage.
+    }
     throw e;
   } finally {
     atomic(path.join(s.output, 'browser-summary.json'), {
       status: failure ? 'FAIL' : 'PASS',
       failed_stage: failure ? failure.stage || 'browser' : null,
+      failure_detail: failureDetail || null,
+      tab_interaction: stageEvidence(s, 'browser-tab-tests'),
       backend_build: stageEvidence(s, 'backend-build'),
       frontend_build: stageEvidence(s, 'frontend-build'),
       scenarios: ['phase12', 'phase14'].map((phase) => ({

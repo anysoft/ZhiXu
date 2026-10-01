@@ -110,12 +110,8 @@ async function until(fn){const deadline=Date.now()+60000;let last;while(Date.now
  await operation('/runtime/node/catalog');await operation('/runtime/node/installations',{version:require('./managed-node/result.json').runtime.version});const nodeRuntime=(await checked('/runtime/node/installations'))[0];await operation('/runtime/node/toolchains',{runtime_id:nodeRuntime.id,manager_type:'NPM'});const tool=(await checked('/runtime/node/toolchains'))[0];
  const nodeEnv=await checked('/runtime/node/environments','POST',{name:'Task Node Environment',runtime_id:nodeRuntime.id,toolchain_id:tool.id,dependencies:[{name:'ql-phase8-foo',specifier:'1.0.0',type:'DEPENDENCY'}],install_scripts_policy:'IGNORE'});await operation(`/runtime/node/environments/${nodeEnv.id}/build`,{expected_version:nodeEnv.version});mark('real-python-venv-and-node-dependency-environments');
  const dialog=()=>page.locator('.ant-modal:visible').filter({has:page.locator('.ant-modal-title').filter({hasText:/^(Task:|Create Task)/})});
- async function taskTab(name){
-  const tab=dialog().getByRole('tab',{name,exact:true});await tab.click();
-  await until(async()=>await tab.getAttribute('aria-selected')==='true');
-  const panelId=await tab.getAttribute('aria-controls');assert.ok(panelId,`${name} tab has no controlled panel`);
-  const pane=dialog().locator(`[id="${panelId}"]`);await pane.waitFor({state:'visible'});assert.match(await pane.getAttribute('class'),/\bant-tabs-tabpane-active\b/);return pane;
- }
+ const {activateTab}=require('../../scripts/ci/browser-tab.cjs');
+ async function taskTab(name){return activateTab(dialog(),name);}
  async function edit(task){await page.goto(base+'/tasks');await page.getByRole('button',{name:task.name,exact:true}).click();await dialog().waitFor();}
  async function save(){const response=page.waitForResponse(r=>/\/api\/tasks(?:\/\d+)?$/.test(new URL(r.url()).pathname)&&['POST','PUT'].includes(r.request().method()));await dialog().getByRole('button',{name:'Save Task',exact:true}).click();const r=await(await response).json();assert.equal(r.code,200,JSON.stringify(r));return r.data;}
  for(const task of tasks){await edit(task);const sourcePane=await taskTab('Source');assert.equal(await sourcePane.getByLabel('Worktree',{exact:true}).isDisabled(),true);const runtimePane=await taskTab('Runtime');if(task.resources.source.language!=='SHELL'){const isPy=task.resources.source.language==='PYTHON',environment=runtimePane.getByLabel(isPy?'Python Environment':'Node Environment',{exact:true});await environment.waitFor({state:'visible'});await environment.locator('xpath=ancestor::div[contains(@class,"ant-select-selector")]').click();await page.locator('.ant-select-dropdown:visible').getByText(new RegExp(isPy?'Task Python Environment':'Task Node Environment')).click();}
