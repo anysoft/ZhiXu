@@ -3,7 +3,8 @@ const fs = require('node:fs'),
   { spawn, execFileSync } = require('node:child_process');
 const { repository, environment, atomic } = require('./context.cjs');
 async function run(s, name, args, extra = {}, seconds = 3600) {
-  if (!/^[a-z0-9-]+$/.test(name)) throw Error('INVALID_STAGE');
+  // Canonical locale stage IDs include region capitals (e.g. i18n-zh-CN).
+  if (!/^[A-Za-z0-9-]+$/.test(name)) throw Error('INVALID_STAGE');
   const log = path.join(s.output, 'logs', name + '.log');
   fs.mkdirSync(path.dirname(log), { recursive: true, mode: 0o700 });
   const fd = fs.openSync(log, 'w', 0o600);

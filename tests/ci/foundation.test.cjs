@@ -358,3 +358,57 @@ runner.run = (s, name) => original(s, name, [process.execPath, '-e', process.env
         assert.equal(scenario.status, 'NOT_RUN');
   }
 });
+
+test('browser orchestration runs canonical locale stages and collects their exact receipts', (t) => {
+  const s = fixture(t), checkout = path.join(s.root, 'browser-checkout');
+  for (const name of ['scripts/ci', 'shell', 'sample'])
+    fs.cpSync(path.join(repository, name), path.join(checkout, name), { recursive: true });
+  const probe = path.join(checkout, 'probe.cjs');
+  // Keep the real orchestration, stage validation, child supervision and receipts.
+  // Replace expensive builds/provision/browser payloads with a successful child.
+  fs.writeFileSync(probe, `
+const assert = require('node:assert/strict'), path = require('node:path');
+const runner = require('./scripts/ci/runner.cjs'), original = runner.run;
+runner.run = (s, name, args, extra, seconds) => {
+  if (/^(i18n|branding)-/.test(name)) {
+    assert.ok(['zh-CN', 'en-US'].includes(extra.QL_I18N_LOCALE));
+    assert.equal(path.basename(extra.QL_ACCEPTANCE_DIR), name);
+  }
+  return original(s, name, [process.execPath, '-e', 'console.log("stage payload completed")'], extra, seconds);
+};
+`);
+  const output = path.join(s.output, 'browser');
+  const result = require('node:child_process').spawnSync(process.execPath,
+    ['-r', probe, 'scripts/ci/ci.cjs', 'browser'], {
+      cwd: checkout, env: { ...process.env, CI_OUTPUT: output },
+      encoding: 'utf8', timeout: 60000,
+    });
+  const state = path.join(output, '.state.json');
+  if (fs.existsSync(state)) {
+    const nested = JSON.parse(fs.readFileSync(state));
+    t.after(() => cleanup(nested));
+  }
+  assert.equal(result.status, 0, result.stdout + result.stderr);
+  const summary = JSON.parse(fs.readFileSync(path.join(output, 'browser-summary.json')));
+  assert.equal(summary.status, 'PASS');
+  assert.equal(summary.failed_stage, null);
+  assert.equal(summary.i18n.length, 2);
+  assert.equal(summary.branding.length, 4);
+  for (const stage of [...summary.scenarios, ...summary.i18n, ...summary.branding]) {
+    assert.equal(stage.status, 'PASS', stage.name);
+    assert.equal(stage.exit_code, 0, stage.name);
+    assert.match(fs.readFileSync(path.join(output, 'logs', stage.name + '.log'), 'utf8'), /stage payload completed/);
+  }
+  assert.deepEqual(summary.i18n.map(x => x.name), ['i18n-zh-CN', 'i18n-en-US']);
+  assert.deepEqual(summary.branding.map(x => x.name), [
+    'branding-zh-CN-zh-CN', 'branding-zh-CN-system',
+    'branding-en-US-en-US', 'branding-en-US-system',
+  ]);
+});
+
+test('stage names still reject path separators, traversal and whitespace before spawning', async (t) => {
+  const s = fixture(t), { run } = require('../../scripts/ci/runner.cjs');
+  for (const name of ['', '../outside', 'a/b', 'a\\b', 'a.b', 'a b', 'a\nb', 'a;echo'])
+    await assert.rejects(run(s, name, [process.execPath, '-e', 'process.exit(0)']), /INVALID_STAGE/);
+  assert.deepEqual(fs.readdirSync(path.join(s.output, 'logs')), []);
+});

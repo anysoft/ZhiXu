@@ -27198,5 +27198,15 @@
     "classification": "HISTORICAL_EVIDENCE_KEEP",
     "action": "KEEP",
     "reason": "Exact report heading identifies the technical contracts excluded by the requested internationalization scope; it introduces no compatibility implementation or product branding."
+  },
+  "09aafffb8b0e4cc3e294c52018b71e30e4d2b6057fabab47ebc76a2acd0538f4": {
+    "classification": "TEST_FIXTURE_REVIEW",
+    "action": "KEEP",
+    "reason": "CI regression asserts the existing browser locale environment contract keeps canonical language values; not a product display label."
+  },
+  "fbb7fedc531ce7a57e3cabcc19c5da4468b63f84c44eff9baf05913278c06fa4": {
+    "classification": "TEST_FIXTURE_REVIEW",
+    "action": "KEEP",
+    "reason": "CI regression checks the existing acceptance output environment contract matches the stage receipt name; not a product display label."
   }
 }
