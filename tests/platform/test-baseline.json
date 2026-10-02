@@ -641,5 +641,13 @@
   {
     "path": "tests/i18n/presentation.test.cjs",
     "classification": "PLATFORM_CORE"
+  },
+  {
+    "path": "tests/branding/brand.test.cjs",
+    "classification": "PLATFORM_CORE"
+  },
+  {
+    "path": "tests/branding/notifications.test.cjs",
+    "classification": "PLATFORM_CORE"
   }
 ]

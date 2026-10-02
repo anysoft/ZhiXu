@@ -1,3 +1,4 @@
+import { PRODUCT_NAME } from '@/utils/brand';
 import { formatBytes } from '@/utils/format';
 import { t as tr } from '@/utils/i18n';
 import {
@@ -201,14 +202,14 @@ const Other = ({
         <Form.Item
           label={intl.get('面板标题')}
           name="panelTitle"
-          tooltip={intl.get('自定义面板的站点标题，留空使用默认值“枝序”')}
+          tooltip={intl.get('ui.brandTitleHelp', { productName: PRODUCT_NAME })}
         >
           <Input.Group compact>
             <Input
               style={{ width: 180 }}
               maxLength={100}
               value={systemConfig?.panelTitle || ''}
-              placeholder={intl.get('留空使用默认值“枝序”')}
+              placeholder={intl.get('ui.brandDefaultTitle', { productName: PRODUCT_NAME })}
               onChange={(e) => {
                 setSystemConfig({
                   ...systemConfig,

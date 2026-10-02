@@ -1,3 +1,4 @@
+import { PRODUCT_NAME } from '@/utils/brand';
 import intl from 'react-intl-universal';
 import { LANG_MAP, LOG_END_SYMBOL } from './const';
 import CronExpressionParser from 'cron-parser';
@@ -161,7 +162,7 @@ export default function browserType() {
   );
 
   console.log(
-    "%c\n .d88b.  d888888b d8b   db  d888b  db       .d88b.  d8b   db  d888b  \n.8P  Y8.   `88'   888o  88 88' Y8b 88      .8P  Y8. 888o  88 88' Y8b \n88    88    88    88V8o 88 88      88      88    88 88V8o 88 88      \n88    88    88    88 V8o88 88  ooo 88      88    88 88 V8o88 88  ooo \n`8P  d8'   .88.   88  V888 88. ~8~ 88booo. `8b  d8' 88  V888 88. ~8~ \n `Y88'Y8 Y888888P VP   V8P  Y888P  Y88888P  `Y88P'  VP   V8P  Y888P  \n                                                                     \n                                                                     \n",
+    `%c${PRODUCT_NAME}`,
     'color: blue;font-size: 14px;',
   );
   console.log(
@@ -169,7 +170,7 @@ export default function browserType() {
     'color: yellow;font-size: 18px;',
   );
   console.log(
-    `%c枝序运行环境:\n\n系统：${result.system}/${result.systemVs}\n浏览器：${result.supporter}/${result.supporterVs}\n内核：${result.engine}/${result.engineVs}`,
+    '%c' + intl.get('ui.brandRuntimeBanner', { productName: PRODUCT_NAME, system: `${result.system}/${result.systemVs}`, browser: `${result.supporter}/${result.supporterVs}`, engine: `${result.engine}/${result.engineVs}` }),
     'color: green;font-size: 14px;font-weight: bold;',
   );
 

@@ -1,0 +1,62 @@
+{
+  "LICENSE": {
+    "sha256": "6bed1dc22012ae02990ae2bc73506bea94dfe4ebf6034e1bfea201c8cf6f3482",
+    "unchanged": true
+  },
+  "package.json": {
+    "sha256": "1105c2f78a57fa6680fe46d166ee13c8645cb172c8e45f12896e4564f54f8fb1",
+    "unchanged": true
+  },
+  "pnpm-lock.yaml": {
+    "sha256": "76ba3496a5fbf05daf3c9fa8573c56c404347eb4a6107d0cd759a85b7077043f",
+    "unchanged": true
+  },
+  "Dockerfile": {
+    "sha256": "f8ba908ee284e037f98a8ce1708c335b3ab9d4753bccd0c8931ab3173068b0f7",
+    "unchanged": true
+  },
+  "compose.yaml": {
+    "sha256": "b1a4b05cbb50296823821b08456360e6280c0cc3d34dcecc04e5a24575498e04",
+    "unchanged": true
+  },
+  "version.yaml": {
+    "sha256": "6c11e4695e57ac951dfaf1a609fed995f2177f66f3b955131f820027a18d95d0",
+    "unchanged": true
+  },
+  "back/schema/platform-v1.json": {
+    "sha256": "e5091cf9b11fedda9d4676fed55c7081507690ee97c5d6977598f5523372d2f1",
+    "unchanged": true
+  },
+  "back/protos/api.proto": {
+    "sha256": "c8c922aa032d0a956c4f261e42aaeb460e93f5741cb8ddcfaa0e314700ba971e",
+    "unchanged": true
+  },
+  "back/protos/health.proto": {
+    "sha256": "67257934dd268aa67583b1b9904fcdd16e1a15bf5601ea337762e1a5a405a702",
+    "unchanged": true
+  },
+  "back/services/repositoryStorage.ts": {
+    "sha256": "facfc32277a4ce599a2d430f2a7f20b4ac3678e739d5b573adac3370298588c8",
+    "unchanged": true
+  },
+  "back/config/grpcCerts.ts": {
+    "sha256": "9e98660579c4366e6ec765408f9e47240a910bcaa2f893f15648b4234cd42783",
+    "unchanged": true
+  },
+  "back/services/backup/archive.ts": {
+    "sha256": "fc097c6086df674a8af14e67bf8fd852698a96563c4ca40131c8f883e46bb4a8",
+    "unchanged": true
+  },
+  "back/services/backup/envelope.ts": {
+    "sha256": "22fa4d5944a2b6d7dec247a201dff9606a3f95a33d3d3d0e6e0ccb71e81b1d90",
+    "unchanged": true
+  },
+  "src/assets/zhixu-logo.svg": {
+    "sha256": "2a2b02611cdc143eee69e2bdd33e8e232563635f8a7a2c3ca3368f645e1d0ec6",
+    "unchanged": true
+  },
+  "public/favicon.svg": {
+    "sha256": "b37db7c9c0b149c59de70ebb2bae37d0c195a013c88dfd55448b1980180f621a",
+    "unchanged": true
+  }
+}

@@ -91,21 +91,8 @@ function audit() {
     'utf8',
   );
   assert.ok(!/\bskip\b/.test(formalEnvironmentTest));
-  const releaseSurfaceFiles = [
-    'package.json', 'version.yaml', 'Dockerfile', 'compose.yaml', 'README.md',
-    'README-en.md', 'SECURITY.md', '.umirc.ts',
-    'scripts/release/build-info.cjs',
-    ...['src', 'deploy/kubernetes', '.github/ISSUE_TEMPLATE'].flatMap((root) =>
-      fs.readdirSync(root, { recursive: true, withFileTypes: true })
-        .filter((entry) => entry.isFile())
-        .map((entry) => path.join(entry.parentPath || entry.path, entry.name))
-        .filter((name) => !name.split(path.sep).some((part) => part.startsWith('.umi')))
-        .filter((name) => /\.(?:c?js|tsx?|json|ya?ml|md|svg)$/.test(name))),
-  ];
-  const retiredBrand = /QingLong|Qinglong|青龙|whyour\/qinglong|anysoft\/qinglong|@whyour\/qinglong|qn\.whyour\.cn/;
-  for (const releaseFile of releaseSurfaceFiles)
-    assert.doesNotMatch(fs.readFileSync(releaseFile, 'utf8'), retiredBrand,
-      `LEGACY_BRAND_ON_RELEASE_SURFACE:${releaseFile}`);
+  const branding = require('../branding/audit.cjs').audit();
+  assert.equal(branding.status, 'PASS', 'BRAND_AUDIT_REQUIRES_REVIEW');
   const packageInfo = JSON.parse(fs.readFileSync('package.json', 'utf8'));
   assert.equal(packageInfo.name, '@anysoft/zhixu');
   const versions = require('../release/bump-version.cjs');

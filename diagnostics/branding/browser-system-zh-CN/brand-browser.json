@@ -1,0 +1,83 @@
+{
+  "status": "PASS",
+  "locale": "zh-CN",
+  "checks": [
+    {
+      "name": "initialization",
+      "title": "ZhiXu · 初始化",
+      "locale": "zh-CN",
+      "preference": "system",
+      "status": "PASS"
+    },
+    {
+      "name": "login",
+      "title": "ZhiXu · 登录",
+      "locale": "zh-CN",
+      "preference": "system",
+      "status": "PASS"
+    },
+    {
+      "name": "dashboard",
+      "title": "ZhiXu · 仪表盘",
+      "locale": "zh-CN",
+      "preference": "system",
+      "status": "PASS"
+    },
+    {
+      "name": "repository",
+      "title": "ZhiXu · 仓库管理",
+      "locale": "zh-CN",
+      "preference": "system",
+      "status": "PASS"
+    },
+    {
+      "name": "tasks",
+      "title": "ZhiXu · 任务管理",
+      "locale": "zh-CN",
+      "preference": "system",
+      "status": "PASS"
+    },
+    {
+      "name": "runs",
+      "title": "ZhiXu · 运行记录",
+      "locale": "zh-CN",
+      "preference": "system",
+      "status": "PASS"
+    },
+    {
+      "name": "runtime",
+      "title": "ZhiXu · 运行时 · Python",
+      "locale": "zh-CN",
+      "preference": "system",
+      "status": "PASS"
+    },
+    {
+      "name": "notifications",
+      "title": "ZhiXu · 通知管理",
+      "locale": "zh-CN",
+      "preference": "system",
+      "status": "PASS"
+    },
+    {
+      "name": "settings",
+      "title": "ZhiXu · 系统设置",
+      "locale": "zh-CN",
+      "preference": "system",
+      "status": "PASS"
+    },
+    {
+      "name": "404",
+      "title": "ZhiXu · 未找到",
+      "locale": "zh-CN",
+      "preference": "system",
+      "status": "PASS"
+    },
+    {
+      "name": "about",
+      "title": "ZhiXu · 系统设置",
+      "locale": "zh-CN",
+      "preference": "system",
+      "status": "PASS"
+    }
+  ]
+}

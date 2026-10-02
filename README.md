@@ -1,7 +1,7 @@
 <div align="center">
-<img width="100" src="./src/assets/zhixu-logo.svg" alt="枝序 ZhiXu">
+<img width="100" src="./src/assets/zhixu-logo.svg" alt="ZhiXu">
 
-# 枝序 · ZhiXu
+# ZhiXu
 
 简体中文 | [English](./README-en.md)
 
@@ -60,7 +60,7 @@ pnpm start
 
 ## 名称
 
-“枝”代表 Git 分支、Repository 与 Worktree；“序”代表任务编排、执行顺序和可靠恢复。ZhiXu 是从零构建的 Git-native 自动化平台；旧项目名称仅保留在历史记录、上游归属与明确的兼容性说明中。
+正式产品名为 ZhiXu，没有中文别名。ZhiXu 源于经过大规模重构的 QingLong 代码库，当前作为 Git-native 自动化与任务调度平台继续发展。
 
 ## License
 

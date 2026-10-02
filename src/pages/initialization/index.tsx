@@ -1,3 +1,4 @@
+import { PRODUCT_NAME } from '@/utils/brand';
 import { useLocale as useI18nLocale } from '@/utils/i18n';
 import intl from 'react-intl-universal';
 import React, { Fragment, useEffect, useState } from 'react';
@@ -50,7 +51,7 @@ const Initialization = () => {
       content: (
         <div className={styles.top} style={{ marginTop: 30 }}>
           <div className={styles.header}>
-            <span className={styles.title}>{intl.get('欢迎使用枝序')}</span>
+            <span className={styles.title}>{intl.get('ui.brandWelcome', { productName: PRODUCT_NAME })}</span>
             <span className={styles.desc}>
               {intl.get(
                 '支持python3、javascript、shell、typescript 的定时任务管理面板',

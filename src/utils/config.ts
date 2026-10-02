@@ -1,10 +1,11 @@
+import { PRODUCT_NAME } from '@/utils/brand';
 import { t as tr } from '@/utils/i18n';
 import { getEffectiveLocale } from './i18n';
 import intl from 'react-intl-universal';
 const baseUrl = window.__ENV__QlBaseUrl || '/';
 
 const buildConfig = () => ({
-  siteName: intl.get('枝序'),
+  siteName: PRODUCT_NAME,
   baseUrl,
   apiPrefix: `${baseUrl}api/`,
   authKey: 'token',
@@ -512,7 +513,7 @@ const buildConfig = () => ({
   documentTitleMap: {
     '/login': intl.get('登录'),
     '/initialization': intl.get('初始化'),
-    '/tasks': 'Tasks',
+    '/tasks': tr('ui.tasks'),
     '/env': intl.get('环境变量'),
     '/subscription': intl.get('订阅管理'),
     '/config': intl.get('配置文件'),
@@ -522,6 +523,9 @@ const buildConfig = () => ({
     '/error': intl.get('错误日志'),
     '/runtime-python': tr('ui.extra.runtimePython'),
     '/dashboard': intl.get('仪表盘'),
+    '/runs': tr('ui.runs'),
+    '/notifications': tr('ui.notifications'),
+    '/repository': tr('ui.repositoriesVariant425'),
   },
 });
 let cachedLocale = '';

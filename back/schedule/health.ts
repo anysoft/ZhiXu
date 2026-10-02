@@ -87,7 +87,7 @@ const check = async (
       const containerHint =
         process.env.QL_CONTAINER === 'true'
           ? 'PM2 file logging is disabled in containers. Check `docker logs <container>` for early startup errors.'
-          : 'Check `pm2 logs qinglong --lines 300` for early startup errors.';
+          : 'Check `pm2 logs zhixu --lines 300` for early startup errors.';
       return callback(
         new Error(
           [

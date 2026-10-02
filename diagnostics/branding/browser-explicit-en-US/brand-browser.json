@@ -1,0 +1,83 @@
+{
+  "status": "PASS",
+  "locale": "en-US",
+  "checks": [
+    {
+      "name": "initialization",
+      "title": "ZhiXu · Initialize",
+      "locale": "en-US",
+      "preference": "en-US",
+      "status": "PASS"
+    },
+    {
+      "name": "login",
+      "title": "ZhiXu · Login",
+      "locale": "en-US",
+      "preference": "en-US",
+      "status": "PASS"
+    },
+    {
+      "name": "dashboard",
+      "title": "ZhiXu · Dashboard",
+      "locale": "en-US",
+      "preference": "en-US",
+      "status": "PASS"
+    },
+    {
+      "name": "repository",
+      "title": "ZhiXu · Repositories",
+      "locale": "en-US",
+      "preference": "en-US",
+      "status": "PASS"
+    },
+    {
+      "name": "tasks",
+      "title": "ZhiXu · Tasks",
+      "locale": "en-US",
+      "preference": "en-US",
+      "status": "PASS"
+    },
+    {
+      "name": "runs",
+      "title": "ZhiXu · Runs",
+      "locale": "en-US",
+      "preference": "en-US",
+      "status": "PASS"
+    },
+    {
+      "name": "runtime",
+      "title": "ZhiXu · Runtime · Python",
+      "locale": "en-US",
+      "preference": "en-US",
+      "status": "PASS"
+    },
+    {
+      "name": "notifications",
+      "title": "ZhiXu · Notifications",
+      "locale": "en-US",
+      "preference": "en-US",
+      "status": "PASS"
+    },
+    {
+      "name": "settings",
+      "title": "ZhiXu · System Settings",
+      "locale": "en-US",
+      "preference": "en-US",
+      "status": "PASS"
+    },
+    {
+      "name": "404",
+      "title": "ZhiXu · Not Found",
+      "locale": "en-US",
+      "preference": "en-US",
+      "status": "PASS"
+    },
+    {
+      "name": "about",
+      "title": "ZhiXu · System Settings",
+      "locale": "en-US",
+      "preference": "en-US",
+      "status": "PASS"
+    }
+  ]
+}

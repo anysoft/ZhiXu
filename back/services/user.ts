@@ -1,3 +1,4 @@
+import { PRODUCT_NAME } from '../shared/brand';
 import { Service, Inject } from 'typedi';
 import winston from 'winston';
 import { createRandomString } from '../config/util';
@@ -546,8 +547,8 @@ export default class UserService {
     const code = Math.random().toString().slice(-6);
     const isSuccess = await this.notificationService.testNotify(
       notificationInfo,
-      t('枝序'),
-      t('ZhiXu 测试通知 https://github.com/anysoft/ZhiXu'),
+      PRODUCT_NAME,
+      tf('%s 测试通知 https://github.com/anysoft/ZhiXu', PRODUCT_NAME),
     );
     if (isSuccess) {
       const result = await this.updateAuthDb({

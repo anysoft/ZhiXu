@@ -1,8 +1,15 @@
+import { PRODUCT_NAME } from './back/shared/brand';
 import { defineConfig } from '@umijs/max';
 const CompressionPlugin = require('compression-webpack-plugin');
 
 const baseUrl = process.env.QlBaseUrl || '/';
 export default defineConfig({
+  title: PRODUCT_NAME,
+  metas: [
+    { name: 'application-name', content: PRODUCT_NAME },
+    { name: 'apple-mobile-web-app-title', content: PRODUCT_NAME },
+    { property: 'og:site_name', content: PRODUCT_NAME },
+  ],
   hash: true,
   jsMinifier: 'terser',
   antd: {},

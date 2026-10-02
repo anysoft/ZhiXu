@@ -383,6 +383,12 @@ async function browser(s) {
         [process.execPath, 'diagnostics/phase14/platform-e2e.cjs'],
         { ...extra, QL_I18N_LOCALE: locale, QL_I18N_ACCEPTANCE: '1',
           QL_ACCEPTANCE_DIR: path.join(s.output, 'browser', 'i18n-' + locale) }, 2400);
+    for (const locale of ['zh-CN', 'en-US'])
+      for (const preference of [locale, 'system'])
+        await run(s, `branding-${locale}-${preference}`,
+          [process.execPath, 'scripts/branding/browser.cjs'],
+          { ...extra, QL_I18N_LOCALE: locale, BRAND_PREFERENCE: preference,
+            QL_ACCEPTANCE_DIR: path.join(s.output, 'browser', `branding-${locale}-${preference}`) }, 300);
   } catch (e) {
     failure = e;
     if (e.stage === 'browser-phase14') {
@@ -405,6 +411,7 @@ async function browser(s) {
       backend_build: stageEvidence(s, 'backend-build'),
       frontend_build: stageEvidence(s, 'frontend-build'),
       i18n: ['zh-CN', 'en-US'].map(locale => ({ locale, ...stageEvidence(s, 'i18n-' + locale) })),
+      branding: ['zh-CN', 'en-US'].flatMap(locale => [locale, 'system'].map(preference => ({ locale, preference, ...stageEvidence(s, `branding-${locale}-${preference}`) }))),
       scenarios: ['phase12', 'phase14'].map((phase) => ({
         phase,
         ...stageEvidence(s, 'browser-' + phase),

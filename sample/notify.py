@@ -674,14 +674,14 @@ def aibotk(title: str, content: str) -> None:
         data = {
             "apiKey": push_config.get("AIBOTK_KEY"),
             "roomName": push_config.get("AIBOTK_NAME"),
-            "message": {"type": 1, "content": f"【枝序通知】\n\n{title}\n{content}"},
+            "message": {"type": 1, "content": f"【ZhiXu 通知】\n\n{title}\n{content}"},
         }
     else:
         url = "https://api-bot.aibotk.com/openapi/v1/chat/contact"
         data = {
             "apiKey": push_config.get("AIBOTK_KEY"),
             "name": push_config.get("AIBOTK_NAME"),
-            "message": {"type": 1, "content": f"【枝序通知】\n\n{title}\n{content}"},
+            "message": {"type": 1, "content": f"【ZhiXu 通知】\n\n{title}\n{content}"},
         }
     body = json.dumps(data).encode(encoding="utf-8")
     headers = {"Content-Type": "application/json"}

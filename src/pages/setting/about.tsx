@@ -1,3 +1,4 @@
+import { PRODUCT_NAME } from '@/utils/brand';
 import { formatDateTime } from '@/utils/format';
 import { useLocale as useI18nLocale } from '@/utils/i18n';
 import intl from 'react-intl-universal';
@@ -16,7 +17,7 @@ const About = ({ systemInfo }: { systemInfo: SharedContext['systemInfo'] }) => {
     <div className={styles.container}>
       <img alt="logo" style={{ width: 140, marginRight: 20 }} src={logo} />
       <div className={styles.right}>
-        <span className={styles.title}>{intl.get('枝序')}</span>
+        <span className={styles.title}>{PRODUCT_NAME}</span>
         <span className={styles.desc}>
           {intl.get(
             '支持python3、javascript、shell、typescript 的定时任务管理面板',

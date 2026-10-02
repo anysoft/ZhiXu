@@ -1,3 +1,4 @@
+import { PRODUCT_NAME } from '../shared/brand';
 import { Response } from 'express';
 import fs from 'fs';
 import path from 'path';
@@ -19,7 +20,7 @@ import {
 } from '../data/system';
 import NotificationService from './notify';
 import dayjs from 'dayjs';
-import { t, setLang } from '../shared/i18n';
+import { t, tf, setLang } from '../shared/i18n';
 import { Container } from 'typedi';
 import RetentionService from './retention';
 
@@ -59,8 +60,8 @@ export default class SystemService {
     const code = Math.random().toString().slice(-6);
     const isSuccess = await this.notificationService.testNotify(
       notificationInfo,
-      t('枝序'),
-      t('ZhiXu 测试通知 https://github.com/anysoft/ZhiXu'),
+      PRODUCT_NAME,
+      tf('%s 测试通知 https://github.com/anysoft/ZhiXu', PRODUCT_NAME),
     );
     if (isSuccess) {
       const result = await this.updateAuthDb({

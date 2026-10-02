@@ -1,0 +1,561 @@
+[
+  {
+    "requested": "buildConfig",
+    "file": "src/utils/config.ts",
+    "result": {
+      "target": {
+        "id": "Function:src/utils/config.ts:buildConfig",
+        "name": "buildConfig",
+        "type": "Function",
+        "filePath": "src/utils/config.ts"
+      },
+      "direction": "upstream",
+      "impactedCount": 1,
+      "risk": "LOW",
+      "riskSharedAxes": "LOW",
+      "riskScale": {
+        "comparableAcrossKinds": true,
+        "unusedAxes": []
+      },
+      "epistemic": "exact",
+      "summary": {
+        "direct": 1,
+        "processes_affected": 0,
+        "modules_affected": 1
+      },
+      "byDepthCounts": {
+        "1": 1
+      },
+      "affected_processes": [],
+      "affected_modules": [
+        {
+          "name": "NodeRuntime",
+          "hits": 1,
+          "impact": "direct"
+        }
+      ]
+    }
+  },
+  {
+    "requested": "default",
+    "file": "src/layouts/index.tsx",
+    "result": {
+      "error": "Target 'default' not found",
+      "target": {
+        "name": "default"
+      },
+      "direction": "upstream",
+      "impactedCount": null,
+      "risk": "UNKNOWN"
+    }
+  },
+  {
+    "requested": "reloadSystemConfig",
+    "file": "src/layouts/index.tsx",
+    "result": {
+      "status": "ambiguous",
+      "message": "Found 2 symbols matching 'reloadSystemConfig'. Blast radius differs per candidate (max 7 impacted at risk UNKNOWN; LOW among the candidates that resolved, and at least one could not be walked). Disambiguate with target_uid (or file_path/kind) for a single authoritative result.",
+      "target": {
+        "name": "reloadSystemConfig"
+      },
+      "direction": "upstream",
+      "totalCandidates": 2,
+      "impactedCount": null,
+      "risk": "UNKNOWN",
+      "maxImpactedCount": 7,
+      "maxRisk": "UNKNOWN",
+      "knownMaxRisk": "LOW",
+      "candidates": [
+        {
+          "uid": "Function:src/layouts/index.tsx:fn@44:15.reloadSystemConfig@134:2",
+          "name": "reloadSystemConfig",
+          "kind": "Function",
+          "filePath": "src/layouts/index.tsx",
+          "line": 135,
+          "score": 0.96,
+          "impactedCount": 7,
+          "risk": "LOW",
+          "riskSharedAxes": "LOW",
+          "riskScale": {
+            "comparableAcrossKinds": false,
+            "unusedAxes": [
+              {
+                "axis": "processes",
+                "reason": "enrichment-skipped"
+              },
+              {
+                "axis": "modules",
+                "reason": "enrichment-skipped"
+              }
+            ]
+          },
+          "direct": 1
+        },
+        {
+          "uid": "Property:src/layouts/index.tsx:SharedContext.reloadSystemConfig",
+          "name": "reloadSystemConfig",
+          "kind": "",
+          "filePath": "src/layouts/index.tsx",
+          "line": 31,
+          "score": 0.9,
+          "impactedCount": 0,
+          "risk": "UNKNOWN",
+          "riskSharedAxes": "UNKNOWN",
+          "riskScale": {
+            "comparableAcrossKinds": false,
+            "unusedAxes": [
+              {
+                "axis": "processes",
+                "reason": "enrichment-skipped"
+              },
+              {
+                "axis": "modules",
+                "reason": "enrichment-skipped"
+              }
+            ]
+          },
+          "direct": 0,
+          "riskNote": "No callers resolved. Absence of edges is not evidence the symbol is unused: a caller reaching it through a reference class this index does not record — plain-object property access, a bare-identifier read of a module-scope const — produces no edge to find. Confirm with a text search before treating the change as safe."
+        }
+      ]
+    }
+  },
+  {
+    "requested": "Initialization",
+    "file": "src/pages/initialization/index.tsx",
+    "result": {
+      "target": {
+        "id": "Function:src/pages/initialization/index.tsx:Initialization",
+        "name": "Initialization",
+        "type": "Function",
+        "filePath": "src/pages/initialization/index.tsx"
+      },
+      "direction": "upstream",
+      "impactedCount": 0,
+      "risk": "UNKNOWN",
+      "riskSharedAxes": "UNKNOWN",
+      "riskScale": {
+        "comparableAcrossKinds": true,
+        "unusedAxes": []
+      },
+      "riskNote": "No callers resolved. Absence of edges is not evidence the symbol is unused: a caller reaching it through a reference class this index does not record — plain-object property access, a bare-identifier read of a module-scope const — produces no edge to find. Confirm with a text search before treating the change as safe.",
+      "epistemic": "exact",
+      "summary": {
+        "direct": 0,
+        "processes_affected": 0,
+        "modules_affected": 0
+      },
+      "byDepthCounts": {},
+      "affected_processes": [],
+      "affected_modules": []
+    }
+  },
+  {
+    "requested": "About",
+    "file": "src/pages/setting/about.tsx",
+    "result": {
+      "target": {
+        "id": "Function:src/pages/setting/about.tsx:About",
+        "name": "About",
+        "type": "Function",
+        "filePath": "src/pages/setting/about.tsx"
+      },
+      "direction": "upstream",
+      "impactedCount": 0,
+      "risk": "UNKNOWN",
+      "riskSharedAxes": "UNKNOWN",
+      "riskScale": {
+        "comparableAcrossKinds": true,
+        "unusedAxes": []
+      },
+      "riskNote": "No callers resolved. Absence of edges is not evidence the symbol is unused: a caller reaching it through a reference class this index does not record — plain-object property access, a bare-identifier read of a module-scope const — produces no edge to find. Confirm with a text search before treating the change as safe.",
+      "epistemic": "exact",
+      "summary": {
+        "direct": 0,
+        "processes_affected": 0,
+        "modules_affected": 0
+      },
+      "byDepthCounts": {},
+      "affected_processes": [],
+      "affected_modules": []
+    }
+  },
+  {
+    "requested": "Other",
+    "file": "src/pages/setting/other.tsx",
+    "result": {
+      "target": {
+        "id": "Function:src/pages/setting/other.tsx:Other",
+        "name": "Other",
+        "type": "Function",
+        "filePath": "src/pages/setting/other.tsx"
+      },
+      "direction": "upstream",
+      "impactedCount": 0,
+      "risk": "UNKNOWN",
+      "riskSharedAxes": "UNKNOWN",
+      "riskScale": {
+        "comparableAcrossKinds": true,
+        "unusedAxes": []
+      },
+      "riskNote": "No callers resolved. Absence of edges is not evidence the symbol is unused: a caller reaching it through a reference class this index does not record — plain-object property access, a bare-identifier read of a module-scope const — produces no edge to find. Confirm with a text search before treating the change as safe.",
+      "epistemic": "exact",
+      "summary": {
+        "direct": 0,
+        "processes_affected": 0,
+        "modules_affected": 0
+      },
+      "byDepthCounts": {},
+      "affected_processes": [],
+      "affected_modules": []
+    }
+  },
+  {
+    "requested": "ClientIp",
+    "file": "src/pages/setting/clientIp.tsx",
+    "result": {
+      "target": {
+        "id": "Function:src/pages/setting/clientIp.tsx:ClientIp",
+        "name": "ClientIp",
+        "type": "Function",
+        "filePath": "src/pages/setting/clientIp.tsx"
+      },
+      "direction": "upstream",
+      "impactedCount": 0,
+      "risk": "UNKNOWN",
+      "riskSharedAxes": "UNKNOWN",
+      "riskScale": {
+        "comparableAcrossKinds": true,
+        "unusedAxes": []
+      },
+      "riskNote": "No callers resolved. Absence of edges is not evidence the symbol is unused: a caller reaching it through a reference class this index does not record — plain-object property access, a bare-identifier read of a module-scope const — produces no edge to find. Confirm with a text search before treating the change as safe.",
+      "epistemic": "exact",
+      "summary": {
+        "direct": 0,
+        "processes_affected": 0,
+        "modules_affected": 0
+      },
+      "byDepthCounts": {},
+      "affected_processes": [],
+      "affected_modules": []
+    }
+  },
+  {
+    "requested": "browserType",
+    "file": "src/utils/index.ts",
+    "result": {
+      "target": {
+        "id": "Function:src/utils/index.ts:browserType",
+        "name": "browserType",
+        "type": "Function",
+        "filePath": "src/utils/index.ts"
+      },
+      "direction": "upstream",
+      "impactedCount": 0,
+      "risk": "UNKNOWN",
+      "riskSharedAxes": "UNKNOWN",
+      "riskScale": {
+        "comparableAcrossKinds": true,
+        "unusedAxes": []
+      },
+      "riskNote": "No callers resolved. Absence of edges is not evidence the symbol is unused: a caller reaching it through a reference class this index does not record — plain-object property access, a bare-identifier read of a module-scope const — produces no edge to find. Confirm with a text search before treating the change as safe.",
+      "epistemic": "exact",
+      "summary": {
+        "direct": 0,
+        "processes_affected": 0,
+        "modules_affected": 0
+      },
+      "byDepthCounts": {},
+      "affected_processes": [],
+      "affected_modules": []
+    }
+  },
+  {
+    "requested": "updateNotificationMode",
+    "file": "back/services/system.ts",
+    "result": {
+      "target": {
+        "id": "Method:back/services/system.ts:SystemService.updateNotificationMode#1",
+        "name": "updateNotificationMode",
+        "type": "Method",
+        "filePath": "back/services/system.ts"
+      },
+      "direction": "upstream",
+      "impactedCount": 0,
+      "risk": "UNKNOWN",
+      "riskSharedAxes": "UNKNOWN",
+      "riskScale": {
+        "comparableAcrossKinds": true,
+        "unusedAxes": []
+      },
+      "riskNote": "No callers resolved. Absence of edges is not evidence the symbol is unused: a caller reaching it through a reference class this index does not record — plain-object property access, a bare-identifier read of a module-scope const — produces no edge to find. Confirm with a text search before treating the change as safe.",
+      "epistemic": "exact",
+      "summary": {
+        "direct": 0,
+        "processes_affected": 0,
+        "modules_affected": 0
+      },
+      "byDepthCounts": {},
+      "affected_processes": [],
+      "affected_modules": []
+    }
+  },
+  {
+    "requested": "updateNotificationMode",
+    "file": "back/services/user.ts",
+    "result": {
+      "target": {
+        "id": "Method:back/services/user.ts:UserService.updateNotificationMode#1",
+        "name": "updateNotificationMode",
+        "type": "Method",
+        "filePath": "back/services/user.ts"
+      },
+      "direction": "upstream",
+      "impactedCount": 0,
+      "risk": "UNKNOWN",
+      "riskSharedAxes": "UNKNOWN",
+      "riskScale": {
+        "comparableAcrossKinds": true,
+        "unusedAxes": []
+      },
+      "riskNote": "No callers resolved. Absence of edges is not evidence the symbol is unused: a caller reaching it through a reference class this index does not record — plain-object property access, a bare-identifier read of a module-scope const — produces no edge to find. Confirm with a text search before treating the change as safe.",
+      "epistemic": "exact",
+      "summary": {
+        "direct": 0,
+        "processes_affected": 0,
+        "modules_affected": 0
+      },
+      "byDepthCounts": {},
+      "affected_processes": [],
+      "affected_modules": []
+    }
+  },
+  {
+    "requested": "aibotk",
+    "file": "back/services/notify.ts",
+    "result": {
+      "target": {
+        "id": "Method:back/services/notify.ts:NotificationService.aibotk#0",
+        "name": "aibotk",
+        "type": "Method",
+        "filePath": "back/services/notify.ts"
+      },
+      "direction": "upstream",
+      "impactedCount": 0,
+      "risk": "UNKNOWN",
+      "riskSharedAxes": "UNKNOWN",
+      "riskScale": {
+        "comparableAcrossKinds": true,
+        "unusedAxes": []
+      },
+      "riskNote": "No callers resolved. Absence of edges is not evidence the symbol is unused: a caller reaching it through a reference class this index does not record — plain-object property access, a bare-identifier read of a module-scope const — produces no edge to find. Confirm with a text search before treating the change as safe.",
+      "epistemic": "exact",
+      "summary": {
+        "direct": 0,
+        "processes_affected": 0,
+        "modules_affected": 0
+      },
+      "byDepthCounts": {},
+      "affected_processes": [],
+      "affected_modules": []
+    }
+  },
+  {
+    "requested": "email",
+    "file": "back/services/notify.ts",
+    "result": {
+      "target": {
+        "id": "Method:back/services/notify.ts:NotificationService.email#0",
+        "name": "email",
+        "type": "Method",
+        "filePath": "back/services/notify.ts"
+      },
+      "direction": "upstream",
+      "impactedCount": 0,
+      "risk": "UNKNOWN",
+      "riskSharedAxes": "UNKNOWN",
+      "riskScale": {
+        "comparableAcrossKinds": true,
+        "unusedAxes": []
+      },
+      "riskNote": "No callers resolved. Absence of edges is not evidence the symbol is unused: a caller reaching it through a reference class this index does not record — plain-object property access, a bare-identifier read of a module-scope const — produces no edge to find. Confirm with a text search before treating the change as safe.",
+      "epistemic": "exact",
+      "summary": {
+        "direct": 0,
+        "processes_affected": 0,
+        "modules_affected": 0
+      },
+      "byDepthCounts": {},
+      "affected_processes": [],
+      "affected_modules": []
+    }
+  },
+  {
+    "requested": "check",
+    "file": "back/schedule/health.ts",
+    "result": {
+      "target": {
+        "id": "Function:back/schedule/health.ts:check",
+        "name": "check",
+        "type": "Function",
+        "filePath": "back/schedule/health.ts"
+      },
+      "direction": "upstream",
+      "impactedCount": 7,
+      "risk": "HIGH",
+      "riskSharedAxes": "LOW",
+      "riskScale": {
+        "comparableAcrossKinds": true,
+        "unusedAxes": []
+      },
+      "epistemic": "exact",
+      "summary": {
+        "direct": 3,
+        "processes_affected": 0,
+        "modules_affected": 3
+      },
+      "byDepthCounts": {
+        "1": 3,
+        "2": 2,
+        "3": 2
+      },
+      "affected_processes": [],
+      "affected_modules": [
+        {
+          "name": "Back",
+          "hits": 2,
+          "impact": "direct"
+        },
+        {
+          "name": "Backup",
+          "hits": 1,
+          "impact": "indirect"
+        },
+        {
+          "name": "Schedule",
+          "hits": 1,
+          "impact": "direct"
+        }
+      ]
+    }
+  },
+  {
+    "requested": "aibotkNotify",
+    "file": "sample/notify.js",
+    "result": {
+      "target": {
+        "id": "Function:sample/notify.js:aibotkNotify",
+        "name": "aibotkNotify",
+        "type": "Function",
+        "filePath": "sample/notify.js"
+      },
+      "direction": "upstream",
+      "impactedCount": 2,
+      "risk": "LOW",
+      "riskSharedAxes": "LOW",
+      "riskScale": {
+        "comparableAcrossKinds": true,
+        "unusedAxes": []
+      },
+      "epistemic": "exact",
+      "summary": {
+        "direct": 1,
+        "processes_affected": 1,
+        "modules_affected": 1
+      },
+      "byDepthCounts": {
+        "1": 1,
+        "2": 1
+      },
+      "affected_processes": [
+        {
+          "name": "sendNotify",
+          "type": "Function",
+          "filePath": "sample/notify.js",
+          "affected_process_count": 5,
+          "total_hits": 5,
+          "earliest_broken_step": 1
+        }
+      ],
+      "affected_modules": [
+        {
+          "name": "Sample",
+          "hits": 1,
+          "impact": "direct"
+        }
+      ]
+    }
+  },
+  {
+    "requested": "aibotk",
+    "file": "sample/notify.py",
+    "result": {
+      "target": {
+        "id": "Function:sample/notify.py:aibotk",
+        "name": "aibotk",
+        "type": "Function",
+        "filePath": "sample/notify.py"
+      },
+      "direction": "upstream",
+      "impactedCount": 0,
+      "risk": "UNKNOWN",
+      "riskSharedAxes": "UNKNOWN",
+      "riskScale": {
+        "comparableAcrossKinds": true,
+        "unusedAxes": []
+      },
+      "riskNote": "No callers resolved. Absence of edges is not evidence the symbol is unused: a caller reaching it through a reference class this index does not record — plain-object property access, a bare-identifier read of a module-scope const — produces no edge to find. Confirm with a text search before treating the change as safe.",
+      "epistemic": "exact",
+      "summary": {
+        "direct": 0,
+        "processes_affected": 0,
+        "modules_affected": 0
+      },
+      "byDepthCounts": {},
+      "affected_processes": [],
+      "affected_modules": []
+    }
+  },
+  {
+    "requested": "audit",
+    "file": "scripts/ci/static.cjs",
+    "result": {
+      "target": {
+        "id": "Function:scripts/ci/static.cjs:audit",
+        "name": "audit",
+        "type": "Function",
+        "filePath": "scripts/ci/static.cjs"
+      },
+      "direction": "upstream",
+      "impactedCount": 1,
+      "risk": "LOW",
+      "riskSharedAxes": "LOW",
+      "riskScale": {
+        "comparableAcrossKinds": true,
+        "unusedAxes": []
+      },
+      "epistemic": "lower-bound",
+      "boundaries": [
+        "1 call site invoking `audit` was dropped at index time because the receiver's type could not be established (e.g. an unresolved constructor, factory or chained expression). Those callers are absent from this result — actual impact may be higher."
+      ],
+      "causes": {
+        "scopeExtractionFiles": 0,
+        "receiverTyping": 1,
+        "dispatchBoundary": 0,
+        "externalBoundary": 0,
+        "undecidedSatisfaction": 0,
+        "callableValueReferences": 0
+      },
+      "summary": {
+        "direct": 1,
+        "processes_affected": 0,
+        "modules_affected": 0
+      },
+      "byDepthCounts": {
+        "1": 1
+      },
+      "affected_processes": [],
+      "affected_modules": []
+    }
+  }
+]

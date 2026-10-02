@@ -1,3 +1,4 @@
+import { PRODUCT_NAME, productTitle } from '@/utils/brand';
 import { useLocale } from '@/utils/i18n';
 import config from '@/utils/config';
 import { useCtx, useTheme } from '@/utils/hooks';
@@ -51,7 +52,7 @@ export default function () {
   const [loading, setLoading] = useState<boolean>(true);
   const [systemInfo, setSystemInfo] = useState<TSystemInfo>();
   const [siteTitle, setSiteTitle] = useState(
-    () => localStorage.getItem('zhixu_panel_title')?.trim() || intl.get('枝序'),
+    () => localStorage.getItem('zhixu_panel_title')?.trim() || PRODUCT_NAME,
   );
   const [collapsed, setCollapsed] = useState(false);
   const [initLoading, setInitLoading] = useState<boolean>(true);
@@ -141,7 +142,7 @@ export default function () {
           setSiteTitle(panelTitle);
           localStorage.setItem('zhixu_panel_title', panelTitle);
         } else {
-          setSiteTitle(intl.get('枝序'));
+          setSiteTitle(PRODUCT_NAME);
           localStorage.removeItem('zhixu_panel_title');
         }
       })
@@ -168,7 +169,7 @@ export default function () {
     }
     const title =
       (config.documentTitleMap as any)[location.pathname] || intl.get('未找到');
-    document.title = `${title} - ${siteTitle}`;
+    document.title = productTitle(title, siteTitle);
   }, [location.pathname, siteTitle, locale]);
 
   useEffect(() => {
@@ -286,7 +287,7 @@ export default function () {
         <>
           <Image preview={false} src={logo} />
           <div className="title">
-            <span className="title">{intl.get('枝序')}</span>
+            <span className="title">{PRODUCT_NAME}</span>
             <span
               onClick={(e) => {
                 e.stopPropagation();
@@ -333,7 +334,7 @@ export default function () {
         const title =
           (config.documentTitleMap as any)[location.pathname] ||
           intl.get('未找到');
-        return `${title} - ${siteTitle}`;
+        return productTitle(title, siteTitle);
       }}
       onCollapse={setCollapsed}
       collapsed={collapsed}

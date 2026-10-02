@@ -3,6 +3,8 @@ import { shareStore } from './store';
 const messages: Record<string, Record<string, string>> = {
   zh: {},
   en: {
+    '通知': 'Notification',
+    '%s 测试通知 https://github.com/anysoft/ZhiXu': '%s test notification https://github.com/anysoft/ZhiXu',
     '暂无权限': 'Access denied',
     '参数错误': 'Invalid parameter',
     '参数不正确': 'Invalid parameter',
@@ -101,7 +103,6 @@ const messages: Record<string, Record<string, string>> = {
     '该 IP 已被列入黑名单': 'This IP address has been blocked',
     '已加入 IP 黑名单': 'IP address added to the blacklist',
     '已移出 IP 黑名单': 'IP address removed from the blacklist',
-    '青龙快讯': 'QingLong',
     '登录通知': 'Login Notification',
     '你于': 'You at ',
     '在': ' in ',
@@ -127,7 +128,6 @@ const messages: Record<string, Record<string, string>> = {
       'Dependency %s%s, end time %s, elapsed %s seconds',
     '任务：%s，命令：%s，定时：%s，处于运行中的超过 %d 个，请检查定时设置':
       'Task: %s, command: %s, schedule: %s, more than %d instances running, please check schedule settings',
-    青龙: 'QingLong',
     '【蛟龙】测试通知 https://t.me/jiao_long':
       '[JiaoLong] Test notification https://t.me/jiao_long',
     '生成token': 'Generate token',

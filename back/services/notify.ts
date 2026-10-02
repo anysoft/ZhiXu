@@ -1,3 +1,4 @@
+import { PRODUCT_NAME } from '../shared/brand';
 import crypto from 'crypto';
 import nodemailer from 'nodemailer';
 import { Inject, Service } from 'typedi';
@@ -434,7 +435,7 @@ export default class NotificationService {
           roomName: `${aibotkName}`,
           message: {
             type: 1,
-            content: `【${t('枝序通知')}】\n\n${this.title}\n${this.content}`,
+            content: `【${PRODUCT_NAME} ${t('通知')}】\n\n${this.title}\n${this.content}`,
           },
         };
         break;
@@ -445,7 +446,7 @@ export default class NotificationService {
           name: `${aibotkName}`,
           message: {
             type: 1,
-            content: `【${t('枝序通知')}】\n\n${this.title}\n${this.content}`,
+            content: `【${PRODUCT_NAME} ${t('通知')}】\n\n${this.title}\n${this.content}`,
           },
         };
         break;
@@ -616,7 +617,7 @@ export default class NotificationService {
       });
 
       const info = await transporter.sendMail({
-        from: `"${t('枝序通知')}" <${emailUser}>`,
+        from: `"${PRODUCT_NAME} ${t('通知')}" <${emailUser}>`,
         to: recipients,
         subject: `${this.title}`,
         html: `${this.content.replace(/\n/g, '<br/>')}`,

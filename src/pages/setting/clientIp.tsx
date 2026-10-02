@@ -1,3 +1,4 @@
+import { PRODUCT_NAME } from '@/utils/brand';
 import { useLocale as useI18nLocale } from '@/utils/i18n';
 import React, { useEffect, useState } from 'react';
 import intl from 'react-intl-universal';
@@ -150,7 +151,7 @@ const ClientIp = () => {
             <div>
               <Paragraph>
                 {intl.get(
-                  '系统从离枝序最近的一跳开始，由右向左检查代理链，并把第一个不可信地址作为客户端 IP。',
+                  'ui.brandProxyChain', { productName: PRODUCT_NAME },
                 )}
               </Paragraph>
               <Paragraph style={{ marginBottom: 0 }}>
@@ -265,7 +266,7 @@ const ClientIp = () => {
                 dataSource={diagnostic.hops}
                 columns={[
                   {
-                    title: intl.get('距离枝序'),
+                    title: intl.get('ui.brandProxyDistance', { productName: PRODUCT_NAME }),
                     dataIndex: 'hop',
                     width: 120,
                     render: (value) => `${value} ${intl.get('跳')}`,

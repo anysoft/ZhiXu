@@ -961,7 +961,7 @@ function aibotkNotify(text, desp) {
             roomName: `${AIBOTK_NAME}`,
             message: {
               type: 1,
-              content: `【枝序通知】\n\n${text}\n${desp}`,
+              content: `【ZhiXu 通知】\n\n${text}\n${desp}`,
             },
           };
           break;
@@ -972,7 +972,7 @@ function aibotkNotify(text, desp) {
             name: `${AIBOTK_NAME}`,
             message: {
               type: 1,
-              content: `【枝序通知】\n\n${text}\n${desp}`,
+              content: `【ZhiXu 通知】\n\n${text}\n${desp}`,
             },
           };
           break;

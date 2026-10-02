@@ -1,0 +1,34 @@
+Changes: 89 files, 53 symbols
+Affected processes: 318
+Risk level: critical
+
+Changed symbols:
+  Section ZhiXu → README.md
+  Section 按 release-manifest.json 设置 DOCKERHUB_IMAGE 和 PLATFORM_VERSION → README.md
+  Section 名称 → README.md
+  Function check → back/schedule/health.ts
+  Class NotificationService → back/services/notify.ts
+  Method aibotk → back/services/notify.ts
+  Method email → back/services/notify.ts
+  Class SystemService → back/services/system.ts
+  Method updateNotificationMode → back/services/system.ts
+  Class UserService → back/services/user.ts
+  Method updateNotificationMode → back/services/user.ts
+  Const PRODUCT_NAME → back/shared/brand.ts
+  Const messages → back/shared/i18n.ts
+  Property en → back/shared/i18n.ts
+  Const cp → scripts/branding/audit.cjs
+... and 38 more
+
+Affected execution flows:
+  • RuntimeRoutes → BackupError (9 steps) — changed: check, check, check, check, check, check
+  • Request → AsError (9 steps) — changed: check, check, check, check
+  • DiscoveryRoutes → TriggerError (8 steps) — changed: check, check, check, check
+  • RunsPage → ResolveLocale (7 steps) — changed: check, check, check, check, check, check, check
+  • Resolve → ScopedEnvironmentError (7 steps) — changed: check
+  • Resolve → TaskDefinitionError (7 steps) — changed: check, check, check
+  • RuntimeRoutes → BackupPaths (6 steps) — changed: check, check, check, check
+  • Render → Request (6 steps) — changed: check, check, check, check, check, check
+  • Prepare → ConfigAssetError (6 steps) — changed: check, check
+  • ObservabilityRoutes → DecodeJson (5 steps) — changed: check, check, check
+... and 308 more

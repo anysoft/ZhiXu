@@ -1,3 +1,5 @@
+> Historical pre-greenfield architecture record. This document describes the earlier codebase, not the current ZhiXu runtime. See [current platform architecture](architecture/21-platform-1.0-freeze.md).
+
 # Project Architecture Guide
 
 This document is written for AI coding agents and maintainers who need to understand and modify this project safely. It focuses on where behavior lives, how the application starts, and which files are usually involved for common changes.
