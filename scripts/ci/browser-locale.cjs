@@ -80,7 +80,8 @@ function pattern(value) {
 }
 async function configure(page) {
   await page.addInitScript((preference) => {
-    if (!localStorage.getItem('lang')) localStorage.setItem('lang', preference);
+    if (!localStorage.getItem('zhixu.language'))
+      localStorage.setItem('zhixu.language', preference);
   }, locale);
 }
 function operationLabel(kind, status) {

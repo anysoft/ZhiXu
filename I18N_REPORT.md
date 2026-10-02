@@ -1,3 +1,5 @@
+> Historical implementation record. The current fresh-install language model, namespace and final qualification are documented in [the Greenfield final report](diagnostics/i18n/GREENFIELD_REPORT.md). The results below describe the earlier implementation.
+
 # I18N Implementation Report
 
 Date: 2026-10-02. Stage: IMPLEMENTED. Final convergence: ACHIEVED.

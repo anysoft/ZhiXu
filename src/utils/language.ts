@@ -1,9 +1,9 @@
 export type LanguagePreference = 'system' | 'zh-CN' | 'en-US';
 export type EffectiveLocale = 'zh-CN' | 'en-US';
+export const LANGUAGE_STORAGE_KEY = 'zhixu.language';
 
 export function normalizePreference(value: unknown): LanguagePreference {
-  if (value === 'zh' || value === 'zh-CN') return 'zh-CN';
-  if (value === 'en' || value === 'en-US') return 'en-US';
+  if (value === 'zh-CN' || value === 'en-US') return value;
   return 'system';
 }
 export function resolveLocale(
@@ -21,7 +21,7 @@ export function createLanguageController(options: {
 }) {
   const read = () => {
     try {
-      return normalizePreference(options.storage.getItem('lang'));
+      return normalizePreference(options.storage.getItem(LANGUAGE_STORAGE_KEY));
     } catch {
       return 'system' as const;
     }
@@ -59,9 +59,12 @@ export function createLanguageController(options: {
     },
     apply,
     setPreference: (value: LanguagePreference) => {
-      preference = normalizePreference(value);
+      if (value !== 'system' && value !== 'zh-CN' && value !== 'en-US') {
+        throw new Error('INVALID_LANGUAGE_PREFERENCE');
+      }
+      preference = value;
       try {
-        options.storage.setItem('lang', preference);
+        options.storage.setItem(LANGUAGE_STORAGE_KEY, preference);
       } catch {
         /* In-memory switching remains available. */
       }

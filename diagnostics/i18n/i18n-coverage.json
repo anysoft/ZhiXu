@@ -1,13 +1,20 @@
 {
   "stage": "IMPLEMENTED",
-  "entry_head": "1c1efb39ba9a669e2261dd63ad12f464b541af16",
+  "entry_head": "99116241390db230e0538a257fa680567f772c62",
   "audit_baseline": "12569b4941174362bd05794e340bd891d2731153",
-  "supported_locales": ["zh-CN", "en-US"],
-  "language_modes": ["system", "zh-CN", "en-US"],
+  "supported_locales": [
+    "zh-CN",
+    "en-US"
+  ],
+  "language_modes": [
+    "system",
+    "zh-CN",
+    "en-US"
+  ],
   "locale_parity": "PASS",
   "resource_keys": {
-    "zh": 1827,
-    "en": 1827
+    "zh-CN": 1827,
+    "en-US": 1827
   },
   "duplicate_keys": 0,
   "missing_static_keys": 0,
@@ -35,12 +42,12 @@
   "typescript": "PASS",
   "frontend_build": "PASS",
   "platform_tests": {
-    "passed": 407,
+    "passed": 412,
     "failed": 0,
     "skipped": 0
   },
   "focused_frontend_ci_tests": {
-    "passed": 22,
+    "passed": 29,
     "failed": 0
   },
   "browser_tab_tests": {
@@ -52,12 +59,36 @@
     "node": "22.23.3",
     "browser": "real Chrome via Playwright",
     "managed_python": "3.13.15",
-    "hosted_ci_run": false
+    "hosted_ci_run": false,
+    "managed_node": "24.21.0"
   },
   "backend_language_sync": "No browser writes; existing backend language API, persisted preference and semantics unchanged.",
-  "brand": "OUT_OF_SCOPE_NOT_MODIFIED",
+  "brand": "IMPLEMENTATION_UNCHANGED_TEST_FIXTURE_PREFERENCE_KEY_UPDATED",
   "exceptions_file": "framework-exceptions.json",
   "final_convergence": "ACHIEVED",
-  "evidence_directory": "evidence",
-  "coverage_boundary": "Counts refer to the semantically reviewed active frontend inventories. User data, raw logs, technical identities and documented third-party ARIA are excluded; future unknown enum/error fallbacks remain supported."
+  "evidence_directory": "greenfield-evidence",
+  "coverage_boundary": "Counts refer to the semantically reviewed active frontend inventories. User data, raw logs, technical identities and documented third-party ARIA are excluded; future unknown enum/error fallbacks remain supported.",
+  "storage_key": "zhixu.language",
+  "effective_locales": [
+    "zh-CN",
+    "en-US"
+  ],
+  "legacy_language_migration": "NONE",
+  "legacy_language_compatibility": "NONE",
+  "current_literal_count": 172,
+  "current_literal_classifications": {
+    "TECHNICAL_TOKEN": 144,
+    "USER_CONTENT_TEMPLATE": 28
+  },
+  "backend_typescript_build": "PASS",
+  "antd_validation_immediate_switch": "PASS",
+  "mounted_forms": [
+    "Task definition",
+    "Settings panel title"
+  ],
+  "brand_browser_sessions": {
+    "passed": 4,
+    "failed": 0
+  },
+  "final_report": "GREENFIELD_REPORT.md"
 }

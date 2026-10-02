@@ -26,10 +26,10 @@ test('resources have parity, no duplicate keys, no missing static calls and ever
 test('new semantic messages are valid ICU and retain the same interpolation variables', () => {
   const intl = require('react-intl-universal'),
     locales = {
-      zh: require('../../src/locales/zh-CN.json'),
-      en: require('../../src/locales/en-US.json'),
+      'zh-CN': require('../../src/locales/zh-CN.json'),
+      'en-US': require('../../src/locales/en-US.json'),
     };
-  for (const locale of ['zh', 'en']) {
+  for (const locale of ['zh-CN', 'en-US']) {
     intl.init({ currentLocale: locale, locales });
     for (const [key, value] of Object.entries(locales[locale])) {
       if (!/^(ui|common|settings|validation|status|field|error)\./.test(key))
@@ -40,7 +40,7 @@ test('new semantic messages are valid ICU and retain the same interpolation vari
       assert.deepEqual(
         params.slice().sort(),
         [
-          ...locales[locale === 'zh' ? 'en' : 'zh'][key].matchAll(
+          ...locales[locale === 'zh-CN' ? 'en-US' : 'zh-CN'][key].matchAll(
             /(?<!')\{([a-zA-Z0-9]+)\}/g,
           ),
         ]

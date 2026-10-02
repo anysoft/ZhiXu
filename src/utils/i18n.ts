@@ -4,6 +4,7 @@ import {
   createLanguageController,
   EffectiveLocale,
   LanguagePreference,
+  LANGUAGE_STORAGE_KEY,
 } from './language';
 export { resolveLocale, normalizePreference } from './language';
 export type { EffectiveLocale, LanguagePreference } from './language';
@@ -27,18 +28,8 @@ controller = createLanguageController({
   browserLanguage: () =>
     typeof navigator === 'undefined' ? 'en-US' : navigator.language,
   apply: (locale) => {
-    const currentLocale = locale === 'zh-CN' ? 'zh' : 'en';
-    if (!ready) {
-      void intl.init({
-        currentLocale,
-        locales: { zh: resources['zh-CN'], en: resources['en-US'] },
-      });
-      ready = true;
-    } else
-      void intl.init({
-        currentLocale,
-        locales: { zh: resources['zh-CN'], en: resources['en-US'] },
-      });
+    void intl.init({ currentLocale: locale, locales: resources });
+    ready = true;
     if (typeof document !== 'undefined') document.documentElement.lang = locale;
     frameworkApply?.(locale);
   },
@@ -47,18 +38,20 @@ export const getLanguagePreference = controller.getPreference;
 export const getEffectiveLocale = controller.getLocale;
 export const setLanguagePreference = controller.setPreference;
 export const applyLocale = controller.apply;
+export const subscribeLocaleChange = controller.subscribe;
 export function initializeLanguage(
   applyFramework: (locale: EffectiveLocale) => void,
 ) {
-  frameworkApply = applyFramework;
   controller.apply();
+  frameworkApply = applyFramework;
   // Ensure framework state is synchronized even when messages initialized earlier.
   applyFramework(getEffectiveLocale());
 }
 if (typeof window !== 'undefined') {
   window.addEventListener('languagechange', controller.systemLanguageChanged);
   window.addEventListener('storage', (event) => {
-    if (event.key === 'lang' || event.key === null) controller.storageChanged();
+    if (event.key === LANGUAGE_STORAGE_KEY || event.key === null)
+      controller.storageChanged();
   });
 }
 export function useLocale() {

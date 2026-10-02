@@ -1,0 +1,17 @@
+{
+  "status": "PASS",
+  "locale": "en-US",
+  "checks": [
+    "reload-preference-and-html-lang",
+    "immediate-switch-no-reload-mounted-unsaved-form",
+    "settings-unsaved-form-preserved",
+    "antd-validation-follows-immediate-switch",
+    "logout-login-preserves-preference",
+    "dashboard-chrome",
+    "credential-capability-and-unset-presentation",
+    "system-zh-CN-and-explicit-isolation",
+    "system-zh-SG-and-explicit-isolation",
+    "system-en-US-and-explicit-isolation",
+    "system-fr-FR-and-explicit-isolation"
+  ]
+}

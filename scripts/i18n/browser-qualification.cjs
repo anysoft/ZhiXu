@@ -32,7 +32,7 @@ module.exports = async function qualify({
   };
   try {
     assert.equal(
-      await page.evaluate(() => localStorage.getItem('lang')),
+      await page.evaluate(() => localStorage.getItem('zhixu.language')),
       locale,
     );
     await waitLocale(page, locale);
@@ -40,10 +40,10 @@ module.exports = async function qualify({
     await waitLocale(page, locale);
     check('reload-preference-and-html-lang');
     // Open a real unsaved form. A second tab changes the user preference through Settings.
-    await page.goto(base + '/repository');
+    await page.goto(base + '/tasks');
     await page
       .getByRole('button', {
-        name: message(locale, 'ui.createRepository'),
+        name: message(locale, 'ui.createTask'),
         exact: true,
       })
       .click();
@@ -54,9 +54,29 @@ module.exports = async function qualify({
     const originalTime = await page.evaluate(() => performance.timeOrigin);
     const settings = await page.context().newPage();
     await settings.goto(base + '/setting');
+    const settingsLoaded = settings.waitForResponse(
+      (response) =>
+        new URL(response.url()).pathname === '/api/system/config' &&
+        response.ok(),
+    );
     await activateTab(settings, message(locale, '其他设置'));
+    const loadedResponse = await settingsLoaded;
+    await loadedResponse.finished();
+    const initialConfig = (await loadedResponse.json()).data.info;
+    await settings
+      .locator('.ant-select-selection-item')
+      .filter({ hasText: initialConfig.timezone })
+      .waitFor();
+    const settingsForm = settings.locator('form:visible');
+    const settingsDraft = 'UNSAVED_SETTINGS_中文_English';
+    await settingsForm.locator('input[maxlength="100"]').fill(settingsDraft);
+    const settingsTime = await settings.evaluate(() => performance.timeOrigin);
     const logPage = await page.context().newPage();
     await logPage.goto(base + '/log');
+    assert.equal(
+      await settingsForm.locator('input[maxlength="100"]').inputValue(),
+      settingsDraft,
+    );
     for (const target of [locale === 'zh-CN' ? 'en-US' : 'zh-CN', locale]) {
       await chooseSelect(
         settings,
@@ -73,6 +93,14 @@ module.exports = async function qualify({
       await waitLocale(settings, target);
       await waitLocale(page, target);
       assert.equal(
+        await settings.evaluate(() => performance.timeOrigin),
+        settingsTime,
+      );
+      assert.equal(
+        await settingsForm.locator('input[maxlength="100"]').inputValue(),
+        settingsDraft,
+      );
+      assert.equal(
         await page.evaluate(() => performance.timeOrigin),
         originalTime,
       );
@@ -87,22 +115,43 @@ module.exports = async function qualify({
         'UNSAVED_I18N_中文_English',
       );
       assert.equal(
-        await page.evaluate(() => localStorage.getItem('lang')),
+        await page.evaluate(() => localStorage.getItem('zhixu.language')),
         target,
       );
       await logPage
         .getByText(message(target, '请选择日志文件'), { exact: true })
         .first()
         .waitFor();
+      // Exercise Ant Design's own validation locale after each live switch.
+      const nameInput = modal.getByLabel(message(target, 'ui.name'), {
+        exact: true,
+      });
+      await nameInput.fill('');
+      await modal
+        .locator('.ant-modal-footer')
+        .getByRole('button', {
+          name: message(target, 'ui.saveTask'),
+          exact: true,
+        })
+        .click();
+      const required = require('antd/lib/locale/' +
+        (target === 'zh-CN' ? 'zh_CN' : 'en_US')).default.Form
+        .defaultValidateMessages.required;
+      await modal
+        .getByText(required.replace('${label}', message(target, 'ui.name')), {
+          exact: true,
+        })
+        .waitFor();
+      await nameInput.fill('UNSAVED_I18N_中文_English');
     }
     await logPage.close();
     await settings.close();
     check('immediate-switch-no-reload-mounted-unsaved-form');
+    check('settings-unsaved-form-preserved');
+    check('antd-validation-follows-immediate-switch');
     await modal
-      .getByRole('button', {
-        name: buttonName('取消'),
-        exact: true,
-      })
+      .locator('.ant-modal-footer')
+      .getByRole('button', { name: buttonName('ui.close'), exact: true })
       .click();
     // Logout through the existing menu and sign back in; language preference is independent of auth.
     const user = page.locator('.side-menu-user-wrapper:visible').first();
@@ -114,7 +163,7 @@ module.exports = async function qualify({
       .click();
     await page.waitForURL('**/login');
     assert.equal(
-      await page.evaluate(() => localStorage.getItem('lang')),
+      await page.evaluate(() => localStorage.getItem('zhixu.language')),
       locale,
     );
     await waitLocale(page, locale);
@@ -186,11 +235,9 @@ module.exports = async function qualify({
         locale: system,
         viewport: { width: 1280, height: 900 },
       });
-      await context.addCookies([{ name: 'lang', value: 'ja', url: base }]);
       await context.addInitScript(
         ({ system }) => {
-          localStorage.setItem('lang', 'system');
-          localStorage.setItem('umi_locale', 'ja-JP');
+          localStorage.setItem('zhixu.language', 'system');
           Object.defineProperty(navigator, 'language', {
             configurable: true,
             get: () => window.__testSystemLanguage || system,
@@ -199,13 +246,13 @@ module.exports = async function qualify({
         { system },
       );
       const probe = await context.newPage();
-      await probe.goto(base + '/login?lang=ja');
+      await probe.goto(base + '/login');
       const effective = system.startsWith('zh') ? 'zh-CN' : 'en-US';
       await waitLocale(probe, effective);
       await probe.reload();
       await waitLocale(probe, effective);
       assert.equal(
-        await probe.evaluate(() => localStorage.getItem('lang')),
+        await probe.evaluate(() => localStorage.getItem('zhixu.language')),
         'system',
       );
       await probe.evaluate(() => {
@@ -220,10 +267,12 @@ module.exports = async function qualify({
       });
       await waitLocale(probe, 'en-US');
       assert.equal(await probe.evaluate(() => performance.timeOrigin), start);
-      // Storage event is the documented cross-tab update path, including legacy browser preferences.
+      // Cross-tab updates use only the formal product preference key.
       await probe.evaluate(() => {
-        localStorage.setItem('lang', 'zh-CN');
-        window.dispatchEvent(new StorageEvent('storage', { key: 'lang' }));
+        localStorage.setItem('zhixu.language', 'zh-CN');
+        window.dispatchEvent(
+          new StorageEvent('storage', { key: 'zhixu.language' }),
+        );
       });
       await waitLocale(probe, 'zh-CN');
       await probe.evaluate(() => {

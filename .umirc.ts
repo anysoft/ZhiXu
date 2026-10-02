@@ -16,7 +16,8 @@ export default defineConfig({
   locale: {
     antd: true,
     title: true,
-    baseNavigator: true,
+    // The product language controller resolves navigator.language centrally.
+    baseNavigator: false,
   },
   outputPath: 'static/dist',
   fastRefresh: true,

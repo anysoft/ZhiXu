@@ -105,7 +105,7 @@ async function port() {
     }),
     page = await context.newPage();
   await page.addInitScript(
-    (preference) => localStorage.setItem('lang', preference),
+    (preference) => localStorage.setItem('zhixu.language', preference),
     process.env.BRAND_PREFERENCE || locale,
   );
   flush = acceptance.observe(page, output);
@@ -133,7 +133,9 @@ async function port() {
       name,
       title,
       locale,
-      preference: await page.evaluate(() => localStorage.getItem('lang')),
+      preference: await page.evaluate(() =>
+        localStorage.getItem('zhixu.language'),
+      ),
       status: 'PASS',
     });
   }

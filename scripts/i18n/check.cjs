@@ -145,6 +145,17 @@ function check() {
   const parity = [...new Set([...Object.keys(zh), ...Object.keys(en)])].filter(
     (key) => !Object.hasOwn(zh, key) || !Object.hasOwn(en, key),
   );
+  const requiredPresentationKeys = [
+    ...Object.entries(require('./enums.json')).flatMap(([domain, values]) =>
+      values.map((value) => `status.${domain}.${value}`),
+    ),
+    ...require('./errors.json').map((code) => `error.${code}`),
+  ];
+  const missingPresentation = requiredPresentationKeys.flatMap((key) =>
+    Object.entries(resources)
+      .filter(([, messages]) => !Object.hasOwn(messages, key) || !messages[key])
+      .map(([locale]) => ({ locale, key })),
+  );
   const exemptions = fs.existsSync(path.join(__dirname, 'exceptions.json'))
     ? require('./exceptions.json')
     : [];
@@ -181,6 +192,7 @@ function check() {
       missing.length ||
       parity.length ||
       semanticErrors.length ||
+      missingPresentation.length ||
       classified.some((x) => x.classification === 'UNCLASSIFIED')
         ? 'FAIL'
         : 'PASS',
@@ -189,6 +201,7 @@ function check() {
     missing,
     parity,
     semanticErrors,
+    missingPresentation,
     literals: classified,
   };
 }

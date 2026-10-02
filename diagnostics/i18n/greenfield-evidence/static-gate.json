@@ -1,0 +1,20 @@
+{
+  "status": "PASS",
+  "keys": {
+    "zh": 1827,
+    "en": 1827
+  },
+  "duplicates": [],
+  "missing": [],
+  "parity": [],
+  "semanticErrors": [],
+  "missingPresentation": [],
+  "current_literal_count": 172,
+  "current_literal_classifications": {
+    "TECHNICAL_TOKEN": 144,
+    "USER_CONTENT_TEMPLATE": 28
+  },
+  "unclassified_ui_literals": 0,
+  "full_result_sha256": "dbe36361f44640620b1d82de6ae755d9faf13eaf238feb43a90d89b347ef4240",
+  "command": "node diagnostics/i18n/inventory.cjs"
+}

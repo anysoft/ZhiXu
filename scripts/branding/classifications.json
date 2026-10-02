@@ -27188,5 +27188,15 @@
     "classification": "HISTORICAL_EVIDENCE_KEEP",
     "action": "KEEP",
     "reason": "Brand audit evidence explicitly records retained identities, removed branding or regression criteria; not a current product label."
+  },
+  "df0cd9ca8534f519bd832f74db6c0935fe35f7ec406dba12566dce7fef649017": {
+    "classification": "HISTORICAL_EVIDENCE_KEEP",
+    "action": "KEEP",
+    "reason": "Final implementation report explicitly states that compatibility with the historical product is absent; this exact statement is not a product display name."
+  },
+  "550c80d1f659a517876f9050926e0e7ba13ae5ab61c203999f64929917da129f": {
+    "classification": "HISTORICAL_EVIDENCE_KEEP",
+    "action": "KEEP",
+    "reason": "Exact report heading identifies the technical contracts excluded by the requested internationalization scope; it introduces no compatibility implementation or product branding."
   }
 }

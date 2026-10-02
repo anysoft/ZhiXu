@@ -31,7 +31,7 @@ async function fixture(page, broken = false) {
 
 test('focus-time layout shift loses the old click; focus-before-click activates with one click', async () => {
   const page = await browser.newPage({ locale: 'en-US' });
-  await page.addInitScript(() => localStorage.setItem('lang', 'en-US'));
+  await page.addInitScript(() => localStorage.setItem('zhixu.language', 'en-US'));
   try {
     await fixture(page);
     const tab = page.getByRole('tab', { name: 'Runtime' });

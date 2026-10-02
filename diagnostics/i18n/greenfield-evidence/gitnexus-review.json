@@ -1,0 +1,86 @@
+{
+  "status": "REVIEWED_WITH_TOOL_LIMITATION",
+  "warning": "Refreshed GitNexus reports identical unrelated CRITICAL call sets for different symbols. These automated counts do not reliably describe the actual blast radius. Manual diff/call-site review and regressions determine scope.",
+  "upstream_impact": [
+    {
+      "target": "normalizePreference",
+      "file": "src/utils/language.ts",
+      "risk": "CRITICAL",
+      "summary": {
+        "direct": 351,
+        "processes_affected": 95,
+        "modules_affected": 9
+      }
+    },
+    {
+      "target": "createLanguageController",
+      "file": "src/utils/language.ts",
+      "risk": "CRITICAL",
+      "summary": {
+        "direct": 351,
+        "processes_affected": 95,
+        "modules_affected": 9
+      }
+    },
+    {
+      "target": "resolveLocale",
+      "file": "src/utils/language.ts",
+      "risk": "CRITICAL",
+      "summary": {
+        "direct": 351,
+        "processes_affected": 95,
+        "modules_affected": 9
+      }
+    },
+    {
+      "target": "initializeLanguage",
+      "file": "src/utils/i18n.ts",
+      "risk": "CRITICAL",
+      "summary": {
+        "direct": 351,
+        "processes_affected": 95,
+        "modules_affected": 9
+      }
+    },
+    {
+      "target": "qualify",
+      "file": "scripts/i18n/browser-qualification.cjs",
+      "risk": "CRITICAL",
+      "summary": {
+        "direct": 351,
+        "processes_affected": 95,
+        "modules_affected": 9
+      }
+    },
+    {
+      "target": "configure",
+      "file": "scripts/ci/browser-locale.cjs",
+      "risk": "CRITICAL",
+      "summary": {
+        "direct": 351,
+        "processes_affected": 95,
+        "modules_affected": 9
+      }
+    },
+    {
+      "target": "verify",
+      "file": "scripts/branding/browser.cjs",
+      "risk": "CRITICAL",
+      "summary": {
+        "direct": 351,
+        "processes_affected": 95,
+        "modules_affected": 9
+      }
+    }
+  ],
+  "additional_impact_targets": [
+    "check: scripts/i18n/check.cjs (CRITICAL)",
+    "visit/walk: diagnostics/i18n/inventory.cjs (NOT FOUND)"
+  ],
+  "detect_changes_scopes": [
+    "staged",
+    "compare against develop"
+  ],
+  "manual_scope": "Production changes only in src/utils/language.ts, src/utils/i18n.ts and .umirc.ts. Other changes are browser fixtures, static checker, tests, report-only brand classifications and evidence. No backend, schema, API enum, dependency, locale message or release workflow changes.",
+  "regression_receipt": "validation.json"
+}

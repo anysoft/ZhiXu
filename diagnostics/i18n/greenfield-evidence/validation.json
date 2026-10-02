@@ -1,0 +1,127 @@
+{
+  "status": "PASS",
+  "generated_at": "2026-10-02T09:46:46.759243+00:00",
+  "entry_head": "99116241390db230e0538a257fa680567f772c62",
+  "platform": "macOS arm64",
+  "node": "22.23.3",
+  "browser": "local Chrome via Playwright",
+  "hosted_ci_run": false,
+  "builds": {
+    "frontend_typescript": {
+      "command": "node node_modules/typescript/bin/tsc --noEmit --skipLibCheck",
+      "exit_code": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "backend_typescript_build": {
+      "command": "node scripts/build-back.cjs",
+      "exit_code": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "frontend_production_build": {
+      "command": "node node_modules/@umijs/max/bin/max.js build",
+      "exit_code": 0,
+      "log_sha256": "b8550941ccaa07cb8ea818ac432b79ebcae14d0361757db515caa74159c33df3"
+    }
+  },
+  "tests": {
+    "platform": {
+      "tests": 412,
+      "pass": 412,
+      "fail": 0,
+      "skipped": 0
+    },
+    "i18n_units": {
+      "tests": 9,
+      "pass": 9,
+      "fail": 0,
+      "skipped": 0
+    },
+    "focused_i18n_ci_brand": {
+      "tests": 29,
+      "pass": 29,
+      "fail": 0,
+      "skipped": 0
+    },
+    "browser_tab": {
+      "tests": 4,
+      "pass": 4,
+      "fail": 0,
+      "skipped": 0
+    }
+  },
+  "counts_note": "Focused counts overlap the platform and standalone browser-tab suites; do not sum them.",
+  "browser_receipts": {
+    "phase12/browser-e2e.json": {
+      "status": "PASS",
+      "scenarios": 16,
+      "sha256": "cab3d1ec0fd87cd170dafbd9cc2061089c9e63b61ff3e1b97675391fb569c741"
+    },
+    "phase14/platform-e2e.json": {
+      "status": "PASS",
+      "scenarios": 54,
+      "sha256": "65b111d310e5a5a2b3c5d8ba33c610b1f1e14d11a0d7c0cdd48143b05576dd96"
+    },
+    "full-zh-CN/platform-e2e.json": {
+      "status": "PASS",
+      "scenarios": 65,
+      "sha256": "5149285cb311fe4a500e561b7c4808ff590d605e21e32bb0bb831b7d4a673cdb"
+    },
+    "full-en-US/platform-e2e.json": {
+      "status": "PASS",
+      "scenarios": 65,
+      "sha256": "a0d43b3bc33e2e6342c4cb01602ebf4a4369b5b0d1a963e0920e71bf72b346ed"
+    },
+    "full-zh-CN/i18n-browser.json": {
+      "status": "PASS",
+      "scenarios": 11,
+      "sha256": "011d1c309600cfa528bcbd784433fdfdab1b4503e290e0d553ef7213182ff911"
+    },
+    "full-en-US/i18n-browser.json": {
+      "status": "PASS",
+      "scenarios": 11,
+      "sha256": "34641df8a5a8e2fc3f15b3147badf78450da66b0dabf6cdf26aa2dc2096fef72"
+    },
+    "focused-zh-CN/i18n-browser.json": {
+      "status": "PASS",
+      "scenarios": 11,
+      "sha256": "011d1c309600cfa528bcbd784433fdfdab1b4503e290e0d553ef7213182ff911"
+    },
+    "focused-en-US/i18n-browser.json": {
+      "status": "PASS",
+      "scenarios": 11,
+      "sha256": "34641df8a5a8e2fc3f15b3147badf78450da66b0dabf6cdf26aa2dc2096fef72"
+    },
+    "brand-zh-CN-zh-CN/brand-browser.json": {
+      "status": "PASS",
+      "sha256": "4d6ee1ab1cf9daa8fc85e67b2859352b176bf36170c1eac734df061571ffd4db"
+    },
+    "brand-en-US-en-US/brand-browser.json": {
+      "status": "PASS",
+      "sha256": "a6545977ea5a3f1f74906b1099290085d5ec974d01363d263bd96fdb3db07e13"
+    },
+    "brand-zh-CN-system/brand-browser.json": {
+      "status": "PASS",
+      "sha256": "b3352624bef271d5ff483784e4c34a23895ba78bce218f1c09bc4292134d6921"
+    },
+    "brand-en-US-system/brand-browser.json": {
+      "status": "PASS",
+      "sha256": "24c74c7439a9a52d6f52fccc3aa67e4e9c2e206952237717a9f816b03daae67b"
+    }
+  },
+  "test_logs_sha256": {
+    "platform": "6bf47afc1dd0c486efa81dd275d4479844d805703a287e91d01aca239b86a10b",
+    "focused-tests": "28ac3e702ca25ef984b583d47cf388dae11823207b8eb7b485b23dc8f8eb2413",
+    "unit": "f0bd663f96bf5710b994e7259e0b02a5d6893d056b36419462801463658cd214",
+    "browser-tab": "f913333794619e37c70592e2e3aeda57c7302d5c00910d7e34a3768d9e251f72"
+  },
+  "brand_static_gate": {
+    "status": "PASS",
+    "manual_review": 0,
+    "invalid_decisions": 0
+  },
+  "owned_fixture_cleanup": {
+    "status": "PASS",
+    "managed_python_root_removed": true,
+    "managed_node_root_removed": true
+  }
+}
