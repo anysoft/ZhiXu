@@ -1,0 +1,50 @@
+{
+  "scope": "Isolated unauthenticated contexts against locally deployed RC.5. Read-only UI observation, not full bilingual acceptance.",
+  "rows": [
+    {
+      "preference": "zh",
+      "browser_locale": "en-US",
+      "document_lang": "",
+      "title": "登录 - 枝序",
+      "persisted_lang": "zh",
+      "umi_locale": "zh-CN",
+      "text": "枝序\n用户名\n密码\n登 录\n登录已过期，请重新登录"
+    },
+    {
+      "preference": "en",
+      "browser_locale": "zh-CN",
+      "document_lang": "",
+      "title": "Login - ZhiXu",
+      "persisted_lang": "en",
+      "umi_locale": "en-US",
+      "text": "ZhiXu\nUsername\nPassword\nLogin\nLogin session has expired, please log in again"
+    },
+    {
+      "preference": "",
+      "browser_locale": "zh-SG",
+      "document_lang": "",
+      "title": "登录 - 枝序",
+      "persisted_lang": "",
+      "umi_locale": "zh-CN",
+      "text": "枝序\n用户名\n密码\n登 录\n登录已过期，请重新登录"
+    },
+    {
+      "preference": "",
+      "browser_locale": "en-US",
+      "document_lang": "",
+      "title": "Login - ZhiXu",
+      "persisted_lang": "",
+      "umi_locale": null,
+      "text": "ZhiXu\nUsername\nPassword\nLogin\nLogin session has expired, please log in again"
+    },
+    {
+      "preference": "",
+      "browser_locale": "fr-FR",
+      "document_lang": "",
+      "title": "登录 - 枝序",
+      "persisted_lang": "",
+      "umi_locale": "zh-CN",
+      "text": "枝序\n用户名\n密码\n登 录"
+    }
+  ]
+}
