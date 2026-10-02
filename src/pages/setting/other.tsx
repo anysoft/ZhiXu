@@ -1,3 +1,11 @@
+import { formatBytes } from '@/utils/format';
+import { t as tr } from '@/utils/i18n';
+import {
+  getLanguagePreference,
+  setLanguagePreference,
+  LanguagePreference,
+  useLocale,
+} from '@/utils/i18n';
 import intl from 'react-intl-universal';
 import React, { useState, useEffect, useRef } from 'react';
 import {
@@ -25,7 +33,6 @@ const dataMap = {
   timezone: 'timezone',
 };
 
-
 const Other = ({
   systemInfo,
   reloadSystemConfig,
@@ -34,6 +41,7 @@ const Other = ({
   SharedContext,
   'reloadSystemConfig' | 'reloadTheme' | 'systemInfo'
 >) => {
+  useLocale();
   const defaultTheme = localStorage.getItem('zhixu_dark_theme') || 'auto';
   const [systemConfig, setSystemConfig] = useState<{
     panelTitle?: string | null;
@@ -66,16 +74,8 @@ const Other = ({
     reloadTheme();
   };
 
-  const handleLangChange = (v: string) => {
-    localStorage.setItem('lang', v);
-    const backendLang = v || navigator.language?.slice(0, 2) || 'zh';
-    request
-      .put(`${config.apiPrefix}system/config/lang`, { lang: backendLang })
-      .catch(() => {});
-    setTimeout(() => {
-      window.location.reload();
-    }, 500);
-  };
+  const handleLangChange = (value: LanguagePreference) =>
+    setLanguagePreference(value);
 
   const getSystemConfig = () => {
     request
@@ -109,16 +109,6 @@ const Other = ({
       });
   };
 
-  const formatBytes = (bytes: number) => {
-    if (!bytes) return '0 B';
-    const units = ['B', 'KiB', 'MiB', 'GiB'];
-    const unit = Math.min(
-      Math.floor(Math.log(bytes) / Math.log(1024)),
-      units.length - 1,
-    );
-    return `${(bytes / 1024 ** unit).toFixed(unit ? 1 : 0)} ${units[unit]}`;
-  };
-
   const previewStorageCleanup = () => {
     setCleanupLoading(true);
     const payload = {
@@ -137,8 +127,17 @@ const Other = ({
           okButtonProps: { danger: true },
           content: (
             <div>
-              <p>将删除 {data.files.length} 个订阅同步日志（{formatBytes(data.bytes)}）。</p>
-              <p>TaskRun 日志单独保留；系统日志由服务日志轮转管理。</p>
+              <p>
+                {tr('ui.cleanupPreviewSummary', {
+                  count: data.files.length,
+                  size: formatBytes(data.bytes),
+                })}
+              </p>
+              <p>
+                {tr(
+                  'ui.runLogsAreRetainedSeparatelyServiceLogRotationManagesSystemLogs',
+                )}
+              </p>
               <p>{intl.get('此操作不可恢复，请确认已完成必要备份')}</p>
             </div>
           ),
@@ -231,7 +230,9 @@ const Other = ({
         <Form.Item
           label={intl.get('日志删除频率')}
           name="frequency"
-          tooltip="订阅同步日志保留天数；0 表示禁用，TaskRun 日志不在清理范围内"
+          tooltip={tr(
+            'ui.subscriptionSyncLogRetentionInDaysZeroDisablesCleanupRunLogsAreExcluded',
+          )}
         >
           <Input.Group compact>
             <InputNumber
@@ -256,8 +257,19 @@ const Other = ({
             </Button>
           </Input.Group>
         </Form.Item>
-        <Form.Item label="订阅同步日志清理" tooltip="按上方保留天数预览；0 表示禁用。每小时检查一次。">
-          <Button danger loading={cleanupLoading} onClick={previewStorageCleanup}>预览清理</Button>
+        <Form.Item
+          label={tr('ui.subscriptionSyncLogCleanup')}
+          tooltip={tr(
+            'ui.previewUsingTheRetentionPeriodAboveZeroDisablesCleanupCheckedHourly',
+          )}
+        >
+          <Button
+            danger
+            loading={cleanupLoading}
+            onClick={previewStorageCleanup}
+          >
+            {tr('ui.previewCleanup')}
+          </Button>
         </Form.Item>
         <Form.Item label={intl.get('时区')} name="timezone">
           <Input.Group compact>
@@ -273,7 +285,9 @@ const Other = ({
               }))}
               showSearch
               filterOption={(input, option) =>
-                (option?.value || '').toLowerCase().includes(input.toLowerCase())
+                (option?.value || '')
+                  .toLowerCase()
+                  .includes(input.toLowerCase())
               }
             />
             <Button
@@ -288,21 +302,21 @@ const Other = ({
           </Input.Group>
         </Form.Item>
 
-        <Form.Item label={intl.get('语言')} name="lang">
+        <Form.Item label={intl.get('语言')} htmlFor="language-preference">
           <Select
-            defaultValue={localStorage.getItem('lang') || ''}
+            id="language-preference"
+            aria-label={intl.get('语言')}
+            value={getLanguagePreference()}
             style={{ width: 264 }}
             onChange={handleLangChange}
             options={[
-              { value: '', label: intl.get('跟随系统') },
-              { value: 'zh', label: '简体中文' },
-              { value: 'en', label: 'English' },
+              { value: 'system', label: intl.get('跟随系统') },
+              { value: 'zh-CN', label: '简体中文' },
+              { value: 'en-US', label: 'English' },
             ]}
           />
         </Form.Item>
-
       </Form>
-
     </>
   );
 };

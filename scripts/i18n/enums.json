@@ -1,0 +1,444 @@
+{
+  "taskOrigin": [
+    "MANUAL",
+    "DISCOVERED"
+  ],
+  "triggerOrigin": [
+    "USER",
+    "DISCOVERY"
+  ],
+  "readiness": [
+    "READY",
+    "CONFIGURATION_REQUIRED",
+    "INVALID",
+    "SOURCE_MISSING",
+    "RESOURCE_UNAVAILABLE"
+  ],
+  "taskRun": [
+    "QUEUED",
+    "RESOLVING",
+    "RUNNING",
+    "SUCCESS",
+    "FAILED",
+    "TIMEOUT",
+    "CANCELLED",
+    "INTERRUPTED",
+    "SKIPPED",
+    "RECOVERY_REQUIRED"
+  ],
+  "taskRunAttempt": [
+    "QUEUED",
+    "RESOLVING",
+    "RUNNING",
+    "SUCCESS",
+    "FAILED",
+    "TIMEOUT",
+    "CANCELLED",
+    "INTERRUPTED",
+    "SKIPPED",
+    "RECOVERY_REQUIRED"
+  ],
+  "triggerType": [
+    "MANUAL",
+    "SCHEDULE",
+    "API",
+    "INTERNAL",
+    "CRON",
+    "WEBHOOK",
+    "GIT_UPDATE"
+  ],
+  "triggerEvent": [
+    "RECEIVED",
+    "PROCESSING",
+    "SUBMITTED",
+    "SKIPPED",
+    "FAILED"
+  ],
+  "misfire": [
+    "SKIP",
+    "FIRE_ONCE"
+  ],
+  "gitUpdate": [
+    "ANY_CHANGE",
+    "SOURCE_CHANGE",
+    "PATH_FILTER"
+  ],
+  "concurrency": [
+    "FORBID",
+    "QUEUE",
+    "ALLOW"
+  ],
+  "backoff": [
+    "FIXED",
+    "EXPONENTIAL"
+  ],
+  "notificationPolicy": [
+    "NONE",
+    "FAILURE",
+    "SUCCESS",
+    "ALWAYS",
+    "CUSTOM"
+  ],
+  "channelMode": [
+    "DEFAULT",
+    "EXPLICIT",
+    "NONE"
+  ],
+  "runtimeProvider": [
+    "UNINITIALIZED",
+    "INSTALLING",
+    "READY",
+    "UPDATING",
+    "ERROR",
+    "MISSING"
+  ],
+  "runtimeInstallation": [
+    "INSTALLING",
+    "READY",
+    "VERIFYING",
+    "ERROR",
+    "REMOVING",
+    "MISSING",
+    "REMOVED"
+  ],
+  "runtimeOperation": [
+    "QUEUED",
+    "RUNNING",
+    "SUCCESS",
+    "FAILED",
+    "CANCELLED",
+    "INTERRUPTED"
+  ],
+  "pythonEnvironment": [
+    "EMPTY",
+    "BUILDING",
+    "READY",
+    "ERROR",
+    "DELETING",
+    "MISSING"
+  ],
+  "pythonBuild": [
+    "QUEUED",
+    "CREATING",
+    "INSTALLING",
+    "VERIFYING",
+    "READY",
+    "ERROR",
+    "DELETING",
+    "MISSING"
+  ],
+  "nodeEnvironment": [
+    "EMPTY",
+    "BUILDING",
+    "READY",
+    "ERROR",
+    "DELETING",
+    "MISSING"
+  ],
+  "nodeBuild": [
+    "QUEUED",
+    "INSTALLING",
+    "READY",
+    "ERROR",
+    "DELETING",
+    "MISSING"
+  ],
+  "nodeToolchain": [
+    "INSTALLING",
+    "READY",
+    "ERROR",
+    "REMOVING",
+    "REMOVED",
+    "MISSING"
+  ],
+  "health": [
+    "HEALTHY",
+    "UNHEALTHY",
+    "UNVERIFIED",
+    "INVALID",
+    "UNKNOWN",
+    "MISSING",
+    "ERROR",
+    "READY",
+    "FAILING"
+  ],
+  "repositoryStorage": [
+    "UNINITIALIZED",
+    "INITIALIZING",
+    "READY",
+    "FETCHING",
+    "ERROR",
+    "MISSING",
+    "DELETING"
+  ],
+  "repositoryAvailability": [
+    "unknown",
+    "available",
+    "auth_failed",
+    "unreachable",
+    "enabled",
+    "disabled"
+  ],
+  "worktreeLifecycle": [
+    "CREATING",
+    "READY",
+    "ERROR",
+    "MISSING",
+    "STALE",
+    "DELETING"
+  ],
+  "worktreeDirty": [
+    "UNKNOWN",
+    "CLEAN",
+    "DIRTY",
+    "CONFLICT"
+  ],
+  "worktreePurpose": [
+    "USER",
+    "SUBSCRIPTION"
+  ],
+  "refType": [
+    "branch",
+    "tag",
+    "commit"
+  ],
+  "notificationDelivery": [
+    "PENDING",
+    "SENDING",
+    "SENT",
+    "DELIVERED",
+    "RETRY",
+    "DEAD",
+    "SKIPPED",
+    "SUCCESS",
+    "FAILED"
+  ],
+  "notificationEvent": [
+    "SUCCESS",
+    "FAILURE",
+    "TIMEOUT",
+    "INTERRUPTED",
+    "CANCELLED",
+    "RECOVERY",
+    "TEST",
+    "FAILED",
+    "RECOVERY_REQUIRED"
+  ],
+  "backupOperation": [
+    "QUEUED",
+    "RUNNING",
+    "SUCCESS",
+    "FAILED",
+    "CANCELLED",
+    "READY",
+    "ERROR"
+  ],
+  "restoreStage": [
+    "PENDING",
+    "VALIDATING",
+    "QUIESCING",
+    "PREPARING",
+    "PREPARED",
+    "SNAPSHOTTING",
+    "OLD_ROOT_MOVED",
+    "CANDIDATE_PUBLISHED",
+    "COMPLETE",
+    "ROLLED_BACK",
+    "RECOVERY_REQUIRED",
+    "FAILED"
+  ],
+  "cwdMode": [
+    "WORKTREE_ROOT",
+    "ENTRYPOINT_DIR",
+    "CUSTOM_RELATIVE"
+  ],
+  "scope": [
+    "GLOBAL",
+    "REPOSITORY",
+    "SUBSCRIPTION",
+    "TASK",
+    "SYSTEM"
+  ],
+  "hook": [
+    "BEFORE",
+    "AFTER_SUCCESS",
+    "AFTER_FAILURE",
+    "FINALLY"
+  ],
+  "failurePolicy": [
+    "FAIL_EXECUTION",
+    "CONTINUE"
+  ],
+  "language": [
+    "PYTHON",
+    "NODE",
+    "SHELL",
+    "JAVASCRIPT",
+    "TYPESCRIPT"
+  ],
+  "dependencyType": [
+    "DEPENDENCY",
+    "DEV_DEPENDENCY"
+  ],
+  "dependencyChange": [
+    "added",
+    "removed",
+    "changed"
+  ],
+  "scriptPolicy": [
+    "ALLOW",
+    "IGNORE"
+  ],
+  "runtimeOperationType": [
+    "PROVIDER_INSTALL",
+    "PROVIDER_UPDATE",
+    "PROVIDER_VERIFY",
+    "PROVIDER_REPAIR",
+    "RUNTIME_INSTALL",
+    "RUNTIME_VERIFY",
+    "RUNTIME_REPAIR",
+    "RUNTIME_REMOVE",
+    "NODE_RUNTIME_INSTALL",
+    "NODE_RUNTIME_VERIFY",
+    "NODE_RUNTIME_REPAIR",
+    "NODE_RUNTIME_REMOVE",
+    "NODE_PACKAGE_MANAGER_INSTALL",
+    "NODE_PACKAGE_MANAGER_VERIFY",
+    "NODE_PACKAGE_MANAGER_REMOVE",
+    "PYTHON_ENV_VERIFY",
+    "PYTHON_ENV_BUILD",
+    "PYTHON_ENV_DELETE",
+    "PYTHON_ENV_DELETE_BUILD",
+    "PYTHON_ENV_PROMOTE",
+    "PYTHON_ENV_REBUILD",
+    "NODE_ENV_VERIFY",
+    "NODE_ENV_BUILD",
+    "NODE_ENV_DELETE",
+    "NODE_ENV_DELETE_BUILD",
+    "NODE_ENV_PROMOTE",
+    "NODE_ENV_REBUILD",
+    "NODE_ENV_RESOLVE",
+    "CATALOG_REFRESH",
+    "NODE_CATALOG_REFRESH"
+  ],
+  "runtimeStage": [
+    "QUEUED",
+    "PREPARING",
+    "REFRESHING_CATALOG",
+    "VERIFYING",
+    "REMOVING",
+    "REPAIRING",
+    "COMPLETE",
+    "CLEANUP_REQUIRED",
+    "RECOVERY_REQUIRED",
+    "REMOVING_RUNTIME",
+    "DELETING_ENVIRONMENT",
+    "VERIFYING_RUNTIME",
+    "DOWNLOADING_CHECKSUM",
+    "DOWNLOADING_RUNTIME",
+    "EXTRACTING_RUNTIME",
+    "VERIFYING_STAGING",
+    "PUBLISHING_RUNTIME",
+    "DELETING_BUILD",
+    "CREATING_VENV",
+    "INSTALLING_DEPENDENCIES",
+    "VERIFYING_ENVIRONMENT",
+    "INSTALLING_TOOLCHAIN",
+    "VERIFYING_BUILD",
+    "FETCHING_PROVIDER",
+    "BUILDING"
+  ],
+  "bindingOperation": [
+    "ATTACH",
+    "MASK"
+  ],
+  "bindingBase": [
+    "WORKSPACE_ROOT",
+    "TASK_DIR"
+  ],
+  "hookBase": [
+    "TASK_CWD",
+    "WORKSPACE_ROOT"
+  ],
+  "materialization": [
+    "COPY",
+    "SYMLINK"
+  ],
+  "conflictPolicy": [
+    "FAIL_IF_EXISTS",
+    "REPLACE_RESTORE"
+  ],
+  "timeUnit": [
+    "days",
+    "hours",
+    "minutes",
+    "seconds"
+  ],
+  "selectionSource": [
+    "TASK",
+    "SUBSCRIPTION",
+    "REPOSITORY",
+    "GLOBAL",
+    "UNBOUND",
+    "NONE",
+    "SYSTEM"
+  ],
+  "subscriptionState": [
+    "SUCCESS",
+    "FAILED",
+    "RUNNING",
+    "QUEUED",
+    "PENDING"
+  ],
+  "subscriptionPhase": [
+    "REPOSITORY_FETCH",
+    "WORKTREE_ENSURE",
+    "WORKTREE_UPDATE",
+    "DISCOVERY",
+    "GIT_UPDATE_TRIGGERS",
+    "COMPLETE"
+  ],
+  "credentialState": [
+    "enabled",
+    "disabled"
+  ],
+  "backupKind": [
+    "CREATE",
+    "IMPORT",
+    "EXPORT",
+    "REBUILD",
+    "SNAPSHOT",
+    "VALIDATE",
+    "VALIDATE_IMPORT",
+    "STAGE_RESTORE"
+  ],
+  "envOperation": [
+    "SET",
+    "UNSET"
+  ],
+  "notificationAttempt": [
+    "SENDING",
+    "SENT",
+    "RETRY",
+    "DEAD",
+    "INTERRUPTED"
+  ],
+  "runEvent": [
+    "RUN_SUBMITTED",
+    "RETRY_SCHEDULED",
+    "RUN_QUEUED",
+    "RUN_RESOLVING",
+    "RUN_RUNNING",
+    "RUN_SUCCESS",
+    "RUN_FAILED",
+    "RUN_TIMEOUT",
+    "RUN_CANCELLED",
+    "RUN_INTERRUPTED",
+    "RUN_SKIPPED",
+    "RUN_RECOVERY_REQUIRED"
+  ],
+  "credentialCapability": [
+    "READ",
+    "WRITE"
+  ]
+}

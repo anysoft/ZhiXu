@@ -1,3 +1,5 @@
+import { useLocale as useI18nLocale } from '@/utils/i18n';
+import { t as tr } from '@/utils/i18n';
 import intl from 'react-intl-universal';
 import React, { useState, useEffect, useRef } from 'react';
 import config from '@/utils/config';
@@ -9,9 +11,10 @@ import { SharedContext } from '@/layouts';
 import { Alert, Typography } from 'antd';
 
 const Error = () => {
+  useI18nLocale();
   const { user } = useOutletContext<SharedContext>();
   const [loading, setLoading] = useState(false);
-  const [data, setData] = useState(intl.get('暂无日志'));
+  const [data, setData] = useState('');
   const retryTimes = useRef(1);
 
   const loopStatus = (message: string) => {
@@ -80,15 +83,13 @@ const Error = () => {
               <Typography.Text type="danger">
                 <div>{intl.get('请先按如下方式修复：')}</div>
                 <div>
-                  1. 宿主机执行 docker run --rm -v
-                  /var/run/docker.sock:/var/run/docker.sock
-                  containrrr/watchtower -cR &lt;容器名&gt;
+                  {tr(
+                    'ui.1OnTheHostRunDockerRunRmVVarRunDockerSockVarRunDockerSockContainrrrWatchtowerCRContainerName',
+                  )}
                 </div>
                 <div>{intl.get('2. 容器内执行 ql check、ql update')}</div>
                 <div>
-                  {intl.get(
-                    '3. 如果无法解决，容器内执行 ql log，拷贝执行结果',
-                  )}
+                  {intl.get('3. 如果无法解决，容器内执行 ql log，拷贝执行结果')}
                   <Typography.Link href="https://github.com/anysoft/ZhiXu/issues/new?assignees=&labels=&template=bug_report.yml">
                     {intl.get('提交 issue')}
                   </Typography.Link>
@@ -98,7 +99,7 @@ const Error = () => {
             banner
           />
           <Typography.Paragraph code className="log">
-            {data}
+            {data || intl.get('暂无日志')}
           </Typography.Paragraph>
         </div>
       ) : (

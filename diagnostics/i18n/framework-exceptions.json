@@ -1,0 +1,8 @@
+[
+  {
+    "classification": "INTENTIONAL_EXCEPTION",
+    "file": "node_modules/.pnpm/rc-dialog@9.0.4_react-dom@18.3.1_react@18.3.1/node_modules/rc-dialog/es/Dialog/Content/Panel.js",
+    "value": "Close",
+    "reason": "Pinned third-party close-icon aria-label is hardcoded by rc-dialog, independent of Ant Design locale. Visible application Close buttons are localized. No dependency patch or DOM mutation is introduced."
+  }
+]

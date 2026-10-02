@@ -374,9 +374,15 @@ async function browser(s) {
         s,
         'browser-' + phase,
         [process.execPath, `diagnostics/${phase}/${file}`],
-        { ...extra, QL_ACCEPTANCE_DIR: path.join(s.output, 'browser', phase) },
+        { ...extra, QL_I18N_LOCALE: 'en-US', QL_I18N_ACCEPTANCE: '0',
+          QL_ACCEPTANCE_DIR: path.join(s.output, 'browser', phase) },
         2400,
       );
+    for (const locale of ['zh-CN', 'en-US'])
+      await run(s, 'i18n-' + locale,
+        [process.execPath, 'diagnostics/phase14/platform-e2e.cjs'],
+        { ...extra, QL_I18N_LOCALE: locale, QL_I18N_ACCEPTANCE: '1',
+          QL_ACCEPTANCE_DIR: path.join(s.output, 'browser', 'i18n-' + locale) }, 2400);
   } catch (e) {
     failure = e;
     if (e.stage === 'browser-phase14') {
@@ -398,6 +404,7 @@ async function browser(s) {
       tab_interaction: stageEvidence(s, 'browser-tab-tests'),
       backend_build: stageEvidence(s, 'backend-build'),
       frontend_build: stageEvidence(s, 'frontend-build'),
+      i18n: ['zh-CN', 'en-US'].map(locale => ({ locale, ...stageEvidence(s, 'i18n-' + locale) })),
       scenarios: ['phase12', 'phase14'].map((phase) => ({
         phase,
         ...stageEvidence(s, 'browser-' + phase),

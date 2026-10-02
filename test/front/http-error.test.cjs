@@ -1,29 +1,19 @@
 const assert = require('node:assert/strict');
 const test = require('node:test');
-
 const { getErrorDetails } = require('../../src/utils/httpError');
+const { setLanguagePreference, translateError } = require('../../src/utils/i18n');
 
-test('validation errors include the failing field names', () => {
-  const details = getErrorDetails({
-    message: 'Validation failed',
-    validation: {
-      body: {
-        source: 'body',
-        keys: ['labels', 'allow_multiple_instances'],
-        message: 'request body contains invalid values',
-      },
-    },
-  });
-
-  assert.deepEqual(details, [
-    'labels: request body contains invalid values',
-    'allow_multiple_instances: request body contains invalid values',
-  ]);
+test('raw validation messages and values never leak through error details', () => {
+  assert.deepEqual(getErrorDetails({ validation: { body: {
+    keys: ['password'], message: 'invalid secret=private-canary',
+  } }, errors: [{ message: 'duplicate value', value: 'private-canary' }] }), []);
 });
-
-test('existing API error details remain visible', () => {
-  assert.deepEqual(
-    getErrorDetails({ errors: [{ message: 'duplicate value', value: 'foo' }] }),
-    ['duplicate value (foo)'],
-  );
+test('explicit safe API error codes retain actionable localized details', () => {
+  for (const locale of ['zh-CN', 'en-US']) {
+    setLanguagePreference(locale);
+    assert.deepEqual(getErrorDetails({ errors: [
+      { message: 'NODE_DEPENDENCY_MISSING', value: 'private-canary' },
+      { message: 'FUTURE_ERROR_CODE' },
+    ] }), [translateError('NODE_DEPENDENCY_MISSING'), translateError('FUTURE_ERROR_CODE')]);
+  }
 });

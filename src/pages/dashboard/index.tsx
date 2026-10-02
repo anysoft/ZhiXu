@@ -1,3 +1,8 @@
+import { formatPercent, formatNumber } from '@/utils/format';
+import { translateEnum, translateError } from '@/utils/i18n';
+import { formatDateTime, formatDuration, formatBytes } from '@/utils/format';
+import { useLocale as useI18nLocale } from '@/utils/i18n';
+import { t as tr } from '@/utils/i18n';
 import React, { useEffect, useState } from 'react';
 import {
   Alert,
@@ -13,6 +18,7 @@ import {
 import { obsGet, RunDetail } from '@/components/observability';
 import config from '@/utils/config';
 export default function Dashboard() {
+  useI18nLocale();
   const [range, setRange] = useState('24h'),
     [data, setData] = useState<any>(),
     [run, setRun] = useState<number>();
@@ -26,32 +32,32 @@ export default function Dashboard() {
   const count = (s: string) =>
     data?.counts.find((x: any) => x.status === s)?.count ?? 0;
   return (
-    <Card title="Observability">
+    <Card title={tr('ui.observability')}>
       <Space>
         <Select
           value={range}
           onChange={setRange}
           options={['24h', '7d', '30d'].map((value) => ({
             value,
-            label: value,
+            label: tr('ui.range.' + value),
           }))}
         />
-        <Button onClick={load}>Refresh</Button>
-        <a href={config.baseUrl + 'runs'}>All runs</a>
+        <Button onClick={load}>{tr('ui.refresh')}</Button>
+        <a href={config.baseUrl + 'runs'}>{tr('ui.allRuns')}</a>
       </Space>
       <Row gutter={16} style={{ margin: '20px 0' }}>
         {[
-          ['Tasks', data?.tasks.total ?? 0],
-          ['Enabled', data?.tasks.enabled ?? 0],
-          ['Ready', data?.tasks.ready ?? 0],
-          ['Success', count('SUCCESS')],
-          ['Failure', count('FAILED')],
-          ['Timeout', count('TIMEOUT')],
+          [tr('ui.dashboard.tasks'), data?.tasks.total ?? 0],
+          [tr('ui.dashboard.enabled'), data?.tasks.enabled ?? 0],
+          [tr('ui.dashboard.ready'), data?.tasks.ready ?? 0],
+          [tr('ui.dashboard.success'), count('SUCCESS')],
+          [tr('ui.dashboard.failure'), count('FAILED')],
+          [tr('ui.dashboard.timeout'), count('TIMEOUT')],
           [
-            'Success rate',
+            tr('ui.dashboard.successRate'),
             data?.success_rate === null
               ? '—'
-              : ((data?.success_rate ?? 0) * 100).toFixed(1) + '%',
+              : formatPercent(data?.success_rate ?? 0),
           ],
         ].map(([title, value]) => (
           <Col key={title} span={3}>
@@ -62,7 +68,7 @@ export default function Dashboard() {
       <Space>
         {data?.queue.map((r: any) => (
           <a key={r.status} href={`${config.baseUrl}runs?status=${r.status}`}>
-            {r.status}: {r.count}
+            {translateEnum('taskRun', r.status)}: {formatNumber(r.count)}
           </a>
         ))}
       </Space>
@@ -71,10 +77,10 @@ export default function Dashboard() {
           key={key}
           title={
             {
-              failures: 'Recent failures',
-              recent: 'Recent runs',
-              longest: 'Longest runs',
-              unhealthy: 'Unhealthy tasks',
+              failures: tr('ui.dashboard.failures'),
+              recent: tr('ui.dashboard.recent'),
+              longest: tr('ui.dashboard.longest'),
+              unhealthy: tr('ui.dashboard.unhealthy'),
             }[key]
           }
           style={{ marginTop: 16 }}
@@ -86,14 +92,19 @@ export default function Dashboard() {
             columns={
               key === 'unhealthy'
                 ? [
-                    { title: 'Task', dataIndex: 'name' },
-                    { title: 'Health', dataIndex: 'health_state' },
+                    { title: tr('ui.task'), dataIndex: 'name' },
                     {
-                      title: 'Consecutive failures',
+                      title: tr('ui.health'),
+                      dataIndex: 'health_state',
+                      render: (value: unknown) =>
+                        translateEnum('health', value),
+                    },
+                    {
+                      title: tr('ui.consecutiveFailures'),
                       dataIndex: 'consecutive_failures',
                     },
                     {
-                      title: 'Last run',
+                      title: tr('ui.lastRun'),
                       dataIndex: 'last_run_id',
                       render: (id) => (
                         <Button type="link" onClick={() => setRun(id)}>
@@ -104,7 +115,7 @@ export default function Dashboard() {
                   ]
                 : [
                     {
-                      title: 'Run',
+                      title: tr('ui.run'),
                       dataIndex: 'id',
                       render: (id) => (
                         <Button type="link" onClick={() => setRun(id)}>
@@ -112,11 +123,30 @@ export default function Dashboard() {
                         </Button>
                       ),
                     },
-                    { title: 'Task', dataIndex: 'task_id' },
-                    { title: 'Status', dataIndex: 'status' },
-                    { title: 'Finished', dataIndex: 'finished_at' },
-                    { title: 'Error', dataIndex: 'error_code' },
-                    { title: 'Duration ms', dataIndex: 'duration_ms' },
+                    { title: tr('ui.task'), dataIndex: 'task_id' },
+                    {
+                      title: tr('ui.status'),
+                      dataIndex: 'status',
+                      render: (value: unknown) =>
+                        translateEnum('taskRun', value),
+                    },
+                    {
+                      title: tr('ui.finished'),
+                      dataIndex: 'finished_at',
+                      render: (value: any) => formatDateTime(value),
+                    },
+                    {
+                      title: tr('ui.error'),
+                      dataIndex: 'error_code',
+                      render: (value: unknown) =>
+                        value ? translateError(value) : '—',
+                    },
+                    {
+                      title: tr('ui.duration'),
+                      dataIndex: 'duration_ms',
+                      render: (value: number | null) =>
+                        formatDuration(value === null ? null : value / 1000),
+                    },
                   ]
             }
           />
@@ -124,11 +154,14 @@ export default function Dashboard() {
       ))}
       <Alert
         style={{ marginTop: 16 }}
-        message={`Storage: ${data?.storage.run_count ?? 0} runs · ${
-          data?.storage.log_bytes ?? 0
-        } log bytes · ${
-          data?.storage.delivery_count ?? 0
-        } delivery attempts. Automatic history deletion is OFF.`}
+        message={tr(
+          'ui.template.storageValueRunsValueLogBytesValueDeliveryAttemptsAutomaticHistoryDeletionIsOFF',
+          {
+            p0: data?.storage.run_count ?? 0,
+            p1: data?.storage.log_bytes ?? 0,
+            p2: data?.storage.delivery_count ?? 0,
+          },
+        )}
       />
       <RunDetail id={run} onClose={() => setRun(undefined)} />
     </Card>

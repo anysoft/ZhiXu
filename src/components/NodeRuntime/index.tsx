@@ -1,3 +1,7 @@
+import { translateEnum, translateError } from '@/utils/i18n';
+import { formatDateTime, formatDuration, formatBytes } from '@/utils/format';
+import { useLocale as useI18nLocale } from '@/utils/i18n';
+import { t as tr } from '@/utils/i18n';
 import React, { useEffect, useState } from 'react';
 import {
   Alert,
@@ -25,6 +29,7 @@ export default function NodeRuntime({
 }: {
   onOperation: (id: number) => void;
 }) {
+  useI18nLocale();
   const [runtimes, setRuntimes] = useState<any[]>([]),
     [tools, setTools] = useState<any[]>([]),
     [catalog, setCatalog] = useState<any[]>([]),
@@ -76,7 +81,7 @@ export default function NodeRuntime({
     }
   }
   useEffect(() => {
-    void load().catch(() => setError('无法读取 Node.js 资源'));
+    void load().catch(() => setError('NODE_READ_FAILED'));
     const timer = setInterval(() => void load().catch(() => {}), 2000);
     return () => clearInterval(timer);
   }, [selected?.id]);
@@ -91,7 +96,7 @@ export default function NodeRuntime({
       await load();
       return result.data;
     } catch {
-      message.error('请求失败，请查看错误与资源状态');
+      message.error(tr('ui.requestFailedCheckTheErrorAndResourceStatus'));
       return false;
     } finally {
       setBusy(false);
@@ -144,9 +149,9 @@ export default function NodeRuntime({
       remove,
     );
   const columns = [
-    { title: 'Package', dataIndex: 'name' },
-    { title: 'Specifier', dataIndex: 'specifier' },
-    { title: 'Type', dataIndex: 'type' },
+    { title: tr('ui.package'), dataIndex: 'name' },
+    { title: tr('ui.specifier'), dataIndex: 'specifier' },
+    { title: tr('ui.type'), dataIndex: 'type' },
   ];
   const current = builds.find((x) => x.id === selected?.current_build_id),
     desired = revisions.find((x) => x.id === selected?.current_revision_id);
@@ -166,25 +171,25 @@ export default function NodeRuntime({
         paddingBottom: 24,
       }}
     >
-      {error && <Alert type="error" message={error} />}
+      {error && <Alert type="error" message={translateError(error)} />}
       <Tabs
         activeKey={tab}
         onChange={setTab}
         items={[
           {
             key: 'versions',
-            label: 'Versions',
+            label: tr('ui.versions'),
             children: (
               <>
                 <Space wrap style={{ marginBottom: 16 }}>
                   <Button onClick={() => perform('catalog')}>
-                    刷新 Node Catalog
+                    {tr('ui.refreshNodeCatalog')}
                   </Button>
                   <Button type="primary" onClick={() => begin('runtime')}>
-                    安装 Node.js
+                    {tr('ui.installNodeJs')}
                   </Button>
                   <Button onClick={() => begin('toolchain')}>
-                    安装 Package Manager
+                    {tr('ui.installPackageManager')}
                   </Button>
                 </Space>
                 <Table
@@ -194,25 +199,39 @@ export default function NodeRuntime({
                   pagination={{ pageSize: 8 }}
                   scroll={{ x: 1050 }}
                   columns={[
-                    { title: 'Node Version', dataIndex: 'version' },
+                    { title: tr('ui.nodeVersion'), dataIndex: 'version' },
                     {
                       title: 'LTS',
                       render: (_, r) =>
                         catalog.find((x) => x.version === r.version)?.lts ||
                         '—',
                     },
-                    { title: 'Status', dataIndex: 'state' },
-                    { title: 'Health', dataIndex: 'health' },
                     {
-                      title: 'Platform',
+                      title: tr('ui.status'),
+                      dataIndex: 'state',
+                      render: (value: unknown) =>
+                        translateEnum('runtimeInstallation', value),
+                    },
+                    {
+                      title: tr('ui.health'),
+                      dataIndex: 'health',
+                      render: (value: unknown) =>
+                        translateEnum('health', value),
+                    },
+                    {
+                      title: tr('ui.platform'),
                       render: (_, r) =>
                         `${r.metadata.platform ?? '—'} / ${
                           r.metadata.architecture ?? '—'
                         }`,
                     },
-                    { title: 'Installed', dataIndex: 'installed_at' },
                     {
-                      title: '操作',
+                      title: tr('ui.installed'),
+                      dataIndex: 'installed_at',
+                      render: (value: any) => formatDateTime(value),
+                    },
+                    {
+                      title: tr('ui.action'),
                       render: (_, r) => (
                         <Space>
                           <Button
@@ -220,7 +239,7 @@ export default function NodeRuntime({
                               perform(`installations/${r.id}/verify`)
                             }
                           >
-                            验证
+                            {tr('ui.verify')}
                           </Button>
                           <Button
                             onClick={async () => {
@@ -228,28 +247,30 @@ export default function NodeRuntime({
                                 `${base}/installations/${r.id}/references`,
                               );
                               setExported({
-                                title: 'Runtime References',
+                                title: tr('ui.runtimeReferences'),
                                 text: JSON.stringify(x.data, null, 2),
                               });
                             }}
                           >
-                            引用
+                            {tr('ui.references')}
                           </Button>
                           <Popconfirm
-                            title="重新下载精确版本并隔离旧目录？有引用时拒绝。"
+                            title={tr(
+                              'ui.downloadTheExactVersionAgainAndIsolateTheOldDirectoryExistingReferencesPreventThisOperation',
+                            )}
                             onConfirm={() =>
                               perform(`installations/${r.id}/repair`)
                             }
                           >
-                            <Button>修复</Button>
+                            <Button>{tr('ui.repair')}</Button>
                           </Popconfirm>
                           <Popconfirm
-                            title="删除此 Node Runtime？"
+                            title={tr('ui.deleteThisNodeRuntime')}
                             onConfirm={() =>
                               perform(`installations/${r.id}`, {}, true)
                             }
                           >
-                            <Button danger>删除</Button>
+                            <Button danger>{tr('ui.delete')}</Button>
                           </Popconfirm>
                         </Space>
                       ),
@@ -257,7 +278,7 @@ export default function NodeRuntime({
                   ]}
                 />
                 <Card
-                  title="Package Manager Toolchains"
+                  title={tr('ui.packageManagerToolchains')}
                   style={{ marginTop: 16 }}
                 >
                   <Table
@@ -272,11 +293,16 @@ export default function NodeRuntime({
                         render: (_, r) =>
                           runtimes.find((x) => x.id === r.runtime_id)?.version,
                       },
-                      { title: 'Manager', dataIndex: 'manager_type' },
-                      { title: 'Exact Version', dataIndex: 'version' },
-                      { title: 'State', dataIndex: 'state' },
+                      { title: tr('ui.manager'), dataIndex: 'manager_type' },
+                      { title: tr('ui.exactVersion'), dataIndex: 'version' },
                       {
-                        title: '操作',
+                        title: tr('ui.state'),
+                        dataIndex: 'state',
+                        render: (value: unknown) =>
+                          translateEnum('nodeToolchain', value),
+                      },
+                      {
+                        title: tr('ui.action'),
                         render: (_, r) => (
                           <Space>
                             <Button
@@ -284,15 +310,15 @@ export default function NodeRuntime({
                                 perform(`toolchains/${r.id}/verify`)
                               }
                             >
-                              验证工具链
+                              {tr('ui.verifyToolchain')}
                             </Button>
                             <Popconfirm
-                              title="删除未引用工具链？"
+                              title={tr('ui.deleteThisUnreferencedToolchain')}
                               onConfirm={() =>
                                 perform(`toolchains/${r.id}`, {}, true)
                               }
                             >
-                              <Button danger>删除工具链</Button>
+                              <Button danger>{tr('ui.deleteToolchain')}</Button>
                             </Popconfirm>
                           </Space>
                         ),
@@ -305,7 +331,7 @@ export default function NodeRuntime({
           },
           {
             key: 'environments',
-            label: 'Environments',
+            label: tr('ui.environments'),
             children: (
               <>
                 <Button
@@ -313,7 +339,7 @@ export default function NodeRuntime({
                   onClick={() => begin('environment')}
                   style={{ marginBottom: 16 }}
                 >
-                  创建 Node Environment
+                  {tr('ui.createNodeEnvironment')}
                 </Button>
                 <Table
                   rowKey="id"
@@ -322,7 +348,7 @@ export default function NodeRuntime({
                   scroll={{ x: 1000 }}
                   columns={[
                     {
-                      title: 'Name',
+                      title: tr('ui.name'),
                       dataIndex: 'name',
                       render: (text, r) => (
                         <Button type="link" onClick={() => openEnvironment(r)}>
@@ -336,20 +362,33 @@ export default function NodeRuntime({
                         runtimes.find((x) => x.id === r.runtime_id)?.version,
                     },
                     {
-                      title: 'Package Manager',
+                      title: tr('ui.packageManager'),
                       render: (_, r) => {
                         const t = tools.find((x) => x.id === r.toolchain_id);
                         return `${t?.manager_type ?? '—'} ${t?.version ?? ''}`;
                       },
                     },
-                    { title: 'Current Build', dataIndex: 'current_build_id' },
-                    { title: 'Status', dataIndex: 'state' },
-                    { title: 'Health', dataIndex: 'health' },
                     {
-                      title: '操作',
+                      title: tr('ui.currentBuild'),
+                      dataIndex: 'current_build_id',
+                    },
+                    {
+                      title: tr('ui.status'),
+                      dataIndex: 'state',
+                      render: (value: unknown) =>
+                        translateEnum('nodeToolchain', value),
+                    },
+                    {
+                      title: tr('ui.health'),
+                      dataIndex: 'health',
+                      render: (value: unknown) =>
+                        translateEnum('health', value),
+                    },
+                    {
+                      title: tr('ui.action'),
                       render: (_, r) => (
                         <Button onClick={() => openEnvironment(r)}>
-                          查看环境
+                          {tr('ui.viewEnvironment')}
                         </Button>
                       ),
                     },
@@ -361,15 +400,15 @@ export default function NodeRuntime({
         ]}
       />
       <Card
-        title="Runtime Operations"
+        title={tr('ui.runtimeOperations')}
         style={{ marginTop: 16 }}
         extra={
           <Select
-            aria-label="Operation language"
+            aria-label={tr('ui.operationLanguage')}
             value={filter}
             onChange={setFilter}
             options={[
-              { value: 'ALL', label: 'All' },
+              { value: 'ALL', label: tr('ui.all') },
               { value: 'PYTHON', label: 'Python' },
               { value: 'NODE', label: 'Node.js' },
             ]}
@@ -385,14 +424,34 @@ export default function NodeRuntime({
           )}
           columns={[
             { title: 'ID', dataIndex: 'id' },
-            { title: 'Operation', dataIndex: 'operation_type' },
-            { title: 'Status', dataIndex: 'status' },
-            { title: 'Stage', dataIndex: 'stage' },
-            { title: 'Error', dataIndex: 'error_code' },
             {
-              title: '操作',
+              title: tr('ui.operation'),
+              dataIndex: 'operation_type',
+              render: (value: unknown) =>
+                translateEnum('runtimeOperationType', value),
+            },
+            {
+              title: tr('ui.status'),
+              dataIndex: 'status',
+              render: (value: unknown) =>
+                translateEnum('runtimeOperation', value),
+            },
+            {
+              title: tr('ui.stage'),
+              dataIndex: 'stage',
+              render: (value: unknown) => translateEnum('runtimeStage', value),
+            },
+            {
+              title: tr('ui.error'),
+              dataIndex: 'error_code',
+              render: (value: unknown) => (value ? translateError(value) : '—'),
+            },
+            {
+              title: tr('ui.action'),
               render: (_, r) => (
-                <Button onClick={() => onOperation(r.id)}>日志</Button>
+                <Button onClick={() => onOperation(r.id)}>
+                  {tr('ui.log')}
+                </Button>
               ),
             },
           ]}
@@ -401,19 +460,23 @@ export default function NodeRuntime({
       <Modal
         title={
           modal === 'runtime'
-            ? '安装 Node.js'
+            ? tr('ui.installNodeJs')
             : modal === 'toolchain'
-            ? '安装 Package Manager'
+            ? tr('ui.installPackageManager')
             : editing
-            ? '编辑 Node Dependencies'
-            : '创建 Node Environment'
+            ? tr('ui.extra.editNodeDependencies')
+            : tr('ui.createNodeEnvironment')
         }
         open={!!modal}
         width={760}
         destroyOnClose
         confirmLoading={busy}
         onCancel={() => setModal('')}
-        okText={modal === 'environment' ? '保存 Revision 并构建' : '安装'}
+        okText={
+          modal === 'environment'
+            ? tr('ui.extra.saveRevisionAndBuild')
+            : tr('ui.extra.install')
+        }
         onOk={async () => {
           try {
             const values = await form.validateFields();
@@ -449,11 +512,11 @@ export default function NodeRuntime({
                 checked={lts}
                 onChange={(e) => setLts(e.target.checked)}
               >
-                LTS only
+                {tr('ui.ltsOnly')}
               </Checkbox>
               <Form.Item
                 name="version"
-                label="Exact Node Version"
+                label={tr('ui.exactNodeVersion')}
                 rules={[{ required: true }]}
               >
                 <Select
@@ -474,19 +537,19 @@ export default function NodeRuntime({
                 <>
                   <Form.Item
                     name="name"
-                    label="Name"
+                    label={tr('ui.name')}
                     rules={[{ required: true, max: 100 }]}
                   >
                     <Input />
                   </Form.Item>
-                  <Form.Item name="description" label="Description">
+                  <Form.Item name="description" label={tr('ui.description')}>
                     <Input />
                   </Form.Item>
                 </>
               )}
               <Form.Item
                 name="runtime_id"
-                label="Node.js Runtime"
+                label={tr('ui.nodeJsRuntime')}
                 rules={[{ required: true }]}
               >
                 <Select
@@ -500,20 +563,22 @@ export default function NodeRuntime({
                 <>
                   <Form.Item
                     name="manager_type"
-                    label="Package Manager"
+                    label={tr('ui.packageManager')}
                     rules={[{ required: true }]}
                   >
                     <Select
                       options={[
                         { value: 'PNPM', label: 'pnpm' },
-                        { value: 'NPM', label: 'Bundled npm' },
+                        { value: 'NPM', label: tr('ui.bundledNpm') },
                       ]}
                     />
                   </Form.Item>
                   <Form.Item
                     name="version"
-                    label="Exact pnpm Version (10.9+)"
-                    extra="Bundled npm 使用所选 Runtime 自带的精确版本。"
+                    label={tr('ui.exactPnpmVersion109')}
+                    extra={tr(
+                      'ui.bundledNpmUsesTheExactVersionIncludedWithTheSelectedRuntime',
+                    )}
                   >
                     <Input placeholder="10.17.1" />
                   </Form.Item>
@@ -522,7 +587,7 @@ export default function NodeRuntime({
                 <>
                   <Form.Item
                     name="toolchain_id"
-                    label="Package Manager Toolchain"
+                    label={tr('ui.packageManagerToolchain')}
                     rules={[{ required: true }]}
                   >
                     <Select
@@ -539,32 +604,35 @@ export default function NodeRuntime({
                   </Form.Item>
                   <Form.Item
                     name="install_scripts_policy"
-                    label="Install Scripts"
+                    label={tr('ui.installScripts')}
                     rules={[{ required: true }]}
                   >
                     <Select
                       options={[
-                        { value: 'ALLOW', label: 'Allow' },
-                        { value: 'IGNORE', label: 'Ignore' },
+                        { value: 'ALLOW', label: tr('ui.allow') },
+                        { value: 'IGNORE', label: tr('ui.ignore') },
                       ]}
                     />
                   </Form.Item>
                   <Alert
                     type="warning"
                     showIcon
-                    message="安装 Node 依赖可能以平台进程的 OS 权限执行第三方生命周期脚本。此功能不是沙箱。"
+                    message={tr(
+                      'ui.installingNodeDependenciesMayRunThirdPartyLifecycleScriptsWithThePlatformProcessSOSPermissionsThisFe',
+                    )}
                   />
                   <Form.Item name="production_only" valuePropName="checked">
                     <Checkbox>
-                      Production only（不安装 devDependencies）
+                      {tr('ui.productionOnlyExcludeDevDependencies')}
                     </Checkbox>
                   </Form.Item>
                   <Form.List name="dependencies">
                     {(fields, { add, remove }) => (
                       <>
                         <p>
-                          Desired Dependencies · 推荐精确版本，也支持 semver
-                          range
+                          {tr(
+                            'ui.desiredDependenciesExactVersionsRecommendedSemverRangesSupported',
+                          )}
                         </p>
                         {fields.map((field) => (
                           <Space key={field.key} align="baseline">
@@ -574,7 +642,7 @@ export default function NodeRuntime({
                             >
                               <Input
                                 placeholder="@scope/package"
-                                aria-label="Package name"
+                                aria-label={tr('ui.packageName')}
                               />
                             </Form.Item>
                             <Form.Item
@@ -583,7 +651,7 @@ export default function NodeRuntime({
                             >
                               <Input
                                 placeholder="1.0.0"
-                                aria-label="Package specifier"
+                                aria-label={tr('ui.packageSpecifier')}
                               />
                             </Form.Item>
                             <Form.Item
@@ -602,7 +670,7 @@ export default function NodeRuntime({
                               />
                             </Form.Item>
                             <Button onClick={() => remove(field.name)}>
-                              移除
+                              {tr('ui.remove')}
                             </Button>
                           </Space>
                         ))}
@@ -611,7 +679,7 @@ export default function NodeRuntime({
                             add({ name: '', specifier: '', type: 'DEPENDENCY' })
                           }
                         >
-                          添加依赖
+                          {tr('ui.addDependency')}
                         </Button>
                       </>
                     )}
@@ -623,7 +691,9 @@ export default function NodeRuntime({
         </Form>
       </Modal>
       <Modal
-        title={`Node Environment · ${selected?.name ?? ''}`}
+        title={tr('ui.template.nodeEnvironmentValue', {
+          p0: selected?.name ?? '',
+        })}
         open={!!selected}
         width="92vw"
         footer={null}
@@ -636,42 +706,48 @@ export default function NodeRuntime({
             items={[
               {
                 key: 'overview',
-                label: 'Overview',
+                label: tr('ui.overview'),
                 children: (
                   <>
-                    <TaskResourceReferences kind="node" id={selected.id} onBlocked={setTaskReferencesBlocked} />
+                    <TaskResourceReferences
+                      kind="node"
+                      id={selected.id}
+                      onBlocked={setTaskReferencesBlocked}
+                    />
                     <Descriptions bordered size="small">
                       <Descriptions.Item label="ID">
                         {selected.id}
                       </Descriptions.Item>
-                      <Descriptions.Item label="State">
-                        {selected.state}
+                      <Descriptions.Item label={tr('ui.state')}>
+                        {translateEnum('nodeEnvironment', selected.state)}
                       </Descriptions.Item>
-                      <Descriptions.Item label="Current Build">
+                      <Descriptions.Item label={tr('ui.currentBuild')}>
                         {selected.current_build_id ?? '—'}
                       </Descriptions.Item>
-                      <Descriptions.Item label="Desired Revision">
+                      <Descriptions.Item label={tr('ui.desiredRevision')}>
                         {selected.current_revision_id}
                       </Descriptions.Item>
-                      <Descriptions.Item label="Install Scripts">
+                      <Descriptions.Item label={tr('ui.installScripts')}>
                         {selected.install_scripts_policy}
                       </Descriptions.Item>
-                      <Descriptions.Item label="Last Error">
-                        {selected.last_error ?? '—'}
+                      <Descriptions.Item label={tr('ui.lastError')}>
+                        {selected.last_error
+                          ? translateError(selected.last_error)
+                          : '—'}
                       </Descriptions.Item>
                     </Descriptions>
                     <Space wrap style={{ marginTop: 16 }}>
                       <Button onClick={() => envAction('build')}>
-                        构建 Desired
+                        {tr('ui.buildDesiredRevision')}
                       </Button>
                       <Button
                         onClick={() => envAction('rebuild')}
                         disabled={!current}
                       >
-                        Frozen Rebuild
+                        {tr('ui.frozenRebuild')}
                       </Button>
                       <Button onClick={() => envAction('resolve')}>
-                        Resolve New Build
+                        {tr('ui.resolveNewBuild')}
                       </Button>
                       <Button
                         onClick={() => {
@@ -682,11 +758,11 @@ export default function NodeRuntime({
                           });
                           setExported({
                             mode: 'metadata',
-                            title: '编辑环境信息',
+                            title: tr('ui.editEnvironmentDetails'),
                           });
                         }}
                       >
-                        编辑信息
+                        {tr('ui.editDetails')}
                       </Button>
                       <Button
                         onClick={() => {
@@ -696,20 +772,24 @@ export default function NodeRuntime({
                           });
                           setExported({
                             mode: 'clone',
-                            title: 'Clone Environment',
+                            title: tr('ui.cloneEnvironment'),
                           });
                         }}
                       >
-                        Clone
+                        {tr('ui.clone')}
                       </Button>
                       <Popconfirm
-                        title="删除环境及其 Builds？Runtime、Toolchain 和缓存保留。"
+                        title={tr(
+                          'ui.deleteTheEnvironmentAndItsBuildsTheRuntimeToolchainAndCacheWillBeRetained',
+                        )}
                         onConfirm={async () => {
                           if (await envAction('', undefined, true))
                             setSelected(undefined);
                         }}
                       >
-                        <Button danger disabled={taskReferencesBlocked}>删除环境</Button>
+                        <Button danger disabled={taskReferencesBlocked}>
+                          {tr('ui.deleteEnvironment')}
+                        </Button>
                       </Popconfirm>
                     </Space>
                   </>
@@ -717,31 +797,38 @@ export default function NodeRuntime({
               },
               {
                 key: 'dependencies',
-                label: 'Dependencies',
+                label: tr('ui.dependencies'),
                 children: (
                   <>
-                    <Button onClick={edit}>编辑依赖</Button>
-                    <h4>Desired Dependencies</h4>
+                    <Button onClick={edit}>{tr('ui.editDependencies')}</Button>
+                    <h4>{tr('ui.desiredDependencies')}</h4>
                     <Table
                       rowKey="name"
                       size="small"
                       dataSource={desired?.dependencies ?? []}
                       columns={columns}
                     />
-                    <h4>Resolved Packages · Current Build</h4>
+                    <h4>{tr('ui.resolvedPackagesCurrentBuild')}</h4>
                     <Table
                       rowKey={(r) => r.name + '@' + r.version}
                       size="small"
                       dataSource={current?.resolved ?? []}
                       columns={[
-                        { title: 'Package', dataIndex: 'name' },
-                        { title: 'Version', dataIndex: 'version' },
+                        { title: tr('ui.package'), dataIndex: 'name' },
+                        { title: tr('ui.version'), dataIndex: 'version' },
                         {
-                          title: 'Direct / Transitive',
+                          title: tr('ui.directTransitive'),
                           render: (_, r) =>
-                            r.direct ? 'Direct' : 'Transitive',
+                            r.direct
+                              ? tr('ui.presentation.Direct')
+                              : tr('ui.presentation.Transitive'),
                         },
-                        { title: 'Type', dataIndex: 'dependency_type' },
+                        {
+                          title: tr('ui.type'),
+                          dataIndex: 'dependency_type',
+                          render: (value: unknown) =>
+                            translateEnum('dependencyType', value),
+                        },
                       ]}
                     />
                   </>
@@ -749,12 +836,12 @@ export default function NodeRuntime({
               },
               {
                 key: 'builds',
-                label: 'Builds',
+                label: tr('ui.builds'),
                 children: (
                   <>
                     <Space wrap>
                       <Select
-                        placeholder="Before Build"
+                        placeholder={tr('ui.beforeBuild')}
                         dropdownStyle={{ zIndex: 1400 }}
                         style={{ width: 180 }}
                         value={from}
@@ -763,11 +850,11 @@ export default function NodeRuntime({
                           .filter((x) => x.state === 'READY')
                           .map((x) => ({
                             value: x.id,
-                            label: `Build #${x.id}`,
+                            label: tr('ui.template.buildValue', { p0: x.id }),
                           }))}
                       />
                       <Select
-                        placeholder="After Build"
+                        placeholder={tr('ui.afterBuild')}
                         dropdownStyle={{ zIndex: 1400 }}
                         style={{ width: 180 }}
                         value={to}
@@ -776,7 +863,7 @@ export default function NodeRuntime({
                           .filter((x) => x.state === 'READY')
                           .map((x) => ({
                             value: x.id,
-                            label: `Build #${x.id}`,
+                            label: tr('ui.template.buildValue', { p0: x.id }),
                           }))}
                       />
                       <Button
@@ -788,7 +875,7 @@ export default function NodeRuntime({
                           setDiff(r.data);
                         }}
                       >
-                        Build Diff
+                        {tr('ui.buildDiff')}
                       </Button>
                     </Space>
                     {diff && (
@@ -798,18 +885,23 @@ export default function NodeRuntime({
                         scroll={{ y: 160 }}
                         dataSource={diff}
                         columns={[
-                          { title: 'Package', dataIndex: 'name' },
+                          { title: tr('ui.package'), dataIndex: 'name' },
                           {
-                            title: 'Before',
+                            title: tr('ui.before'),
                             dataIndex: 'before',
                             render: (v) => v.join(', '),
                           },
                           {
-                            title: 'After',
+                            title: tr('ui.after'),
                             dataIndex: 'after',
                             render: (v) => v.join(', '),
                           },
-                          { title: 'Change', dataIndex: 'change' },
+                          {
+                            title: tr('ui.change'),
+                            dataIndex: 'change',
+                            render: (value: unknown) =>
+                              translateEnum('dependencyChange', value),
+                          },
                         ]}
                       />
                     )}
@@ -819,32 +911,46 @@ export default function NodeRuntime({
                       dataSource={builds}
                       scroll={{ x: 1100, y: 330 }}
                       columns={[
-                        { title: 'Build', dataIndex: 'id' },
-                        { title: 'Revision', dataIndex: 'revision_id' },
+                        { title: tr('ui.build'), dataIndex: 'id' },
+                        { title: tr('ui.revision'), dataIndex: 'revision_id' },
                         {
-                          title: 'Node / Manager',
+                          title: tr('ui.nodeManager'),
                           render: (_, r) =>
                             `${r.metadata.node_version ?? ''} / ${
                               r.metadata.manager_type ?? ''
                             } ${r.metadata.manager_version ?? ''}`,
                         },
                         {
-                          title: 'Lock Hash',
+                          title: tr('ui.lockHash'),
                           dataIndex: 'lock_hash',
                           render: (v) => v?.slice(0, 12),
                         },
-                        { title: 'Status', dataIndex: 'state' },
-                        { title: 'Health', dataIndex: 'health' },
-                        { title: 'Created', dataIndex: 'createdAt' },
                         {
-                          title: '操作',
+                          title: tr('ui.status'),
+                          dataIndex: 'state',
+                          render: (value: unknown) =>
+                            translateEnum('nodeToolchain', value),
+                        },
+                        {
+                          title: tr('ui.health'),
+                          dataIndex: 'health',
+                          render: (value: unknown) =>
+                            translateEnum('health', value),
+                        },
+                        {
+                          title: tr('ui.created'),
+                          dataIndex: 'createdAt',
+                          render: (value: any) => formatDateTime(value),
+                        },
+                        {
+                          title: tr('ui.action'),
                           render: (_, r) => (
                             <Space>
                               <Button
                                 disabled={r.state !== 'READY'}
                                 onClick={() => envAction('verify', r.id)}
                               >
-                                验证 Build
+                                {tr('ui.verifyBuild')}
                               </Button>
                               <Button
                                 disabled={
@@ -853,28 +959,31 @@ export default function NodeRuntime({
                                 }
                                 onClick={() => envAction('promote', r.id)}
                               >
-                                Promote
+                                {tr('ui.promote')}
                               </Button>
                               <Button
                                 disabled={!r.lock_hash}
                                 onClick={() =>
                                   setExported({
-                                    title: `Build #${r.id} snapshots`,
+                                    title: tr(
+                                      'ui.template.buildValueSnapshots',
+                                      { p0: r.id },
+                                    ),
                                     build: r,
                                   })
                                 }
                               >
-                                导出
+                                {tr('ui.export')}
                               </Button>
                               <Popconfirm
-                                title="删除未引用 Build？"
+                                title={tr('ui.deleteThisUnreferencedBuild')}
                                 onConfirm={() => envAction('', r.id, true)}
                               >
                                 <Button
                                   danger
                                   disabled={r.id === selected.current_build_id}
                                 >
-                                  删除 Build
+                                  {tr('ui.deleteBuild')}
                                 </Button>
                               </Popconfirm>
                             </Space>
@@ -887,7 +996,7 @@ export default function NodeRuntime({
               },
               {
                 key: 'operations',
-                label: 'Operations',
+                label: tr('ui.operations'),
                 children: (
                   <Table
                     rowKey="id"
@@ -899,14 +1008,29 @@ export default function NodeRuntime({
                     )}
                     columns={[
                       { title: 'ID', dataIndex: 'id' },
-                      { title: 'Type', dataIndex: 'operation_type' },
-                      { title: 'Status', dataIndex: 'status' },
-                      { title: 'Error', dataIndex: 'error_code' },
                       {
-                        title: '操作',
+                        title: tr('ui.type'),
+                        dataIndex: 'operation_type',
+                        render: (value: unknown) =>
+                          translateEnum('runtimeOperationType', value),
+                      },
+                      {
+                        title: tr('ui.status'),
+                        dataIndex: 'status',
+                        render: (value: unknown) =>
+                          translateEnum('runtimeOperation', value),
+                      },
+                      {
+                        title: tr('ui.error'),
+                        dataIndex: 'error_code',
+                        render: (value: unknown) =>
+                          value ? translateError(value) : '—',
+                      },
+                      {
+                        title: tr('ui.action'),
                         render: (_, r) => (
                           <Button onClick={() => onOperation(r.id)}>
-                            日志
+                            {tr('ui.log')}
                           </Button>
                         ),
                       },
@@ -949,11 +1073,15 @@ export default function NodeRuntime({
       >
         {exported?.mode ? (
           <Form form={form} layout="vertical">
-            <Form.Item name="name" label="Name" rules={[{ required: true }]}>
+            <Form.Item
+              name="name"
+              label={tr('ui.name')}
+              rules={[{ required: true }]}
+            >
               <Input />
             </Form.Item>
             {exported.mode === 'metadata' && (
-              <Form.Item name="description" label="Description">
+              <Form.Item name="description" label={tr('ui.description')}>
                 <Input />
               </Form.Item>
             )}
@@ -966,7 +1094,7 @@ export default function NodeRuntime({
                   download('package.json', exported.build.package_json)
                 }
               >
-                下载 package.json
+                {tr('ui.downloadPackageJson')}
               </Button>
               <Button
                 onClick={() =>
@@ -978,7 +1106,7 @@ export default function NodeRuntime({
                   )
                 }
               >
-                下载 Lockfile
+                {tr('ui.downloadLockfile')}
               </Button>
             </Space>
             <pre style={{ maxHeight: '55vh', overflow: 'auto' }}>

@@ -1,3 +1,4 @@
+import { useLocale as useI18nLocale } from '@/utils/i18n';
 import { useRequest } from 'ahooks';
 import { Service, Options } from 'ahooks/lib/useRequest/src/types';
 import { Spin, Typography } from 'antd';
@@ -12,6 +13,7 @@ export default function Name<
   service: Service<TData, [TParams]>;
   options: Options<TData, [TParams]>;
 }) {
+  useI18nLocale();
   const { loading, data } = useRequest(service, options);
 
   return (

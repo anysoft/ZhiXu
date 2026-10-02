@@ -1,3 +1,4 @@
+import { useLocale as useI18nLocale } from '@/utils/i18n';
 import intl from 'react-intl-universal';
 import React, { useEffect, useRef, useState } from 'react';
 import {
@@ -34,7 +35,8 @@ const TaskBridgeLogModal = ({
   data?: string;
   logUrl?: string;
 }) => {
-  const [value, setValue] = useState<string>(intl.get('启动中...'));
+  useI18nLocale();
+  const [value, setValue] = useState<string>('');
   const [loading, setLoading] = useState<any>(true);
   const [executing, setExecuting] = useState<any>(true);
   const [isPhone, setIsPhone] = useState(false);
@@ -69,9 +71,6 @@ const TaskBridgeLogModal = ({
         const hasNext = logStatus === 'running';
         const chunk = (data as string) || '';
         let log = isFirst ? chunk : `${valueRef.current}${chunk}`;
-        if (!log && !hasNext) {
-          log = intl.get('暂无日志');
-        }
         if (log.length > MAX_LOG_VIEW_CHARS) {
           log = log.slice(-MAX_LOG_VIEW_CHARS);
         }
@@ -190,7 +189,9 @@ const TaskBridgeLogModal = ({
                 : {}
             }
           >
-            <Ansi>{value}</Ansi>
+            <Ansi>
+              {value || intl.get(executing ? '启动中...' : '暂无日志')}
+            </Ansi>
           </pre>
         )}
         <div id="log-flag"></div>

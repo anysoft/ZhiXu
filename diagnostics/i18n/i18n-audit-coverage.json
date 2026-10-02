@@ -1,0 +1,34 @@
+{
+  "stage": "AUDIT_ONLY",
+  "source_commit": "12569b4941174362bd05794e340bd891d2731153",
+  "supported_locales": [
+    "zh-CN",
+    "en-US"
+  ],
+  "existing_preference_values": [
+    "",
+    "zh",
+    "en"
+  ],
+  "language_modes": [
+    "system",
+    "zh-CN",
+    "en-US"
+  ],
+  "locale_parity": "FAIL",
+  "frontend_files_scanned": 66,
+  "ui_literal_candidates": 1054,
+  "hardcoded_ui_strings": null,
+  "untranslated_enums": null,
+  "untranslated_known_errors": null,
+  "counts_note": "null means not semantically classified; candidate counts are not proof of complete coverage",
+  "enum_declaration_groups": 97,
+  "backend_error_code_candidates": 422,
+  "zh_browser_acceptance": "NOT_RUN",
+  "en_browser_acceptance": "NOT_RUN",
+  "language_probe_scenarios": 5,
+  "document_lang": "FAIL",
+  "immediate_switch": "FAIL",
+  "final_convergence": "NOT_ACHIEVED",
+  "exceptions": []
+}

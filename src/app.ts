@@ -1,31 +1,9 @@
 const baseUrl = window.__ENV__QlBaseUrl || '/';
 import { setLocale } from '@umijs/max';
-import intl from 'react-intl-universal';
+import { initializeLanguage } from './utils/i18n';
 
 export function rootContainer(container: any) {
-  const locales = {
-    'en': require('./locales/en-US.json'),
-    'zh': require('./locales/zh-CN.json'),
-  };
-  let currentLocale: string;
-  try {
-    currentLocale = intl.determineLocale({
-      urlLocaleKey: 'lang',
-      cookieLocaleKey: 'lang',
-      localStorageLocaleKey: 'lang',
-    }).slice(0, 2);
-  } catch (e: unknown) {
-    // Handle decodeURIComponent errors from malformed cookies
-    console.warn('Failed to determine locale from cookies:', e);
-    currentLocale = '';
-  }
-
-  if (!currentLocale || !Object.keys(locales).includes(currentLocale)) {
-    currentLocale = 'zh';
-  }
-
-  intl.init({ currentLocale, locales });
-  setLocale(currentLocale === 'zh' ? 'zh-CN' : 'en-US');
+  initializeLanguage((locale) => setLocale(locale, false));
   return container;
 }
 

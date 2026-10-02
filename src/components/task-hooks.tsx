@@ -1,3 +1,7 @@
+import { formatDuration } from '@/utils/format';
+import { translateEnum } from '@/utils/i18n';
+import { useLocale as useI18nLocale } from '@/utils/i18n';
+import { t as tr } from '@/utils/i18n';
 import React, { useEffect, useState } from 'react';
 import {
   Alert,
@@ -18,6 +22,7 @@ import config from '@/utils/config';
 import { request } from '@/utils/http';
 const phases = ['BEFORE', 'AFTER_SUCCESS', 'AFTER_FAILURE', 'FINALLY'];
 export function TaskHooks({ id }: { id: number }) {
+  useI18nLocale();
   const [rows, setRows] = useState<any[]>([]),
     [editing, setEditing] = useState<any>();
   const [form] = Form.useForm();
@@ -59,7 +64,7 @@ export function TaskHooks({ id }: { id: number }) {
       if (r.code === 200) {
         setEditing(undefined);
         await load();
-        message.success('Hook 已保存');
+        message.success(tr('ui.hookSaved'));
       }
     } catch {}
   };
@@ -67,15 +72,19 @@ export function TaskHooks({ id }: { id: number }) {
     <Space direction="vertical" style={{ width: '100%' }}>
       <Alert
         type="info"
-        message="Secrets 请通过 Environment 或 Config Assets 传递。BEFORE 可使用 PLATFORM_HOOK_OUTPUT 返回本次执行的 ENV patch。"
+        message={tr(
+          'ui.passSecretsThroughEnvironmentVariablesOrConfigAssetsBEFOREHooksCanUsePLATFORMHOOKOUTPUTToReturnEnvir',
+        )}
       />
       <Tabs
         items={phases.map((phase) => ({
           key: phase,
-          label: phase,
+          label: translateEnum('hook', phase),
           children: (
             <>
-              <Button onClick={() => open(phase)}>添加 {phase} Hook</Button>
+              <Button onClick={() => open(phase)}>
+                {tr('ui.hookAdd', { phase: translateEnum('hook', phase) })}
+              </Button>
               <Table
                 rowKey="id"
                 size="small"
@@ -84,23 +93,32 @@ export function TaskHooks({ id }: { id: number }) {
                   .filter((x) => x.phase === phase)
                   .sort((a, b) => a.position - b.position)}
                 columns={[
-                  { title: 'Name', dataIndex: 'name' },
-                  { title: 'Order', dataIndex: 'position' },
-                  { title: 'Timeout (s)', dataIndex: 'timeout_seconds' },
-                  { title: 'Failure Policy', dataIndex: 'failure_policy' },
+                  { title: tr('ui.name'), dataIndex: 'name' },
+                  { title: tr('ui.order'), dataIndex: 'position' },
                   {
-                    title: 'Enabled',
-                    render: (_, row) => (row.enabled ? 'Yes' : 'No'),
+                    title: tr('ui.timeoutS'),
+                    dataIndex: 'timeout_seconds',
+                    render: (v: number) => formatDuration(v),
                   },
                   {
-                    title: '操作',
+                    title: tr('ui.failurePolicy'),
+                    dataIndex: 'failure_policy',
+                    render: (v: unknown) => translateEnum('failurePolicy', v),
+                  },
+                  {
+                    title: tr('ui.enabled'),
+                    render: (_, row) =>
+                      row.enabled ? tr('ui.extra.yes') : tr('ui.extra.no'),
+                  },
+                  {
+                    title: tr('ui.action'),
                     render: (_, row) => (
                       <Space>
                         <Button size="small" onClick={() => open(phase, row)}>
-                          编辑
+                          {tr('ui.edit')}
                         </Button>
                         <Popconfirm
-                          title="删除此 Hook？"
+                          title={tr('ui.deleteThisHook')}
                           onConfirm={async () => {
                             await request.delete(
                               `${endpoint}/${row.id}?version=${row.version}`,
@@ -109,7 +127,7 @@ export function TaskHooks({ id }: { id: number }) {
                           }}
                         >
                           <Button size="small" danger>
-                            删除
+                            {tr('ui.delete')}
                           </Button>
                         </Popconfirm>
                       </Space>
@@ -122,55 +140,75 @@ export function TaskHooks({ id }: { id: number }) {
         }))}
       />
       <Modal
-        title="Task Hook"
+        title={tr('ui.taskHook')}
         open={!!editing}
         onCancel={() => setEditing(undefined)}
         onOk={save}
         destroyOnClose
       >
-        <Form name={`task-hook-${id}`} form={form} layout="vertical" preserve={false}>
-          <Form.Item name="name" label="Hook 名称" rules={[{ required: true }]}>
+        <Form
+          name={`task-hook-${id}`}
+          form={form}
+          layout="vertical"
+          preserve={false}
+        >
+          <Form.Item
+            name="name"
+            label={tr('ui.hookName')}
+            rules={[{ required: true }]}
+          >
             <Input />
           </Form.Item>
-          <Form.Item name="phase" label="Phase">
+          <Form.Item name="phase" label={tr('ui.phase')}>
             <Select
-              options={phases.map((value) => ({ value, label: value }))}
+              options={phases.map((value) => ({
+                value,
+                label: translateEnum('hook', value),
+              }))}
             />
           </Form.Item>
           <Form.Item
             name="command"
-            label="Command"
+            label={tr('ui.command')}
             rules={[{ required: true }]}
           >
             <Input.TextArea rows={5} autoComplete="off" />
           </Form.Item>
-          <Form.Item name="cwd_base" label="Working Directory">
+          <Form.Item name="cwd_base" label={tr('ui.workingDirectory')}>
             <Select
               options={['TASK_CWD', 'WORKSPACE_ROOT'].map((value) => ({
                 value,
-                label: value,
+                label: translateEnum('hookBase', value),
               }))}
             />
           </Form.Item>
-          <Form.Item name="position" label="Order" rules={[{ required: true }]}>
+          <Form.Item
+            name="position"
+            label={tr('ui.order')}
+            rules={[{ required: true }]}
+          >
             <InputNumber min={0} />
           </Form.Item>
           <Form.Item
             name="timeout_seconds"
-            label="Timeout Seconds"
+            label={tr('ui.timeoutSecondsVariant368')}
             rules={[{ required: true }]}
           >
             <InputNumber min={1} max={3600} />
           </Form.Item>
-          <Form.Item name="failure_policy" label="Failure Policy">
+          <Form.Item name="failure_policy" label={tr('ui.failurePolicy')}>
             <Select
               options={['FAIL_EXECUTION', 'CONTINUE'].map((value) => ({
                 value,
-                label: value,
+                label: translateEnum('failurePolicy', value),
               }))}
             />
           </Form.Item>
-          <Form.Item name="enabled" label="Enabled" valuePropName="checked">
+          <Form.Item
+            name="enabled"
+            label={tr('ui.enabled')}
+            valuePropName="checked"
+          >
             <Switch />
           </Form.Item>
         </Form>

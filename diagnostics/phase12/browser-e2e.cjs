@@ -1,3 +1,5 @@
+const {buttonName}=require('../../scripts/ci/browser-locale.cjs');
+const {ui,pattern,locale,configure}=require('../../scripts/ci/browser-locale.cjs');
 const acceptance=require('../../scripts/ci/acceptance.cjs');
 const evidenceDirectory=acceptance.output(__dirname);
 const fs = require('node:fs'),
@@ -237,10 +239,10 @@ async function until(fn) {
     ...(process.platform === 'darwin' ? { channel: 'chrome' } : {}),
   });
   page = await browser.newPage({
-    locale: 'zh-CN',
+    locale,
     viewport: { width: 1440, height: 1100 },
   });
-  flushBrowser=acceptance.observe(page,evidenceDirectory);page.setDefaultTimeout(20000);
+  await configure(page);flushBrowser=acceptance.observe(page,evidenceDirectory);page.setDefaultTimeout(20000);
   const forbidden = [
     'local-e2e-only-backend-secret',
     'CONFIG_SECRET_E2E',
@@ -270,18 +272,18 @@ async function until(fn) {
     } catch {}
   });
   await page.goto(base);
-  await page.getByRole('button', { name: '开始安装', exact: true }).click();
-  await page.getByLabel('用户名', { exact: true }).fill('platform-owner');
-  await page.getByLabel('密码', { exact: true }).fill(acceptance.secret('e2e-fixture-password'));
+  await page.getByRole('button', { name: buttonName('开始安装'), exact: true }).click();
+  await page.getByLabel(ui('用户名'), { exact: true }).fill('platform-owner');
+  await page.getByLabel(ui('密码'), { exact: true }).fill(acceptance.secret('e2e-fixture-password'));
   await page
-    .getByLabel('确认密码', { exact: true })
+    .getByLabel(ui('确认密码'), { exact: true })
     .fill(acceptance.secret('e2e-fixture-password'));
-  await page.getByRole('button', { name: /提.*交/ }).click();
-  await page.getByRole('button', { name: '去登录', exact: true }).click();
+  await page.getByRole('button', { name: pattern('提交') }).click();
+  await page.getByRole('button', { name: buttonName('去登录'), exact: true }).click();
   async function login() {
-    await page.getByLabel('用户名', { exact: true }).fill('platform-owner');
-    await page.getByLabel('密码', { exact: true }).fill(acceptance.secret('e2e-fixture-password'));
-    await page.getByRole('button', { name: /登.*录/ }).click();
+    await page.getByLabel(ui('用户名'), { exact: true }).fill('platform-owner');
+    await page.getByLabel(ui('密码'), { exact: true }).fill(acceptance.secret('e2e-fixture-password'));
+    await page.getByRole('button', { name: pattern('登录') }).click();
     await until(async () =>
       page.evaluate(() => !!localStorage.getItem('token')),
     );
@@ -423,18 +425,18 @@ async function until(fn) {
     .length;
   const initialRuns = (await checked(`/tasks/${task.id}/runs`)).length;
   await page.goto(base + '/repository-workspace?id='+repo.id);
-  await page.getByRole('tab',{name:'Worktrees',exact:true}).click();
-  await page.getByRole('link',{name:'Open Workspace',exact:true}).click();
+  await page.getByRole('tab',{name:ui('Worktrees'),exact:true}).click();
+  await page.getByRole('link',{name:ui('Open Workspace'),exact:true}).click();
   await page.waitForURL('**/workspace?id='+wt.id);
   mark('browser-repository-worktree-open-workspace');
-  await page.getByRole('button', { name: 'edit.txt', exact: true }).click();
+  await page.getByRole('button', { name: buttonName('edit.txt'), exact: true }).click();
   const editor = page.locator('.workspace-editor .monaco-editor textarea');
   // Initial Git status and file reads share repository ownership; retry only
   // the explicit transient busy response without relaxing editor assertions.
   await until(async () => {
     if (await editor.count()) return true;
-    if (await page.getByText('REPOSITORY_BUSY', {exact:true}).count())
-      await page.getByRole('button', { name: 'edit.txt', exact: true }).click();
+    if (await page.getByText(ui('REPOSITORY_BUSY'), {exact:true}).count())
+      await page.getByRole('button', { name: buttonName('edit.txt'), exact: true }).click();
     return false;
   });
   await editor.waitFor();
@@ -446,7 +448,7 @@ async function until(fn) {
     await page.keyboard.insertText(text);
   }
   await replace('browser saved\n');
-  await page.getByRole('button', { name: 'Save', exact: true }).click();
+  await page.getByRole('button', { name: buttonName('Save'), exact: true }).click();
   await until(
     () =>
       fs.readFileSync(path.join(wtPath, 'edit.txt'), 'utf8') ===
@@ -454,27 +456,27 @@ async function until(fn) {
   );
   mark('browser-open-edit-atomic-save');
   const changes = page.locator('.workspace-git');
-  await changes.getByRole('button', { name: 'Diff', exact: true }).click();
+  await changes.getByRole('button', { name: buttonName('Diff'), exact: true }).click();
   await page
     .getByRole('dialog')
     .getByText(/browser saved/)
     .waitFor();
   await page
     .getByRole('dialog')
-    .getByRole('button', { name: 'Close', exact: true })
+    .getByRole('button', { name: buttonName('Close'), exact: true })
     .click();
   mark('browser-working-diff');
-  await page.getByRole('button', { name: 'New file', exact: true }).click();
-  await page.getByLabel('New path').fill('browser-new.py');
+  await page.getByRole('button', { name: buttonName('New file'), exact: true }).click();
+  await page.getByLabel(ui('New path')).fill('browser-new.py');
   await page
     .getByRole('dialog')
-    .getByRole('button', { name: /确.*定|OK/ })
+    .getByRole('button', { name: pattern('确定') })
     .click();
   await page
-    .getByRole('tab', { name: 'browser-new.py', exact: true })
+    .getByRole('tab', { name: ui('browser-new.py'), exact: true })
     .waitFor();
   await replace('print("workspace")\n');
-  await page.getByRole('button', { name: 'Save', exact: true }).click();
+  await page.getByRole('button', { name: buttonName('Save'), exact: true }).click();
   await until(() =>
     fs
       .readFileSync(path.join(wtPath, 'browser-new.py'), 'utf8')
@@ -482,13 +484,13 @@ async function until(fn) {
   );
   await until(async () => (await checked(ws + '/git/status')).untracked === 1);
   mark('browser-create-untracked-file');
-  await changes.getByLabel('Git author name').fill('Browser Author');
-  await changes.getByLabel('Git author email').fill('browser@example.invalid');
+  await changes.getByLabel(ui('Git author name')).fill('Browser Author');
+  await changes.getByLabel(ui('Git author email')).fill('browser@example.invalid');
   const identityResponse = page.waitForResponse((r) =>
     new URL(r.url()).pathname.endsWith(ws + '/git/identity'),
   );
   await changes
-    .getByRole('button', { name: 'Save Git identity', exact: true })
+    .getByRole('button', { name: buttonName('Save Git identity'), exact: true })
     .click();
   assert.equal((await (await identityResponse).json()).code, 200);
   for (const name of ['browser-new.py', 'edit.txt']) {
@@ -498,24 +500,24 @@ async function until(fn) {
       const response = page.waitForResponse((r) =>
         new URL(r.url()).pathname.endsWith(ws + '/git/stage'),
       );
-      await row.getByRole('button', { name: 'Stage', exact: true }).click();
+      await row.getByRole('button', { name: buttonName('Stage'), exact: true }).click();
       staged = await (await response).json();
       if (staged.code === 200) break;
       assert.equal(staged.error_code, 'REPOSITORY_BUSY');
       await delay(400);
     }
     assert.equal(staged.code, 200);
-    await page.getByRole('button', { name: 'Refresh', exact: true }).waitFor();
+    await page.getByRole('button', { name: buttonName('Refresh'), exact: true }).waitFor();
     await until(
       async () =>
         !(await page
-          .getByRole('button', { name: 'Refresh', exact: true })
+          .getByRole('button', { name: buttonName('Refresh'), exact: true })
           .isDisabled()),
     );
   }
   const before = (await checked(ws)).head;
   await changes
-    .getByLabel('Commit message')
+    .getByLabel(ui('Commit message'))
     .fill('Browser workspace commit\n\nUnicode 提交');
   const committedResponse = page.waitForResponse((r) =>
     new URL(r.url()).pathname.endsWith(ws + '/git/commit'),
@@ -528,15 +530,15 @@ async function until(fn) {
   await until(
     async () =>
       !(await page
-        .getByRole('button', { name: 'Refresh', exact: true })
+        .getByRole('button', { name: buttonName('Refresh'), exact: true })
         .isDisabled()),
   );
   assert.notEqual(git('rev-parse', 'HEAD').toString().trim(), pushed);
   mark('browser-stage-explicit-commit-no-auto-push');
-  await changes.getByRole('button', { name: 'Push', exact: true }).click();
+  await changes.getByRole('button', { name: buttonName('Push'), exact: true }).click();
   await page
     .getByRole('dialog')
-    .getByRole('button', { name: /确.*定|OK/ })
+    .getByRole('button', { name: pattern('确定') })
     .click();
   await until(() => git('rev-parse', 'HEAD').toString().trim() === pushed);
   mark('browser-explicit-real-ssh-push');
@@ -583,7 +585,7 @@ async function until(fn) {
   git('add', '.');
   git('commit', '-qm', 'remote update');
   const remoteSha = git('rev-parse', 'HEAD').toString().trim();
-  await page.getByRole('button', { name: 'Sync', exact: true }).click();
+  await page.getByRole('button', { name: buttonName('Sync'), exact: true }).click();
   await until(
     async () =>
       (await checked('/subscriptions')).find((s) => s.id === sub.id)
@@ -603,21 +605,21 @@ async function until(fn) {
   });
   mark('official-sync-new-remote-commit-produces-git-event-and-run');
 
-  await page.getByRole('tab', { name: 'edit.txt', exact: true }).click();
+  await page.getByRole('tab', { name: ui('edit.txt'), exact: true }).click();
   await replace('my draft\n');
   await page
     .locator('.ant-tabs-tab')
-    .filter({has:page.getByRole('tab', {name:'edit.txt •',exact:true})})
+    .filter({has:page.getByRole('tab', {name:ui('edit.txt •'),exact:true})})
     .locator('.ant-tabs-tab-remove')
     .click();
-  await page.getByText('放弃此文件未保存的更改？', { exact: true }).waitFor();
-  await page.getByRole('button', { name: /取.*消|Cancel/ }).click();
+  await page.getByText(ui('放弃此文件未保存的更改？'), { exact: true }).waitFor();
+  await page.getByRole('button', { name: pattern('取消') }).click();
   assert.ok(
-    await page.getByRole('tab', { name: 'edit.txt •', exact: true }).count(),
+    await page.getByRole('tab', { name: ui('edit.txt •'), exact: true }).count(),
   );
   await page.locator('a[href="/tasks"]').first().click();
-  await page.getByText('放弃未保存的更改？', { exact: true }).waitFor();
-  await page.getByRole('button', { name: /取.*消|Cancel/ }).click();
+  await page.getByText(ui('放弃未保存的更改？'), { exact: true }).waitFor();
+  await page.getByRole('button', { name: pattern('取消') }).click();
   assert.ok(page.url().includes('/workspace'));
   mark('browser-dirty-tab-close-and-navigation-confirmation');
   execFileSync(process.execPath, [
@@ -625,18 +627,18 @@ async function until(fn) {
     'require("fs").writeFileSync(process.argv[1],"external process\\n")',
     path.join(wtPath, 'edit.txt'),
   ]);
-  await page.getByRole('button', { name: 'Save', exact: true }).click();
-  await page.getByText('File changed on disk', { exact: true }).waitFor();
-  await page.getByRole('button', { name: 'Cancel', exact: true }).click();
+  await page.getByRole('button', { name: buttonName('Save'), exact: true }).click();
+  await page.getByText(ui('File changed on disk'), { exact: true }).waitFor();
+  await page.getByRole('button', { name: buttonName('Cancel'), exact: true }).click();
   assert.equal(
     fs.readFileSync(path.join(wtPath, 'edit.txt'), 'utf8'),
     'external process\n',
   );
-  await page.getByRole('button', { name: 'Save', exact: true }).click();
-  await page.getByRole('button', { name: 'Reload', exact: true }).click();
+  await page.getByRole('button', { name: buttonName('Save'), exact: true }).click();
+  await page.getByRole('button', { name: buttonName('Reload'), exact: true }).click();
   await page
     .locator('.workspace-editor .view-lines')
-    .getByText('external process', { exact: false })
+    .getByText(ui('external process'), { exact: false })
     .waitFor();
   mark('browser-external-process-conflict-cancel-reload');
   await replace('after execution\n');
@@ -646,8 +648,8 @@ async function until(fn) {
   await until(
     async () => (await checked(`/task-runs/${run.id}`)).status === 'RUNNING',
   );
-  await page.getByRole('button', { name: 'Save', exact: true }).click();
-  await page.getByText(/WORKTREE_BUSY：/).waitFor();
+  await page.getByRole('button', { name: buttonName('Save'), exact: true }).click();
+  await page.locator('.ant-alert').getByText(ui('WORKTREE_BUSY'), {exact:true}).waitFor();
   assert.equal(
     (await api(ws + '/files?path=edit.txt')).error_code,
     'WORKTREE_BUSY',
@@ -659,7 +661,7 @@ async function until(fn) {
   await until(
     async () => (await checked(`/task-runs/${run.id}`)).status === 'SUCCESS',
   );
-  await page.getByRole('button', { name: 'Save', exact: true }).click();
+  await page.getByRole('button', { name: buttonName('Save'), exact: true }).click();
   await until(
     () =>
       fs.readFileSync(path.join(wtPath, 'edit.txt'), 'utf8') ===
@@ -669,7 +671,7 @@ async function until(fn) {
   await until(
     async () =>
       !(await page
-        .getByRole('button', { name: 'Refresh', exact: true })
+        .getByRole('button', { name: buttonName('Refresh'), exact: true })
         .isDisabled()),
   );
   assert.ok(!fs.existsSync(path.join(wtPath, 'secret.txt')));
@@ -697,8 +699,8 @@ async function until(fn) {
     expected_hash: old.hash,
   });
   await page.goto(base + '/setting');
-  await page.getByRole('tab', { name: '备份与恢复', exact: true }).click();
-  await page.getByRole('button', { name: '创建备份', exact: true }).click();
+  await page.getByRole('tab', { name: ui('备份与恢复'), exact: true }).click();
+  await page.getByRole('button', { name: buttonName('创建备份'), exact: true }).click();
   await until(async () =>
     (await checked('/backups')).some((b) => b.status === 'READY'),
   );
@@ -742,7 +744,7 @@ async function until(fn) {
   assert.notEqual(env.QL_DATA_DIR, original);
   mark('different-root-restore-preserves-editor-local-commit-dirty-untracked');
   await page.goto(base + `/workspace?id=${wt.id}`);
-  await page.getByRole('button', { name: 'edit.txt', exact: true }).click();
+  await page.getByRole('button', { name: buttonName('edit.txt'), exact: true }).click();
   await page.screenshot({
     path: path.join(evidenceDirectory, 'browser-workspace.png'),
     fullPage: true,

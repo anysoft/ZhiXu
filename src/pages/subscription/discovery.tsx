@@ -1,3 +1,6 @@
+import { translateEnum } from '@/utils/i18n';
+import { useLocale as useI18nLocale } from '@/utils/i18n';
+import { t as tr } from '@/utils/i18n';
 import React, { useEffect, useState } from 'react';
 import {
   Alert,
@@ -17,6 +20,7 @@ export default function DiscoveryPolicy({
 }: {
   subscriptionId: number;
 }) {
+  useI18nLocale();
   const [policy, setPolicy] = useState<any>(),
     [preview, setPreview] = useState<any>();
   const [form] = Form.useForm();
@@ -38,28 +42,30 @@ export default function DiscoveryPolicy({
   return (
     <Space direction="vertical" style={{ width: '100%' }}>
       <Alert
-        message="Discovery policy"
-        description="Preview reads the saved policy. Apply discovers task sources and their cron metadata; user overrides are preserved."
+        message={tr('ui.discoveryPolicy')}
+        description={tr(
+          'ui.previewReadsTheSavedPolicyApplyDiscoversTaskSourcesAndTheirCronMetadataUserOverridesArePreserved',
+        )}
       />
       <Form form={form} layout="vertical">
         <Form.Item
           name="enabled"
-          label="Discovery enabled"
+          label={tr('ui.discoveryEnabled')}
           valuePropName="checked"
         >
           <Switch />
         </Form.Item>
-        <Form.Item name="includes" label="Include globs (one per line)">
+        <Form.Item name="includes" label={tr('ui.includeGlobsOnePerLine')}>
           <Input.TextArea />
         </Form.Item>
-        <Form.Item name="excludes" label="Exclude globs (one per line)">
+        <Form.Item name="excludes" label={tr('ui.excludeGlobsOnePerLine')}>
           <Input.TextArea />
         </Form.Item>
-        <Form.Item name="languages" label="Languages">
+        <Form.Item name="languages" label={tr('ui.languages')}>
           <Select
             mode="multiple"
             options={['PYTHON', 'JAVASCRIPT', 'TYPESCRIPT', 'SHELL'].map(
-              (value) => ({ value, label: value }),
+              (value) => ({ value, label: translateEnum('language', value) }),
             )}
           />
         </Form.Item>
@@ -81,12 +87,12 @@ export default function DiscoveryPolicy({
               expected_version: policy.version,
             });
             if (result.code === 200) {
-              message.success('Discovery policy saved');
+              message.success(tr('ui.discoveryPolicySaved'));
               await load();
             }
           }}
         >
-          Save discovery policy
+          {tr('ui.saveDiscoveryPolicy')}
         </Button>
         <Button
           onClick={async () => {
@@ -94,24 +100,26 @@ export default function DiscoveryPolicy({
             if (result.code === 200) setPreview(result.data);
           }}
         >
-          Preview discovery
+          {tr('ui.previewDiscovery')}
         </Button>
         <Button
           onClick={async () => {
             const result = await request.post(api + '/apply', {});
             if (result.code === 200) {
-              message.success('Discovery applied');
+              message.success(tr('ui.discoveryApplied'));
               await load();
               setPreview(undefined);
             }
           }}
         >
-          Apply discovery
+          {tr('ui.applyDiscoveryVariant16')}
         </Button>
       </Space>
       {policy?.last_reconciled_at && (
         <Alert
-          message={`Last reconcile: ${policy.last_reconciled_at}`}
+          message={tr('ui.template.lastReconcileValue', {
+            p0: policy.last_reconciled_at,
+          })}
           description={JSON.stringify(policy.last_result)}
         />
       )}
@@ -121,11 +129,12 @@ export default function DiscoveryPolicy({
           rowKey={(row: any) => row.file?.key ?? row.task_id}
           dataSource={preview.changes}
           columns={[
-            { title: 'Action', dataIndex: 'action' },
+            { title: tr('ui.action'), dataIndex: 'action' },
             {
-              title: 'Source',
+              title: tr('ui.source'),
               render: (_: unknown, row: any) =>
-                row.file?.relative_path ?? `Task #${row.task_id}`,
+                row.file?.relative_path ??
+                tr('ui.presentation.taskId', { id: row.task_id }),
             },
           ]}
           pagination={{ pageSize: 10 }}

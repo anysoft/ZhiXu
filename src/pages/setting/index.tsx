@@ -1,3 +1,5 @@
+import { useLocale as useI18nLocale } from '@/utils/i18n';
+import { t as tr } from '@/utils/i18n';
 import intl from 'react-intl-universal';
 import React, { useState, useEffect, useRef } from 'react';
 import {
@@ -41,6 +43,7 @@ const { Text } = Typography;
 const isDemoEnv = window.__ENV__DeployEnv === 'demo';
 
 const Setting = () => {
+  useI18nLocale();
   const {
     headerStyle,
     isPhone,
@@ -58,7 +61,7 @@ const Setting = () => {
       key: 'name',
     },
     {
-      title: 'Client ID',
+      title: tr('ui.clientID'),
       dataIndex: 'client_id',
       key: 'client_id',
       render: (text: string, record: any) => {
@@ -66,7 +69,7 @@ const Setting = () => {
       },
     },
     {
-      title: 'Client Secret',
+      title: tr('ui.clientSecret'),
       dataIndex: 'client_secret',
       key: 'client_secret',
       render: (text: string, record: any) => {
@@ -253,7 +256,6 @@ const Setting = () => {
       getApps();
     } else if (activeKey === 'login') {
       getLoginLog();
-
     }
   };
 
@@ -337,7 +339,7 @@ const Setting = () => {
             },
             {
               key: 'backup',
-              label: '备份与恢复',
+              label: tr('ui.backupAndRestore'),
               children: <BackupSettings />,
             },
             {

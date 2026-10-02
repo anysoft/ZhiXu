@@ -1,3 +1,5 @@
+import { formatDateTime } from '@/utils/format';
+import { useLocale as useI18nLocale } from '@/utils/i18n';
 import intl from 'react-intl-universal';
 import React, { useEffect, useState } from 'react';
 import { Typography, Input, Form, Button, message, Descriptions } from 'antd';
@@ -9,13 +11,10 @@ import logo from '@/assets/zhixu-logo.svg';
 const { Link } = Typography;
 
 const About = ({ systemInfo }: { systemInfo: SharedContext['systemInfo'] }) => {
+  useI18nLocale();
   return (
     <div className={styles.container}>
-      <img
-        alt="logo"
-        style={{ width: 140, marginRight: 20 }}
-        src={logo}
-      />
+      <img alt="logo" style={{ width: 140, marginRight: 20 }} src={logo} />
       <div className={styles.right}>
         <span className={styles.title}>{intl.get('枝序')}</span>
         <span className={styles.desc}>
@@ -31,7 +30,7 @@ const About = ({ systemInfo }: { systemInfo: SharedContext['systemInfo'] }) => {
             v{systemInfo.version}
           </Descriptions.Item>
           <Descriptions.Item label={intl.get('更新时间')} span={3}>
-            {dayjs(systemInfo.publishTime * 1000).format('YYYY-MM-DD HH:mm')}
+            {formatDateTime(systemInfo.publishTime * 1000)}
           </Descriptions.Item>
           <Descriptions.Item label={intl.get('更新日志')} span={3}>
             <Link
@@ -57,10 +56,7 @@ const About = ({ systemInfo }: { systemInfo: SharedContext['systemInfo'] }) => {
           >
             {intl.get('Telegram频道')}
           </Link>
-          <Link
-            href="https://github.com/anysoft/ZhiXu/issues"
-            target="_blank"
-          >
+          <Link href="https://github.com/anysoft/ZhiXu/issues" target="_blank">
             {intl.get('提交BUG')}
           </Link>
         </div>

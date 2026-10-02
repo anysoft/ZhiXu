@@ -1,0 +1,34 @@
+Changes: 101 files, 381 symbols
+Affected processes: 127
+Risk level: critical
+
+Changed symbols:
+  Const catalog → scripts/ci/browser-locale.cjs
+  Const en → scripts/ci/browser-locale.cjs
+  Const zh → scripts/ci/browser-locale.cjs
+  Const locale → scripts/ci/browser-locale.cjs
+  Const resources → scripts/ci/browser-locale.cjs
+  Const manual → scripts/ci/browser-locale.cjs
+  Property 确定 → scripts/ci/browser-locale.cjs
+  Property 取消 → scripts/ci/browser-locale.cjs
+  Property 关闭 → scripts/ci/browser-locale.cjs
+  Function ui → scripts/ci/browser-locale.cjs
+  Function pattern → scripts/ci/browser-locale.cjs
+  Function configure → scripts/ci/browser-locale.cjs
+  Function operationLabel → scripts/ci/browser-locale.cjs
+  Function buttonName → scripts/ci/browser-locale.cjs
+  Function runTitle → scripts/ci/browser-locale.cjs
+... and 366 more
+
+Affected execution flows:
+  • RunsPage → ResolveLocale (7 steps) — changed: translateEnum, t, RunDetail, apply, resolveLocale, RunsPage, fieldValue
+  • Render → Request (6 steps) — changed: render, act
+  • SendNotify → Post (4 steps) — changed: calls
+  • Qualify → Ui (4 steps) — changed: buttonName, pattern, ui, qualify
+  • Render → Load (4 steps) — changed: render, perform
+  • Dashboard → Numeric (4 steps) — changed: Dashboard, formatPercent, formatNumber, numeric
+  • NotificationChannelsPage → ObsGet (4 steps) — changed: DeliveryTable, NotificationChannelsPage
+  • RunsPage → FormatDateTime (4 steps) — changed: formatDateTime, RunDetail, RunsPage, fieldValue
+  • ScopedEnvironmentPage → Load (4 steps) — changed: ScopedEnvironmentPage, TaskEnvironment, load, ScopedVariables
+  • ScopedEnvironmentPage → Open (4 steps) — changed: ScopedEnvironmentPage, TaskEnvironment, open, ScopedVariables
+... and 117 more

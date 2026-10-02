@@ -1,14 +1,7 @@
+import { useLocale as useI18nLocale } from '@/utils/i18n';
 import intl from 'react-intl-universal';
 import React, { Fragment, useEffect, useState } from 'react';
-import {
-  Button,
-  Row,
-  Input,
-  Form,
-  message,
-  Typography,
-  Steps,
-} from 'antd';
+import { Button, Row, Input, Form, message, Typography, Steps } from 'antd';
 import config from '@/utils/config';
 import { history } from '@umijs/max';
 import styles from './index.less';
@@ -20,6 +13,7 @@ const { Step } = Steps;
 const { Link } = Typography;
 
 const Initialization = () => {
+  useI18nLocale();
   const [loading, setLoading] = useState(false);
   const [current, setCurrent] = React.useState(0);
 
@@ -165,11 +159,7 @@ const Initialization = () => {
     <div className={styles.container}>
       <div className={styles.top}>
         <div className={styles.header}>
-          <img
-            alt="logo"
-            className={styles.logo}
-            src={logo}
-          />
+          <img alt="logo" className={styles.logo} src={logo} />
           <span className={styles.title}>{intl.get('初始化配置')}</span>
         </div>
       </div>

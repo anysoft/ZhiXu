@@ -1,3 +1,4 @@
+import { useLocale as useI18nLocale } from '@/utils/i18n';
 import intl from 'react-intl-universal';
 import { Modal, Progress } from 'antd';
 import { useRef } from 'react';
@@ -11,6 +12,7 @@ const ProgressElement = ({ percent }: { percent: number }) => (
 );
 
 export default function useProgress(title: string) {
+  useI18nLocale();
   const modalRef = useRef<ReturnType<typeof Modal.info> | null>();
 
   const showProgress = (percent: number) => {

@@ -1,5 +1,9 @@
-import TaskPolicy, {TaskHealth} from '@/components/observability/taskPolicy';
-import {RunsTable,RunDetail} from '@/components/observability';
+import { translateEnum, translateError } from '@/utils/i18n';
+import { formatDateTime, formatDuration, formatBytes } from '@/utils/format';
+import { useLocale as useI18nLocale } from '@/utils/i18n';
+import { t as tr } from '@/utils/i18n';
+import TaskPolicy, { TaskHealth } from '@/components/observability/taskPolicy';
+import { RunsTable, RunDetail } from '@/components/observability';
 import TaskTriggers from './triggers';
 import React, { useEffect, useState } from 'react';
 import {
@@ -55,6 +59,7 @@ function RuntimeDefaults({
   environments: any[];
   onChange: () => void;
 }) {
+  useI18nLocale();
   const [detailRun, setDetailRun] = useState<number>();
   const [rows, setRows] = useState<Record<string, any>>({}),
     [values, setValues] = useState<Record<string, number | null>>({});
@@ -101,18 +106,22 @@ function RuntimeDefaults({
           <Card
             size="small"
             key={scope.name}
-            title={`${scope.name} Runtime Default`}
+            title={tr('ui.template.valueRuntimeDefault', {
+              p0: translateEnum('scope', scope.name.toUpperCase()),
+            })}
           >
             <Space>
               <Select
-                aria-label={`${scope.name} Runtime Default`}
+                aria-label={tr('ui.template.valueRuntimeDefault', {
+                  p0: translateEnum('scope', scope.name.toUpperCase()),
+                })}
                 style={{ minWidth: 220 }}
                 value={values[scope.name] ?? null}
                 onChange={(value) =>
                   setValues((old) => ({ ...old, [scope.name]: value }))
                 }
                 options={[
-                  { value: null, label: 'Unset / inherit' },
+                  { value: null, label: tr('ui.unsetInherit') },
                   ...environments.map((env) => ({
                     value: env.id,
                     label: env.name,
@@ -132,11 +141,13 @@ function RuntimeDefaults({
                   if (response.code === 200) {
                     await load();
                     onChange();
-                    message.success('Runtime default saved');
+                    message.success(tr('ui.runtimeDefaultSaved'));
                   }
                 }}
               >
-                Save {scope.name} Default
+                {tr('ui.saveScopeDefault', {
+                  scope: translateEnum('scope', scope.name.toUpperCase()),
+                })}
               </Button>
             </Space>
           </Card>
@@ -145,6 +156,7 @@ function RuntimeDefaults({
   );
 }
 export default function TasksPage() {
+  useI18nLocale();
   const [detailRun, setDetailRun] = useState<number>();
   const [rows, setRows] = useState<any[]>([]),
     [worktrees, setWorktrees] = useState<any[]>([]),
@@ -238,7 +250,7 @@ export default function TasksPage() {
         )
           throw Error();
       } catch {
-        message.error('Arguments must be a JSON array of strings');
+        message.error(tr('ui.argumentsMustBeAJSONArrayOfStrings'));
         return;
       }
       const body = {
@@ -281,7 +293,7 @@ export default function TasksPage() {
         setSelected(response.data);
         setPreview(response.data.resources);
         await load();
-        message.success('Task saved');
+        message.success(tr('ui.taskSaved'));
       }
     } finally {
       setBusy(false);
@@ -293,7 +305,7 @@ export default function TasksPage() {
       setPreview(response.data);
       if (!open)
         Modal.info({
-          title: 'Task readiness',
+          title: tr('ui.taskReadiness'),
           content: (
             <pre style={{ whiteSpace: 'pre-wrap' }}>
               {JSON.stringify(response.data.readiness, null, 2)}
@@ -307,9 +319,21 @@ export default function TasksPage() {
     selected && get(`tasks/${selected.id}/resources`).then(setPreview);
   const resourceTabs = selected
     ? [
-        {key: 'runs', label: 'Runs', children: <RunsTable taskId={selected.id}/>},
-        {key: 'health', label: 'Health', children: <TaskHealth id={selected.id}/>},
-        {key: 'notifications', label: 'Notifications', children: <TaskPolicy id={selected.id}/>},
+        {
+          key: 'runs',
+          label: tr('ui.runs'),
+          children: <RunsTable taskId={selected.id} />,
+        },
+        {
+          key: 'health',
+          label: tr('ui.health'),
+          children: <TaskHealth id={selected.id} />,
+        },
+        {
+          key: 'notifications',
+          label: tr('ui.notifications'),
+          children: <TaskPolicy id={selected.id} />,
+        },
         {
           key: 'environment',
           label: 'ENV',
@@ -317,37 +341,45 @@ export default function TasksPage() {
         },
         {
           key: 'config',
-          label: 'Config',
+          label: tr('ui.config'),
           children: <ConfigBindings scope="task" id={selected.id} />,
         },
         {
           key: 'hooks',
-          label: 'Hooks',
+          label: tr('ui.hooks'),
           children: <TaskHooks id={selected.id} />,
         },
       ]
     : ['ENV', 'Config', 'Hooks'].map((label) => ({
         key: label.toLowerCase(),
         label,
-        children: <Alert message="先保存 Task，再配置这些独立提交的资源。" />,
+        children: (
+          <Alert
+            message={tr(
+              'ui.saveTheTaskFirstThenConfigureTheseSeparatelySavedResources',
+            )}
+          />
+        ),
       }));
   return (
     <div style={{ padding: 24 }}>
       <Space direction="vertical" size="large" style={{ width: '100%' }}>
         <Space>
           <Typography.Title level={2} style={{ margin: 0 }}>
-            Tasks
+            {tr('ui.tasks')}
           </Typography.Title>
           <Button type="primary" onClick={() => edit()}>
-            Create Task
+            {tr('ui.createTask')}
           </Button>
-          <Button onClick={load}>Refresh</Button>
+          <Button onClick={load}>{tr('ui.refresh')}</Button>
         </Space>
         <Alert
           type="info"
           showIcon
-          message="Configured Resources"
-          description="任务直接执行 Worktree 中的文件。每次运行固定所选 Environment Build、环境变量、Config 和 Hooks；Arguments 按独立参数传入。"
+          message={tr('ui.configuredResources')}
+          description={tr(
+            'ui.tasksExecuteFilesInAWorktreeEachRunPinsTheEnvironmentBuildVariablesConfigAndHooksArgumentsArePassedI',
+          )}
         />
         <Table
           rowKey="id"
@@ -356,7 +388,7 @@ export default function TasksPage() {
           scroll={{ x: 1100 }}
           columns={[
             {
-              title: 'Name',
+              title: tr('ui.name'),
               dataIndex: 'name',
               render: (name: string, task: any) => (
                 <Button type="link" onClick={() => edit(task.id)}>
@@ -365,31 +397,40 @@ export default function TasksPage() {
               ),
             },
             {
-              title: 'Source',
+              title: tr('ui.source'),
               render: (_: unknown, task: any) =>
                 task.resources?.source?.relative_entrypoint ??
-                'Source required',
+                tr('ui.extra.sourceRequired'),
             },
             {
-              title: 'Runtime',
+              title: tr('ui.runtime'),
               render: (_: unknown, task: any) => (
                 <span>
-                  {task.resources?.runtime?.kind ?? 'Unbound'} ·{' '}
-                  {task.resources?.runtime?.environment_id ?? '—'}
+                  {task.resources?.runtime?.kind
+                    ? translateEnum('language', task.resources.runtime.kind)
+                    : tr('ui.extra.unbound')}{' '}
+                  · {task.resources?.runtime?.environment_id ?? '—'}
                   <br />
-                  {task.resources?.runtime?.selected_by}
+                  {translateEnum(
+                    'selectionSource',
+                    task.resources?.runtime?.selected_by,
+                  )}
                 </span>
               ),
             },
             {
-              title: 'Last run',
+              title: tr('ui.lastRun'),
               render: (_: unknown, task: any) =>
                 task.last_run
-                  ? `${task.last_run.status} · #${task.last_run.id} · ${task.last_run.attempt_count} attempt(s)`
-                  : 'No runs',
+                  ? tr('ui.lastRunSummary', {
+                      status: translateEnum('taskRun', task.last_run.status),
+                      id: task.last_run.id,
+                      count: task.last_run.attempt_count,
+                    })
+                  : tr('ui.extra.noRuns'),
             },
             {
-              title: 'Readiness',
+              title: tr('ui.readiness'),
               render: (_: unknown, task: any) => (
                 <Tag
                   color={
@@ -398,12 +439,15 @@ export default function TasksPage() {
                       : 'orange'
                   }
                 >
-                  {task.resources?.readiness?.status}
+                  {translateEnum(
+                    'readiness',
+                    task.resources?.readiness?.status,
+                  )}
                 </Tag>
               ),
             },
             {
-              title: 'Enabled',
+              title: tr('ui.enabled'),
               render: (_: unknown, task: any) => (
                 <Switch
                   checked={task.enabled}
@@ -418,10 +462,12 @@ export default function TasksPage() {
               ),
             },
             {
-              title: 'Actions',
+              title: tr('ui.actions'),
               render: (_: unknown, task: any) => (
                 <Space wrap>
-                  <Button onClick={() => validate(task.id)}>Validate</Button>
+                  <Button onClick={() => validate(task.id)}>
+                    {tr('ui.validate')}
+                  </Button>
                   <Button
                     onClick={async () => {
                       const response = await request.post(
@@ -431,19 +477,34 @@ export default function TasksPage() {
                       if (response.code === 200) {
                         await load();
                         await edit(response.data.id);
-                        if (response.data.webhook_secrets?.length) Modal.info({ title: 'Copy cloned webhook secrets now', content: <pre>{JSON.stringify(response.data.webhook_secrets, null, 2)}</pre>, width: 700 });
+                        if (response.data.webhook_secrets?.length)
+                          Modal.info({
+                            title: tr('ui.copyClonedWebhookSecretsNow'),
+                            content: (
+                              <pre>
+                                {JSON.stringify(
+                                  response.data.webhook_secrets,
+                                  null,
+                                  2,
+                                )}
+                              </pre>
+                            ),
+                            width: 700,
+                          });
                       }
                     }}
                   >
-                    Clone
+                    {tr('ui.clone')}
                   </Button>
                   <Button
                     onClick={async () => {
-                      await request.post(api + `tasks/${task.id}/run`, { source: 'MANUAL' });
+                      await request.post(api + `tasks/${task.id}/run`, {
+                        source: 'MANUAL',
+                      });
                       await load();
                     }}
                   >
-                    Run
+                    {tr('ui.run')}
                   </Button>
                   <Button
                     onClick={async () => {
@@ -451,7 +512,7 @@ export default function TasksPage() {
                       setRuns(await get(`tasks/${task.id}/runs`));
                     }}
                   >
-                    Runs
+                    {tr('ui.runs')}
                   </Button>
                   <Button
                     onClick={async () => {
@@ -459,18 +520,22 @@ export default function TasksPage() {
                       await load();
                     }}
                   >
-                    Stop
+                    {tr('ui.stop')}
                   </Button>
                   <Button
                     onClick={async () => {
-                      const latest = await get(`task-runs?task_id=${task.id}&limit=1`);
+                      const latest = await get(
+                        `task-runs?task_id=${task.id}&limit=1`,
+                      );
                       if (latest.data[0]) setDetailRun(latest.data[0].id);
                     }}
                   >
-                    Log
+                    {tr('ui.log')}
                   </Button>
                   <Popconfirm
-                    title="Delete Task and its owned bindings? Historical logs are retained."
+                    title={tr(
+                      'ui.deleteTaskAndItsOwnedBindingsHistoricalLogsAreRetained',
+                    )}
                     onConfirm={async () => {
                       const response = await request.delete(
                         api + `tasks/${task.id}`,
@@ -479,7 +544,7 @@ export default function TasksPage() {
                       if (response.code === 200) await load();
                     }}
                   >
-                    <Button danger>Delete</Button>
+                    <Button danger>{tr('ui.delete')}</Button>
                   </Popconfirm>
                 </Space>
               ),
@@ -487,7 +552,11 @@ export default function TasksPage() {
           ]}
         />
         <Modal
-          title={selected ? `Task: ${selected.name}` : 'Create Task'}
+          title={
+            selected
+              ? tr('ui.presentation.taskTitle', { name: selected.name })
+              : tr('ui.createTask')
+          }
           open={open}
           width={960}
           onCancel={() => setOpen(false)}
@@ -495,12 +564,12 @@ export default function TasksPage() {
             <Space>
               {selected && (
                 <Button onClick={() => validate(selected.id)}>
-                  Validate Task
+                  {tr('ui.validateTask')}
                 </Button>
               )}
-              <Button onClick={() => setOpen(false)}>Close</Button>
+              <Button onClick={() => setOpen(false)}>{tr('ui.close')}</Button>
               <Button type="primary" loading={busy} onClick={save}>
-                Save Task
+                {tr('ui.saveTask')}
               </Button>
             </Space>
           }
@@ -513,41 +582,48 @@ export default function TasksPage() {
               items={[
                 {
                   key: 'general',
-                  label: 'General',
+                  label: tr('ui.general'),
                   forceRender: true,
                   children: (
                     <>
                       <Form.Item
                         name="name"
-                        label="Name"
+                        label={tr('ui.name')}
                         rules={[{ required: true }]}
                       >
                         <Input maxLength={255} />
                       </Form.Item>
-                      <Form.Item name="description" label="Description">
+                      <Form.Item
+                        name="description"
+                        label={tr('ui.description')}
+                      >
                         <Input.TextArea />
                       </Form.Item>
                       <Form.Item
                         name="enabled"
-                        label="Enabled"
+                        label={tr('ui.enabled')}
                         valuePropName="checked"
                       >
                         <Switch />
                       </Form.Item>
                       <Form.Item
                         name="arguments_json"
-                        label="Arguments — JSON array"
+                        label={tr('ui.argumentsJSONArray')}
                         rules={[{ required: true }]}
                       >
                         <Input.TextArea rows={4} />
                       </Form.Item>
-                      <Alert message="Do not put secrets in arguments. Use Environment or Config Assets. Arguments can appear in process listings; $TOKEN is a literal string." />
+                      <Alert
+                        message={tr(
+                          'ui.doNotPutSecretsInArgumentsUseEnvironmentOrConfigAssetsArgumentsCanAppearInProcessListingsTOKENIsALit',
+                        )}
+                      />
                     </>
                   ),
                 },
                 {
                   key: 'source',
-                  label: 'Source',
+                  label: tr('ui.source'),
                   forceRender: true,
                   children: (
                     <>
@@ -562,7 +638,11 @@ export default function TasksPage() {
                           disabled={selected?.origin === 'DISCOVERED'}
                           options={worktrees.map((tree) => ({
                             value: tree.id,
-                            label: `${tree.name} · Repository ${tree.repository_id} · ${tree.ref_name}`,
+                            label: tr('ui.template.valueRepositoryValueValue', {
+                              p0: tree.name,
+                              p1: tree.repository_id,
+                              p2: tree.ref_name,
+                            }),
                           }))}
                           onChange={() =>
                             form.setFieldValue('relative_entrypoint', undefined)
@@ -571,7 +651,7 @@ export default function TasksPage() {
                       </Form.Item>
                       <Form.Item
                         name="relative_entrypoint"
-                        label="Entrypoint"
+                        label={tr('ui.entrypoint')}
                         rules={[{ required: true }]}
                       >
                         <Select
@@ -589,22 +669,28 @@ export default function TasksPage() {
                           }}
                         />
                       </Form.Item>
-                      <Form.Item name="language" label="Language">
+                      <Form.Item name="language" label={tr('ui.language')}>
                         <Input readOnly />
                       </Form.Item>
-                      <Form.Item name="cwd_mode" label="Working directory">
+                      <Form.Item
+                        name="cwd_mode"
+                        label={tr('ui.workingDirectoryVariant397')}
+                      >
                         <Select
                           options={[
                             'WORKTREE_ROOT',
                             'ENTRYPOINT_DIR',
                             'CUSTOM_RELATIVE',
-                          ].map((value) => ({ value, label: value }))}
+                          ].map((value) => ({
+                            value,
+                            label: translateEnum('cwdMode', value),
+                          }))}
                         />
                       </Form.Item>
                       {cwdMode === 'CUSTOM_RELATIVE' && (
                         <Form.Item
                           name="cwd_relative_path"
-                          label="Relative working directory"
+                          label={tr('ui.relativeWorkingDirectory')}
                           rules={[{ required: true }]}
                         >
                           <Input />
@@ -615,45 +701,65 @@ export default function TasksPage() {
                 },
                 {
                   key: 'runtime',
-                  label: 'Runtime',
+                  label: tr('ui.runtime'),
                   forceRender: true,
                   children: (
                     <Space direction="vertical" style={{ width: '100%' }}>
                       <Alert
-                        message={`${kind} · Configured Resources`}
-                        description="Environment 是逻辑绑定；每次运行固定当时的 Current Build。TypeScript 需要该 Build 安装 tsx 4.x。"
+                        message={tr('ui.template.valueConfiguredResources', {
+                          p0: kind,
+                        })}
+                        description={tr(
+                          'ui.eachRunPinsTheEnvironmentSCurrentBuildTypeScriptRequiresTsx4XInThatBuild',
+                        )}
                       />
                       {kind !== 'SHELL' && (
                         <Form.Item
                           name="environment_id"
-                          label={`${
-                            kind === 'PYTHON' ? 'Python' : 'Node'
-                          } Environment`}
+                          label={tr('ui.template.valueEnvironment', {
+                            p0: kind === 'PYTHON' ? 'Python' : 'Node',
+                          })}
                         >
                           <Select
                             options={[
                               {
                                 value: null,
-                                label:
-                                  'Inherit — Subscription / Repository Default',
+                                label: tr(
+                                  'ui.inheritSubscriptionRepositoryDefault',
+                                ),
                               },
                               ...environments.map((env) => ({
                                 value: env.id,
-                                label: `${env.name} · ${
-                                  env.state
-                                } · Current Build ${
-                                  env.current_build_id ?? 'none'
-                                }`,
+                                label: tr(
+                                  'ui.template.valueValueCurrentBuildValue',
+                                  {
+                                    p0: env.name,
+                                    p1: translateEnum(
+                                      form.getFieldValue([
+                                        'runtime',
+                                        'kind',
+                                      ]) === 'PYTHON'
+                                        ? 'pythonEnvironment'
+                                        : 'nodeEnvironment',
+                                      env.state,
+                                    ),
+                                    p2:
+                                      env.current_build_id ?? tr('common.none'),
+                                  },
+                                ),
                               })),
                             ]}
                           />
                         </Form.Item>
                       )}
                       <Typography.Text>
-                        Selection:{' '}
-                        {environmentId
-                          ? 'TASK'
-                          : preview?.runtime?.selected_by ?? 'UNBOUND'}
+                        {tr('ui.selection')}{' '}
+                        {translateEnum(
+                          'selectionSource',
+                          environmentId
+                            ? 'TASK'
+                            : preview?.runtime?.selected_by ?? 'UNBOUND',
+                        )}
                       </Typography.Text>
                       <RuntimeDefaults
                         repositoryId={worktree?.repository_id}
@@ -668,36 +774,47 @@ export default function TasksPage() {
                 ...resourceTabs,
                 {
                   key: 'triggers',
-                  label: 'Triggers',
+                  label: tr('ui.triggers'),
                   children: <TaskTriggers taskId={selected?.id} />,
                 },
                 {
                   key: 'settings',
-                  label: 'Execution Settings',
+                  label: tr('ui.executionSettings'),
                   forceRender: true,
                   children: (
                     <>
-                      <Alert message="Retry and concurrency apply to each run. Configure delivery separately in Notifications." />
+                      <Alert
+                        message={tr(
+                          'ui.retryAndConcurrencyApplyToEachRunConfigureDeliverySeparatelyInNotifications',
+                        )}
+                      />
                       <Form.Item
                         name="timeout_seconds"
-                        label="Timeout seconds (empty = platform default)"
+                        label={tr('ui.timeoutSecondsEmptyPlatformDefault')}
                       >
                         <InputNumber min={1} max={86400} />
                       </Form.Item>
-                      <Form.Item name="max_attempts" label="Maximum attempts">
+                      <Form.Item
+                        name="max_attempts"
+                        label={tr('ui.maximumAttempts')}
+                      >
                         <InputNumber min={1} max={10} />
                       </Form.Item>
                       <Form.Item
                         name="initial_delay_seconds"
-                        label="Initial delay seconds"
+                        label={tr('ui.initialDelaySeconds')}
                       >
                         <InputNumber min={0} max={3600} />
                       </Form.Item>
                       {[
-                        ['backoff', 'Backoff', ['FIXED', 'EXPONENTIAL']],
+                        [
+                          'backoff',
+                          tr('ui.extra.backoff'),
+                          ['FIXED', 'EXPONENTIAL'],
+                        ],
                         [
                           'concurrency',
-                          'Concurrency',
+                          tr('ui.extra.concurrency'),
                           ['FORBID', 'QUEUE', 'ALLOW'],
                         ],
                       ].map(([name, label, values]) => (
@@ -709,7 +826,7 @@ export default function TasksPage() {
                           <Select
                             options={(values as string[]).map((value) => ({
                               value,
-                              label: value,
+                              label: translateEnum(String(name), value),
                             }))}
                           />
                         </Form.Item>
@@ -719,16 +836,18 @@ export default function TasksPage() {
                 },
                 {
                   key: 'resources',
-                  label: 'Resource Preview',
+                  label: tr('ui.resourcePreview'),
                   children: preview ? (
                     <>
-                      <Tag>{preview.readiness.status}</Tag>
+                      <Tag>
+                        {translateEnum('readiness', preview.readiness.status)}
+                      </Tag>
                       <pre style={{ whiteSpace: 'pre-wrap' }}>
                         {JSON.stringify(preview, null, 2)}
                       </pre>
                     </>
                   ) : (
-                    <Alert message="Save Task to preview resources" />
+                    <Alert message={tr('ui.saveTaskToPreviewResources')} />
                   ),
                 },
               ]}
@@ -737,7 +856,7 @@ export default function TasksPage() {
         </Modal>
         <Modal
           open={runs !== undefined}
-          title="Task runs"
+          title={tr('ui.taskRuns')}
           width={850}
           footer={null}
           onCancel={() => setRuns(undefined)}
@@ -745,27 +864,32 @@ export default function TasksPage() {
           <Button
             onClick={async () => setRuns(await get(`tasks/${runTask}/runs`))}
           >
-            Refresh runs
+            {tr('ui.refreshRuns')}
           </Button>
           <Table
             rowKey="id"
             dataSource={runs}
             pagination={{ pageSize: 10 }}
             columns={[
-              { title: 'Run', dataIndex: 'id' },
-              { title: 'Status', dataIndex: 'status' },
-              { title: 'Attempts', dataIndex: 'attempt_count' },
-              { title: 'Result', dataIndex: 'error_code' },
+              { title: tr('ui.run'), dataIndex: 'id' },
               {
-                title: 'Actions',
+                title: tr('ui.status'),
+                dataIndex: 'status',
+                render: (value: unknown) => translateEnum('taskRun', value),
+              },
+              { title: tr('ui.attempts'), dataIndex: 'attempt_count' },
+              {
+                title: tr('ui.result'),
+                dataIndex: 'error_code',
+                render: (value: unknown) =>
+                  value ? translateError(value) : '—',
+              },
+              {
+                title: tr('ui.actions'),
                 render: (_: unknown, run: any) => (
                   <Space>
-                    <Button
-                      onClick={async () =>
-                        setDetailRun(run.id)
-                      }
-                    >
-                      Run log
+                    <Button onClick={async () => setDetailRun(run.id)}>
+                      {tr('ui.runLog')}
                     </Button>
                     <Button
                       disabled={
@@ -777,7 +901,7 @@ export default function TasksPage() {
                         await load();
                       }}
                     >
-                      Cancel run
+                      {tr('ui.cancelRun')}
                     </Button>
                   </Space>
                 ),
@@ -785,10 +909,10 @@ export default function TasksPage() {
             ]}
           />
         </Modal>
-        <RunDetail id={detailRun} onClose={()=>setDetailRun(undefined)}/>
+        <RunDetail id={detailRun} onClose={() => setDetailRun(undefined)} />
         <Modal
           open={log !== undefined}
-          title="Run log"
+          title={tr('ui.runLog')}
           width={900}
           onCancel={() => setLog(undefined)}
           footer={null}

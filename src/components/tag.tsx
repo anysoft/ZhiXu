@@ -1,3 +1,4 @@
+import { useLocale as useI18nLocale } from '@/utils/i18n';
 import intl from 'react-intl-universal';
 import { Tag, Input } from 'antd';
 import { TweenOneGroup } from 'rc-tween-one';
@@ -11,6 +12,7 @@ const EditableTagGroup = ({
   value?: string[];
   onChange?: (tags: string[]) => void;
 }) => {
+  useI18nLocale();
   const [inputValue, setInputValue] = useState('');
   const [inputVisible, setInputVisible] = useState(false);
   const [tags, setTags] = useState<string[]>([]);

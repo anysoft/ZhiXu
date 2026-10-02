@@ -1,3 +1,4 @@
+import { useLocale } from '@/utils/i18n';
 import config from '@/utils/config';
 import { useCtx, useTheme } from '@/utils/hooks';
 import { request } from '@/utils/http';
@@ -14,7 +15,7 @@ import { Avatar, Badge, Dropdown, Image, MenuProps, Tooltip } from 'antd';
 import React, { useEffect, useState } from 'react';
 import intl from 'react-intl-universal';
 import vhCheck from 'vh-check';
-import defaultProps from './defaultProps';
+import getDefaultProps from './defaultProps';
 import './index.less';
 import { init } from '../utils/init';
 import WebSocketManager from '../utils/websocket';
@@ -42,6 +43,7 @@ interface TSystemInfo {
 }
 
 export default function () {
+  const locale = useLocale();
   const location = useLocation();
   const ctx = useCtx();
   const { theme, reloadTheme } = useTheme();
@@ -142,15 +144,6 @@ export default function () {
           setSiteTitle(intl.get('枝序'));
           localStorage.removeItem('zhixu_panel_title');
         }
-        if (!data?.info?.lang) {
-          const browserLang =
-            localStorage.getItem('lang') ||
-            navigator.language?.slice(0, 2) ||
-            'zh';
-          request
-            .put(`${config.apiPrefix}system/config/lang`, { lang: browserLang })
-            .catch(() => {});
-        }
       })
       .catch(() => {});
   };
@@ -176,7 +169,7 @@ export default function () {
     const title =
       (config.documentTitleMap as any)[location.pathname] || intl.get('未找到');
     document.title = `${title} - ${siteTitle}`;
-  }, [location.pathname, siteTitle]);
+  }, [location.pathname, siteTitle, locale]);
 
   useEffect(() => {
     if (theme === 'vs-dark') {
@@ -394,7 +387,7 @@ export default function () {
           </span>
         </span>
       )}
-      {...defaultProps}
+      {...getDefaultProps()}
     >
       <Outlet
         context={{

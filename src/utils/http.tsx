@@ -1,3 +1,4 @@
+import { translateError } from './i18n';
 import intl from 'react-intl-universal';
 import { message, notification } from 'antd';
 import config from './config';
@@ -16,6 +17,7 @@ export interface IResponseData extends ValidationErrorResponse {
   data?: any;
   message?: string;
   error?: any;
+  error_code?: string;
 }
 
 export type Override<
@@ -41,9 +43,9 @@ const errorHandler = function (
   >,
 ) {
   if (error.response) {
-    const msg = error.response.data
-      ? error.response.data.message || error.message
-      : error.response.statusText;
+    const msg = translateError(
+      error.response.data?.error_code ?? error.response.data?.message,
+    );
     const errorDetails = getErrorDetails(error.response.data);
     const responseStatus = error.response.status;
     if ([502, 504].includes(responseStatus)) {
@@ -72,7 +74,7 @@ const errorHandler = function (
         });
     }
   } else {
-    console.log(error.message);
+    message.error(translateError('NETWORK_ERROR'));
   }
 
   return Promise.reject(error);
@@ -114,18 +116,9 @@ _request.interceptors.response.use(async (response) => {
     try {
       const res = response.data;
       if (res.code !== 200) {
-        const msg = res.message || res.data;
-        msg &&
-          notification.error({
-            message: msg,
-            description: res?.errors ? (
-              <>
-                {res?.errors.map((item: any) => (
-                  <div>{item.message}</div>
-                ))}
-              </>
-            ) : undefined,
-          });
+        notification.error({
+          message: translateError(res.error_code ?? res.message),
+        });
       }
       return res;
     } catch (error) {}

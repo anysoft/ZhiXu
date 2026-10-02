@@ -1,3 +1,4 @@
+import { useLocale as useI18nLocale } from '@/utils/i18n';
 import intl from 'react-intl-universal';
 import React, { useEffect, useState } from 'react';
 import { Modal, message, Input, Form, Select } from 'antd';
@@ -11,6 +12,7 @@ const AppModal = ({
   app?: any;
   handleCancel: (needUpdate?: boolean) => void;
 }) => {
+  useI18nLocale();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
 

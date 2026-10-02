@@ -1,0 +1,54 @@
+[
+  {
+    "file": "diagnostics/phase14/platform-e2e.cjs",
+    "name": "main",
+    "result": {
+      "error": "Target 'main' not found",
+      "target": {
+        "name": "main"
+      },
+      "direction": "upstream",
+      "impactedCount": null,
+      "risk": "UNKNOWN"
+    }
+  },
+  {
+    "file": "diagnostics/phase14/browser-observability.cjs",
+    "name": "configure",
+    "result": {
+      "error": "Target 'configure' not found",
+      "target": {
+        "name": "configure"
+      },
+      "direction": "upstream",
+      "impactedCount": null,
+      "risk": "UNKNOWN"
+    }
+  },
+  {
+    "file": "diagnostics/phase14/browser-observability.cjs",
+    "name": "run",
+    "result": {
+      "error": "Target 'run' not found",
+      "target": {
+        "name": "run"
+      },
+      "direction": "upstream",
+      "impactedCount": null,
+      "risk": "UNKNOWN"
+    }
+  },
+  {
+    "file": "diagnostics/phase14/browser-backup.cjs",
+    "name": "backupPage",
+    "result": {
+      "error": "Target 'backupPage' not found",
+      "target": {
+        "name": "backupPage"
+      },
+      "direction": "upstream",
+      "impactedCount": null,
+      "risk": "UNKNOWN"
+    }
+  }
+]

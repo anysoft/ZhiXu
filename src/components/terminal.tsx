@@ -1,3 +1,4 @@
+import { useLocale as useI18nLocale } from '@/utils/i18n';
 import React, { useEffect, useRef } from 'react';
 import './index.less';
 
@@ -26,6 +27,7 @@ const Terminal = ({
   lineData,
   startingInputValue = '',
 }: Props) => {
+  useI18nLocale();
   const lastLineRef = useRef<null | HTMLElement>(null);
 
   // An effect that handles scrolling into view the last line of terminal input or output

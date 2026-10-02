@@ -1,3 +1,7 @@
+import { translateEnum, translateError } from '@/utils/i18n';
+import { formatDateTime, formatDuration, formatBytes } from '@/utils/format';
+import { useLocale as useI18nLocale } from '@/utils/i18n';
+import { t as tr } from '@/utils/i18n';
 import React, { useEffect, useState } from 'react';
 import {
   Alert,
@@ -17,6 +21,7 @@ import { request } from '@/utils/http';
 import config from '@/utils/config';
 
 export default function ConfigAssetsPage() {
+  useI18nLocale();
   const [rows, setRows] = useState<any[]>([]),
     [editing, setEditing] = useState<any>(),
     [replace, setReplace] = useState(false),
@@ -60,51 +65,65 @@ export default function ConfigAssetsPage() {
         setEditing(undefined);
         form.resetFields();
         await load();
-        message.success(replace ? '新 Revision 已保存' : '元数据已保存');
+        message.success(
+          replace
+            ? tr('ui.extra.newRevisionSaved')
+            : tr('ui.extra.metadataSaved'),
+        );
       }
     } catch {}
   };
   return (
     <PageContainer
-      title="Config Assets"
+      title={tr('ui.configAssets')}
       extra={
         <Button type="primary" onClick={() => open()}>
-          创建 Config Asset
+          {tr('ui.createConfigAsset')}
         </Button>
       }
     >
       <Alert
         type="info"
         showIcon
-        message="配置资产独立于 Git；每次内容修改创建不可变 Revision。Secret 内容仅可替换，不会返回浏览器。"
+        message={tr(
+          'ui.configAssetsAreIndependentOfGitEachContentChangeCreatesAnImmutableRevisionSecretContentCanOnlyBeRepl',
+        )}
         style={{ marginBottom: 16 }}
       />
       <Table
         rowKey="id"
         dataSource={rows}
         columns={[
-          { title: 'Name', dataIndex: 'name' },
-          { title: 'Type', dataIndex: 'content_type' },
+          { title: tr('ui.name'), dataIndex: 'name' },
+          { title: tr('ui.type'), dataIndex: 'content_type' },
           {
-            title: 'Secret',
+            title: tr('ui.secret'),
             render: (_, row) =>
-              row.is_secret ? <Tag>Secret · Set</Tag> : 'No',
+              row.is_secret ? (
+                <Tag>{tr('ui.secretSet')}</Tag>
+              ) : (
+                tr('ui.extra.no')
+              ),
           },
           {
-            title: 'Current Revision',
+            title: tr('ui.currentRevision'),
             render: (_, row) => row.current_revision?.revision_number,
           },
           {
-            title: 'Size',
-            render: (_, row) => `${row.current_revision?.size ?? 0} bytes`,
+            title: tr('ui.size'),
+            render: (_, row) => formatBytes(row.current_revision?.size ?? 0),
           },
-          { title: 'Usage Count', dataIndex: 'usage_count' },
-          { title: 'Updated At', dataIndex: 'updatedAt' },
+          { title: tr('ui.usageCount'), dataIndex: 'usage_count' },
           {
-            title: '操作',
+            title: tr('ui.updatedAt'),
+            dataIndex: 'updatedAt',
+            render: (value: any) => formatDateTime(value),
+          },
+          {
+            title: tr('ui.action'),
             render: (_, row) => (
               <Space>
-                <Button onClick={() => open(row)}>编辑</Button>
+                <Button onClick={() => open(row)}>{tr('ui.edit')}</Button>
                 <Button
                   onClick={async () => {
                     const [revisions, usage] = await Promise.all([
@@ -123,10 +142,12 @@ export default function ConfigAssetsPage() {
                       });
                   }}
                 >
-                  详情
+                  {tr('ui.details')}
                 </Button>
                 <Popconfirm
-                  title="删除资产？有绑定时不能删除。"
+                  title={tr(
+                    'ui.deleteThisAssetExistingBindingsPreventDeletion',
+                  )}
                   onConfirm={async () => {
                     const r = await request.delete(
                       `${config.apiPrefix}config-assets/${row.id}?version=${row.version}`,
@@ -134,7 +155,7 @@ export default function ConfigAssetsPage() {
                     if (r.code === 200) await load();
                   }}
                 >
-                  <Button danger>删除</Button>
+                  <Button danger>{tr('ui.delete')}</Button>
                 </Popconfirm>
               </Space>
             ),
@@ -142,7 +163,11 @@ export default function ConfigAssetsPage() {
         ]}
       />
       <Modal
-        title={editing?.id ? '编辑 Config Asset' : '创建 Config Asset'}
+        title={
+          editing?.id
+            ? tr('ui.extra.editConfigAsset')
+            : tr('ui.createConfigAsset')
+        }
         open={!!editing}
         onCancel={() => {
           setEditing(undefined);
@@ -155,35 +180,43 @@ export default function ConfigAssetsPage() {
         <Form form={form} layout="vertical" preserve={false}>
           <Form.Item
             name="name"
-            label="Name"
+            label={tr('ui.name')}
             rules={[{ required: true, max: 255 }]}
           >
             <Input />
           </Form.Item>
-          <Form.Item name="description" label="Description">
+          <Form.Item name="description" label={tr('ui.description')}>
             <Input.TextArea maxLength={4096} />
           </Form.Item>
-          <Form.Item name="is_secret" label="Secret" valuePropName="checked">
+          <Form.Item
+            name="is_secret"
+            label={tr('ui.secret')}
+            valuePropName="checked"
+          >
             <Switch disabled={editing?.is_secret} />
           </Form.Item>
           {editing?.id && editing.is_secret && (
             <Space direction="vertical">
-              <Alert message="Secret Content: Set — Keep Existing" />
+              <Alert message={tr('ui.secretContentSetKeepExisting')} />
               <Button onClick={() => setReplace(!replace)}>
-                {replace ? 'Keep Existing' : 'Replace'}
+                {replace ? tr('ui.extra.keepExisting') : tr('ui.extra.replace')}
               </Button>
             </Space>
           )}
           {replace && (
             <Form.Item
               name="content"
-              label="Content (UTF-8 TEXT, ≤ 1 MiB)"
+              label={tr('ui.contentUTF8TEXT1MiB')}
               rules={[
                 {
                   validator: (_, value) =>
                     typeof value === 'string'
                       ? Promise.resolve()
-                      : Promise.reject(new Error('请输入内容，可为空字符串')),
+                      : Promise.reject(
+                          new Error(
+                            tr('ui.extra.enterContentEmptyStringAllowed'),
+                          ),
+                        ),
                 },
               ]}
               initialValue=""
@@ -200,38 +233,42 @@ export default function ConfigAssetsPage() {
         footer={null}
         width={850}
       >
-        <h3>Immutable Revisions</h3>
+        <h3>{tr('ui.immutableRevisions')}</h3>
         <Table
           rowKey="id"
           size="small"
           dataSource={detail?.revisions}
           columns={[
-            { title: 'Revision', dataIndex: 'revision_number' },
-            { title: 'Size', dataIndex: 'size' },
+            { title: tr('ui.revision'), dataIndex: 'revision_number' },
+            { title: tr('ui.size'), dataIndex: 'size' },
             { title: 'SHA-256', dataIndex: 'checksum' },
-            { title: 'Created', dataIndex: 'createdAt' },
+            {
+              title: tr('ui.created'),
+              dataIndex: 'createdAt',
+              render: (value: any) => formatDateTime(value),
+            },
           ]}
         />
-        <h3>Repository Bindings</h3>
+        <h3>{tr('ui.repositoryBindings')}</h3>
         <Table
           rowKey="id"
           size="small"
           dataSource={detail?.usage.repositories}
           columns={[
-            { title: 'Repository', dataIndex: 'repository_id' },
-            { title: 'Target Base', dataIndex: 'target_base' },
-            { title: 'Target Path', dataIndex: 'target_path' },
+            { title: tr('ui.repository'), dataIndex: 'repository_id' },
+            { title: tr('ui.targetBase'), dataIndex: 'target_base' },
+            { title: tr('ui.targetPath'), dataIndex: 'target_path' },
           ]}
         />
-        <h3>Task Bindings</h3>
+        <h3>{tr('ui.taskBindings')}</h3>
         <Table
           rowKey="id"
           size="small"
           dataSource={detail?.usage.tasks}
           columns={[
-            { title: 'Task', dataIndex: 'task_id' },
-            { title: 'Target Base', dataIndex: 'target_base' },
-            { title: 'Target Path', dataIndex: 'target_path' },
+            { title: tr('ui.task'), dataIndex: 'task_id' },
+            { title: tr('ui.targetBase'), dataIndex: 'target_base' },
+            { title: tr('ui.targetPath'), dataIndex: 'target_path' },
           ]}
         />
       </Modal>

@@ -1,3 +1,7 @@
+import { translateEnum, translateError } from '@/utils/i18n';
+import { formatDateTime, formatDuration, formatBytes } from '@/utils/format';
+import { useLocale as useI18nLocale } from '@/utils/i18n';
+import { t as tr } from '@/utils/i18n';
 import React, { useEffect, useState } from 'react';
 import {
   Alert,
@@ -17,6 +21,7 @@ import { request } from '@/utils/http';
 import config from '@/utils/config';
 
 export default function TaskTriggers({ taskId }: { taskId?: number }) {
+  useI18nLocale();
   const [rows, setRows] = useState<any[]>([]),
     [events, setEvents] = useState<any[]>([]),
     [editing, setEditing] = useState<any>(),
@@ -37,7 +42,7 @@ export default function TaskTriggers({ taskId }: { taskId?: number }) {
     if (taskId) void load();
   }, [taskId]);
   if (!taskId)
-    return <Alert message="Save this task before adding triggers." />;
+    return <Alert message={tr('ui.saveThisTaskBeforeAddingTriggers')} />;
   const edit = (row?: any) => {
     const value = row ?? {
       type: 'CRON',
@@ -83,21 +88,25 @@ export default function TaskTriggers({ taskId }: { taskId?: number }) {
       setEditing(undefined);
       setSecret(result.data.secret);
       await load();
-    } else message.error(result.message ?? 'Unable to save trigger');
+    } else message.error(translateError(result.error_code ?? result.message));
   };
   return (
     <Space direction="vertical" style={{ width: '100%' }}>
-      <Alert message="Triggers submit runs using this task’s saved resources and execution settings." />
+      <Alert
+        message={tr(
+          'ui.triggersSubmitRunsUsingThisTaskSSavedResourcesAndExecutionSettings',
+        )}
+      />
       <Space>
-        <Button onClick={() => edit()}>Add trigger</Button>
-        <Button onClick={() => void load()}>Refresh triggers</Button>
+        <Button onClick={() => edit()}>{tr('ui.addTrigger')}</Button>
+        <Button onClick={() => void load()}>{tr('ui.refreshTriggers')}</Button>
       </Space>
       {secret && (
         <Alert
           type="warning"
           closable
           onClose={() => setSecret(undefined)}
-          message="Copy this webhook secret now. It is shown only once."
+          message={tr('ui.copyThisWebhookSecretNowItIsShownOnlyOnce')}
           description={
             <Typography.Text copyable code>
               {secret}
@@ -111,26 +120,32 @@ export default function TaskTriggers({ taskId }: { taskId?: number }) {
         dataSource={rows}
         pagination={false}
         columns={[
-          { title: 'Type', dataIndex: 'type' },
+          { title: tr('ui.type'), dataIndex: 'type' },
           {
-            title: 'Origin',
-            render: (_: unknown, row: any) => <Tag>{row.origin}</Tag>,
+            title: tr('ui.origin'),
+            render: (_: unknown, row: any) => (
+              <Tag>{translateEnum('triggerOrigin', row.origin)}</Tag>
+            ),
           },
           {
-            title: 'Enabled',
-            render: (_: unknown, row: any) => (row.enabled ? 'Yes' : 'No'),
+            title: tr('ui.enabled'),
+            render: (_: unknown, row: any) =>
+              row.enabled ? tr('common.yes') : tr('common.no'),
           },
           {
-            title: 'Configuration',
+            title: tr('ui.configuration'),
             render: (_: unknown, row: any) =>
               row.type === 'CRON' ? (
                 <>
                   {row.config.expression} · {row.config.timezone} ·{' '}
-                  {row.config.misfire_policy}
+                  {translateEnum('misfire', row.config.misfire_policy)}
                   <br />
-                  Next: {row.enabled ? row.config.next_fire_at : '— (disabled)'}
+                  {tr('ui.next')}{' '}
+                  {row.enabled
+                    ? formatDateTime(row.config.next_fire_at)
+                    : tr('ui.extra.disabled')}
                   <br />
-                  Last: {row.config.last_fire_at ?? '—'}
+                  {tr('ui.last')} {formatDateTime(row.config.last_fire_at)}
                 </>
               ) : row.type === 'WEBHOOK' ? (
                 <Typography.Text copyable>
@@ -141,17 +156,20 @@ export default function TaskTriggers({ taskId }: { taskId?: number }) {
                 </Typography.Text>
               ) : (
                 <>
-                  {row.config.mode} ·{' '}
-                  {(row.config.path_filters ?? []).join(', ')} · Initial:{' '}
-                  {row.config.fire_on_initial ? 'Yes' : 'No'}
+                  {translateEnum('gitUpdate', row.config.mode)} ·{' '}
+                  {(row.config.path_filters ?? []).join(', ')}{' '}
+                  {tr('ui.initial')}{' '}
+                  {row.config.fire_on_initial
+                    ? tr('ui.extra.yes')
+                    : tr('ui.extra.no')}
                 </>
               ),
           },
           {
-            title: 'Actions',
+            title: tr('ui.actions'),
             render: (_: unknown, row: any) => (
               <Space wrap>
-                <Button onClick={() => edit(row)}>Edit</Button>
+                <Button onClick={() => edit(row)}>{tr('ui.edit')}</Button>
                 {row.type === 'WEBHOOK' && (
                   <Button
                     onClick={async () => {
@@ -165,7 +183,7 @@ export default function TaskTriggers({ taskId }: { taskId?: number }) {
                       }
                     }}
                   >
-                    Rotate secret
+                    {tr('ui.rotateSecret')}
                   </Button>
                 )}
                 <Button
@@ -178,26 +196,40 @@ export default function TaskTriggers({ taskId }: { taskId?: number }) {
                     if (result.code === 200) await load();
                   }}
                 >
-                  Remove
+                  {tr('ui.remove')}
                 </Button>
               </Space>
             ),
           },
         ]}
       />
-      <Typography.Title level={5}>Recent trigger events</Typography.Title>
+      <Typography.Title level={5}>
+        {tr('ui.recentTriggerEvents')}
+      </Typography.Title>
       <Table
         size="small"
         rowKey="id"
         dataSource={events}
         pagination={false}
         columns={[
-          { title: 'Event', dataIndex: 'id' },
-          { title: 'Type', dataIndex: 'trigger_type' },
-          { title: 'Status', dataIndex: 'status' },
-          { title: 'Diagnostic', dataIndex: 'error_code' },
+          { title: tr('ui.event'), dataIndex: 'id' },
           {
-            title: 'Run',
+            title: tr('ui.type'),
+            dataIndex: 'trigger_type',
+            render: (value: unknown) => translateEnum('triggerType', value),
+          },
+          {
+            title: tr('ui.status'),
+            dataIndex: 'status',
+            render: (value: unknown) => translateEnum('triggerEvent', value),
+          },
+          {
+            title: tr('ui.diagnostic'),
+            dataIndex: 'error_code',
+            render: (value: unknown) => (value ? translateError(value) : '—'),
+          },
+          {
+            title: tr('ui.run'),
             render: (_: unknown, row: any) =>
               row.task_run_id ? (
                 <Button
@@ -214,7 +246,7 @@ export default function TaskTriggers({ taskId }: { taskId?: number }) {
       />
       <Modal
         open={!!editing}
-        title={editing?.id ? 'Edit trigger' : 'Add trigger'}
+        title={editing?.id ? tr('ui.extra.editTrigger') : tr('ui.addTrigger')}
         onCancel={() => setEditing(undefined)}
         onOk={() => void save()}
         destroyOnClose
@@ -222,43 +254,47 @@ export default function TaskTriggers({ taskId }: { taskId?: number }) {
         <Form form={form} layout="vertical" preserve={false}>
           <Form.Item
             name="type"
-            label="Trigger type"
+            label={tr('ui.triggerType')}
             rules={[{ required: true }]}
           >
             <Select
               disabled={!!editing?.id}
               options={['CRON', 'WEBHOOK', 'GIT_UPDATE'].map((value) => ({
                 value,
-                label: value,
+                label: translateEnum('triggerType', value),
               }))}
             />
           </Form.Item>
-          <Form.Item name="enabled" label="Enabled" valuePropName="checked">
+          <Form.Item
+            name="enabled"
+            label={tr('ui.enabled')}
+            valuePropName="checked"
+          >
             <Switch />
           </Form.Item>
           {type === 'CRON' && (
             <>
               <Form.Item
                 name="expression"
-                label="Cron expression"
+                label={tr('ui.cronExpression')}
                 rules={[{ required: true }]}
               >
                 <Input placeholder="0 8 * * *" />
               </Form.Item>
-              <Form.Item name="timezone" label="Timezone">
-                <Input placeholder="Platform configured timezone" />
+              <Form.Item name="timezone" label={tr('ui.timezone')}>
+                <Input placeholder={tr('ui.platformConfiguredTimezone')} />
               </Form.Item>
               <Form.Item
                 name="misfire_policy"
-                label="Missed schedules"
+                label={tr('ui.missedSchedules')}
                 initialValue="SKIP"
               >
                 <Select
                   options={[
-                    { value: 'SKIP', label: 'Skip missed schedules' },
+                    { value: 'SKIP', label: tr('ui.skipMissedSchedules') },
                     {
                       value: 'FIRE_ONCE',
-                      label: 'Run once after a missed schedule',
+                      label: tr('ui.runOnceAfterAMissedSchedule'),
                     },
                   ]}
                 />
@@ -266,30 +302,37 @@ export default function TaskTriggers({ taskId }: { taskId?: number }) {
             </>
           )}
           {type === 'WEBHOOK' && (
-            <Alert message="POST JSON or an empty body to the endpoint with Authorization: Bearer <secret>. The body does not change task execution." />
+            <Alert
+              message={tr(
+                'ui.postJSONOrAnEmptyBodyToTheEndpointWithAuthorizationBearerSecretTheBodyDoesNotChangeTaskExecution',
+              )}
+            />
           )}
           {type === 'GIT_UPDATE' && (
             <>
               <Form.Item
                 name="mode"
-                label="Change mode"
+                label={tr('ui.changeMode')}
                 initialValue="ANY_CHANGE"
               >
                 <Select
                   options={['ANY_CHANGE', 'SOURCE_CHANGE', 'PATH_FILTER'].map(
-                    (value) => ({ value, label: value }),
+                    (value) => ({
+                      value,
+                      label: translateEnum('gitUpdate', value),
+                    }),
                   )}
                 />
               </Form.Item>
               <Form.Item
                 name="path_filters"
-                label="Relative path globs (one per line)"
+                label={tr('ui.relativePathGlobsOnePerLine')}
               >
                 <Input.TextArea placeholder="src/**/*.py" />
               </Form.Item>
               <Form.Item
                 name="fire_on_initial"
-                label="Run on initial sync"
+                label={tr('ui.runOnInitialSync')}
                 valuePropName="checked"
               >
                 <Switch />

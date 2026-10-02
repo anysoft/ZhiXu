@@ -1,0 +1,1389 @@
+{
+  "status": "PASS",
+  "keys": {
+    "zh": 1827,
+    "en": 1827
+  },
+  "duplicates": [],
+  "missing": [],
+  "parity": [],
+  "semanticErrors": [],
+  "literals": [
+    {
+      "file": "src/components/NodeRuntime/index.tsx",
+      "line": 204,
+      "value": "LTS",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/components/NodeRuntime/index.tsx",
+      "line": 224,
+      "value": "`${r.metadata.platform ?? '—'} / ${\n                          r.metadata.architecture ?? '—'\n                        }`",
+      "kind": "presentation-expression",
+      "classification": "USER_CONTENT_TEMPLATE",
+      "reason": "Runtime platform, architecture, exact version, package manager and LTS codename are technical identities."
+    },
+    {
+      "file": "src/components/NodeRuntime/index.tsx",
+      "line": 290,
+      "value": "ID",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/components/NodeRuntime/index.tsx",
+      "line": 292,
+      "value": "Node",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/components/NodeRuntime/index.tsx",
+      "line": 360,
+      "value": "Node",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/components/NodeRuntime/index.tsx",
+      "line": 412,
+      "value": "Python",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/components/NodeRuntime/index.tsx",
+      "line": 413,
+      "value": "Node.js",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/components/NodeRuntime/index.tsx",
+      "line": 426,
+      "value": "ID",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/components/NodeRuntime/index.tsx",
+      "line": 528,
+      "value": "`${x.version}${x.lts ? ' · LTS ' + x.lts : ''}`",
+      "kind": "presentation-expression",
+      "classification": "USER_CONTENT_TEMPLATE",
+      "reason": "Runtime platform, architecture, exact version, package manager and LTS codename are technical identities."
+    },
+    {
+      "file": "src/components/NodeRuntime/index.tsx",
+      "line": 571,
+      "value": "pnpm",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/components/NodeRuntime/index.tsx",
+      "line": 601,
+      "value": "`${x.manager_type} ${x.version}`",
+      "kind": "presentation-expression",
+      "classification": "USER_CONTENT_TEMPLATE",
+      "reason": "Runtime platform, architecture, exact version, package manager and LTS codename are technical identities."
+    },
+    {
+      "file": "src/components/NodeRuntime/index.tsx",
+      "line": 644,
+      "value": "@scope/package",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/components/NodeRuntime/index.tsx",
+      "line": 664,
+      "value": "dependency",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/components/NodeRuntime/index.tsx",
+      "line": 667,
+      "value": "devDependency",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/components/NodeRuntime/index.tsx",
+      "line": 718,
+      "value": "ID",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/components/NodeRuntime/index.tsx",
+      "line": 919,
+      "value": "`${r.metadata.node_version ?? ''} / ${\n                              r.metadata.manager_type ?? ''\n                            } ${r.metadata.manager_version ?? ''}`",
+      "kind": "presentation-expression",
+      "classification": "USER_CONTENT_TEMPLATE",
+      "reason": "Runtime platform, architecture, exact version, package manager and LTS codename are technical identities."
+    },
+    {
+      "file": "src/components/NodeRuntime/index.tsx",
+      "line": 1010,
+      "value": "ID",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/components/PythonEnvironments/index.tsx",
+      "line": 235,
+      "value": "Python",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/components/PythonEnvironments/index.tsx",
+      "line": 248,
+      "value": "`#${x}`",
+      "kind": "presentation-expression",
+      "classification": "USER_CONTENT_TEMPLATE",
+      "reason": "Build identity/package counts or version tuple; state and health are translated before composition."
+    },
+    {
+      "file": "src/components/PythonEnvironments/index.tsx",
+      "line": 253,
+      "value": "`${row.direct_packages} / ${row.resolved_packages}`",
+      "kind": "presentation-expression",
+      "classification": "USER_CONTENT_TEMPLATE",
+      "reason": "Build identity/package counts or version tuple; state and health are translated before composition."
+    },
+    {
+      "file": "src/components/PythonEnvironments/index.tsx",
+      "line": 530,
+      "value": "`${translateEnum(\n                              'pythonBuild',\n                              x.state,\n                            )} / ${translateEnum('health', x.health)}`",
+      "kind": "presentation-expression",
+      "classification": "USER_CONTENT_TEMPLATE",
+      "reason": "Formatted composition of user data or technical identifiers with previously reviewed localized wrappers; raw user data remains unchanged."
+    },
+    {
+      "file": "src/components/PythonEnvironments/index.tsx",
+      "line": 606,
+      "value": "ID",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/components/PythonEnvironments/index.tsx",
+      "line": 691,
+      "value": "`CPython ${x.version} (#${x.id})`",
+      "kind": "presentation-expression",
+      "classification": "USER_CONTENT_TEMPLATE",
+      "reason": "Build identity/package counts or version tuple; state and health are translated before composition."
+    },
+    {
+      "file": "src/components/PythonEnvironments/index.tsx",
+      "line": 701,
+      "value": "requests==2.32.3\nhttpx[http2]>=0.27,<0.29",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/components/config-bindings.tsx",
+      "line": 93,
+      "value": "`${translateEnum('bindingBase', row.target_base)}/${row.target_path}`",
+      "kind": "presentation-expression",
+      "classification": "USER_CONTENT_TEMPLATE",
+      "reason": "User path or asset name; binding-base and secret suffix are translated before composition."
+    },
+    {
+      "file": "src/components/config-bindings.tsx",
+      "line": 210,
+      "value": "`${translateEnum('bindingBase', row.binding.target_base)}/${\n                    row.binding.target_path\n                  }`",
+      "kind": "presentation-expression",
+      "classification": "USER_CONTENT_TEMPLATE",
+      "reason": "Formatted composition of user data or technical identifiers with previously reviewed localized wrappers; raw user data remains unchanged."
+    },
+    {
+      "file": "src/components/config-bindings.tsx",
+      "line": 273,
+      "value": "`${asset.name}${\n                  asset.is_secret ? tr('common.secretSuffix') : ''\n                }`",
+      "kind": "presentation-expression",
+      "classification": "USER_CONTENT_TEMPLATE",
+      "reason": "Formatted composition of user data or technical identifiers with previously reviewed localized wrappers; raw user data remains unchanged."
+    },
+    {
+      "file": "src/components/config-bindings.tsx",
+      "line": 292,
+      "value": "config.yaml",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/components/scoped-environment.tsx",
+      "line": 245,
+      "value": "`${p.name}${\n                  p.is_default ? tr('common.defaultSuffix') : ''\n                }${p.status === 'disabled' ? tr('common.disabledSuffix') : ''}`",
+      "kind": "presentation-expression",
+      "classification": "USER_CONTENT_TEMPLATE",
+      "reason": "Formatted composition of user data or technical identifiers with previously reviewed localized wrappers; raw user data remains unchanged."
+    },
+    {
+      "file": "src/layouts/index.tsx",
+      "line": 313,
+      "value": "v",
+      "kind": "jsx-text",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/pages/config/index.tsx",
+      "line": 244,
+      "value": "SHA-256",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/pages/initialization/index.tsx",
+      "line": 137,
+      "value": "Github",
+      "kind": "jsx-text",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/pages/initialization/index.tsx",
+      "line": 162,
+      "value": "logo",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/pages/login/index.tsx",
+      "line": 154,
+      "value": "logo",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/pages/login/index.tsx",
+      "line": 194,
+      "value": "`${intl.get('用户名')}${\n                  isDemoEnv ? ': admin' : ''\n                }`",
+      "kind": "presentation-expression",
+      "classification": "USER_CONTENT_TEMPLATE",
+      "reason": "Translated field labels with literal demo credential examples; user data is not translated."
+    },
+    {
+      "file": "src/pages/login/index.tsx",
+      "line": 203,
+      "value": "`${intl.get('密码')}${isDemoEnv ? ': 123' : ''}`",
+      "kind": "presentation-expression",
+      "classification": "USER_CONTENT_TEMPLATE",
+      "reason": "Translated field labels with literal demo credential examples; user data is not translated."
+    },
+    {
+      "file": "src/pages/repository/index.tsx",
+      "line": 133,
+      "value": "`${c.name} (${c.auth_type}, ${translateEnum(\n        'credentialState',\n        c.status,\n      )})`",
+      "kind": "presentation-expression",
+      "classification": "USER_CONTENT_TEMPLATE",
+      "reason": "Formatted composition of user data or technical identifiers with previously reviewed localized wrappers; raw user data remains unchanged."
+    },
+    {
+      "file": "src/pages/repository/index.tsx",
+      "line": 279,
+      "value": "`${\n                              r.last_test_result\n                                ? translateEnum(\n                                    'repositoryAvailability',\n                                    r.last_test_result,\n                                  )\n                                : '—'\n                            } · ${formatDateTime(r.last_test_at)}`",
+      "kind": "presentation-expression",
+      "classification": "USER_CONTENT_TEMPLATE",
+      "reason": "Formatted composition of user data or technical identifiers with previously reviewed localized wrappers; raw user data remains unchanged."
+    },
+    {
+      "file": "src/pages/repository/index.tsx",
+      "line": 351,
+      "value": "`${parsed.provider} · ${parsed.host}`",
+      "kind": "presentation-expression",
+      "classification": "USER_CONTENT_TEMPLATE",
+      "reason": "User credential identity or provider/host; status and timestamp are localized before composition."
+    },
+    {
+      "file": "src/pages/repository/index.tsx",
+      "line": 503,
+      "value": "https://host/team/repo.git",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/pages/repository-workspace.tsx",
+      "line": 179,
+      "value": "`PID ${diagnostics.lock.owner?.pid || '—'}`",
+      "kind": "presentation-expression",
+      "classification": "USER_CONTENT_TEMPLATE",
+      "reason": "Git user ref or numeric process/lease/ahead/behind diagnostics; ref type is localized before composition."
+    },
+    {
+      "file": "src/pages/repository-workspace.tsx",
+      "line": 397,
+      "value": "`${translateEnum('refType', r.ref_type)}: ${\n                          r.ref_name\n                        }`",
+      "kind": "presentation-expression",
+      "classification": "USER_CONTENT_TEMPLATE",
+      "reason": "Formatted composition of user data or technical identifiers with previously reviewed localized wrappers; raw user data remains unchanged."
+    },
+    {
+      "file": "src/pages/repository-workspace.tsx",
+      "line": 402,
+      "value": "HEAD",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/pages/repository-workspace.tsx",
+      "line": 429,
+      "value": "`${r.status_snapshot?.ahead ?? '—'} / ${\n                          r.status_snapshot?.behind ?? '—'\n                        }`",
+      "kind": "presentation-expression",
+      "classification": "USER_CONTENT_TEMPLATE",
+      "reason": "Git user ref or numeric process/lease/ahead/behind diagnostics; ref type is localized before composition."
+    },
+    {
+      "file": "src/pages/repository-workspace.tsx",
+      "line": 651,
+      "value": "HEAD",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/pages/repository-workspace.tsx",
+      "line": 665,
+      "value": "`${detail.lease.owner?.operation} · ${detail.lease.owner?.owner_type}/${detail.lease.owner?.owner_id} · PID ${detail.lease.owner?.pid}`",
+      "kind": "presentation-expression",
+      "classification": "USER_CONTENT_TEMPLATE",
+      "reason": "Git user ref or numeric process/lease/ahead/behind diagnostics; ref type is localized before composition."
+    },
+    {
+      "file": "src/pages/repository-workspace.tsx",
+      "line": 677,
+      "value": "Worktree",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/pages/runtime-python.tsx",
+      "line": 155,
+      "value": "Python",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/pages/runtime-python.tsx",
+      "line": 156,
+      "value": "Node.js",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/pages/runtime-python.tsx",
+      "line": 183,
+      "value": "pyenv ·",
+      "kind": "jsx-text",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/pages/runtime-python.tsx",
+      "line": 262,
+      "value": "pyenv",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "pyenv provider name or Python version, both technical identities."
+    },
+    {
+      "file": "src/pages/runtime-python.tsx",
+      "line": 340,
+      "value": "ID",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/pages/runtime-python.tsx",
+      "line": 580,
+      "value": "`Python ${detail?.version ?? ''}`",
+      "kind": "presentation-expression",
+      "classification": "USER_CONTENT_TEMPLATE",
+      "reason": "pyenv provider name or Python version, both technical identities."
+    },
+    {
+      "file": "src/pages/setting/about.tsx",
+      "line": 17,
+      "value": "logo",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/pages/setting/about.tsx",
+      "line": 30,
+      "value": "v",
+      "kind": "jsx-text",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/pages/setting/about.tsx",
+      "line": 50,
+      "value": "Github",
+      "kind": "jsx-text",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/pages/setting/clientIp.tsx",
+      "line": 210,
+      "value": "loopback,172.18.0.0/16,10.20.0.8/32",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/pages/setting/clientIp.tsx",
+      "line": 248,
+      "value": "X-Forwarded-For",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/pages/setting/clientIp.tsx",
+      "line": 271,
+      "value": "`${value} ${intl.get('跳')}`",
+      "kind": "presentation-expression",
+      "classification": "USER_CONTENT_TEMPLATE",
+      "reason": "Numeric proxy hop count with existing translated unit."
+    },
+    {
+      "file": "src/pages/setting/clientIp.tsx",
+      "line": 273,
+      "value": "IP",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/pages/setting/other.tsx",
+      "line": 314,
+      "value": "简体中文",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/pages/setting/other.tsx",
+      "line": 315,
+      "value": "English",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/pages/setting/progress.tsx",
+      "line": 21,
+      "value": "`${title}${\n          percent >= 100 ? intl.get('成功') : intl.get('中...')\n        }`",
+      "kind": "presentation-expression",
+      "classification": "USER_CONTENT_TEMPLATE",
+      "reason": "Caller-provided localized title and translated progress suffix."
+    },
+    {
+      "file": "src/pages/setting/progress.tsx",
+      "line": 37,
+      "value": "`${title}${\n          percent >= 100 ? intl.get('成功') : intl.get('中...')\n        }`",
+      "kind": "presentation-expression",
+      "classification": "USER_CONTENT_TEMPLATE",
+      "reason": "Caller-provided localized title and translated progress suffix."
+    },
+    {
+      "file": "src/pages/setting/security.tsx",
+      "line": 123,
+      "value": "Microsoft Authenticator",
+      "kind": "jsx-text",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/pages/setting/security.tsx",
+      "line": 127,
+      "value": "Authy",
+      "kind": "jsx-text",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/pages/setting/security.tsx",
+      "line": 134,
+      "value": "1Password",
+      "kind": "jsx-text",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/pages/setting/security.tsx",
+      "line": 141,
+      "value": "LastPass Authenticator",
+      "kind": "jsx-text",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/pages/subscription/index.tsx",
+      "line": 99,
+      "value": "Worktree #",
+      "kind": "jsx-text",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/pages/subscription/index.tsx",
+      "line": 104,
+      "value": "`${translateEnum(\n                'subscriptionPhase',\n                row.last_sync_phase,\n              )} ${\n                row.last_sync_error ? translateError(row.last_sync_error) : ''\n              } ${formatDateTime(row.last_sync_at)} ${\n                row.last_synced_commit || ''\n              }`",
+      "kind": "presentation-expression",
+      "classification": "USER_CONTENT_TEMPLATE",
+      "reason": "Formatted composition of user data or technical identifiers with previously reviewed localized wrappers; raw user data remains unchanged."
+    },
+    {
+      "file": "src/pages/subscription/modal.tsx",
+      "line": 165,
+      "value": "Cron",
+      "kind": "jsx-text",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/pages/subscription/modal.tsx",
+      "line": 197,
+      "value": "Cron",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/pages/tasks/index.tsx",
+      "line": 339,
+      "value": "ENV",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/pages/tasks/index.tsx",
+      "line": 632,
+      "value": "Worktree",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/pages/tasks/triggers.tsx",
+      "line": 154,
+      "value": "/hooks/",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Internal webhook URL path segment, not a UI label."
+    },
+    {
+      "file": "src/pages/tasks/triggers.tsx",
+      "line": 331,
+      "value": "src/**/*.py",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/pages/workspace.tsx",
+      "line": 403,
+      "value": "Worktree",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/pages/workspace.tsx",
+      "line": 409,
+      "value": "`${w.name} (#${w.id})`",
+      "kind": "presentation-expression",
+      "classification": "USER_CONTENT_TEMPLATE",
+      "reason": "User worktree name and numeric identity, or source line number."
+    },
+    {
+      "file": "src/pages/workspace.tsx",
+      "line": 435,
+      "value": "Git",
+      "kind": "jsx-text",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/pages/workspace.tsx",
+      "line": 683,
+      "value": "`:${r.line}`",
+      "kind": "presentation-expression",
+      "classification": "USER_CONTENT_TEMPLATE",
+      "reason": "User worktree name and numeric identity, or source line number."
+    },
+    {
+      "file": "src/pages/workspace.tsx",
+      "line": 756,
+      "value": "Git",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 45,
+      "value": "Gotify",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 46,
+      "value": "Ntfy",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 47,
+      "value": "GoCqHttpBot",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 49,
+      "value": "PushDeer",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 50,
+      "value": "Bark",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 56,
+      "value": "IGot",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 57,
+      "value": "PushPlus",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 59,
+      "value": "wxPusher",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 61,
+      "value": "OpeniLink",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 62,
+      "value": "WPUSH",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 66,
+      "value": "PushMe",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 67,
+      "value": "Chronocat",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 74,
+      "value": "gotifyUrl",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 79,
+      "value": "gotifyToken",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 83,
+      "value": "gotifyPriority",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 87,
+      "value": "ntfyUrl",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 92,
+      "value": "ntfyTopic",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 96,
+      "value": "ntfyPriority",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 97,
+      "value": "ntfyToken",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 98,
+      "value": "ntfyUsername",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 99,
+      "value": "ntfyPassword",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 100,
+      "value": "ntfyActions",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 104,
+      "value": "synologyChatUrl",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 111,
+      "value": "goCqHttpBotUrl",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 117,
+      "value": "goCqHttpBotToken",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 119,
+      "value": "goCqHttpBotQq",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 128,
+      "value": "serverChanKey",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 135,
+      "value": "pushDeerKey",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 140,
+      "value": "pushDeerUrl",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 148,
+      "value": "barkPush",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 155,
+      "value": "barkIcon",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 159,
+      "value": "barkSound",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 163,
+      "value": "barkGroup",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 167,
+      "value": "barkLevel",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 171,
+      "value": "barkUrl",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 175,
+      "value": "barkArchive",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 181,
+      "value": "telegramBotToken",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 188,
+      "value": "telegramBotUserId",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 192,
+      "value": "telegramBotProxyHost",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 193,
+      "value": "telegramBotProxyPort",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 195,
+      "value": "telegramBotProxyAuth",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 201,
+      "value": "telegramBotApiHost",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 207,
+      "value": "dingtalkBotToken",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 214,
+      "value": "dingtalkBotSecret",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 222,
+      "value": "weWorkBotKey",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 229,
+      "value": "weWorkOrigin",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 235,
+      "value": "weWorkAppKey",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 242,
+      "value": "weWorkOrigin",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 248,
+      "value": "aibotkKey",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 255,
+      "value": "aibotkType",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 265,
+      "value": "aibotkName",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 274,
+      "value": "iGotPushKey",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 283,
+      "value": "pushPlusToken",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 290,
+      "value": "pushPlusUser",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 296,
+      "value": "pushplusTemplate",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 300,
+      "value": "pushplusChannel",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 304,
+      "value": "pushplusWebhook",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 308,
+      "value": "pushplusCallbackUrl",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 312,
+      "value": "pushplusTo",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 318,
+      "value": "wePlusBotToken",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 325,
+      "value": "wePlusBotReceiver",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 329,
+      "value": "wePlusBotVersion",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 337,
+      "value": "wxPusherBotAppToken",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 342,
+      "value": "wxPusherBotTopicIds",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 347,
+      "value": "wxPusherBotUids",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 354,
+      "value": "wxPusherSptList",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 361,
+      "value": "wpushApiKey",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 368,
+      "value": "wpushChannel",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 374,
+      "value": "wpushTopicCode",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 382,
+      "value": "openiLinkAppToken",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 389,
+      "value": "openiLinkHubUrl",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 395,
+      "value": "openiLinkContextToken",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 403,
+      "value": "larkKey",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 410,
+      "value": "larkSecret",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 416,
+      "value": "emailService",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 422,
+      "value": "emailUser",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 424,
+      "value": "emailPass",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 431,
+      "value": "emailTo",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 437,
+      "value": "pushMeKey",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 442,
+      "value": "pushMeUrl",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 451,
+      "value": "chronocatURL",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 458,
+      "value": "chronocatQQ",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 465,
+      "value": "chronocatToken",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 474,
+      "value": "webhookMethod",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 480,
+      "value": "webhookContentType",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 491,
+      "value": "webhookUrl",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 496,
+      "value": "https://xxx.cn/api?content=$title\n",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 499,
+      "value": "webhookHeaders",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 501,
+      "value": "Custom-Header1: Header1\nCustom-Header2: Header2",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 504,
+      "value": "webhookBody",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    },
+    {
+      "file": "src/utils/config.ts",
+      "line": 508,
+      "value": "key1: $title\nkey2: $content",
+      "kind": "presentation-expression",
+      "classification": "TECHNICAL_TOKEN",
+      "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+    }
+  ]
+}

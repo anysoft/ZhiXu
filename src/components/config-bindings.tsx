@@ -1,3 +1,6 @@
+import { translateEnum } from '@/utils/i18n';
+import { useLocale as useI18nLocale } from '@/utils/i18n';
+import { t as tr } from '@/utils/i18n';
 import React, { useEffect, useState } from 'react';
 import {
   Alert,
@@ -23,6 +26,7 @@ export function ConfigBindings({
   scope: 'repository' | 'task';
   id: number;
 }) {
+  useI18nLocale();
   const [rows, setRows] = useState<any[]>([]),
     [assets, setAssets] = useState<any[]>([]),
     [inherited, setInherited] = useState<any[]>([]),
@@ -78,37 +82,52 @@ export function ConfigBindings({
         setEditing(undefined);
         await load();
         setPreview(undefined);
-        message.success('Config binding 已保存');
+        message.success(tr('ui.configBindingSaved'));
       }
     } catch {}
   };
   const columns: any[] = [
     {
-      title: 'Target',
-      render: (_: any, row: any) => `${row.target_base}/${row.target_path}`,
+      title: tr('ui.target'),
+      render: (_: any, row: any) =>
+        `${translateEnum('bindingBase', row.target_base)}/${row.target_path}`,
     },
-    { title: '操作', dataIndex: 'operation' },
     {
-      title: 'Asset',
+      title: tr('ui.action'),
+      dataIndex: 'operation',
+      render: (v: unknown) => translateEnum('bindingOperation', v),
+    },
+    {
+      title: tr('ui.asset'),
       render: (_: any, row: any) =>
         assets.find((x) => x.id === row.asset_id)?.name ?? '—',
     },
-    { title: 'Mode', dataIndex: 'materialization_mode' },
-    { title: 'Conflict Policy', dataIndex: 'conflict_policy' },
     {
-      title: 'Writable',
-      render: (_: any, row: any) => (row.writable ? 'Yes' : 'Read-only'),
+      title: tr('ui.mode'),
+      dataIndex: 'materialization_mode',
+      render: (v: unknown) => translateEnum('materialization', v),
     },
     {
-      title: 'Enabled',
-      render: (_: any, row: any) => (row.enabled ? 'Yes' : 'No'),
+      title: tr('ui.conflictPolicy'),
+      dataIndex: 'conflict_policy',
+      render: (v: unknown) => translateEnum('conflictPolicy', v),
+    },
+    {
+      title: tr('ui.writable'),
+      render: (_: any, row: any) =>
+        row.writable ? tr('ui.extra.yes') : tr('ui.presentation.Readonly'),
+    },
+    {
+      title: tr('ui.enabled'),
+      render: (_: any, row: any) =>
+        row.enabled ? tr('ui.extra.yes') : tr('ui.extra.no'),
     },
   ];
   return (
     <Space direction="vertical" style={{ width: '100%' }}>
       {scope === 'task' && inherited.length > 0 && (
         <>
-          <strong>Inherited Repository Bindings</strong>
+          <strong>{tr('ui.inheritedRepositoryBindings')}</strong>
           <Table
             rowKey="id"
             size="small"
@@ -120,10 +139,10 @@ export function ConfigBindings({
       )}
       <strong>
         {scope === 'task'
-          ? 'Task Overrides / Masks'
-          : 'Repository Config Bindings'}
+          ? tr('ui.extra.taskOverridesAndMasks')
+          : tr('ui.extra.repositoryConfigBindings')}
       </strong>
-      <Button onClick={() => open()}>添加 Config Binding</Button>
+      <Button onClick={() => open()}>{tr('ui.addConfigBinding')}</Button>
       <Table
         rowKey="id"
         size="small"
@@ -131,14 +150,14 @@ export function ConfigBindings({
         columns={[
           ...columns,
           {
-            title: '操作',
+            title: tr('ui.action'),
             render: (_: any, row: any) => (
               <Space>
                 <Button size="small" onClick={() => open(row)}>
-                  编辑
+                  {tr('ui.edit')}
                 </Button>
                 <Popconfirm
-                  title="删除此绑定？"
+                  title={tr('ui.deleteThisBinding')}
                   onConfirm={async () => {
                     await request.delete(
                       `${endpoint}/${row.id}?version=${row.version}`,
@@ -148,7 +167,7 @@ export function ConfigBindings({
                   }}
                 >
                   <Button size="small" danger>
-                    删除
+                    {tr('ui.delete')}
                   </Button>
                 </Popconfirm>
               </Space>
@@ -164,117 +183,145 @@ export function ConfigBindings({
             if (r.code === 200) setPreview(r.data);
           }}
         >
-          预览有效 Config
+          {tr('ui.previewEffectiveConfig')}
         </Button>
       )}
       {preview && (
         <>
           <Alert
             type="info"
-            message="Effective Config — 当前解析结果；执行开始时冻结 Revision"
+            message={tr(
+              'ui.effectiveConfigurationRevisionsArePinnedWhenExecutionStarts',
+            )}
           />
           <Table
             rowKey={(row) =>
-              `${row.binding.target_base}:${row.binding.target_path}`
+              `${translateEnum('bindingBase', row.binding.target_base)}:${
+                row.binding.target_path
+              }`
             }
             size="small"
             dataSource={preview}
             pagination={false}
             columns={[
               {
-                title: 'Target',
+                title: tr('ui.target'),
                 render: (_, row) =>
-                  `${row.binding.target_base}/${row.binding.target_path}`,
+                  `${translateEnum('bindingBase', row.binding.target_base)}/${
+                    row.binding.target_path
+                  }`,
               },
-              { title: 'Asset', dataIndex: 'asset_name' },
+              { title: tr('ui.asset'), dataIndex: 'asset_name' },
               {
-                title: 'Revision',
+                title: tr('ui.revision'),
                 render: (_, row) => row.revision.revision_number,
               },
-              { title: 'Source', dataIndex: 'source' },
+              { title: tr('ui.source'), dataIndex: 'source' },
               {
-                title: 'Mode',
-                render: (_, row) => row.binding.materialization_mode,
+                title: tr('ui.mode'),
+                render: (_, row) =>
+                  translateEnum(
+                    'materialization',
+                    row.binding.materialization_mode,
+                  ),
               },
               {
-                title: 'Conflict Policy',
-                render: (_, row) => row.binding.conflict_policy,
+                title: tr('ui.conflictPolicy'),
+                render: (_, row) =>
+                  translateEnum('conflictPolicy', row.binding.conflict_policy),
               },
               {
-                title: 'Secret',
-                render: (_, row) => (row.is_secret ? <Tag>Secret</Tag> : 'No'),
+                title: tr('ui.secret'),
+                render: (_, row) =>
+                  row.is_secret ? (
+                    <Tag>{tr('ui.secret')}</Tag>
+                  ) : (
+                    tr('ui.extra.no')
+                  ),
               },
             ]}
           />
         </>
       )}
       <Modal
-        title="Config Binding"
+        title={tr('ui.configBinding')}
         open={!!editing}
         onCancel={() => setEditing(undefined)}
         onOk={save}
         destroyOnClose
       >
         <Form form={form} layout="vertical" preserve={false}>
-          <Form.Item name="operation" label="绑定操作">
+          <Form.Item name="operation" label={tr('ui.bindingOperation')}>
             <Select
               options={(scope === 'task' ? ['ATTACH', 'MASK'] : ['ATTACH']).map(
-                (value) => ({ value, label: value }),
+                (value) => ({
+                  value,
+                  label: translateEnum('bindingOperation', value),
+                }),
               )}
             />
           </Form.Item>
           <Form.Item
             name="asset_id"
-            label="Config Asset"
+            label={tr('ui.configAsset')}
             rules={operation === 'MASK' ? [] : [{ required: true }]}
           >
             <Select
               disabled={operation === 'MASK'}
               options={assets.map((asset) => ({
                 value: asset.id,
-                label: `${asset.name}${asset.is_secret ? ' (Secret)' : ''}`,
+                label: `${asset.name}${
+                  asset.is_secret ? tr('common.secretSuffix') : ''
+                }`,
               }))}
             />
           </Form.Item>
-          <Form.Item name="target_base" label="Target Base">
+          <Form.Item name="target_base" label={tr('ui.targetBase')}>
             <Select
               options={['WORKSPACE_ROOT', 'TASK_DIR'].map((value) => ({
                 value,
-                label: value,
+                label: translateEnum('bindingBase', value),
               }))}
             />
           </Form.Item>
           <Form.Item
             name="target_path"
-            label="Target Path"
+            label={tr('ui.targetPath')}
             rules={[{ required: true }]}
           >
             <Input placeholder="config.yaml" />
           </Form.Item>
-          <Form.Item name="materialization_mode" label="Materialization Mode">
+          <Form.Item
+            name="materialization_mode"
+            label={tr('ui.materializationMode')}
+          >
             <Select
               options={['COPY', 'SYMLINK'].map((value) => ({
                 value,
-                label: value,
+                label: translateEnum('materialization', value),
               }))}
             />
           </Form.Item>
-          <Form.Item name="conflict_policy" label="Conflict Policy">
+          <Form.Item name="conflict_policy" label={tr('ui.conflictPolicy')}>
             <Select
               options={['FAIL_IF_EXISTS', 'REPLACE_RESTORE'].map((value) => ({
                 value,
-                label: value,
+                label: translateEnum('conflictPolicy', value),
               }))}
             />
           </Form.Item>
           <Form.Item
             name="writable"
-            label="Writable — 仅本次执行副本"
+            label={tr('ui.writableExecutionCopyOnly')}
             valuePropName="checked"
           >
             <Switch />
           </Form.Item>
-          <Form.Item name="enabled" label="Enabled" valuePropName="checked">
+          <Form.Item
+            name="enabled"
+            label={tr('ui.enabled')}
+            valuePropName="checked"
+          >
             <Switch />
           </Form.Item>
         </Form>

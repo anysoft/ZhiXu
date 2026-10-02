@@ -1,3 +1,6 @@
+import { translateError } from '@/utils/i18n';
+import { useLocale as useI18nLocale } from '@/utils/i18n';
+import { t as tr } from '@/utils/i18n';
 import React, { useEffect, useState } from 'react';
 import {
   Alert,
@@ -17,6 +20,7 @@ import { request } from '@/utils/http';
 import config from '@/utils/config';
 import { obsGet, DeliveryTable } from '@/components/observability';
 export default function NotificationChannelsPage() {
+  useI18nLocale();
   const [rows, setRows] = useState<any[]>([]),
     [providers, setProviders] = useState<string[]>([]),
     [editing, setEditing] = useState<any>();
@@ -69,53 +73,58 @@ export default function NotificationChannelsPage() {
         setEditing(undefined);
         form.resetFields();
         await load();
-      } else message.error(r.error_code);
+      } else message.error(translateError(r.error_code));
     } catch {
-      message.error('Check the channel fields and secret JSON.');
+      message.error(tr('ui.checkTheChannelFieldsAndSecretJSON'));
     }
   };
   return (
-    <Card title="Notifications">
+    <Card title={tr('ui.notifications')}>
       <Tabs
         items={[
           {
             key: 'channels',
-            label: 'Channels',
+            label: tr('ui.channels'),
             children: (
               <>
                 <Button type="primary" onClick={() => edit()}>
-                  Add channel
+                  {tr('ui.addChannel')}
                 </Button>
                 <Table
                   rowKey="id"
                   dataSource={rows}
                   columns={[
-                    { title: 'Name', dataIndex: 'name' },
-                    { title: 'Provider', dataIndex: 'type' },
+                    { title: tr('ui.name'), dataIndex: 'name' },
+                    { title: tr('ui.provider'), dataIndex: 'type' },
                     {
-                      title: 'Enabled',
+                      title: tr('ui.enabled'),
                       dataIndex: 'enabled',
-                      render: (v) => (v ? 'Yes' : 'No'),
+                      render: (v) =>
+                        v ? tr('ui.extra.yes') : tr('ui.extra.no'),
                     },
                     {
-                      title: 'Default',
+                      title: tr('ui.default'),
                       dataIndex: 'is_default',
-                      render: (v) => (v ? 'Yes' : 'No'),
+                      render: (v) =>
+                        v ? tr('ui.extra.yes') : tr('ui.extra.no'),
                     },
                     {
-                      title: 'Secret',
+                      title: tr('ui.secret'),
                       dataIndex: 'secret_configured',
-                      render: (v) => (v ? 'Configured' : 'Missing'),
+                      render: (v) =>
+                        v
+                          ? tr('ui.presentation.Configured')
+                          : tr('ui.presentation.Missing'),
                     },
                     {
-                      title: 'Actions',
+                      title: tr('ui.actions'),
                       render: (_, r) => (
                         <Space>
                           <Button
                             disabled={!!r.archived}
                             onClick={() => edit(r)}
                           >
-                            Edit
+                            {tr('ui.edit')}
                           </Button>
                           <Button
                             disabled={!r.enabled}
@@ -125,20 +134,21 @@ export default function NotificationChannelsPage() {
                                   `notification-channels/${r.id}/test`,
                               );
                               message.info(
-                                'Test notification queued; see Deliveries.',
+                                tr('ui.testNotificationQueuedSeeDeliveries'),
                               );
                             }}
                           >
-                            Test
+                            {tr('ui.test')}
                           </Button>
                           <Button
                             disabled={!!r.archived}
                             danger
                             onClick={() =>
                               Modal.confirm({
-                                title: 'Archive channel?',
-                                content:
-                                  'Delivery history is retained. Pending deliveries will fail with CHANNEL_DISABLED.',
+                                title: tr('ui.archiveChannel'),
+                                content: tr(
+                                  'ui.extra.deliveryHistoryIsRetainedPendingDeliveriesWillFailWithCHANNELDISABLED',
+                                ),
                                 onOk: async () => {
                                   await request.delete(
                                     config.apiPrefix +
@@ -150,7 +160,7 @@ export default function NotificationChannelsPage() {
                               })
                             }
                           >
-                            Archive
+                            {tr('ui.archive')}
                           </Button>
                         </Space>
                       ),
@@ -162,14 +172,14 @@ export default function NotificationChannelsPage() {
           },
           {
             key: 'deliveries',
-            label: 'Deliveries',
+            label: tr('ui.deliveries'),
             children: <DeliveryTable />,
           },
         ]}
       />
       <Modal
         open={!!editing}
-        title="Notification channel"
+        title={tr('ui.notificationChannel')}
         onCancel={() => {
           setEditing(undefined);
           form.resetFields();
@@ -178,25 +188,37 @@ export default function NotificationChannelsPage() {
         destroyOnClose
       >
         <Form form={form} layout="vertical">
-          <Form.Item name="name" label="Name" rules={[{ required: true }]}>
+          <Form.Item
+            name="name"
+            label={tr('ui.name')}
+            rules={[{ required: true }]}
+          >
             <Input />
           </Form.Item>
-          <Form.Item name="type" label="Provider" rules={[{ required: true }]}>
+          <Form.Item
+            name="type"
+            label={tr('ui.provider')}
+            rules={[{ required: true }]}
+          >
             <Select
               options={providers.map((value) => ({ value, label: value }))}
             />
           </Form.Item>
-          <Form.Item name="enabled" label="Enabled" valuePropName="checked">
-            <Switch />
-          </Form.Item>
           <Form.Item
-            name="is_default"
-            label="Default channel"
+            name="enabled"
+            label={tr('ui.enabled')}
             valuePropName="checked"
           >
             <Switch />
           </Form.Item>
-          <Form.Item name="secret_action" label="Secret action">
+          <Form.Item
+            name="is_default"
+            label={tr('ui.defaultChannel')}
+            valuePropName="checked"
+          >
+            <Switch />
+          </Form.Item>
+          <Form.Item name="secret_action" label={tr('ui.secretAction')}>
             <Select
               options={['KEEP', 'REPLACE', 'DELETE'].map((value) => ({
                 value,
@@ -205,14 +227,14 @@ export default function NotificationChannelsPage() {
             />
           </Form.Item>
           <Alert
-            message={
-              'WEBHOOK: {"url":"https://…","authorization":"Bearer …"}. Other providers use their existing named fields. All connection fields are protected and never returned. Webhooks can access your platform network.'
-            }
+            message={tr(
+              'ui.webhookUrlHttpsAuthorizationBearerOtherProvidersUseTheirExistingNamedFieldsAllConnectionFieldsArePro',
+            )}
           />
           {action === 'REPLACE' && (
             <Form.Item
               name="secret"
-              label="Secret configuration JSON"
+              label={tr('ui.secretConfigurationJSON')}
               rules={[{ required: true }]}
             >
               <Input.TextArea autoComplete="off" rows={5} />

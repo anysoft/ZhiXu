@@ -1,0 +1,132 @@
+[
+  {
+    "file": "diagnostics/phase14/browser-observability.cjs",
+    "name": "configure",
+    "result": {
+      "error": "Target 'configure' not found",
+      "target": {
+        "name": "configure"
+      },
+      "direction": "upstream",
+      "impactedCount": null,
+      "risk": "UNKNOWN"
+    }
+  },
+  {
+    "file": "diagnostics/phase14/browser-observability.cjs",
+    "name": "run",
+    "result": {
+      "error": "Target 'run' not found",
+      "target": {
+        "name": "run"
+      },
+      "direction": "upstream",
+      "impactedCount": null,
+      "risk": "UNKNOWN"
+    }
+  },
+  {
+    "file": "diagnostics/phase14/browser-backup.cjs",
+    "name": "backupPage",
+    "result": {
+      "error": "Target 'backupPage' not found",
+      "target": {
+        "name": "backupPage"
+      },
+      "direction": "upstream",
+      "impactedCount": null,
+      "risk": "UNKNOWN"
+    }
+  },
+  {
+    "file": "diagnostics/phase14/browser-backup.cjs",
+    "name": "waitOperation",
+    "result": {
+      "error": "Target 'waitOperation' not found",
+      "target": {
+        "name": "waitOperation"
+      },
+      "direction": "upstream",
+      "impactedCount": null,
+      "risk": "UNKNOWN"
+    }
+  },
+  {
+    "file": "diagnostics/phase14/browser-backup.cjs",
+    "name": "local",
+    "result": {
+      "error": "Target 'local' not found",
+      "target": {
+        "name": "local"
+      },
+      "direction": "upstream",
+      "impactedCount": null,
+      "risk": "UNKNOWN"
+    }
+  },
+  {
+    "file": "diagnostics/phase14/browser-backup.cjs",
+    "name": "upload",
+    "result": {
+      "error": "Target 'upload' not found",
+      "target": {
+        "name": "upload"
+      },
+      "direction": "upstream",
+      "impactedCount": null,
+      "risk": "UNKNOWN"
+    }
+  },
+  {
+    "file": "diagnostics/phase14/browser-backup.cjs",
+    "name": "cli",
+    "result": {
+      "error": "Target 'cli' not found",
+      "target": {
+        "name": "cli"
+      },
+      "direction": "upstream",
+      "impactedCount": null,
+      "risk": "UNKNOWN"
+    }
+  },
+  {
+    "file": "diagnostics/phase14/browser-backup.cjs",
+    "name": "stableTrigger",
+    "result": {
+      "error": "Target 'stableTrigger' not found",
+      "target": {
+        "name": "stableTrigger"
+      },
+      "direction": "upstream",
+      "impactedCount": null,
+      "risk": "UNKNOWN"
+    }
+  },
+  {
+    "file": "diagnostics/phase14/browser-backup.cjs",
+    "name": "configure",
+    "result": {
+      "error": "Target 'configure' not found",
+      "target": {
+        "name": "configure"
+      },
+      "direction": "upstream",
+      "impactedCount": null,
+      "risk": "UNKNOWN"
+    }
+  },
+  {
+    "file": "diagnostics/phase14/browser-backup.cjs",
+    "name": "run",
+    "result": {
+      "error": "Target 'run' not found",
+      "target": {
+        "name": "run"
+      },
+      "direction": "upstream",
+      "impactedCount": null,
+      "risk": "UNKNOWN"
+    }
+  }
+]

@@ -1,3 +1,4 @@
+import { useLocale as useI18nLocale } from '@/utils/i18n';
 import intl from 'react-intl-universal';
 import React, { useRef, useState } from 'react';
 import CodeMirror from '@uiw/react-codemirror';
@@ -21,6 +22,7 @@ import {
 const { RangePicker } = DatePicker;
 
 const SystemLog = ({ height, theme }: any) => {
+  useI18nLocale();
   const editorRef = useRef<any>(null);
   const panelVisiableRef = useRef<[string, string] | false>();
   const [range, setRange] = useState<string[]>(['', '']);

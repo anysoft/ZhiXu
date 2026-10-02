@@ -1,3 +1,7 @@
+import { translateEnum, translateError } from '@/utils/i18n';
+import { formatDateTime, formatDuration, formatBytes } from '@/utils/format';
+import { useLocale as useI18nLocale } from '@/utils/i18n';
+import { t as tr } from '@/utils/i18n';
 import { ConfigBindings } from '@/components/config-bindings';
 import { TaskResourceReferences } from '@/components/task-resource-references';
 import React, { useEffect, useState } from 'react';
@@ -21,22 +25,8 @@ import {
 import { request } from '@/utils/http';
 import config from '@/utils/config';
 import RepositoryEnvironment from '@/components/repository-environment';
-const explanations: Record<string, string> = {
-  WORKTREE_DIRTY:
-    '工作区包含未提交、未跟踪或忽略文件，操作已停止。请先自行保存或提交。',
-  WORKTREE_CONFLICT: '工作区存在冲突，操作已停止。',
-  WORKTREE_DIVERGED: '本地分支与远端已分叉，不会自动 merge、rebase 或 reset。',
-  WORKTREE_LOCAL_COMMITS: '工作区包含本地提交，删除已被阻止。',
-  WORKTREE_IN_USE:
-    '工作区仍被订阅引用，请先修改或删除订阅绑定。',
-  WORKTREE_BUSY: '工作区正被其他操作占用，请稍后刷新。',
-  REPOSITORY_BUSY: '仓库正在执行其他操作，请稍后刷新。',
-  WORKTREE_STALE:
-    '工作区元数据失配。目录缺失时，先 Prune，再选择 Repair 或移除记录。',
-  REF_NOT_FOUND: '指定的引用不存在，请先 Fetch 并检查分支。',
-  DETACHED_HEAD: '此工作区固定在 commit/tag，不执行分支更新。',
-};
 export default function RepositoryWorkspacePage() {
+  useI18nLocale();
   const id = Number(new URLSearchParams(window.location.search).get('id'));
   const [repo, setRepo] = useState<any>(),
     [diagnostics, setDiagnostics] = useState<any>(),
@@ -91,25 +81,21 @@ export default function RepositoryWorkspacePage() {
           : await request[method](endpoint, body, { timeout: 330000 });
       if (result.code === 200) {
         setActivities((a) => [
-          { at: new Date().toLocaleString(), action: label, result: '完成' },
+          { at: new Date().toISOString(), action: label, result: 'SUCCESS' },
           ...a,
         ]);
         await reload();
-        message.success(`${label}完成`);
+        message.success(tr('ui.template.valueCompleted', { p0: tr(label) }));
         return result.data;
       }
     } catch (e: any) {
       const code = e.response?.data?.error_code;
-      setError(
-        explanations[code] ||
-          e.response?.data?.message ||
-          '操作失败，请刷新诊断。',
-      );
+      setError(code || 'REPOSITORY_OPERATION_FAILED');
       setActivities((a) => [
         {
-          at: new Date().toLocaleString(),
+          at: new Date().toISOString(),
           action: label,
-          result: code || '失败',
+          result: code || 'REPOSITORY_OPERATION_FAILED',
         },
         ...a,
       ]);
@@ -140,11 +126,16 @@ export default function RepositoryWorkspacePage() {
   const create = async () => {
     try {
       const values = await form.validateFields();
-      const result = await perform('创建 Worktree', 'worktrees', 'post', {
-        ...values,
-        repository_id: id,
-        ref_type: refType,
-      });
+      const result = await perform(
+        'ui.extra.createWorktree',
+        'worktrees',
+        'post',
+        {
+          ...values,
+          repository_id: id,
+          ref_type: refType,
+        },
+      );
       if (result) setCreating(false);
     } catch {}
   };
@@ -152,21 +143,28 @@ export default function RepositoryWorkspacePage() {
   return (
     <div style={{ padding: 24 }}>
       <Space>
-        <a href={`${config.baseUrl}repository`}>← 仓库管理</a>
+        <a href={`${config.baseUrl}repository`}>
+          {tr('ui.repositoriesVariant417')}
+        </a>
         <Typography.Title level={3} style={{ margin: 0 }}>
-          {repo?.name || 'Repository Workspace'}
+          {repo?.name || tr('ui.extra.repositoryWorkspace')}
         </Typography.Title>
-        <Tag>{repo?.storage_state || '加载中'}</Tag>
+        <Tag>
+          {repo
+            ? translateEnum('repositoryStorage', repo.storage_state)
+            : tr('common.loading')}
+        </Tag>
       </Space>
       <p style={{ marginTop: 12 }}>
-        持久 Git 工作区。Fetch 更新远端引用，Update Worktree
-        才快进本地分支；任务和 Code Workspace 直接使用注册 Worktree。
+        {tr(
+          'ui.persistentGitWorktreesFetchUpdatesRemoteReferencesUpdateWorktreeFastForwardsTheLocalBranchTasksAndTh',
+        )}
       </p>
       {error && (
         <Alert
           type="error"
           showIcon
-          message={error}
+          message={translateError(error)}
           closable
           onClose={() => setError('')}
           style={{ marginBottom: 16 }}
@@ -175,9 +173,9 @@ export default function RepositoryWorkspacePage() {
       {diagnostics?.lock?.busy && (
         <Alert
           type="info"
-          message={`仓库占用中：${
-            diagnostics.lock.owner?.operation || 'operation'
-          }`}
+          message={tr('ui.template.repositoryIsBusyValue', {
+            p0: diagnostics.lock.owner?.operation || 'operation',
+          })}
           description={`PID ${diagnostics.lock.owner?.pid || '—'}`}
         />
       )}
@@ -185,56 +183,66 @@ export default function RepositoryWorkspacePage() {
       <Tabs
         defaultActiveKey="overview"
         items={[
-          { key: 'config', label: 'Config', children: <ConfigBindings scope="repository" id={id} /> },
-          { key: 'environment', label: 'Environment', children: <RepositoryEnvironment id={id} /> },
+          {
+            key: 'config',
+            label: tr('ui.config'),
+            children: <ConfigBindings scope="repository" id={id} />,
+          },
+          {
+            key: 'environment',
+            label: tr('ui.environment'),
+            children: <RepositoryEnvironment id={id} />,
+          },
           {
             key: 'overview',
-            label: 'Overview',
+            label: tr('ui.overview'),
             children: (
               <>
                 <Descriptions bordered column={2} size="small">
-                  <Descriptions.Item label="Remote" span={2}>
+                  <Descriptions.Item label={tr('ui.remote')} span={2}>
                     {repo?.remote_url}
                   </Descriptions.Item>
-                  <Descriptions.Item label="默认凭证">
-                    {repo?.default_credential_id || 'Anonymous'}
+                  <Descriptions.Item label={tr('ui.defaultCredential')}>
+                    {repo?.default_credential_id || tr('ui.extra.anonymous')}
                   </Descriptions.Item>
-                  <Descriptions.Item label="Storage State">
+                  <Descriptions.Item label={tr('ui.storageState')}>
                     {repo?.storage_state}
                   </Descriptions.Item>
-                  <Descriptions.Item label="Local Storage" span={2}>
+                  <Descriptions.Item label={tr('ui.localStorage')} span={2}>
                     <Typography.Text copyable={!!repo?.storage_path}>
-                      {repo?.storage_path || '尚未初始化'}
+                      {repo?.storage_path || tr('ui.extra.notInitialized')}
                     </Typography.Text>
                   </Descriptions.Item>
-                  <Descriptions.Item label="Default Branch">
+                  <Descriptions.Item label={tr('ui.defaultBranch')}>
                     {repo?.default_branch || '—'}
                   </Descriptions.Item>
-                  <Descriptions.Item label="Last Fetch">
+                  <Descriptions.Item label={tr('ui.lastFetch')}>
                     {repo?.last_fetch_at
-                      ? new Date(repo.last_fetch_at).toLocaleString()
+                      ? formatDateTime(repo.last_fetch_at)
                       : '—'}{' '}
                     · {repo?.last_fetch_status || '—'}
                   </Descriptions.Item>
-                  <Descriptions.Item label="Last Error" span={2}>
-                    {repo?.last_error || '—'}
+                  <Descriptions.Item label={tr('ui.lastError')} span={2}>
+                    {repo?.last_error ? translateError(repo.last_error) : '—'}
                   </Descriptions.Item>
                 </Descriptions>
                 <Space wrap style={{ marginTop: 16 }}>
                   <Button
                     loading={busy}
                     onClick={() =>
-                      perform('Initialize', `repositories/${id}/initialize`)
+                      perform('ui.initialize', `repositories/${id}/initialize`)
                     }
                   >
-                    Initialize
+                    {tr('ui.initialize')}
                   </Button>
                   <Button
                     loading={busy}
                     disabled={!repo?.storage_path}
-                    onClick={() => perform('Fetch', `repositories/${id}/fetch`)}
+                    onClick={() =>
+                      perform('ui.fetch', `repositories/${id}/fetch`)
+                    }
                   >
-                    Fetch
+                    {tr('ui.fetch')}
                   </Button>
                   <Button
                     loading={busy}
@@ -245,25 +253,27 @@ export default function RepositoryWorkspacePage() {
                         .finally(() => setBusy(false));
                     }}
                   >
-                    Diagnostics
+                    {tr('ui.diagnostics')}
                   </Button>
                   <Button
                     loading={busy}
                     disabled={!repo?.storage_path}
                     onClick={() =>
-                      perform('Repair Metadata', `repositories/${id}/repair`)
+                      perform('ui.repairMetadata', `repositories/${id}/repair`)
                     }
                   >
-                    Repair Metadata
+                    {tr('ui.repairMetadata')}
                   </Button>
                   <Popconfirm
-                    title="仅清理已丢失目录的 Git 工作区记录。存在占用时将停止。"
+                    title={tr(
+                      'ui.removeGitWorktreeRecordsOnlyWhenTheirDirectoriesAreMissingStopsIfResourcesAreBusy',
+                    )}
                     onConfirm={() =>
-                      perform('Prune', `repositories/${id}/prune`)
+                      perform('ui.prune', `repositories/${id}/prune`)
                     }
                   >
                     <Button disabled={busy || !repo?.storage_path}>
-                      Prune
+                      {tr('ui.prune')}
                     </Button>
                   </Popconfirm>
                   <Button
@@ -273,20 +283,21 @@ export default function RepositoryWorkspacePage() {
                       setRemoteEdit(true);
                     }}
                   >
-                    修改 Remote 访问地址
+                    {tr('ui.changeRemoteURL')}
                   </Button>
                 </Space>
                 {!!repo?.subscriptions_count && (
                   <p>
-                    有旧订阅引用时，Remote 地址保持固定，以保护原 clone
-                    路径；凭证可在仓库管理页修改。
+                    {tr(
+                      'ui.remoteURLsRemainFixedWhileReferencedByOlderSubscriptionsProtectingExistingClonePathsCredentialsCanBe',
+                    )}
                   </p>
                 )}
                 {!!diagnostics?.orphans?.length && (
                   <Alert
                     style={{ marginTop: 16 }}
                     type="warning"
-                    message="发现未登记到数据库的 Git Worktree"
+                    message={tr('ui.unregisteredGitWorktreesFound')}
                     description={diagnostics.orphans.map((o: any) => (
                       <div key={o.path}>{o.path}</div>
                     ))}
@@ -297,23 +308,23 @@ export default function RepositoryWorkspacePage() {
           },
           {
             key: 'refs',
-            label: 'Refs / Branches',
+            label: tr('ui.refsBranches'),
             children: (
               <>
                 <Button
                   onClick={() => startCreate('commit', '')}
                   disabled={busy || repo?.storage_state !== 'READY'}
                 >
-                  从 Commit 创建 Worktree
+                  {tr('ui.createWorktreeFromCommit')}
                 </Button>
                 <Table
                   rowKey="ref"
                   dataSource={refs}
                   columns={[
-                    { title: '类型', dataIndex: 'type' },
-                    { title: 'Branch / Tag', dataIndex: 'name' },
+                    { title: tr('ui.type'), dataIndex: 'type' },
+                    { title: tr('ui.branchTag'), dataIndex: 'name' },
                     {
-                      title: 'Commit',
+                      title: tr('ui.commit'),
                       dataIndex: 'commit',
                       render: (v: string) => (
                         <Typography.Text copyable>
@@ -321,15 +332,19 @@ export default function RepositoryWorkspacePage() {
                         </Typography.Text>
                       ),
                     },
-                    { title: 'Updated', dataIndex: 'updated' },
                     {
-                      title: '操作',
+                      title: tr('ui.updated'),
+                      dataIndex: 'updated',
+                      render: (value: any) => formatDateTime(value),
+                    },
+                    {
+                      title: tr('ui.action'),
                       render: (_: any, r: any) => (
                         <Button
                           disabled={busy}
                           onClick={() => startCreate(r.type, r.name)}
                         >
-                          Create Worktree
+                          {tr('ui.createWorktree')}
                         </Button>
                       ),
                     },
@@ -340,7 +355,7 @@ export default function RepositoryWorkspacePage() {
           },
           {
             key: 'worktrees',
-            label: 'Worktrees',
+            label: tr('ui.worktrees'),
             children: (
               <>
                 <Button
@@ -348,22 +363,24 @@ export default function RepositoryWorkspacePage() {
                   disabled={busy || repo?.storage_state !== 'READY'}
                   onClick={() => startCreate()}
                 >
-                  创建 Worktree
+                  {tr('ui.createWorktree')}
                 </Button>
                 <Table
                   rowKey="id"
                   dataSource={trees}
                   scroll={{ x: 1200 }}
                   columns={[
-                    { title: '名称', dataIndex: 'name' },
+                    { title: tr('ui.name'), dataIndex: 'name' },
                     {
-                      title: '创建用途',
+                      title: tr('ui.purpose'),
                       dataIndex: 'purpose',
                       render: (value: string) =>
-                        value === 'SUBSCRIPTION' ? '订阅工作区' : '用户工作区',
+                        value === 'SUBSCRIPTION'
+                          ? tr('ui.extra.subscriptionWorktree')
+                          : tr('ui.extra.userWorktree'),
                     },
                     {
-                      title: '订阅引用',
+                      title: tr('ui.subscriptionReferences'),
                       render: (_: any, row: any) =>
                         row.subscriptions?.length
                           ? row.subscriptions
@@ -372,87 +389,110 @@ export default function RepositoryWorkspacePage() {
                                   `${sub.name || 'Subscription'} #${sub.id}`,
                               )
                               .join(', ')
-                          : '未绑定（保留工作区）',
+                          : tr('ui.extra.unboundWorktreeRetained'),
                     },
                     {
-                      title: 'Branch / Ref',
+                      title: tr('ui.branchRef'),
                       render: (_: any, r: any) =>
-                        `${r.ref_type}: ${r.ref_name}`,
+                        `${translateEnum('refType', r.ref_type)}: ${
+                          r.ref_name
+                        }`,
                     },
                     {
                       title: 'HEAD',
                       dataIndex: 'commit',
                       render: (v: string) => v?.slice(0, 10) || '—',
                     },
-                    { title: '状态', dataIndex: 'lifecycle_state' },
-                    { title: 'Dirty', dataIndex: 'dirty_state' },
                     {
-                      title: 'Busy',
+                      title: tr('ui.status'),
+                      dataIndex: 'lifecycle_state',
+                      render: (value: unknown) =>
+                        translateEnum('worktreeLifecycle', value),
+                    },
+                    {
+                      title: tr('ui.dirty'),
+                      dataIndex: 'dirty_state',
+                      render: (value: unknown) =>
+                        translateEnum('worktreeDirty', value),
+                    },
+                    {
+                      title: tr('ui.busy'),
                       render: (_: any, r: any) =>
                         r.lease?.busy
-                          ? r.lease.owner?.operation || 'BUSY'
+                          ? r.lease.owner?.operation ||
+                            tr('ui.presentation.Busy')
                           : '—',
                     },
                     {
-                      title: 'Ahead / Behind',
+                      title: tr('ui.aheadBehind'),
                       render: (_: any, r: any) =>
                         `${r.status_snapshot?.ahead ?? '—'} / ${
                           r.status_snapshot?.behind ?? '—'
                         }`,
                     },
-                    { title: 'Path', dataIndex: 'local_path', ellipsis: true },
                     {
-                      title: 'Last Updated',
-                      dataIndex: 'last_update_at',
-                      render: (v: string) =>
-                        v ? new Date(v).toLocaleString() : '—',
+                      title: tr('ui.path'),
+                      dataIndex: 'local_path',
+                      ellipsis: true,
                     },
                     {
-                      title: '操作',
+                      title: tr('ui.lastUpdated'),
+                      dataIndex: 'last_update_at',
+                      render: (v: string) => (v ? formatDateTime(v) : '—'),
+                    },
+                    {
+                      title: tr('ui.action'),
                       fixed: 'right' as const,
                       render: (_: any, r: any) => (
                         <Space wrap>
-                          <Button size="small" href={`${config.baseUrl}workspace?id=${r.id}`}>Open Workspace</Button>
+                          <Button
+                            size="small"
+                            href={`${config.baseUrl}workspace?id=${r.id}`}
+                          >
+                            {tr('ui.openWorkspace')}
+                          </Button>
                           <Button size="small" onClick={() => openTree(r.id)}>
-                            Open
+                            {tr('ui.open')}
                           </Button>
                           <Button
                             size="small"
                             disabled={busy}
                             onClick={async () => {
                               const result = await perform(
-                                'Refresh',
+                                'ui.refresh',
                                 `worktrees/${r.id}/refresh`,
                               );
                               if (result) setDetail(result);
                             }}
                           >
-                            Refresh
+                            {tr('ui.refresh')}
                           </Button>
                           <Button
                             size="small"
                             disabled={busy}
                             onClick={() =>
                               perform(
-                                'Update Worktree',
+                                'ui.extra.updateWorktree',
                                 `worktrees/${r.id}/update`,
                               )
                             }
                           >
-                            Update
+                            {tr('ui.update')}
                           </Button>
                           <Popconfirm
-                            title="删除工作区？有本地改动、提交或占用时将拒绝。"
+                            title={tr(
+                              'ui.deleteThisWorktreeLocalChangesCommitsOrActiveUseWillPreventDeletion',
+                            )}
                             onConfirm={() =>
                               perform(
-                                'Delete Worktree',
+                                'ui.extra.deleteWorktree',
                                 `worktrees/${r.id}`,
                                 'delete',
                               )
                             }
                           >
                             <Button danger size="small" disabled={busy}>
-                              Delete
+                              {tr('ui.delete')}
                             </Button>
                           </Popconfirm>
                         </Space>
@@ -465,17 +505,36 @@ export default function RepositoryWorkspacePage() {
           },
           {
             key: 'activity',
-            label: 'Activity',
+            label: tr('ui.activity'),
             children: (
               <>
-                <p>当前页面会话的操作结果；后端系统日志保留资源操作记录。</p>
+                <p>
+                  {tr(
+                    'ui.resultsFromThisPageSessionBackendSystemLogsRetainResourceOperationRecords',
+                  )}
+                </p>
                 <Table
                   rowKey={(_, i) => String(i)}
                   dataSource={activities}
                   columns={[
-                    { title: '时间', dataIndex: 'at' },
-                    { title: '操作', dataIndex: 'action' },
-                    { title: '结果', dataIndex: 'result' },
+                    {
+                      title: tr('ui.time'),
+                      dataIndex: 'at',
+                      render: (value: string) => formatDateTime(value),
+                    },
+                    {
+                      title: tr('ui.action'),
+                      dataIndex: 'action',
+                      render: (key: string) => tr(key),
+                    },
+                    {
+                      title: tr('ui.result'),
+                      dataIndex: 'result',
+                      render: (value: string) =>
+                        value === 'SUCCESS'
+                          ? tr('ui.extra.completed')
+                          : translateError(value),
+                    },
                   ]}
                 />
               </>
@@ -485,14 +544,14 @@ export default function RepositoryWorkspacePage() {
       />
       <Modal
         open={creating}
-        title="创建 Worktree"
+        title={tr('ui.createWorktree')}
         onCancel={() => setCreating(false)}
         onOk={create}
         confirmLoading={busy}
         forceRender
       >
         <Form form={form} layout="vertical">
-          <Form.Item label="Ref Type">
+          <Form.Item label={tr('ui.refType')}>
             <Radio.Group
               value={refType}
               onChange={(e) => {
@@ -500,17 +559,25 @@ export default function RepositoryWorkspacePage() {
                 form.setFieldsValue({ ref_name: '' });
               }}
             >
-              <Radio value="branch">Branch</Radio>
-              <Radio value="tag">Tag</Radio>
-              <Radio value="commit">Commit</Radio>
+              <Radio value="branch">{tr('ui.branch')}</Radio>
+              <Radio value="tag">{tr('ui.tag')}</Radio>
+              <Radio value="commit">{tr('ui.commit')}</Radio>
             </Radio.Group>
           </Form.Item>
-          <Form.Item label="名称" name="name" rules={[{ required: true }]}>
+          <Form.Item
+            label={tr('ui.name')}
+            name="name"
+            rules={[{ required: true }]}
+          >
             <Input maxLength={255} />
           </Form.Item>
-          <Form.Item label="Ref" name="ref_name" rules={[{ required: true }]}>
+          <Form.Item
+            label={tr('ui.ref')}
+            name="ref_name"
+            rules={[{ required: true }]}
+          >
             {refType === 'commit' ? (
-              <Input placeholder="完整 Commit SHA" />
+              <Input placeholder={tr('ui.fullCommitSHA')} />
             ) : (
               <Select
                 showSearch
@@ -521,94 +588,103 @@ export default function RepositoryWorkspacePage() {
             )}
           </Form.Item>
           <p>
-            路径由系统生成。每个远端分支默认只有一个 managed
-            Worktree；Commit/Tag 使用 Detached HEAD。
+            {tr(
+              'ui.pathsAreGeneratedByTheSystemEachRemoteBranchHasOneManagedWorktreeByDefaultCommitsAndTagsUseDetachedH',
+            )}
           </p>
         </Form>
       </Modal>
       <Modal
         width={880}
         open={!!detail}
-        title={`Worktree：${detail?.name || ''}`}
+        title={tr('ui.template.worktreeValue', { p0: detail?.name || '' })}
         onCancel={() => setDetail(undefined)}
         footer={
           <Space>
-            <Button onClick={() => openTree(detail.id)}>Refresh</Button>
+            <Button onClick={() => openTree(detail.id)}>
+              {tr('ui.refresh')}
+            </Button>
             <Button
               disabled={busy}
               onClick={async () => {
                 const result = await perform(
-                  'Repair Worktree',
+                  'ui.extra.repairWorktree',
                   `worktrees/${detail.id}/repair`,
                 );
                 if (result) setDetail(result);
               }}
             >
-              Repair
+              {tr('ui.repair')}
             </Button>
             {detail?.lifecycle_state === 'MISSING' && (
               <Popconfirm
-                title="目录缺失且 Git 注册已清理时可移除记录；本地提交仍受保护。"
+                title={tr(
+                  'ui.recordsCanBeRemovedAfterMissingDirectoriesArePrunedFromGitLocalCommitsRemainProtected',
+                )}
                 onConfirm={async () => {
                   await perform(
-                    'Remove Record',
+                    'ui.extra.removeRecord',
                     `worktrees/${detail.id}/remove-record`,
                   );
                   setDetail(undefined);
                 }}
               >
-                <Button danger>Remove Record</Button>
+                <Button danger>{tr('ui.removeRecord')}</Button>
               </Popconfirm>
             )}
           </Space>
         }
       >
-        {detail?.id && <TaskResourceReferences kind="worktree" id={detail.id} />}
+        {detail?.id && (
+          <TaskResourceReferences kind="worktree" id={detail.id} />
+        )}
         <Descriptions column={2} bordered size="small">
-          <Descriptions.Item label="Repository">{repo?.name}</Descriptions.Item>
-          <Descriptions.Item label="Ref">
+          <Descriptions.Item label={tr('ui.repository')}>
+            {repo?.name}
+          </Descriptions.Item>
+          <Descriptions.Item label={tr('ui.ref')}>
             {detail?.ref_type}: {detail?.ref_name}
           </Descriptions.Item>
-          <Descriptions.Item label="Branch">
-            {git?.branch || 'Detached'}
+          <Descriptions.Item label={tr('ui.branch')}>
+            {git?.branch || tr('ui.extra.detached')}
           </Descriptions.Item>
           <Descriptions.Item label="HEAD">
             {git?.head || detail?.commit}
           </Descriptions.Item>
-          <Descriptions.Item label="Local Path" span={2}>
+          <Descriptions.Item label={tr('ui.localPath')} span={2}>
             {detail?.local_path}
           </Descriptions.Item>
-          <Descriptions.Item label="状态">
+          <Descriptions.Item label={tr('ui.status')}>
             {detail?.lifecycle_state} / {detail?.dirty_state}
           </Descriptions.Item>
-          <Descriptions.Item label="Ahead / Behind">
+          <Descriptions.Item label={tr('ui.aheadBehind')}>
             {git?.ahead ?? '—'} / {git?.behind ?? '—'}
           </Descriptions.Item>
-          <Descriptions.Item label="Active Lease" span={2}>
+          <Descriptions.Item label={tr('ui.activeLease')} span={2}>
             {detail?.lease?.busy
               ? `${detail.lease.owner?.operation} · ${detail.lease.owner?.owner_type}/${detail.lease.owner?.owner_id} · PID ${detail.lease.owner?.pid}`
-              : '无占用'}
+              : tr('ui.extra.notInUse')}
           </Descriptions.Item>
         </Descriptions>
-        <h4>Changed Files</h4>
+        <h4>{tr('ui.changedFiles')}</h4>
         <Table
           size="small"
           rowKey="path"
           dataSource={git?.changed_files || []}
           columns={[
-            { title: '文件', dataIndex: 'path' },
-            { title: 'Index', dataIndex: 'index' },
+            { title: tr('ui.file'), dataIndex: 'path' },
+            { title: tr('ui.index'), dataIndex: 'index' },
             { title: 'Worktree', dataIndex: 'worktree' },
           ]}
         />
       </Modal>
       <Modal
-        title="修改同一仓库的 Remote 访问地址"
+        title={tr('ui.changeTheRemoteURLForThisRepository')}
         open={remoteEdit}
         onCancel={() => setRemoteEdit(false)}
         onOk={async () => {
           const result = await perform(
-            'Change Remote',
+            'ui.extra.changeRemote',
             `repositories/${id}/remote`,
             'post',
             { remote_url: remote },
@@ -619,8 +695,9 @@ export default function RepositoryWorkspacePage() {
       >
         <Input value={remote} onChange={(e) => setRemote(e.target.value)} />
         <p>
-          只接受归一化后身份相同的安全 URL。更换 Credential 不需要修改 URL
-          或重新 clone。
+          {tr(
+            'ui.onlySafeURLsWithTheSameNormalizedRepositoryIdentityAreAcceptedChangingCredentialsDoesNotRequireChang',
+          )}
         </p>
       </Modal>
     </div>

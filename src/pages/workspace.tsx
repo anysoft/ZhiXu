@@ -1,3 +1,6 @@
+import { translateEnum, translateError } from '@/utils/i18n';
+import { useLocale as useI18nLocale } from '@/utils/i18n';
+import { t as tr } from '@/utils/i18n';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   Alert,
@@ -42,6 +45,7 @@ type Tab = {
   eol: string;
 };
 export default function CodeWorkspacePage() {
+  useI18nLocale();
   const [id, setId] = useState(
       Number(new URLSearchParams(window.location.search).get('id')),
     ),
@@ -138,8 +142,8 @@ export default function CodeWorkspacePage() {
         return;
       }
       Modal.confirm({
-        title: '放弃未保存的更改？',
-        content: '草稿仅保存在当前页面内存中。',
+        title: tr('ui.discardUnsavedChanges'),
+        content: tr('ui.extra.draftsAreKeptOnlyInThisPageSMemory'),
         onOk: () => {
           unblock?.();
           transition.retry();
@@ -153,7 +157,7 @@ export default function CodeWorkspacePage() {
   }, []);
   const confirmDirty = (action: () => void) =>
     dirty
-      ? Modal.confirm({ title: '放弃未保存的更改？', onOk: action })
+      ? Modal.confirm({ title: tr('ui.discardUnsavedChanges'), onOk: action })
       : action();
   const open = async (file: string, reloadFile = false) => {
     if (!reloadFile && tabs.some((t) => t.path === file)) {
@@ -189,11 +193,12 @@ export default function CodeWorkspacePage() {
       const code = e.response?.data?.error_code;
       if (code === 'WORKSPACE_FILE_CONFLICT')
         Modal.confirm({
-          title: 'File changed on disk',
-          content:
-            '磁盘文件已更改。Reload 将丢弃当前草稿；Cancel 保留草稿供手工比较。',
-          okText: 'Reload',
-          cancelText: 'Cancel',
+          title: tr('ui.fileChangedOnDisk'),
+          content: tr(
+            'ui.extra.theFileOnDiskChangedReloadDiscardsTheCurrentDraftCancelKeepsItForManualComparison',
+          ),
+          okText: tr('ui.reload'),
+          cancelText: tr('ui.cancel'),
           onOk: () => perform(() => open(tab.path, true)),
         });
       else setError(code || 'WORKSPACE_SAVE_FAILED');
@@ -209,7 +214,10 @@ export default function CodeWorkspacePage() {
         setActive(tabs.find((t) => t.path !== file)?.path || '');
     };
     if (t?.content !== t?.saved)
-      Modal.confirm({ title: '放弃此文件未保存的更改？', onOk: action });
+      Modal.confirm({
+        title: tr('ui.discardUnsavedChangesToThisFile'),
+        onOk: action,
+      });
     else action();
   };
   const entryIdentity = async (entry: any) =>
@@ -220,10 +228,10 @@ export default function CodeWorkspacePage() {
         );
   const gitPanel = (
     <Space direction="vertical" style={{ width: '100%' }}>
-      <Typography.Title level={4}>Git Changes</Typography.Title>
+      <Typography.Title level={4}>{tr('ui.gitChanges')}</Typography.Title>
       <div>
-        Staged {git.staged || 0} · Unstaged {git.modified || 0} · Untracked{' '}
-        {git.untracked || 0}
+        {tr('ui.staged')} {git.staged || 0} {tr('ui.unstaged')}{' '}
+        {git.modified || 0} {tr('ui.untracked')} {git.untracked || 0}
       </div>
       <List
         size="small"
@@ -250,7 +258,7 @@ export default function CodeWorkspacePage() {
                     )
                   }
                 >
-                  Diff
+                  {tr('ui.diff')}
                 </Button>
                 <Button
                   size="small"
@@ -265,7 +273,7 @@ export default function CodeWorkspacePage() {
                     )
                   }
                 >
-                  Staged diff
+                  {tr('ui.stagedDiff')}
                 </Button>
                 <Button
                   size="small"
@@ -277,7 +285,7 @@ export default function CodeWorkspacePage() {
                     })
                   }
                 >
-                  Stage
+                  {tr('ui.stage')}
                 </Button>
                 <Button
                   size="small"
@@ -291,7 +299,7 @@ export default function CodeWorkspacePage() {
                     })
                   }
                 >
-                  Unstage
+                  {tr('ui.unstage')}
                 </Button>
               </Space>
             </div>
@@ -303,24 +311,24 @@ export default function CodeWorkspacePage() {
           disabled={!gitOffset}
           onClick={() => setGitOffset(Math.max(0, gitOffset - 100))}
         >
-          Previous changes
+          {tr('ui.previousChanges')}
         </Button>
         <Button
           disabled={git.next === null || git.next === undefined}
           onClick={() => setGitOffset(git.next)}
         >
-          More changes
+          {tr('ui.moreChanges')}
         </Button>
       </Space>
       <Input
-        aria-label="Git author name"
-        placeholder="Git author name"
+        aria-label={tr('ui.gitAuthorName')}
+        placeholder={tr('ui.gitAuthorName')}
         value={identity.name}
         onChange={(e) => setIdentity({ ...identity, name: e.target.value })}
       />
       <Input
-        aria-label="Git author email"
-        placeholder="Git author email"
+        aria-label={tr('ui.gitAuthorEmail')}
+        placeholder={tr('ui.gitAuthorEmail')}
         value={identity.email}
         onChange={(e) => setIdentity({ ...identity, email: e.target.value })}
       />
@@ -328,11 +336,11 @@ export default function CodeWorkspacePage() {
         disabled={busy}
         onClick={() => perform(() => call('put', '/git/identity', identity))}
       >
-        Save Git identity
+        {tr('ui.saveGitIdentity')}
       </Button>
       <Input.TextArea
-        aria-label="Commit message"
-        placeholder="Commit message"
+        aria-label={tr('ui.commitMessage')}
+        placeholder={tr('ui.commitMessage')}
         value={message}
         maxLength={8192}
         onChange={(e) => setMessage(e.target.value)}
@@ -348,16 +356,17 @@ export default function CodeWorkspacePage() {
           })
         }
       >
-        Commit staged ({git.staged || 0})
+        {tr('ui.commitStaged')} {git.staged || 0})
       </Button>
       <div>
-        Push → {info?.upstream || 'origin / select branch'} · ahead{' '}
+        {tr('ui.pushVariant250')}{' '}
+        {info?.upstream || tr('ui.extra.originSelectBranch')} {tr('ui.ahead')}{' '}
         {info?.ahead ?? '—'}
       </div>
       {!info?.upstream && (
         <Input
-          aria-label="Push branch"
-          placeholder="Remote branch"
+          aria-label={tr('ui.pushBranch')}
+          placeholder={tr('ui.remoteBranch')}
           value={branch}
           onChange={(e) => setBranch(e.target.value)}
         />
@@ -366,7 +375,7 @@ export default function CodeWorkspacePage() {
         disabled={busy || !info?.branch}
         onClick={() =>
           Modal.confirm({
-            title: 'Push to origin?',
+            title: tr('ui.pushToOrigin'),
             content: info?.upstream || branch,
             onOk: () =>
               perform(async () => {
@@ -380,7 +389,7 @@ export default function CodeWorkspacePage() {
           })
         }
       >
-        Push
+        {tr('ui.push')}
       </Button>
     </Space>
   );
@@ -388,12 +397,12 @@ export default function CodeWorkspacePage() {
     <div className="code-workspace">
       <Space wrap>
         <Typography.Title level={3} style={{ margin: 0 }}>
-          Code Workspace
+          {tr('ui.codeWorkspace')}
         </Typography.Title>
         <Select
           aria-label="Worktree"
           value={id || undefined}
-          placeholder="选择 Worktree"
+          placeholder={tr('ui.selectWorktree')}
           style={{ minWidth: 220 }}
           options={worktrees.map((w) => ({
             value: w.id,
@@ -417,7 +426,7 @@ export default function CodeWorkspacePage() {
           }
         />
         <Button disabled={!id || busy} onClick={() => perform(reload)}>
-          Refresh
+          {tr('ui.refresh')}
         </Button>
         <Button
           className="workspace-git-toggle"
@@ -429,8 +438,8 @@ export default function CodeWorkspacePage() {
       {info?.subscriptions?.length > 0 && (
         <Space>
           <Select
-            aria-label="Workspace subscription"
-            placeholder="Subscription"
+            aria-label={tr('ui.workspaceSubscription')}
+            placeholder={tr('ui.subscription')}
             value={subscription || info.subscriptions[0].id}
             options={info.subscriptions.map((s: any) => ({
               value: s.id,
@@ -448,7 +457,7 @@ export default function CodeWorkspacePage() {
               })
             }
           >
-            Sync
+            {tr('ui.sync')}
           </Button>
           <Button
             disabled={busy}
@@ -465,18 +474,19 @@ export default function CodeWorkspacePage() {
               })
             }
           >
-            Apply Discovery
+            {tr('ui.applyDiscovery')}
           </Button>
         </Space>
       )}
       {info && (
         <p>
           {info.repository.name} / {info.name} ·{' '}
-          <Tag>{info.branch || 'Detached HEAD'}</Tag>
-          <code data-testid="workspace-head">{info.head}</code> · ahead{' '}
-          {info.ahead ?? '—'} / behind {info.behind ?? '—'} · {git.total || 0}{' '}
-          changed · Used by {info.tasks_count} Tasks ·{' '}
-          <a href={`${config.baseUrl}subscription`}>Sync / Discovery</a>
+          <Tag>{info.branch || tr('ui.extra.detachedHEAD')}</Tag>
+          <code data-testid="workspace-head">{info.head}</code> {tr('ui.ahead')}{' '}
+          {info.ahead ?? '—'} {tr('ui.behind')} {info.behind ?? '—'} ·{' '}
+          {git.total || 0} {tr('ui.changedUsedBy')} {info.tasks_count}{' '}
+          {tr('ui.tasksVariant362')}{' '}
+          <a href={`${config.baseUrl}subscription`}>{tr('ui.syncDiscovery')}</a>
         </p>
       )}
       {error && (
@@ -484,8 +494,8 @@ export default function CodeWorkspacePage() {
           type="error"
           message={
             error === 'WORKTREE_BUSY'
-              ? 'WORKTREE_BUSY：任务或同步正在占用 Worktree，请稍后重试。'
-              : error
+              ? tr('ui.extra.theWorktreeIsInUseByATaskOrSyncTryAgainLater')
+              : translateError(error)
           }
           closable
           onClose={() => setError('')}
@@ -494,19 +504,23 @@ export default function CodeWorkspacePage() {
       {stale && (
         <Alert
           type="info"
-          message="Discovery changes available"
+          message={tr('ui.discoveryChangesAvailable')}
           description={
             <span>
-              文件结构已改变。请在绑定订阅的 Discovery 中显式
-              Apply；保存文件不会自动运行任务。{' '}
-              <a href={`${config.baseUrl}subscription`}>打开订阅</a>
+              {tr(
+                'ui.theFileStructureHasChangedApplyDiscoveryExplicitlyInTheLinkedSubscriptionSavingFilesDoesNotRunTasksA',
+              )}{' '}
+              <a href={`${config.baseUrl}subscription`}>
+                {tr('ui.openSubscription')}
+              </a>
             </span>
           }
         />
       )}
       <p>
-        草稿仅保存在页面内存，关闭或浏览器崩溃会丢失。Ctrl/Cmd+F
-        查找，Ctrl/Cmd+H 替换。user.env 只作为普通文件编辑。
+        {tr(
+          'ui.draftsAreStoredOnlyInPageMemoryAndAreLostIfThePageClosesOrTheBrowserCrashesCtrlCmdFToFindCtrlCmdHToR',
+        )}
       </p>
       {!!id && (
         <div className="workspace-columns">
@@ -518,7 +532,7 @@ export default function CodeWorkspacePage() {
                   setNewItem('file');
                 }}
               >
-                New file
+                {tr('ui.newFile')}
               </Button>
               <Button
                 onClick={() => {
@@ -526,7 +540,7 @@ export default function CodeWorkspacePage() {
                   setNewItem('directory');
                 }}
               >
-                New directory
+                {tr('ui.newDirectory')}
               </Button>
             </Space>
             <p>
@@ -558,7 +572,7 @@ export default function CodeWorkspacePage() {
                       {entry.kind === 'directory' ? '📁 ' : ''}
                       {entry.name}
                     </Button>
-                    {entry.kind === 'special' && <Tag>Special</Tag>}
+                    {entry.kind === 'special' && <Tag>{tr('ui.special')}</Tag>}
                     {entry.kind !== 'symlink' && entry.kind !== 'special' && (
                       <Space>
                         <Button
@@ -573,7 +587,7 @@ export default function CodeWorkspacePage() {
                             })
                           }
                         >
-                          Rename
+                          {tr('ui.rename')}
                         </Button>
                         <Button
                           size="small"
@@ -582,8 +596,12 @@ export default function CodeWorkspacePage() {
                             perform(async () => {
                               const expected_hash = await entryIdentity(entry);
                               Modal.confirm({
-                                title: `Delete ${entry.path}?`,
-                                content: '仅删除文件或空目录。',
+                                title: tr('ui.template.deleteValue', {
+                                  p0: entry.path,
+                                }),
+                                content: tr(
+                                  'ui.extra.onlyFilesOrEmptyDirectoriesCanBeDeleted',
+                                ),
                                 onOk: () =>
                                   perform(async () => {
                                     await call('delete', '/files', {
@@ -600,7 +618,7 @@ export default function CodeWorkspacePage() {
                             })
                           }
                         >
-                          Delete
+                          {tr('ui.delete')}
                         </Button>
                       </Space>
                     )}
@@ -613,18 +631,18 @@ export default function CodeWorkspacePage() {
                 disabled={!offset}
                 onClick={() => setOffset(Math.max(0, offset - 200))}
               >
-                Previous
+                {tr('ui.previous')}
               </Button>
               <Button
                 disabled={tree.next === null || tree.next === undefined}
                 onClick={() => setOffset(tree.next)}
               >
-                More files
+                {tr('ui.moreFiles')}
               </Button>
             </Space>
             <Input.Search
-              aria-label="Workspace search"
-              placeholder="Search workspace"
+              aria-label={tr('ui.workspaceSearch')}
+              placeholder={tr('ui.searchWorkspace')}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onSearch={() =>
@@ -642,15 +660,15 @@ export default function CodeWorkspacePage() {
               value={searchContent ? 'content' : 'filename'}
               onChange={(v) => setSearchContent(v === 'content')}
               options={[
-                { value: 'filename', label: 'Filename' },
-                { value: 'content', label: 'Content' },
+                { value: 'filename', label: tr('ui.filename') },
+                { value: 'content', label: tr('ui.content') },
               ]}
             />
             {results && (
               <>
                 <p>
-                  {results.items.length} results{' '}
-                  {results.truncated ? '(truncated)' : ''}
+                  {results.items.length} {tr('ui.results')}{' '}
+                  {results.truncated ? tr('ui.extra.truncated') : ''}
                 </p>
                 <List
                   size="small"
@@ -695,13 +713,15 @@ export default function CodeWorkspacePage() {
                     }
                     onClick={save}
                   >
-                    Save
+                    {tr('ui.save')}
                   </Button>
                   <span>
-                    {tab.eol} · mode {tab.mode?.toString(8)}
+                    {tab.eol} {tr('ui.modeVariant416')} {tab.mode?.toString(8)}
                   </span>
                 </Space>
-                {tab.error_code && <Alert message={tab.error_code} />}
+                {tab.error_code && (
+                  <Alert message={translateError(tab.error_code)} />
+                )}
                 <Editor
                   height="65vh"
                   path={`${id}/${tab.path}`}
@@ -726,7 +746,7 @@ export default function CodeWorkspacePage() {
                 />
               </>
             ) : (
-              <p>选择文件开始编辑。</p>
+              <p>{tr('ui.selectAFileToStartEditing')}</p>
             )}
           </main>
           <aside className="workspace-git">{gitPanel}</aside>
@@ -742,15 +762,16 @@ export default function CodeWorkspacePage() {
       </Drawer>
       <Modal
         width="90vw"
-        title={`${diff?.staged ? 'Staged' : 'Working'} diff: ${
-          diff?.path || ''
-        }`}
+        title={tr('ui.template.valueDiffValue', {
+          p0: diff?.staged ? tr('ui.staged') : tr('ui.working'),
+          p1: diff?.path || '',
+        })}
         open={!!diff}
         footer={null}
         onCancel={() => setDiff(undefined)}
       >
         {diff?.truncated && (
-          <Alert message="Diff truncated (256 KiB / 4000 lines)" />
+          <Alert message={tr('ui.diffTruncated256KiB4000Lines')} />
         )}
         <pre
           style={{
@@ -759,11 +780,11 @@ export default function CodeWorkspacePage() {
             whiteSpace: 'pre-wrap',
           }}
         >
-          {diff?.text || 'No diff'}
+          {diff?.text || tr('ui.extra.noDiff')}
         </pre>
       </Modal>
       <Modal
-        title={newItem === 'file' ? 'New file' : 'New directory'}
+        title={newItem === 'file' ? tr('ui.newFile') : tr('ui.newDirectory')}
         open={!!newItem}
         onCancel={() => setNewItem(null)}
         onOk={() =>
@@ -783,13 +804,13 @@ export default function CodeWorkspacePage() {
         }
       >
         <Input
-          aria-label="New path"
+          aria-label={tr('ui.newPath')}
           value={newPath}
           onChange={(e) => setNewPath(e.target.value)}
         />
       </Modal>
       <Modal
-        title="Rename"
+        title={tr('ui.rename')}
         open={!!rename}
         onCancel={() => setRename(undefined)}
         onOk={() =>
@@ -812,7 +833,7 @@ export default function CodeWorkspacePage() {
         }
       >
         <Input
-          aria-label="Destination path"
+          aria-label={tr('ui.destinationPath')}
           value={destination}
           onChange={(e) => setDestination(e.target.value)}
         />

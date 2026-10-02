@@ -1,0 +1,4817 @@
+{
+  "/ behind": {
+    "classification": "LOCALIZED",
+    "key": "ui.behind",
+    "zh": "/ 落后",
+    "en": "/ behind"
+  },
+  "1. 宿主机执行 docker run --rm -v /var/run/docker.sock:/var/run/docker.sock containrrr/watchtower -cR &lt;容器名&gt;": {
+    "classification": "LOCALIZED",
+    "key": "ui.1OnTheHostRunDockerRunRmVVarRunDockerSockVarRunDockerSockContainrrrWatchtowerCRContainerName",
+    "zh": "1. 宿主机执行 docker run --rm -v /var/run/docker.sock:/var/run/docker.sock containrrr/watchtower -cR &lt;容器名&gt;",
+    "en": "1. On the host, run docker run --rm -v /var/run/docker.sock:/var/run/docker.sock containrrr/watchtower -cR <container-name>"
+  },
+  "1Password": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "@scope/package": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "Action": {
+    "classification": "LOCALIZED",
+    "key": "ui.action",
+    "zh": "操作",
+    "en": "Action"
+  },
+  "Actions": {
+    "classification": "LOCALIZED",
+    "key": "ui.actions",
+    "zh": "操作",
+    "en": "Actions"
+  },
+  "Active Lease": {
+    "classification": "LOCALIZED",
+    "key": "ui.activeLease",
+    "zh": "有效租约",
+    "en": "Active Lease"
+  },
+  "Activity": {
+    "classification": "LOCALIZED",
+    "key": "ui.activity",
+    "zh": "活动",
+    "en": "Activity"
+  },
+  "Add channel": {
+    "classification": "LOCALIZED",
+    "key": "ui.addChannel",
+    "zh": "添加渠道",
+    "en": "Add channel"
+  },
+  "Add trigger": {
+    "classification": "LOCALIZED",
+    "key": "ui.addTrigger",
+    "zh": "添加触发器",
+    "en": "Add trigger"
+  },
+  "After": {
+    "classification": "LOCALIZED",
+    "key": "ui.after",
+    "zh": "之后",
+    "en": "After"
+  },
+  "After Build": {
+    "classification": "LOCALIZED",
+    "key": "ui.afterBuild",
+    "zh": "构建后",
+    "en": "After Build"
+  },
+  "Ahead / Behind": {
+    "classification": "LOCALIZED",
+    "key": "ui.aheadBehind",
+    "zh": "领先 / 落后",
+    "en": "Ahead / Behind"
+  },
+  "All": {
+    "classification": "LOCALIZED",
+    "key": "ui.all",
+    "zh": "全部",
+    "en": "All"
+  },
+  "All runs": {
+    "classification": "LOCALIZED",
+    "key": "ui.allRuns",
+    "zh": "全部运行记录",
+    "en": "All runs"
+  },
+  "Allow": {
+    "classification": "LOCALIZED",
+    "key": "ui.allow",
+    "zh": "允许",
+    "en": "Allow"
+  },
+  "Anonymous / 无凭证": {
+    "classification": "LOCALIZED",
+    "key": "ui.anonymous",
+    "zh": "无凭证",
+    "en": "Anonymous / 无凭证"
+  },
+  "Apply Discovery": {
+    "classification": "LOCALIZED",
+    "key": "ui.applyDiscovery",
+    "zh": "应用任务发现",
+    "en": "Apply Discovery"
+  },
+  "Apply discovery": {
+    "classification": "LOCALIZED",
+    "key": "ui.applyDiscoveryVariant16",
+    "zh": "应用任务发现",
+    "en": "Apply discovery"
+  },
+  "Archive": {
+    "classification": "LOCALIZED",
+    "key": "ui.archive",
+    "zh": "归档",
+    "en": "Archive"
+  },
+  "Archive channel?": {
+    "classification": "LOCALIZED",
+    "key": "ui.archiveChannel",
+    "zh": "归档此渠道？",
+    "en": "Archive channel?"
+  },
+  "Arguments must be a JSON array of strings": {
+    "classification": "LOCALIZED",
+    "key": "ui.argumentsMustBeAJSONArrayOfStrings",
+    "zh": "参数必须是由字符串组成的 JSON 数组",
+    "en": "Arguments must be a JSON array of strings"
+  },
+  "Arguments — JSON array": {
+    "classification": "LOCALIZED",
+    "key": "ui.argumentsJSONArray",
+    "zh": "参数 — JSON 数组",
+    "en": "Arguments — JSON array"
+  },
+  "Asset": {
+    "classification": "LOCALIZED",
+    "key": "ui.asset",
+    "zh": "资产",
+    "en": "Asset"
+  },
+  "Attempts": {
+    "classification": "LOCALIZED",
+    "key": "ui.attempts",
+    "zh": "尝试次数",
+    "en": "Attempts"
+  },
+  "Authy": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "Backup &amp; Restore / 备份与恢复": {
+    "classification": "LOCALIZED",
+    "key": "ui.backupAmpRestore",
+    "zh": "备份与恢复",
+    "en": "Backup &amp; Restore / 备份与恢复"
+  },
+  "Bark": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "Before": {
+    "classification": "LOCALIZED",
+    "key": "ui.before",
+    "zh": "之前",
+    "en": "Before"
+  },
+  "Before Build": {
+    "classification": "LOCALIZED",
+    "key": "ui.beforeBuild",
+    "zh": "构建前",
+    "en": "Before Build"
+  },
+  "Branch": {
+    "classification": "LOCALIZED",
+    "key": "ui.branch",
+    "zh": "分支",
+    "en": "Branch"
+  },
+  "Branch / Ref": {
+    "classification": "LOCALIZED",
+    "key": "ui.branchRef",
+    "zh": "分支 / 引用",
+    "en": "Branch / Ref"
+  },
+  "Branch / Tag": {
+    "classification": "LOCALIZED",
+    "key": "ui.branchTag",
+    "zh": "分支 / 标签",
+    "en": "Branch / Tag"
+  },
+  "Build": {
+    "classification": "LOCALIZED",
+    "key": "ui.build",
+    "zh": "构建",
+    "en": "Build"
+  },
+  "Build #": {
+    "classification": "LOCALIZED",
+    "key": "ui.buildVariant30",
+    "zh": "构建 #",
+    "en": "Build #"
+  },
+  "Build Diagnostics": {
+    "classification": "LOCALIZED",
+    "key": "ui.buildDiagnostics",
+    "zh": "构建诊断",
+    "en": "Build Diagnostics"
+  },
+  "Build Diff": {
+    "classification": "LOCALIZED",
+    "key": "ui.buildDiff",
+    "zh": "构建差异",
+    "en": "Build Diff"
+  },
+  "Build Health": {
+    "classification": "LOCALIZED",
+    "key": "ui.buildHealth",
+    "zh": "构建健康状态",
+    "en": "Build Health"
+  },
+  "Build Jobs": {
+    "classification": "LOCALIZED",
+    "key": "ui.buildJobs",
+    "zh": "构建并发数",
+    "en": "Build Jobs"
+  },
+  "Build Timestamp": {
+    "classification": "LOCALIZED",
+    "key": "ui.buildTimestamp",
+    "zh": "构建时间",
+    "en": "Build Timestamp"
+  },
+  "Build dependency diff": {
+    "classification": "LOCALIZED",
+    "key": "ui.buildDependencyDiff",
+    "zh": "构建依赖差异",
+    "en": "Build dependency diff"
+  },
+  "Builds": {
+    "classification": "LOCALIZED",
+    "key": "ui.builds",
+    "zh": "构建列表",
+    "en": "Builds"
+  },
+  "Bundled npm": {
+    "classification": "LOCALIZED",
+    "key": "ui.bundledNpm",
+    "zh": "内置 npm",
+    "en": "Bundled npm"
+  },
+  "Bundled npm 使用所选 Runtime 自带的精确版本。": {
+    "classification": "LOCALIZED",
+    "key": "ui.bundledNpmUsesTheExactVersionIncludedWithTheSelectedRuntime",
+    "zh": "内置 npm 使用所选 运行时 自带的精确版本。",
+    "en": "Bundled npm uses the exact version included with the selected runtime."
+  },
+  "Busy": {
+    "classification": "LOCALIZED",
+    "key": "ui.busy",
+    "zh": "占用状态",
+    "en": "Busy"
+  },
+  "Bytes": {
+    "classification": "LOCALIZED",
+    "key": "ui.bytes",
+    "zh": "字节数",
+    "en": "Bytes"
+  },
+  "CUSTOM": {
+    "classification": "LOCALIZED",
+    "key": "ui.custom",
+    "zh": "自定义",
+    "en": "CUSTOM"
+  },
+  "Cancel": {
+    "classification": "LOCALIZED",
+    "key": "ui.cancel",
+    "zh": "取消",
+    "en": "Cancel"
+  },
+  "Cancel run": {
+    "classification": "LOCALIZED",
+    "key": "ui.cancelRun",
+    "zh": "取消运行",
+    "en": "Cancel run"
+  },
+  "Catalog Updated": {
+    "classification": "LOCALIZED",
+    "key": "ui.catalogUpdated",
+    "zh": "版本目录更新时间",
+    "en": "Catalog Updated"
+  },
+  "Change": {
+    "classification": "LOCALIZED",
+    "key": "ui.change",
+    "zh": "更改",
+    "en": "Change"
+  },
+  "Change mode": {
+    "classification": "LOCALIZED",
+    "key": "ui.changeMode",
+    "zh": "变更模式",
+    "en": "Change mode"
+  },
+  "Changed Files": {
+    "classification": "LOCALIZED",
+    "key": "ui.changedFiles",
+    "zh": "已更改文件",
+    "en": "Changed Files"
+  },
+  "Channel": {
+    "classification": "LOCALIZED",
+    "key": "ui.channel",
+    "zh": "渠道",
+    "en": "Channel"
+  },
+  "Channel mode": {
+    "classification": "LOCALIZED",
+    "key": "ui.channelMode",
+    "zh": "渠道模式",
+    "en": "Channel mode"
+  },
+  "Channels": {
+    "classification": "LOCALIZED",
+    "key": "ui.channels",
+    "zh": "渠道",
+    "en": "Channels"
+  },
+  "Check the channel fields and secret JSON.": {
+    "classification": "LOCALIZED",
+    "key": "ui.checkTheChannelFieldsAndSecretJSON",
+    "zh": "请检查渠道字段和密钥 JSON。",
+    "en": "Check the channel fields and secret JSON."
+  },
+  "Chronocat": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "Client ID": {
+    "classification": "LOCALIZED",
+    "key": "ui.clientID",
+    "zh": "客户端 ID",
+    "en": "Client ID"
+  },
+  "Client Secret": {
+    "classification": "LOCALIZED",
+    "key": "ui.clientSecret",
+    "zh": "客户端密钥",
+    "en": "Client Secret"
+  },
+  "Clone": {
+    "classification": "LOCALIZED",
+    "key": "ui.clone",
+    "zh": "克隆",
+    "en": "Clone"
+  },
+  "Clone Environment": {
+    "classification": "LOCALIZED",
+    "key": "ui.cloneEnvironment",
+    "zh": "克隆环境",
+    "en": "Clone Environment"
+  },
+  "Clone Profile": {
+    "classification": "LOCALIZED",
+    "key": "ui.cloneProfile",
+    "zh": "克隆配置方案",
+    "en": "Clone Profile"
+  },
+  "Clone 名称": {
+    "classification": "LOCALIZED",
+    "key": "ui.cloneName",
+    "zh": "克隆 名称",
+    "en": "Clone name"
+  },
+  "Close": {
+    "classification": "LOCALIZED",
+    "key": "ui.close",
+    "zh": "关闭",
+    "en": "Close"
+  },
+  "Code Workspace": {
+    "classification": "LOCALIZED",
+    "key": "ui.codeWorkspace",
+    "zh": "代码工作区",
+    "en": "Code Workspace"
+  },
+  "Command": {
+    "classification": "LOCALIZED",
+    "key": "ui.command",
+    "zh": "命令",
+    "en": "Command"
+  },
+  "Commit": {
+    "classification": "LOCALIZED",
+    "key": "ui.commit",
+    "zh": "提交",
+    "en": "Commit"
+  },
+  "Commit message": {
+    "classification": "LOCALIZED",
+    "key": "ui.commitMessage",
+    "zh": "提交说明",
+    "en": "Commit message"
+  },
+  "Commit staged (": {
+    "classification": "LOCALIZED",
+    "key": "ui.commitStaged",
+    "zh": "提交已暂存内容（",
+    "en": "Commit staged ("
+  },
+  "Config": {
+    "classification": "LOCALIZED",
+    "key": "ui.config",
+    "zh": "配置",
+    "en": "Config"
+  },
+  "Config Asset": {
+    "classification": "LOCALIZED",
+    "key": "ui.configAsset",
+    "zh": "配置资产",
+    "en": "Config Asset"
+  },
+  "Config Assets": {
+    "classification": "LOCALIZED",
+    "key": "ui.configAssets",
+    "zh": "配置资产",
+    "en": "Config Assets"
+  },
+  "Config Binding": {
+    "classification": "LOCALIZED",
+    "key": "ui.configBinding",
+    "zh": "配置绑定",
+    "en": "Config Binding"
+  },
+  "Config binding 已保存": {
+    "classification": "LOCALIZED",
+    "key": "ui.configBindingSaved",
+    "zh": "配置绑定 已保存",
+    "en": "Config binding saved"
+  },
+  "Configuration": {
+    "classification": "LOCALIZED",
+    "key": "ui.configuration",
+    "zh": "配置",
+    "en": "Configuration"
+  },
+  "Configured Resources": {
+    "classification": "LOCALIZED",
+    "key": "ui.configuredResources",
+    "zh": "已配置资源",
+    "en": "Configured Resources"
+  },
+  "Conflict Policy": {
+    "classification": "LOCALIZED",
+    "key": "ui.conflictPolicy",
+    "zh": "冲突处理策略",
+    "en": "Conflict Policy"
+  },
+  "Consecutive failures": {
+    "classification": "LOCALIZED",
+    "key": "ui.consecutiveFailures",
+    "zh": "连续失败次数",
+    "en": "Consecutive failures"
+  },
+  "Content": {
+    "classification": "LOCALIZED",
+    "key": "ui.content",
+    "zh": "内容",
+    "en": "Content"
+  },
+  "Content (UTF-8 TEXT, ≤ 1 MiB)": {
+    "classification": "LOCALIZED",
+    "key": "ui.contentUTF8TEXT1MiB",
+    "zh": "内容（UTF-8 文本，不超过 1 MiB）",
+    "en": "Content (UTF-8 TEXT, ≤ 1 MiB)"
+  },
+  "Copy cloned webhook secrets now": {
+    "classification": "LOCALIZED",
+    "key": "ui.copyClonedWebhookSecretsNow",
+    "zh": "请立即复制克隆后的 Webhook 密钥",
+    "en": "Copy cloned webhook secrets now"
+  },
+  "Copy this webhook secret now. It is shown only once.": {
+    "classification": "LOCALIZED",
+    "key": "ui.copyThisWebhookSecretNowItIsShownOnlyOnce",
+    "zh": "请立即复制 Webhook 密钥，它仅显示一次。",
+    "en": "Copy this webhook secret now. It is shown only once."
+  },
+  "Create Task": {
+    "classification": "LOCALIZED",
+    "key": "ui.createTask",
+    "zh": "创建任务",
+    "en": "Create Task"
+  },
+  "Create Worktree": {
+    "classification": "LOCALIZED",
+    "key": "ui.createWorktree",
+    "zh": "创建 工作树",
+    "en": "Create Worktree"
+  },
+  "Created": {
+    "classification": "LOCALIZED",
+    "key": "ui.created",
+    "zh": "创建时间",
+    "en": "Created"
+  },
+  "Credentials / 凭证": {
+    "classification": "LOCALIZED",
+    "key": "ui.credentials",
+    "zh": "凭证",
+    "en": "Credentials / 凭证"
+  },
+  "Cron": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "Cron expression": {
+    "classification": "LOCALIZED",
+    "key": "ui.cronExpression",
+    "zh": "Cron 表达式",
+    "en": "Cron expression"
+  },
+  "Current": {
+    "classification": "LOCALIZED",
+    "key": "ui.current",
+    "zh": "当前",
+    "en": "Current"
+  },
+  "Current Build": {
+    "classification": "LOCALIZED",
+    "key": "ui.currentBuild",
+    "zh": "当前构建",
+    "en": "Current Build"
+  },
+  "Current Revision": {
+    "classification": "LOCALIZED",
+    "key": "ui.currentRevision",
+    "zh": "当前修订",
+    "en": "Current Revision"
+  },
+  "Custom-Header1: Header1\nCustom-Header2: Header2": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "Default": {
+    "classification": "LOCALIZED",
+    "key": "ui.default",
+    "zh": "默认",
+    "en": "Default"
+  },
+  "Default Branch": {
+    "classification": "LOCALIZED",
+    "key": "ui.defaultBranch",
+    "zh": "默认分支",
+    "en": "Default Branch"
+  },
+  "Default channel": {
+    "classification": "LOCALIZED",
+    "key": "ui.defaultChannel",
+    "zh": "默认渠道",
+    "en": "Default channel"
+  },
+  "Delete": {
+    "classification": "LOCALIZED",
+    "key": "ui.delete",
+    "zh": "删除",
+    "en": "Delete"
+  },
+  "Delete Task and its owned bindings? Historical logs are retained.": {
+    "classification": "LOCALIZED",
+    "key": "ui.deleteTaskAndItsOwnedBindingsHistoricalLogsAreRetained",
+    "zh": "删除任务及其绑定？历史日志将保留。",
+    "en": "Delete Task and its owned bindings? Historical logs are retained."
+  },
+  "Deliveries": {
+    "classification": "LOCALIZED",
+    "key": "ui.deliveries",
+    "zh": "投递记录",
+    "en": "Deliveries"
+  },
+  "Delivery": {
+    "classification": "LOCALIZED",
+    "key": "ui.delivery",
+    "zh": "投递",
+    "en": "Delivery"
+  },
+  "Delivery attempts": {
+    "classification": "LOCALIZED",
+    "key": "ui.deliveryAttempts",
+    "zh": "投递尝试",
+    "en": "Delivery attempts"
+  },
+  "Dependencies": {
+    "classification": "LOCALIZED",
+    "key": "ui.dependencies",
+    "zh": "依赖",
+    "en": "Dependencies"
+  },
+  "Dependencies — 每行一个 PEP 508 requirement": {
+    "classification": "LOCALIZED",
+    "key": "ui.dependenciesOnePEP508RequirementPerLine",
+    "zh": "依赖 — 每行一个 PEP 508 依赖声明",
+    "en": "Dependencies — one PEP 508 requirement per line"
+  },
+  "Description": {
+    "classification": "LOCALIZED",
+    "key": "ui.description",
+    "zh": "描述",
+    "en": "Description"
+  },
+  "Desired Dependencies": {
+    "classification": "LOCALIZED",
+    "key": "ui.desiredDependencies",
+    "zh": "期望依赖",
+    "en": "Desired Dependencies"
+  },
+  "Desired Dependencies · 推荐精确版本，也支持 semver range": {
+    "classification": "LOCALIZED",
+    "key": "ui.desiredDependenciesExactVersionsRecommendedSemverRangesSupported",
+    "zh": "期望依赖 · 推荐精确版本，也支持 语义版本范围",
+    "en": "Desired dependencies · exact versions recommended; semver ranges supported"
+  },
+  "Desired Requirement": {
+    "classification": "LOCALIZED",
+    "key": "ui.desiredRequirement",
+    "zh": "期望依赖要求",
+    "en": "Desired Requirement"
+  },
+  "Desired Revision": {
+    "classification": "LOCALIZED",
+    "key": "ui.desiredRevision",
+    "zh": "期望修订",
+    "en": "Desired Revision"
+  },
+  "Destination path": {
+    "classification": "LOCALIZED",
+    "key": "ui.destinationPath",
+    "zh": "目标路径",
+    "en": "Destination path"
+  },
+  "Diagnostic": {
+    "classification": "LOCALIZED",
+    "key": "ui.diagnostic",
+    "zh": "诊断",
+    "en": "Diagnostic"
+  },
+  "Diagnostics": {
+    "classification": "LOCALIZED",
+    "key": "ui.diagnostics",
+    "zh": "诊断信息",
+    "en": "Diagnostics"
+  },
+  "Diff": {
+    "classification": "LOCALIZED",
+    "key": "ui.diff",
+    "zh": "差异",
+    "en": "Diff"
+  },
+  "Diff truncated (256 KiB / 4000 lines)": {
+    "classification": "LOCALIZED",
+    "key": "ui.diffTruncated256KiB4000Lines",
+    "zh": "差异已截断（最多 256 KiB / 4000 行）",
+    "en": "Diff truncated (256 KiB / 4000 lines)"
+  },
+  "Direct / Resolved": {
+    "classification": "LOCALIZED",
+    "key": "ui.directResolved",
+    "zh": "直接 / 已解析",
+    "en": "Direct / Resolved"
+  },
+  "Direct / Transitive": {
+    "classification": "LOCALIZED",
+    "key": "ui.directTransitive",
+    "zh": "直接 / 间接",
+    "en": "Direct / Transitive"
+  },
+  "Direct Package": {
+    "classification": "LOCALIZED",
+    "key": "ui.directPackage",
+    "zh": "直接依赖包",
+    "en": "Direct Package"
+  },
+  "Dirty": {
+    "classification": "LOCALIZED",
+    "key": "ui.dirty",
+    "zh": "未提交更改",
+    "en": "Dirty"
+  },
+  "Disabled": {
+    "classification": "LOCALIZED",
+    "key": "ui.disabled",
+    "zh": "已禁用",
+    "en": "Disabled"
+  },
+  "Disabled — 不参与覆盖": {
+    "classification": "LOCALIZED",
+    "key": "ui.disabledExcludedFromOverrides",
+    "zh": "禁用 — 不参与覆盖",
+    "en": "Disabled — excluded from overrides"
+  },
+  "Discovery applied": {
+    "classification": "LOCALIZED",
+    "key": "ui.discoveryApplied",
+    "zh": "已应用任务发现",
+    "en": "Discovery applied"
+  },
+  "Discovery changes available": {
+    "classification": "LOCALIZED",
+    "key": "ui.discoveryChangesAvailable",
+    "zh": "有新的任务发现变更",
+    "en": "Discovery changes available"
+  },
+  "Discovery enabled": {
+    "classification": "LOCALIZED",
+    "key": "ui.discoveryEnabled",
+    "zh": "启用任务发现",
+    "en": "Discovery enabled"
+  },
+  "Discovery policy": {
+    "classification": "LOCALIZED",
+    "key": "ui.discoveryPolicy",
+    "zh": "任务发现策略",
+    "en": "Discovery policy"
+  },
+  "Discovery policy saved": {
+    "classification": "LOCALIZED",
+    "key": "ui.discoveryPolicySaved",
+    "zh": "任务发现策略已保存",
+    "en": "Discovery policy saved"
+  },
+  "Disk Usage": {
+    "classification": "LOCALIZED",
+    "key": "ui.diskUsage",
+    "zh": "磁盘占用",
+    "en": "Disk Usage"
+  },
+  "Do not put secrets in arguments. Use Environment or Config Assets. Arguments can appear in process listings; $TOKEN is a literal string.": {
+    "classification": "LOCALIZED",
+    "key": "ui.doNotPutSecretsInArgumentsUseEnvironmentOrConfigAssetsArgumentsCanAppearInProcessListingsTOKENIsALit",
+    "zh": "请使用环境变量或配置资产传递密钥，不要放入参数。参数可能出现在进程列表中；$TOKEN 会按字面字符串传入。",
+    "en": "Do not put secrets in arguments. Use Environment or Config Assets. Arguments can appear in process listings; $TOKEN is a literal string."
+  },
+  "Duration ms": {
+    "classification": "LOCALIZED",
+    "key": "ui.durationMs",
+    "zh": "耗时（毫秒）",
+    "en": "Duration ms"
+  },
+  "ENV": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "Edit": {
+    "classification": "LOCALIZED",
+    "key": "ui.edit",
+    "zh": "编辑",
+    "en": "Edit"
+  },
+  "Effective Config — 当前解析结果；执行开始时冻结 Revision": {
+    "classification": "LOCALIZED",
+    "key": "ui.effectiveConfigurationRevisionsArePinnedWhenExecutionStarts",
+    "zh": "有效配置 — 当前解析结果；执行开始时冻结 修订",
+    "en": "Effective configuration — revisions are pinned when execution starts"
+  },
+  "Enabled": {
+    "classification": "LOCALIZED",
+    "key": "ui.enabled",
+    "zh": "已启用",
+    "en": "Enabled"
+  },
+  "English": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "Entrypoint": {
+    "classification": "LOCALIZED",
+    "key": "ui.entrypoint",
+    "zh": "脚本入口",
+    "en": "Entrypoint"
+  },
+  "Environment": {
+    "classification": "LOCALIZED",
+    "key": "ui.environment",
+    "zh": "环境",
+    "en": "Environment"
+  },
+  "Environment ID": {
+    "classification": "LOCALIZED",
+    "key": "ui.environmentID",
+    "zh": "环境 ID",
+    "en": "Environment ID"
+  },
+  "Environment Name": {
+    "classification": "LOCALIZED",
+    "key": "ui.environmentName",
+    "zh": "环境名称",
+    "en": "Environment Name"
+  },
+  "Environment Profiles": {
+    "classification": "LOCALIZED",
+    "key": "ui.environmentProfiles",
+    "zh": "环境配置方案",
+    "en": "Environment Profiles"
+  },
+  "Environment 是逻辑绑定；每次运行固定当时的 Current Build。TypeScript 需要该 Build 安装 tsx 4.x。": {
+    "classification": "LOCALIZED",
+    "key": "ui.eachRunPinsTheEnvironmentSCurrentBuildTypeScriptRequiresTsx4XInThatBuild",
+    "zh": "环境 是逻辑绑定；每次运行固定当时的 当前构建。TypeScript 需要该 构建 安装 tsx 4.x。",
+    "en": "Each run pins the environment's current build. TypeScript requires tsx 4.x in that build."
+  },
+  "Environments": {
+    "classification": "LOCALIZED",
+    "key": "ui.environments",
+    "zh": "环境",
+    "en": "Environments"
+  },
+  "Error": {
+    "classification": "LOCALIZED",
+    "key": "ui.error",
+    "zh": "错误",
+    "en": "Error"
+  },
+  "Event": {
+    "classification": "LOCALIZED",
+    "key": "ui.event",
+    "zh": "事件",
+    "en": "Event"
+  },
+  "Exact Node Version": {
+    "classification": "LOCALIZED",
+    "key": "ui.exactNodeVersion",
+    "zh": "精确 Node 版本",
+    "en": "Exact Node Version"
+  },
+  "Exact Python Version": {
+    "classification": "LOCALIZED",
+    "key": "ui.exactPythonVersion",
+    "zh": "精确 Python 版本",
+    "en": "Exact Python Version"
+  },
+  "Exact Version": {
+    "classification": "LOCALIZED",
+    "key": "ui.exactVersion",
+    "zh": "精确版本",
+    "en": "Exact Version"
+  },
+  "Exact pnpm Version (10.9+)": {
+    "classification": "LOCALIZED",
+    "key": "ui.exactPnpmVersion109",
+    "zh": "精确 pnpm 版本（10.9 及以上）",
+    "en": "Exact pnpm Version (10.9+)"
+  },
+  "Exclude globs (one per line)": {
+    "classification": "LOCALIZED",
+    "key": "ui.excludeGlobsOnePerLine",
+    "zh": "排除规则（每行一个）",
+    "en": "Exclude globs (one per line)"
+  },
+  "Execution Settings": {
+    "classification": "LOCALIZED",
+    "key": "ui.executionSettings",
+    "zh": "执行设置",
+    "en": "Execution Settings"
+  },
+  "Explicit channels": {
+    "classification": "LOCALIZED",
+    "key": "ui.explicitChannels",
+    "zh": "指定渠道",
+    "en": "Explicit channels"
+  },
+  "Failure Policy": {
+    "classification": "LOCALIZED",
+    "key": "ui.failurePolicy",
+    "zh": "失败处理策略",
+    "en": "Failure Policy"
+  },
+  "Failure threshold": {
+    "classification": "LOCALIZED",
+    "key": "ui.failureThreshold",
+    "zh": "失败阈值",
+    "en": "Failure threshold"
+  },
+  "Fetch": {
+    "classification": "LOCALIZED",
+    "key": "ui.fetch",
+    "zh": "获取远端引用",
+    "en": "Fetch"
+  },
+  "File changed on disk": {
+    "classification": "LOCALIZED",
+    "key": "ui.fileChangedOnDisk",
+    "zh": "磁盘上的文件已更改",
+    "en": "File changed on disk"
+  },
+  "Filename": {
+    "classification": "LOCALIZED",
+    "key": "ui.filename",
+    "zh": "文件名",
+    "en": "Filename"
+  },
+  "Finished": {
+    "classification": "LOCALIZED",
+    "key": "ui.finished",
+    "zh": "完成时间",
+    "en": "Finished"
+  },
+  "First events": {
+    "classification": "LOCALIZED",
+    "key": "ui.firstEvents",
+    "zh": "最早事件",
+    "en": "First events"
+  },
+  "From": {
+    "classification": "LOCALIZED",
+    "key": "ui.from",
+    "zh": "起始",
+    "en": "From"
+  },
+  "Frozen Rebuild": {
+    "classification": "LOCALIZED",
+    "key": "ui.frozenRebuild",
+    "zh": "按锁定版本重建",
+    "en": "Frozen Rebuild"
+  },
+  "General": {
+    "classification": "LOCALIZED",
+    "key": "ui.general",
+    "zh": "基本信息",
+    "en": "General"
+  },
+  "Git": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "Git Changes": {
+    "classification": "LOCALIZED",
+    "key": "ui.gitChanges",
+    "zh": "Git 变更",
+    "en": "Git Changes"
+  },
+  "Git author email": {
+    "classification": "LOCALIZED",
+    "key": "ui.gitAuthorEmail",
+    "zh": "Git 作者邮箱",
+    "en": "Git author email"
+  },
+  "Git author name": {
+    "classification": "LOCALIZED",
+    "key": "ui.gitAuthorName",
+    "zh": "Git 作者名称",
+    "en": "Git author name"
+  },
+  "Git 同步": {
+    "classification": "LOCALIZED",
+    "key": "ui.gitSync",
+    "zh": "Git 同步",
+    "en": "Git sync"
+  },
+  "Github": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "Global": {
+    "classification": "LOCALIZED",
+    "key": "ui.global",
+    "zh": "全局",
+    "en": "Global"
+  },
+  "GoCqHttpBot": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "Gotify": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "HEAD": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "Health": {
+    "classification": "LOCALIZED",
+    "key": "ui.health",
+    "zh": "健康状态",
+    "en": "Health"
+  },
+  "Health describes completed executions; readiness describes whether a task can execute.": {
+    "classification": "LOCALIZED",
+    "key": "ui.healthDescribesCompletedExecutionsReadinessDescribesWhetherATaskCanExecute",
+    "zh": "健康状态反映已完成的执行结果；就绪状态表示任务是否具备执行条件。",
+    "en": "Health describes completed executions; readiness describes whether a task can execute."
+  },
+  "History": {
+    "classification": "LOCALIZED",
+    "key": "ui.history",
+    "zh": "历史记录",
+    "en": "History"
+  },
+  "Hook": {
+    "classification": "LOCALIZED",
+    "key": "ui.hook",
+    "zh": "钩子",
+    "en": "Hook"
+  },
+  "Hook 名称": {
+    "classification": "LOCALIZED",
+    "key": "ui.hookName",
+    "zh": "钩子 名称",
+    "en": "Hook name"
+  },
+  "Hook 已保存": {
+    "classification": "LOCALIZED",
+    "key": "ui.hookSaved",
+    "zh": "钩子 已保存",
+    "en": "Hook saved"
+  },
+  "Hooks": {
+    "classification": "LOCALIZED",
+    "key": "ui.hooks",
+    "zh": "钩子",
+    "en": "Hooks"
+  },
+  "ID": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "IGot": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "IP": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "Ignore": {
+    "classification": "LOCALIZED",
+    "key": "ui.ignore",
+    "zh": "忽略",
+    "en": "Ignore"
+  },
+  "Immutable Revisions": {
+    "classification": "LOCALIZED",
+    "key": "ui.immutableRevisions",
+    "zh": "不可变修订",
+    "en": "Immutable Revisions"
+  },
+  "Include globs (one per line)": {
+    "classification": "LOCALIZED",
+    "key": "ui.includeGlobsOnePerLine",
+    "zh": "包含规则（每行一个）",
+    "en": "Include globs (one per line)"
+  },
+  "Index": {
+    "classification": "LOCALIZED",
+    "key": "ui.index",
+    "zh": "索引",
+    "en": "Index"
+  },
+  "Index Policy": {
+    "classification": "LOCALIZED",
+    "key": "ui.indexPolicy",
+    "zh": "索引策略",
+    "en": "Index Policy"
+  },
+  "Inherit — Subscription / Repository Default": {
+    "classification": "LOCALIZED",
+    "key": "ui.inheritSubscriptionRepositoryDefault",
+    "zh": "继承订阅 / 仓库默认值",
+    "en": "Inherit — Subscription / Repository Default"
+  },
+  "Inherited Repository Bindings": {
+    "classification": "LOCALIZED",
+    "key": "ui.inheritedRepositoryBindings",
+    "zh": "继承的仓库绑定",
+    "en": "Inherited Repository Bindings"
+  },
+  "Initial delay seconds": {
+    "classification": "LOCALIZED",
+    "key": "ui.initialDelaySeconds",
+    "zh": "初始延迟（秒）",
+    "en": "Initial delay seconds"
+  },
+  "Initialize": {
+    "classification": "LOCALIZED",
+    "key": "ui.initialize",
+    "zh": "初始化",
+    "en": "Initialize"
+  },
+  "Install Scripts": {
+    "classification": "LOCALIZED",
+    "key": "ui.installScripts",
+    "zh": "安装脚本策略",
+    "en": "Install Scripts"
+  },
+  "Installed": {
+    "classification": "LOCALIZED",
+    "key": "ui.installed",
+    "zh": "已安装",
+    "en": "Installed"
+  },
+  "Installed At": {
+    "classification": "LOCALIZED",
+    "key": "ui.installedAt",
+    "zh": "安装时间",
+    "en": "Installed At"
+  },
+  "Interval": {
+    "classification": "LOCALIZED",
+    "key": "ui.interval",
+    "zh": "间隔",
+    "en": "Interval"
+  },
+  "Keep Existing — 保留现有值": {
+    "classification": "LOCALIZED",
+    "key": "ui.keepExistingValue",
+    "zh": "保留现有值 — 保留现有值",
+    "en": "Keep existing value"
+  },
+  "LTS": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "LTS only": {
+    "classification": "LOCALIZED",
+    "key": "ui.ltsOnly",
+    "zh": "仅 LTS 版本",
+    "en": "LTS only"
+  },
+  "Language": {
+    "classification": "LOCALIZED",
+    "key": "ui.language",
+    "zh": "语言",
+    "en": "Language"
+  },
+  "Languages": {
+    "classification": "LOCALIZED",
+    "key": "ui.languages",
+    "zh": "语言",
+    "en": "Languages"
+  },
+  "Last Error": {
+    "classification": "LOCALIZED",
+    "key": "ui.lastError",
+    "zh": "最近错误",
+    "en": "Last Error"
+  },
+  "Last Fetch": {
+    "classification": "LOCALIZED",
+    "key": "ui.lastFetch",
+    "zh": "最近获取时间",
+    "en": "Last Fetch"
+  },
+  "Last Updated": {
+    "classification": "LOCALIZED",
+    "key": "ui.lastUpdated",
+    "zh": "最近更新时间",
+    "en": "Last Updated"
+  },
+  "Last run": {
+    "classification": "LOCALIZED",
+    "key": "ui.lastRun",
+    "zh": "最近运行",
+    "en": "Last run"
+  },
+  "Last:": {
+    "classification": "LOCALIZED",
+    "key": "ui.last",
+    "zh": "最近：",
+    "en": "Last:"
+  },
+  "LastPass Authenticator": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "Local Path": {
+    "classification": "LOCALIZED",
+    "key": "ui.localPath",
+    "zh": "本地路径",
+    "en": "Local Path"
+  },
+  "Local Storage": {
+    "classification": "LOCALIZED",
+    "key": "ui.localStorage",
+    "zh": "本地存储",
+    "en": "Local Storage"
+  },
+  "Lock Hash": {
+    "classification": "LOCALIZED",
+    "key": "ui.lockHash",
+    "zh": "锁文件哈希",
+    "en": "Lock Hash"
+  },
+  "Log": {
+    "classification": "LOCALIZED",
+    "key": "ui.log",
+    "zh": "日志",
+    "en": "Log"
+  },
+  "Logs": {
+    "classification": "LOCALIZED",
+    "key": "ui.logs",
+    "zh": "日志",
+    "en": "Logs"
+  },
+  "Manager": {
+    "classification": "LOCALIZED",
+    "key": "ui.manager",
+    "zh": "包管理器",
+    "en": "Manager"
+  },
+  "Materialization Mode": {
+    "classification": "LOCALIZED",
+    "key": "ui.materializationMode",
+    "zh": "文件生成模式",
+    "en": "Materialization Mode"
+  },
+  "Maximum attempts": {
+    "classification": "LOCALIZED",
+    "key": "ui.maximumAttempts",
+    "zh": "最大尝试次数",
+    "en": "Maximum attempts"
+  },
+  "Microsoft Authenticator": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "Missed schedules": {
+    "classification": "LOCALIZED",
+    "key": "ui.missedSchedules",
+    "zh": "错过的调度",
+    "en": "Missed schedules"
+  },
+  "Missing Managed Resources / 待重建资源": {
+    "classification": "LOCALIZED",
+    "key": "ui.missingManagedResources",
+    "zh": "待重建的托管资源",
+    "en": "Missing Managed Resources / 待重建资源"
+  },
+  "Mode": {
+    "classification": "LOCALIZED",
+    "key": "ui.mode",
+    "zh": "模式",
+    "en": "Mode"
+  },
+  "More changes": {
+    "classification": "LOCALIZED",
+    "key": "ui.moreChanges",
+    "zh": "更多变更",
+    "en": "More changes"
+  },
+  "More files": {
+    "classification": "LOCALIZED",
+    "key": "ui.moreFiles",
+    "zh": "更多文件",
+    "en": "More files"
+  },
+  "Name": {
+    "classification": "LOCALIZED",
+    "key": "ui.name",
+    "zh": "名称",
+    "en": "Name"
+  },
+  "New directory": {
+    "classification": "LOCALIZED",
+    "key": "ui.newDirectory",
+    "zh": "新建目录",
+    "en": "New directory"
+  },
+  "New file": {
+    "classification": "LOCALIZED",
+    "key": "ui.newFile",
+    "zh": "新建文件",
+    "en": "New file"
+  },
+  "New path": {
+    "classification": "LOCALIZED",
+    "key": "ui.newPath",
+    "zh": "新路径",
+    "en": "New path"
+  },
+  "Newest deliveries": {
+    "classification": "LOCALIZED",
+    "key": "ui.newestDeliveries",
+    "zh": "最新投递记录",
+    "en": "Newest deliveries"
+  },
+  "Next events": {
+    "classification": "LOCALIZED",
+    "key": "ui.nextEvents",
+    "zh": "后续事件",
+    "en": "Next events"
+  },
+  "Next page": {
+    "classification": "LOCALIZED",
+    "key": "ui.nextPage",
+    "zh": "下一页",
+    "en": "Next page"
+  },
+  "Next:": {
+    "classification": "LOCALIZED",
+    "key": "ui.next",
+    "zh": "下次：",
+    "en": "Next:"
+  },
+  "Node": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "Node / Manager": {
+    "classification": "LOCALIZED",
+    "key": "ui.nodeManager",
+    "zh": "Node / 包管理器",
+    "en": "Node / Manager"
+  },
+  "Node Version": {
+    "classification": "LOCALIZED",
+    "key": "ui.nodeVersion",
+    "zh": "Node 版本",
+    "en": "Node Version"
+  },
+  "Node.js": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "Node.js Runtime": {
+    "classification": "LOCALIZED",
+    "key": "ui.nodeJsRuntime",
+    "zh": "Node.js 运行时",
+    "en": "Node.js Runtime"
+  },
+  "Notification channel": {
+    "classification": "LOCALIZED",
+    "key": "ui.notificationChannel",
+    "zh": "通知渠道",
+    "en": "Notification channel"
+  },
+  "Notification policy saved": {
+    "classification": "LOCALIZED",
+    "key": "ui.notificationPolicySaved",
+    "zh": "通知策略已保存",
+    "en": "Notification policy saved"
+  },
+  "Notifications": {
+    "classification": "LOCALIZED",
+    "key": "ui.notifications",
+    "zh": "通知管理",
+    "en": "Notifications"
+  },
+  "Ntfy": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "Observability": {
+    "classification": "LOCALIZED",
+    "key": "ui.observability",
+    "zh": "运行概览",
+    "en": "Observability"
+  },
+  "Older deliveries": {
+    "classification": "LOCALIZED",
+    "key": "ui.olderDeliveries",
+    "zh": "较早投递记录",
+    "en": "Older deliveries"
+  },
+  "Open": {
+    "classification": "LOCALIZED",
+    "key": "ui.open",
+    "zh": "打开",
+    "en": "Open"
+  },
+  "Open Workspace": {
+    "classification": "LOCALIZED",
+    "key": "ui.openWorkspace",
+    "zh": "打开工作区",
+    "en": "Open Workspace"
+  },
+  "OpeniLink": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "Operation": {
+    "classification": "LOCALIZED",
+    "key": "ui.operation",
+    "zh": "操作",
+    "en": "Operation"
+  },
+  "Operation language": {
+    "classification": "LOCALIZED",
+    "key": "ui.operationLanguage",
+    "zh": "操作语言",
+    "en": "Operation language"
+  },
+  "Operations": {
+    "classification": "LOCALIZED",
+    "key": "ui.operations",
+    "zh": "操作记录",
+    "en": "Operations"
+  },
+  "Order": {
+    "classification": "LOCALIZED",
+    "key": "ui.order",
+    "zh": "顺序",
+    "en": "Order"
+  },
+  "Origin": {
+    "classification": "LOCALIZED",
+    "key": "ui.origin",
+    "zh": "来源",
+    "en": "Origin"
+  },
+  "Overview": {
+    "classification": "LOCALIZED",
+    "key": "ui.overview",
+    "zh": "概览",
+    "en": "Overview"
+  },
+  "POST JSON or an empty body to the endpoint with Authorization: Bearer <secret>. The body does not change task execution.": {
+    "classification": "LOCALIZED",
+    "key": "ui.postJSONOrAnEmptyBodyToTheEndpointWithAuthorizationBearerSecretTheBodyDoesNotChangeTaskExecution",
+    "zh": "使用 Authorization: Bearer <secret> 向端点发送 JSON 或空请求体。请求体不改变任务执行配置。",
+    "en": "POST JSON or an empty body to the endpoint with Authorization: Bearer <secret>. The body does not change task execution."
+  },
+  "Package": {
+    "classification": "LOCALIZED",
+    "key": "ui.package",
+    "zh": "依赖包",
+    "en": "Package"
+  },
+  "Package Manager": {
+    "classification": "LOCALIZED",
+    "key": "ui.packageManager",
+    "zh": "包管理器",
+    "en": "Package Manager"
+  },
+  "Package Manager Toolchain": {
+    "classification": "LOCALIZED",
+    "key": "ui.packageManagerToolchain",
+    "zh": "包管理工具链",
+    "en": "Package Manager Toolchain"
+  },
+  "Package Manager Toolchains": {
+    "classification": "LOCALIZED",
+    "key": "ui.packageManagerToolchains",
+    "zh": "包管理工具链",
+    "en": "Package Manager Toolchains"
+  },
+  "Package name": {
+    "classification": "LOCALIZED",
+    "key": "ui.packageName",
+    "zh": "包名",
+    "en": "Package name"
+  },
+  "Package specifier": {
+    "classification": "LOCALIZED",
+    "key": "ui.packageSpecifier",
+    "zh": "依赖声明",
+    "en": "Package specifier"
+  },
+  "Packages": {
+    "classification": "LOCALIZED",
+    "key": "ui.packages",
+    "zh": "依赖包",
+    "en": "Packages"
+  },
+  "Passphrase（可选）": {
+    "classification": "LOCALIZED",
+    "key": "ui.passphraseOptional",
+    "zh": "口令（可选）",
+    "en": "Passphrase (optional)"
+  },
+  "Path": {
+    "classification": "LOCALIZED",
+    "key": "ui.path",
+    "zh": "路径",
+    "en": "Path"
+  },
+  "Phase": {
+    "classification": "LOCALIZED",
+    "key": "ui.phase",
+    "zh": "阶段",
+    "en": "Phase"
+  },
+  "Platform": {
+    "classification": "LOCALIZED",
+    "key": "ui.platform",
+    "zh": "平台",
+    "en": "Platform"
+  },
+  "Platform / Architecture": {
+    "classification": "LOCALIZED",
+    "key": "ui.platformArchitecture",
+    "zh": "平台 / 架构",
+    "en": "Platform / Architecture"
+  },
+  "Platform configured timezone": {
+    "classification": "LOCALIZED",
+    "key": "ui.platformConfiguredTimezone",
+    "zh": "平台配置的时区",
+    "en": "Platform configured timezone"
+  },
+  "Preset": {
+    "classification": "LOCALIZED",
+    "key": "ui.preset",
+    "zh": "预设",
+    "en": "Preset"
+  },
+  "Preview discovery": {
+    "classification": "LOCALIZED",
+    "key": "ui.previewDiscovery",
+    "zh": "预览任务发现",
+    "en": "Preview discovery"
+  },
+  "Preview reads the saved policy. Apply discovers task sources and their cron metadata; user overrides are preserved.": {
+    "classification": "LOCALIZED",
+    "key": "ui.previewReadsTheSavedPolicyApplyDiscoversTaskSourcesAndTheirCronMetadataUserOverridesArePreserved",
+    "zh": "预览使用已保存的策略。应用后会发现任务来源和 Cron 元数据，并保留用户覆盖配置。",
+    "en": "Preview reads the saved policy. Apply discovers task sources and their cron metadata; user overrides are preserved."
+  },
+  "Previous": {
+    "classification": "LOCALIZED",
+    "key": "ui.previous",
+    "zh": "上一页",
+    "en": "Previous"
+  },
+  "Previous changes": {
+    "classification": "LOCALIZED",
+    "key": "ui.previousChanges",
+    "zh": "之前的变更",
+    "en": "Previous changes"
+  },
+  "Production only（不安装 devDependencies）": {
+    "classification": "LOCALIZED",
+    "key": "ui.productionOnlyExcludeDevDependencies",
+    "zh": "仅生产依赖（不安装 devDependencies）",
+    "en": "Production only (exclude devDependencies)"
+  },
+  "Profile": {
+    "classification": "LOCALIZED",
+    "key": "ui.profile",
+    "zh": "配置方案",
+    "en": "Profile"
+  },
+  "Profile 名称": {
+    "classification": "LOCALIZED",
+    "key": "ui.profileName",
+    "zh": "配置档 名称",
+    "en": "Profile name"
+  },
+  "Profile 绑定已保存": {
+    "classification": "LOCALIZED",
+    "key": "ui.profileBindingSaved",
+    "zh": "配置档 绑定已保存",
+    "en": "Profile binding saved"
+  },
+  "Promote": {
+    "classification": "LOCALIZED",
+    "key": "ui.promote",
+    "zh": "设为当前构建",
+    "en": "Promote"
+  },
+  "Provider": {
+    "classification": "LOCALIZED",
+    "key": "ui.provider",
+    "zh": "提供方",
+    "en": "Provider"
+  },
+  "Provider Revision": {
+    "classification": "LOCALIZED",
+    "key": "ui.providerRevision",
+    "zh": "提供方修订",
+    "en": "Provider Revision"
+  },
+  "Prune": {
+    "classification": "LOCALIZED",
+    "key": "ui.prune",
+    "zh": "清理失效记录",
+    "en": "Prune"
+  },
+  "Push": {
+    "classification": "LOCALIZED",
+    "key": "ui.push",
+    "zh": "推送",
+    "en": "Push"
+  },
+  "Push branch": {
+    "classification": "LOCALIZED",
+    "key": "ui.pushBranch",
+    "zh": "推送分支",
+    "en": "Push branch"
+  },
+  "Push to origin?": {
+    "classification": "LOCALIZED",
+    "key": "ui.pushToOrigin",
+    "zh": "推送到 origin？",
+    "en": "Push to origin?"
+  },
+  "Push →": {
+    "classification": "LOCALIZED",
+    "key": "ui.pushVariant250",
+    "zh": "推送 →",
+    "en": "Push →"
+  },
+  "PushDeer": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "PushMe": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "PushPlus": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "Python": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "Python Environments": {
+    "classification": "LOCALIZED",
+    "key": "ui.pythonEnvironments",
+    "zh": "Python 环境",
+    "en": "Python Environments"
+  },
+  "Python Provider": {
+    "classification": "LOCALIZED",
+    "key": "ui.pythonProvider",
+    "zh": "Python 提供方",
+    "en": "Python Provider"
+  },
+  "Python Runtime": {
+    "classification": "LOCALIZED",
+    "key": "ui.pythonRuntime",
+    "zh": "Python 运行时",
+    "en": "Python Runtime"
+  },
+  "Python Version": {
+    "classification": "LOCALIZED",
+    "key": "ui.pythonVersion",
+    "zh": "Python 版本",
+    "en": "Python Version"
+  },
+  "Python executable": {
+    "classification": "LOCALIZED",
+    "key": "ui.pythonExecutable",
+    "zh": "Python 可执行文件",
+    "en": "Python executable"
+  },
+  "READ": {
+    "classification": "LOCALIZED",
+    "key": "status.credentialCapability.READ",
+    "reason": "Known operation/capability enum; translated only at presentation."
+  },
+  "RESTORE_PENDING — 等待重启恢复": {
+    "classification": "LOCALIZED",
+    "key": "ui.restorePendingRestartToRestore",
+    "zh": "RESTORE_PENDING — 等待重启恢复",
+    "en": "Restore pending — restart to restore"
+  },
+  "Readiness": {
+    "classification": "LOCALIZED",
+    "key": "ui.readiness",
+    "zh": "就绪状态",
+    "en": "Readiness"
+  },
+  "Recent trigger events": {
+    "classification": "LOCALIZED",
+    "key": "ui.recentTriggerEvents",
+    "zh": "最近触发事件",
+    "en": "Recent trigger events"
+  },
+  "Redacted run log · live following · display keeps the latest 2 MiB": {
+    "classification": "LOCALIZED",
+    "key": "ui.redactedRunLogLiveFollowingDisplayKeepsTheLatest2MiB",
+    "zh": "已脱敏运行日志 · 实时跟随 · 显示最近 2 MiB",
+    "en": "Redacted run log · live following · display keeps the latest 2 MiB"
+  },
+  "Ref": {
+    "classification": "LOCALIZED",
+    "key": "ui.ref",
+    "zh": "引用",
+    "en": "Ref"
+  },
+  "Ref Type": {
+    "classification": "LOCALIZED",
+    "key": "ui.refType",
+    "zh": "引用类型",
+    "en": "Ref Type"
+  },
+  "References": {
+    "classification": "LOCALIZED",
+    "key": "ui.references",
+    "zh": "引用",
+    "en": "References"
+  },
+  "Refresh": {
+    "classification": "LOCALIZED",
+    "key": "ui.refresh",
+    "zh": "刷新",
+    "en": "Refresh"
+  },
+  "Refresh deliveries": {
+    "classification": "LOCALIZED",
+    "key": "ui.refreshDeliveries",
+    "zh": "刷新投递记录",
+    "en": "Refresh deliveries"
+  },
+  "Refresh references": {
+    "classification": "LOCALIZED",
+    "key": "ui.refreshReferences",
+    "zh": "刷新引用",
+    "en": "Refresh references"
+  },
+  "Refresh runs": {
+    "classification": "LOCALIZED",
+    "key": "ui.refreshRuns",
+    "zh": "刷新运行记录",
+    "en": "Refresh runs"
+  },
+  "Refresh triggers": {
+    "classification": "LOCALIZED",
+    "key": "ui.refreshTriggers",
+    "zh": "刷新触发器",
+    "en": "Refresh triggers"
+  },
+  "Refs / Branches": {
+    "classification": "LOCALIZED",
+    "key": "ui.refsBranches",
+    "zh": "引用 / 分支",
+    "en": "Refs / Branches"
+  },
+  "Relation": {
+    "classification": "LOCALIZED",
+    "key": "ui.relation",
+    "zh": "关系",
+    "en": "Relation"
+  },
+  "Relative path globs (one per line)": {
+    "classification": "LOCALIZED",
+    "key": "ui.relativePathGlobsOnePerLine",
+    "zh": "相对路径匹配规则（每行一个）",
+    "en": "Relative path globs (one per line)"
+  },
+  "Relative working directory": {
+    "classification": "LOCALIZED",
+    "key": "ui.relativeWorkingDirectory",
+    "zh": "相对工作目录",
+    "en": "Relative working directory"
+  },
+  "Reload": {
+    "classification": "LOCALIZED",
+    "key": "ui.reload",
+    "zh": "重新加载",
+    "en": "Reload"
+  },
+  "Remote": {
+    "classification": "LOCALIZED",
+    "key": "ui.remote",
+    "zh": "远端",
+    "en": "Remote"
+  },
+  "Remote URL": {
+    "classification": "LOCALIZED",
+    "key": "ui.remoteURL",
+    "zh": "远端 URL",
+    "en": "Remote URL"
+  },
+  "Remote branch": {
+    "classification": "LOCALIZED",
+    "key": "ui.remoteBranch",
+    "zh": "远端分支",
+    "en": "Remote branch"
+  },
+  "Remove": {
+    "classification": "LOCALIZED",
+    "key": "ui.remove",
+    "zh": "移除",
+    "en": "Remove"
+  },
+  "Remove Record": {
+    "classification": "LOCALIZED",
+    "key": "ui.extra.removeRecord",
+    "zh": "移除记录",
+    "en": "Remove record"
+  },
+  "Rename": {
+    "classification": "LOCALIZED",
+    "key": "ui.rename",
+    "zh": "重命名",
+    "en": "Rename"
+  },
+  "Repair": {
+    "classification": "LOCALIZED",
+    "key": "ui.repair",
+    "zh": "修复",
+    "en": "Repair"
+  },
+  "Repair Metadata": {
+    "classification": "LOCALIZED",
+    "key": "ui.repairMetadata",
+    "zh": "修复元数据",
+    "en": "Repair Metadata"
+  },
+  "Repeat every failures (0 = once per incident)": {
+    "classification": "LOCALIZED",
+    "key": "ui.repeatEveryFailures0OncePerIncident",
+    "zh": "每隔多少次失败再次通知（0 表示每次故障仅通知一次）",
+    "en": "Repeat every failures (0 = once per incident)"
+  },
+  "Replace — 替换值": {
+    "classification": "LOCALIZED",
+    "key": "ui.replaceValue",
+    "zh": "替换 — 替换值",
+    "en": "Replace value"
+  },
+  "Repositories / 仓库": {
+    "classification": "LOCALIZED",
+    "key": "ui.repositories",
+    "zh": "仓库",
+    "en": "Repositories / 仓库"
+  },
+  "Repository": {
+    "classification": "LOCALIZED",
+    "key": "ui.repository",
+    "zh": "仓库",
+    "en": "Repository"
+  },
+  "Repository Bindings": {
+    "classification": "LOCALIZED",
+    "key": "ui.repositoryBindings",
+    "zh": "仓库绑定",
+    "en": "Repository Bindings"
+  },
+  "Repository Profile": {
+    "classification": "LOCALIZED",
+    "key": "ui.repositoryProfile",
+    "zh": "仓库配置方案",
+    "en": "Repository Profile"
+  },
+  "Resolve New Build": {
+    "classification": "LOCALIZED",
+    "key": "ui.resolveNewBuild",
+    "zh": "解析并创建新构建",
+    "en": "Resolve New Build"
+  },
+  "Resolved Package": {
+    "classification": "LOCALIZED",
+    "key": "ui.resolvedPackage",
+    "zh": "已解析依赖包",
+    "en": "Resolved Package"
+  },
+  "Resolved Packages · Current Build": {
+    "classification": "LOCALIZED",
+    "key": "ui.resolvedPackagesCurrentBuild",
+    "zh": "已解析依赖包 · 当前构建",
+    "en": "Resolved Packages · Current Build"
+  },
+  "Resolved Requirements": {
+    "classification": "LOCALIZED",
+    "key": "ui.resolvedRequirements",
+    "zh": "已解析依赖要求",
+    "en": "Resolved Requirements"
+  },
+  "Resource Preview": {
+    "classification": "LOCALIZED",
+    "key": "ui.resourcePreview",
+    "zh": "资源预览",
+    "en": "Resource Preview"
+  },
+  "Resource identities and immutable revisions only. Secret values are never included.": {
+    "classification": "LOCALIZED",
+    "key": "ui.resourceIdentitiesAndImmutableRevisionsOnlySecretValuesAreNeverIncluded",
+    "zh": "仅显示资源标识和不可变修订，不包含密钥值。",
+    "en": "Resource identities and immutable revisions only. Secret values are never included."
+  },
+  "Resources": {
+    "classification": "LOCALIZED",
+    "key": "ui.resources",
+    "zh": "资源",
+    "en": "Resources"
+  },
+  "Result": {
+    "classification": "LOCALIZED",
+    "key": "ui.result",
+    "zh": "结果",
+    "en": "Result"
+  },
+  "Retry and concurrency apply to each run. Configure delivery separately in Notifications.": {
+    "classification": "LOCALIZED",
+    "key": "ui.retryAndConcurrencyApplyToEachRunConfigureDeliverySeparatelyInNotifications",
+    "zh": "重试和并发设置适用于每次运行。请在通知中单独配置投递策略。",
+    "en": "Retry and concurrency apply to each run. Configure delivery separately in Notifications."
+  },
+  "Retry notification": {
+    "classification": "LOCALIZED",
+    "key": "ui.retryNotification",
+    "zh": "重试通知",
+    "en": "Retry notification"
+  },
+  "Revision": {
+    "classification": "LOCALIZED",
+    "key": "ui.revision",
+    "zh": "修订",
+    "en": "Revision"
+  },
+  "Rotate secret": {
+    "classification": "LOCALIZED",
+    "key": "ui.rotateSecret",
+    "zh": "轮换密钥",
+    "en": "Rotate secret"
+  },
+  "Run": {
+    "classification": "LOCALIZED",
+    "key": "ui.run",
+    "zh": "运行",
+    "en": "Run"
+  },
+  "Run log": {
+    "classification": "LOCALIZED",
+    "key": "ui.runLog",
+    "zh": "运行日志",
+    "en": "Run log"
+  },
+  "Run on initial sync": {
+    "classification": "LOCALIZED",
+    "key": "ui.runOnInitialSync",
+    "zh": "首次同步时运行",
+    "en": "Run on initial sync"
+  },
+  "Run once after a missed schedule": {
+    "classification": "LOCALIZED",
+    "key": "ui.runOnceAfterAMissedSchedule",
+    "zh": "错过调度后补跑一次",
+    "en": "Run once after a missed schedule"
+  },
+  "Run status filter": {
+    "classification": "LOCALIZED",
+    "key": "ui.runStatusFilter",
+    "zh": "运行状态筛选",
+    "en": "Run status filter"
+  },
+  "Runs": {
+    "classification": "LOCALIZED",
+    "key": "ui.runs",
+    "zh": "运行记录",
+    "en": "Runs"
+  },
+  "Runtime": {
+    "classification": "LOCALIZED",
+    "key": "ui.runtime",
+    "zh": "运行时",
+    "en": "Runtime"
+  },
+  "Runtime Default ·": {
+    "classification": "LOCALIZED",
+    "key": "ui.runtimeDefault",
+    "zh": "默认运行时 ·",
+    "en": "Runtime Default ·"
+  },
+  "Runtime ID": {
+    "classification": "LOCALIZED",
+    "key": "ui.runtimeID",
+    "zh": "运行时 ID",
+    "en": "Runtime ID"
+  },
+  "Runtime Operations": {
+    "classification": "LOCALIZED",
+    "key": "ui.runtimeOperations",
+    "zh": "运行时操作",
+    "en": "Runtime Operations"
+  },
+  "Runtime References": {
+    "classification": "LOCALIZED",
+    "key": "ui.runtimeReferences",
+    "zh": "运行时引用",
+    "en": "Runtime References"
+  },
+  "Runtime default saved": {
+    "classification": "LOCALIZED",
+    "key": "ui.runtimeDefaultSaved",
+    "zh": "默认运行时已保存",
+    "en": "Runtime default saved"
+  },
+  "Runtime operation log": {
+    "classification": "LOCALIZED",
+    "key": "ui.runtimeOperationLog",
+    "zh": "运行时操作日志",
+    "en": "Runtime operation log"
+  },
+  "Runtime 可写:": {
+    "classification": "LOCALIZED",
+    "key": "ui.runtimeWritable",
+    "zh": "运行时 可写:",
+    "en": "Runtime writable:"
+  },
+  "SET — 设置值": {
+    "classification": "LOCALIZED",
+    "key": "ui.setValue",
+    "zh": "SET — 设置值",
+    "en": "Set value"
+  },
+  "SHA-256": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "SSH Private Key": {
+    "classification": "LOCALIZED",
+    "key": "ui.sshPrivateKey",
+    "zh": "SSH 私钥",
+    "en": "SSH Private Key"
+  },
+  "Save": {
+    "classification": "LOCALIZED",
+    "key": "ui.save",
+    "zh": "保存",
+    "en": "Save"
+  },
+  "Save Git identity": {
+    "classification": "LOCALIZED",
+    "key": "ui.saveGitIdentity",
+    "zh": "保存 Git 身份",
+    "en": "Save Git identity"
+  },
+  "Save Task": {
+    "classification": "LOCALIZED",
+    "key": "ui.saveTask",
+    "zh": "保存任务",
+    "en": "Save Task"
+  },
+  "Save Task to preview resources": {
+    "classification": "LOCALIZED",
+    "key": "ui.saveTaskToPreviewResources",
+    "zh": "保存任务后可预览资源",
+    "en": "Save Task to preview resources"
+  },
+  "Save discovery policy": {
+    "classification": "LOCALIZED",
+    "key": "ui.saveDiscoveryPolicy",
+    "zh": "保存任务发现策略",
+    "en": "Save discovery policy"
+  },
+  "Save notification policy": {
+    "classification": "LOCALIZED",
+    "key": "ui.saveNotificationPolicy",
+    "zh": "保存通知策略",
+    "en": "Save notification policy"
+  },
+  "Save this task before adding triggers.": {
+    "classification": "LOCALIZED",
+    "key": "ui.saveThisTaskBeforeAddingTriggers",
+    "zh": "请先保存任务，再添加触发器。",
+    "en": "Save this task before adding triggers."
+  },
+  "Schema": {
+    "classification": "LOCALIZED",
+    "key": "ui.schema",
+    "zh": "数据结构版本",
+    "en": "Schema"
+  },
+  "Search workspace": {
+    "classification": "LOCALIZED",
+    "key": "ui.searchWorkspace",
+    "zh": "搜索工作区",
+    "en": "Search workspace"
+  },
+  "Secret": {
+    "classification": "LOCALIZED",
+    "key": "ui.secret",
+    "zh": "密钥",
+    "en": "Secret"
+  },
+  "Secret Content: Set — Keep Existing": {
+    "classification": "LOCALIZED",
+    "key": "ui.secretContentSetKeepExisting",
+    "zh": "密钥内容：设置 — 保留现有值",
+    "en": "Secret Content: Set — Keep Existing"
+  },
+  "Secret action": {
+    "classification": "LOCALIZED",
+    "key": "ui.secretAction",
+    "zh": "密钥操作",
+    "en": "Secret action"
+  },
+  "Secret configuration JSON": {
+    "classification": "LOCALIZED",
+    "key": "ui.secretConfigurationJSON",
+    "zh": "密钥配置 JSON",
+    "en": "Secret configuration JSON"
+  },
+  "Secret · Set": {
+    "classification": "LOCALIZED",
+    "key": "ui.secretSet",
+    "zh": "密钥 · 已设置",
+    "en": "Secret · Set"
+  },
+  "Secret 更新": {
+    "classification": "LOCALIZED",
+    "key": "ui.secretUpdate",
+    "zh": "机密值 更新",
+    "en": "Secret update"
+  },
+  "Secrets 请通过 Environment 或 Config Assets 传递。BEFORE 可使用 PLATFORM_HOOK_OUTPUT 返回本次执行的 ENV patch。": {
+    "classification": "LOCALIZED",
+    "key": "ui.passSecretsThroughEnvironmentVariablesOrConfigAssetsBEFOREHooksCanUsePLATFORMHOOKOUTPUTToReturnEnvir",
+    "zh": "机密值 请通过 环境 或 配置资产 传递。BEFORE 可使用 PLATFORM_HOOK_OUTPUT 返回本次执行的 ENV 补丁。",
+    "en": "Pass secrets through environment variables or config assets. BEFORE hooks can use PLATFORM_HOOK_OUTPUT to return environment changes for this run."
+  },
+  "Selection:": {
+    "classification": "LOCALIZED",
+    "key": "ui.selection",
+    "zh": "已选择：",
+    "en": "Selection:"
+  },
+  "Size": {
+    "classification": "LOCALIZED",
+    "key": "ui.size",
+    "zh": "大小",
+    "en": "Size"
+  },
+  "Skip missed schedules": {
+    "classification": "LOCALIZED",
+    "key": "ui.skipMissedSchedules",
+    "zh": "跳过错过的调度",
+    "en": "Skip missed schedules"
+  },
+  "Source": {
+    "classification": "LOCALIZED",
+    "key": "ui.source",
+    "zh": "来源",
+    "en": "Source"
+  },
+  "Special": {
+    "classification": "LOCALIZED",
+    "key": "ui.special",
+    "zh": "特殊类型",
+    "en": "Special"
+  },
+  "Specifier": {
+    "classification": "LOCALIZED",
+    "key": "ui.specifier",
+    "zh": "依赖声明",
+    "en": "Specifier"
+  },
+  "Stage": {
+    "classification": "LOCALIZED",
+    "key": "ui.stage",
+    "zh": "阶段",
+    "en": "Stage"
+  },
+  "Staged": {
+    "classification": "LOCALIZED",
+    "key": "ui.staged",
+    "zh": "已暂存",
+    "en": "Staged"
+  },
+  "Staged diff": {
+    "classification": "LOCALIZED",
+    "key": "ui.stagedDiff",
+    "zh": "已暂存差异",
+    "en": "Staged diff"
+  },
+  "State": {
+    "classification": "LOCALIZED",
+    "key": "ui.state",
+    "zh": "状态",
+    "en": "State"
+  },
+  "State / Health": {
+    "classification": "LOCALIZED",
+    "key": "ui.stateHealth",
+    "zh": "状态 / 健康状态",
+    "en": "State / Health"
+  },
+  "Status": {
+    "classification": "LOCALIZED",
+    "key": "ui.status",
+    "zh": "状态",
+    "en": "Status"
+  },
+  "Stop": {
+    "classification": "LOCALIZED",
+    "key": "ui.stop",
+    "zh": "停止",
+    "en": "Stop"
+  },
+  "Storage State": {
+    "classification": "LOCALIZED",
+    "key": "ui.storageState",
+    "zh": "存储状态",
+    "en": "Storage State"
+  },
+  "Subscription": {
+    "classification": "LOCALIZED",
+    "key": "ui.subscription",
+    "zh": "订阅",
+    "en": "Subscription"
+  },
+  "Sync": {
+    "classification": "LOCALIZED",
+    "key": "ui.sync",
+    "zh": "同步",
+    "en": "Sync"
+  },
+  "Sync / Discovery": {
+    "classification": "LOCALIZED",
+    "key": "ui.syncDiscovery",
+    "zh": "同步 / 任务发现",
+    "en": "Sync / Discovery"
+  },
+  "Tag": {
+    "classification": "LOCALIZED",
+    "key": "ui.tag",
+    "zh": "标签",
+    "en": "Tag"
+  },
+  "Target": {
+    "classification": "LOCALIZED",
+    "key": "ui.target",
+    "zh": "目标",
+    "en": "Target"
+  },
+  "Target Base": {
+    "classification": "LOCALIZED",
+    "key": "ui.targetBase",
+    "zh": "目标基准目录",
+    "en": "Target Base"
+  },
+  "Target Path": {
+    "classification": "LOCALIZED",
+    "key": "ui.targetPath",
+    "zh": "目标路径",
+    "en": "Target Path"
+  },
+  "Task": {
+    "classification": "LOCALIZED",
+    "key": "ui.task",
+    "zh": "任务",
+    "en": "Task"
+  },
+  "Task Bindings": {
+    "classification": "LOCALIZED",
+    "key": "ui.taskBindings",
+    "zh": "任务绑定",
+    "en": "Task Bindings"
+  },
+  "Task Hook": {
+    "classification": "LOCALIZED",
+    "key": "ui.taskHook",
+    "zh": "任务钩子",
+    "en": "Task Hook"
+  },
+  "Task ID": {
+    "classification": "LOCALIZED",
+    "key": "ui.taskID",
+    "zh": "任务 ID",
+    "en": "Task ID"
+  },
+  "Task filter": {
+    "classification": "LOCALIZED",
+    "key": "ui.taskFilter",
+    "zh": "任务筛选",
+    "en": "Task filter"
+  },
+  "Task readiness": {
+    "classification": "LOCALIZED",
+    "key": "ui.taskReadiness",
+    "zh": "任务就绪状态",
+    "en": "Task readiness"
+  },
+  "Task runs": {
+    "classification": "LOCALIZED",
+    "key": "ui.taskRuns",
+    "zh": "任务运行记录",
+    "en": "Task runs"
+  },
+  "Task saved": {
+    "classification": "LOCALIZED",
+    "key": "ui.taskSaved",
+    "zh": "任务已保存",
+    "en": "Task saved"
+  },
+  "TaskRun 日志单独保留；系统日志由服务日志轮转管理。": {
+    "classification": "LOCALIZED",
+    "key": "ui.runLogsAreRetainedSeparatelyServiceLogRotationManagesSystemLogs",
+    "zh": "执行记录 日志单独保留；系统日志由服务日志轮转管理。",
+    "en": "Run logs are retained separately; service log rotation manages system logs."
+  },
+  "Tasks": {
+    "classification": "LOCALIZED",
+    "key": "ui.tasks",
+    "zh": "任务管理",
+    "en": "Tasks"
+  },
+  "Tasks ·": {
+    "classification": "LOCALIZED",
+    "key": "ui.tasksVariant362",
+    "zh": "任务 ·",
+    "en": "Tasks ·"
+  },
+  "Test": {
+    "classification": "LOCALIZED",
+    "key": "ui.test",
+    "zh": "测试",
+    "en": "Test"
+  },
+  "Test notification queued; see Deliveries.": {
+    "classification": "LOCALIZED",
+    "key": "ui.testNotificationQueuedSeeDeliveries",
+    "zh": "测试通知已入队，请查看投递记录。",
+    "en": "Test notification queued; see Deliveries."
+  },
+  "Timeline": {
+    "classification": "LOCALIZED",
+    "key": "ui.timeline",
+    "zh": "时间线",
+    "en": "Timeline"
+  },
+  "Timeout (s)": {
+    "classification": "LOCALIZED",
+    "key": "ui.timeoutS",
+    "zh": "超时（秒）",
+    "en": "Timeout (s)"
+  },
+  "Timeout (seconds)": {
+    "classification": "LOCALIZED",
+    "key": "ui.timeoutSeconds",
+    "zh": "超时（秒）",
+    "en": "Timeout (seconds)"
+  },
+  "Timeout Seconds": {
+    "classification": "LOCALIZED",
+    "key": "ui.timeoutSecondsVariant368",
+    "zh": "超时秒数",
+    "en": "Timeout Seconds"
+  },
+  "Timeout seconds (empty = platform default)": {
+    "classification": "LOCALIZED",
+    "key": "ui.timeoutSecondsEmptyPlatformDefault",
+    "zh": "超时秒数（留空使用平台默认值）",
+    "en": "Timeout seconds (empty = platform default)"
+  },
+  "Timezone": {
+    "classification": "LOCALIZED",
+    "key": "ui.timezone",
+    "zh": "时区",
+    "en": "Timezone"
+  },
+  "To": {
+    "classification": "LOCALIZED",
+    "key": "ui.to",
+    "zh": "目标",
+    "en": "To"
+  },
+  "Token": {
+    "classification": "LOCALIZED",
+    "key": "ui.token",
+    "zh": "令牌",
+    "en": "Token"
+  },
+  "Trigger": {
+    "classification": "LOCALIZED",
+    "key": "ui.trigger",
+    "zh": "触发器",
+    "en": "Trigger"
+  },
+  "Trigger Event": {
+    "classification": "LOCALIZED",
+    "key": "ui.triggerEvent",
+    "zh": "触发事件",
+    "en": "Trigger Event"
+  },
+  "Trigger filter": {
+    "classification": "LOCALIZED",
+    "key": "ui.triggerFilter",
+    "zh": "触发器筛选",
+    "en": "Trigger filter"
+  },
+  "Trigger type": {
+    "classification": "LOCALIZED",
+    "key": "ui.triggerType",
+    "zh": "触发器类型",
+    "en": "Trigger type"
+  },
+  "Triggers": {
+    "classification": "LOCALIZED",
+    "key": "ui.triggers",
+    "zh": "触发器",
+    "en": "Triggers"
+  },
+  "Triggers submit runs using this task’s saved resources and execution settings.": {
+    "classification": "LOCALIZED",
+    "key": "ui.triggersSubmitRunsUsingThisTaskSSavedResourcesAndExecutionSettings",
+    "zh": "触发器使用任务已保存的资源和执行设置提交运行。",
+    "en": "Triggers submit runs using this task’s saved resources and execution settings."
+  },
+  "Type": {
+    "classification": "LOCALIZED",
+    "key": "ui.type",
+    "zh": "类型",
+    "en": "Type"
+  },
+  "UNSET": {
+    "classification": "LOCALIZED",
+    "key": "status.envOperation.UNSET",
+    "reason": "Known operation/capability enum; translated only at presentation."
+  },
+  "UNSET — 从环境删除": {
+    "classification": "LOCALIZED",
+    "key": "ui.removeFromEnvironment",
+    "zh": "UNSET — 从环境删除",
+    "en": "Remove from environment"
+  },
+  "Unset / inherit": {
+    "classification": "LOCALIZED",
+    "key": "ui.unsetInherit",
+    "zh": "未设置 / 继承",
+    "en": "Unset / inherit"
+  },
+  "Unstage": {
+    "classification": "LOCALIZED",
+    "key": "ui.unstage",
+    "zh": "取消暂存",
+    "en": "Unstage"
+  },
+  "Update": {
+    "classification": "LOCALIZED",
+    "key": "ui.update",
+    "zh": "更新",
+    "en": "Update"
+  },
+  "Updated": {
+    "classification": "LOCALIZED",
+    "key": "ui.updated",
+    "zh": "已更新",
+    "en": "Updated"
+  },
+  "Updated At": {
+    "classification": "LOCALIZED",
+    "key": "ui.updatedAt",
+    "zh": "更新时间",
+    "en": "Updated At"
+  },
+  "Usage Count": {
+    "classification": "LOCALIZED",
+    "key": "ui.usageCount",
+    "zh": "引用次数",
+    "en": "Usage Count"
+  },
+  "Used by": {
+    "classification": "LOCALIZED",
+    "key": "ui.usedBy",
+    "zh": "引用方",
+    "en": "Used by"
+  },
+  "Validate": {
+    "classification": "LOCALIZED",
+    "key": "ui.validate",
+    "zh": "验证",
+    "en": "Validate"
+  },
+  "Validate Task": {
+    "classification": "LOCALIZED",
+    "key": "ui.validateTask",
+    "zh": "验证任务",
+    "en": "Validate Task"
+  },
+  "Variables": {
+    "classification": "LOCALIZED",
+    "key": "ui.variables",
+    "zh": "变量",
+    "en": "Variables"
+  },
+  "Verified At": {
+    "classification": "LOCALIZED",
+    "key": "ui.verifiedAt",
+    "zh": "验证时间",
+    "en": "Verified At"
+  },
+  "Version": {
+    "classification": "LOCALIZED",
+    "key": "ui.version",
+    "zh": "版本",
+    "en": "Version"
+  },
+  "Versions": {
+    "classification": "LOCALIZED",
+    "key": "ui.versions",
+    "zh": "版本",
+    "en": "Versions"
+  },
+  "View Trigger Event": {
+    "classification": "LOCALIZED",
+    "key": "ui.viewTriggerEvent",
+    "zh": "查看触发事件",
+    "en": "View Trigger Event"
+  },
+  "WEBHOOK: {\"url\":\"https://…\",\"authorization\":\"Bearer …\"}. Other providers use their existing named fields. All connection fields are protected and never returned. Webhooks can access your platform network.": {
+    "classification": "LOCALIZED",
+    "key": "ui.webhookUrlHttpsAuthorizationBearerOtherProvidersUseTheirExistingNamedFieldsAllConnectionFieldsArePro",
+    "zh": "WEBHOOK 配置示例：'{'\"url\":\"https://…\",\"authorization\":\"Bearer …\"'}'。其他提供方使用各自的字段。所有连接字段均受保护且不会返回；Webhook 可以访问平台所在网络。",
+    "en": "WEBHOOK: {\"url\":\"https://…\",\"authorization\":\"Bearer …\"}. Other providers use their existing named fields. All connection fields are protected and never returned. Webhooks can access your platform network."
+  },
+  "WPUSH": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "WRITE": {
+    "classification": "LOCALIZED",
+    "key": "status.credentialCapability.WRITE",
+    "reason": "Known operation/capability enum; translated only at presentation."
+  },
+  "Working Directory": {
+    "classification": "LOCALIZED",
+    "key": "ui.workingDirectory",
+    "zh": "工作目录",
+    "en": "Working Directory"
+  },
+  "Working directory": {
+    "classification": "LOCALIZED",
+    "key": "ui.workingDirectoryVariant397",
+    "zh": "工作目录",
+    "en": "Working directory"
+  },
+  "Workspace search": {
+    "classification": "LOCALIZED",
+    "key": "ui.workspaceSearch",
+    "zh": "工作区搜索",
+    "en": "Workspace search"
+  },
+  "Workspace subscription": {
+    "classification": "LOCALIZED",
+    "key": "ui.workspaceSubscription",
+    "zh": "工作区订阅",
+    "en": "Workspace subscription"
+  },
+  "Worktree": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "Worktree #": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "Worktrees": {
+    "classification": "LOCALIZED",
+    "key": "ui.worktrees",
+    "zh": "工作树 列表",
+    "en": "Worktrees"
+  },
+  "Writable": {
+    "classification": "LOCALIZED",
+    "key": "ui.writable",
+    "zh": "可写",
+    "en": "Writable"
+  },
+  "Writable — 仅本次执行副本": {
+    "classification": "LOCALIZED",
+    "key": "ui.writableExecutionCopyOnly",
+    "zh": "可写 — 仅本次执行副本",
+    "en": "Writable — execution copy only"
+  },
+  "WxPusher(极简推送SPT-推荐)": {
+    "classification": "LOCALIZED",
+    "key": "ui.wxpusherSimpleSPTRecommended",
+    "zh": "WxPusher(极简推送SPT-推荐)",
+    "en": "WxPusher (simple SPT, recommended)"
+  },
+  "X-Forwarded-For": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "aibotkKey": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "aibotkName": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "aibotkType": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "barkArchive": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "barkGroup": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "barkIcon": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "barkLevel": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "barkPush": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "barkSound": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "barkUrl": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "bytes": {
+    "classification": "LOCALIZED",
+    "key": "ui.bytesVariant404",
+    "zh": "字节",
+    "en": "bytes"
+  },
+  "changed · Used by": {
+    "classification": "LOCALIZED",
+    "key": "ui.changedUsedBy",
+    "zh": "已更改 · 引用方",
+    "en": "changed · Used by"
+  },
+  "chronocatQQ": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "chronocatToken": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "chronocatURL": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "config.yaml": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "dependency": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "devDependency": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "dingtalkBotSecret": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "dingtalkBotToken": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "emailPass": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "emailService": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "emailTo": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "emailUser": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "files ·": {
+    "classification": "LOCALIZED",
+    "key": "ui.files",
+    "zh": "个文件 ·",
+    "en": "files ·"
+  },
+  "goCqHttpBotQq": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "goCqHttpBotToken": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "goCqHttpBotUrl": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "gotifyPriority": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "gotifyToken": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "gotifyUrl": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "https://host/team/repo.git": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "https://xxx.cn/api?content=$title\n": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "iGotPushKey": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "key1: $title\nkey2: $content": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "larkKey": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "larkSecret": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "logo": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "loopback,172.18.0.0/16,10.20.0.8/32": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "ntfyActions": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "ntfyPassword": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "ntfyPriority": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "ntfyToken": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "ntfyTopic": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "ntfyUrl": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "ntfyUsername": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "openiLinkAppToken": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "openiLinkContextToken": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "openiLinkHubUrl": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "pnpm": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "pushDeerKey": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "pushDeerUrl": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "pushMeKey": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "pushMeUrl": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "pushPlusToken": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "pushPlusUser": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "pushplusCallbackUrl": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "pushplusChannel": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "pushplusTemplate": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "pushplusTo": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "pushplusWebhook": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "pyenv ·": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "requests==2.32.3\nhttpx[http2]>=0.27,<0.29": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "results": {
+    "classification": "LOCALIZED",
+    "key": "ui.results",
+    "zh": "条结果",
+    "en": "results"
+  },
+  "serverChanKey": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "src/**/*.py": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "synologyChatUrl": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "telegramBotApiHost": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "telegramBotProxyAuth": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "telegramBotProxyHost": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "telegramBotProxyPort": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "telegramBotToken": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "telegramBotUserId": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "v": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "wePlusBotReceiver": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "wePlusBotToken": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "wePlusBotVersion": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "weWorkAppKey": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "weWorkBotKey": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "weWorkOrigin": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "webhookBody": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "webhookContentType": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "webhookHeaders": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "webhookMethod": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "webhookUrl": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "wpushApiKey": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "wpushChannel": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "wpushTopicCode": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "wxPusher": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "wxPusherBotAppToken": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "wxPusherBotTopicIds": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "wxPusherBotUids": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "wxPusherSptList": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "· Cache 可写:": {
+    "classification": "LOCALIZED",
+    "key": "ui.cacheWritable",
+    "zh": "· 缓存 可写:",
+    "en": "· Cache writable:"
+  },
+  "· Exit:": {
+    "classification": "LOCALIZED",
+    "key": "ui.exit",
+    "zh": "· 退出码：",
+    "en": "· Exit:"
+  },
+  "· Initial:": {
+    "classification": "LOCALIZED",
+    "key": "ui.initial",
+    "zh": "· 首次：",
+    "en": "· Initial:"
+  },
+  "· Task": {
+    "classification": "LOCALIZED",
+    "key": "ui.taskVariant411",
+    "zh": "· 任务",
+    "en": "· Task"
+  },
+  "· Unstaged": {
+    "classification": "LOCALIZED",
+    "key": "ui.unstaged",
+    "zh": "· 未暂存",
+    "en": "· Unstaged"
+  },
+  "· Untracked": {
+    "classification": "LOCALIZED",
+    "key": "ui.untracked",
+    "zh": "· 未跟踪",
+    "en": "· Untracked"
+  },
+  "· Variables": {
+    "classification": "LOCALIZED",
+    "key": "ui.variablesVariant414",
+    "zh": "· 变量",
+    "en": "· Variables"
+  },
+  "· ahead": {
+    "classification": "LOCALIZED",
+    "key": "ui.ahead",
+    "zh": "· 领先",
+    "en": "· ahead"
+  },
+  "· mode": {
+    "classification": "LOCALIZED",
+    "key": "ui.modeVariant416",
+    "zh": "· 模式",
+    "en": "· mode"
+  },
+  "← 仓库管理": {
+    "classification": "LOCALIZED",
+    "key": "ui.repositoriesVariant417",
+    "zh": "← 仓库管理",
+    "en": "← Repositories"
+  },
+  "下载 Lockfile": {
+    "classification": "LOCALIZED",
+    "key": "ui.downloadLockfile",
+    "zh": "下载 Lockfile",
+    "en": "Download lockfile"
+  },
+  "下载 package.json": {
+    "classification": "LOCALIZED",
+    "key": "ui.downloadPackageJson",
+    "zh": "下载 package.json",
+    "en": "Download package.json"
+  },
+  "下载加密备份": {
+    "classification": "LOCALIZED",
+    "key": "ui.downloadEncryptedBackup",
+    "zh": "下载加密备份",
+    "en": "Download encrypted backup"
+  },
+  "个订阅同步日志（": {
+    "classification": "LOCALIZED",
+    "key": "ui.subscriptionSyncLogs",
+    "zh": "个订阅同步日志（",
+    "en": "subscription sync logs ("
+  },
+  "仅支持分支；留空使用仓库默认分支。": {
+    "classification": "LOCALIZED",
+    "key": "ui.branchesOnlyLeaveBlankToUseTheRepositorySDefaultBranch",
+    "zh": "仅支持分支；留空使用仓库默认分支。",
+    "en": "Branches only. Leave blank to use the repository's default branch."
+  },
+  "仅清理已丢失目录的 Git 工作区记录。存在占用时将停止。": {
+    "classification": "LOCALIZED",
+    "key": "ui.removeGitWorktreeRecordsOnlyWhenTheirDirectoriesAreMissingStopsIfResourcesAreBusy",
+    "zh": "仅清理已丢失目录的 Git 工作区记录。存在占用时将停止。",
+    "en": "Remove Git worktree records only when their directories are missing. Stops if resources are busy."
+  },
+  "从 Commit 创建 Worktree": {
+    "classification": "LOCALIZED",
+    "key": "ui.createWorktreeFromCommit",
+    "zh": "从 提交 创建 工作树",
+    "en": "Create Worktree from commit"
+  },
+  "仓库管理": {
+    "classification": "LOCALIZED",
+    "key": "ui.repositoriesVariant425",
+    "zh": "仓库管理",
+    "en": "Repositories"
+  },
+  "任务直接执行 Worktree 中的文件。每次运行固定所选 Environment Build、环境变量、Config 和 Hooks；Arguments 按独立参数传入。": {
+    "classification": "LOCALIZED",
+    "key": "ui.tasksExecuteFilesInAWorktreeEachRunPinsTheEnvironmentBuildVariablesConfigAndHooksArgumentsArePassedI",
+    "zh": "任务直接执行 工作树 中的文件。每次运行固定所选 环境构建、环境变量、配置 和 钩子；参数 按独立参数传入。",
+    "en": "Tasks execute files in a Worktree. Each run pins the environment build, variables, config and hooks. Arguments are passed individually."
+  },
+  "依赖变更会创建新的 Revision 和 Build；已发布构建保持完整。": {
+    "classification": "LOCALIZED",
+    "key": "ui.dependencyChangesCreateANewRevisionAndBuildPublishedBuildsRemainIntact",
+    "zh": "依赖变更会创建新的 修订 和 构建；已发布构建保持完整。",
+    "en": "Dependency changes create a new revision and build; published builds remain intact."
+  },
+  "保存后可测试访问。": {
+    "classification": "LOCALIZED",
+    "key": "ui.saveBeforeTestingAccess",
+    "zh": "保存后可测试访问。",
+    "en": "Save before testing access."
+  },
+  "保存或构建失败；请检查输入并刷新，已保存的定义可重新构建。": {
+    "classification": "LOCALIZED",
+    "key": "ui.saveOrBuildFailedCheckYourInputAndRefreshSavedDefinitionsCanBeRebuilt",
+    "zh": "保存或构建失败；请检查输入并刷新，已保存的定义可重新构建。",
+    "en": "Save or build failed. Check your input and refresh. Saved definitions can be rebuilt."
+  },
+  "保持现有 Secret": {
+    "classification": "LOCALIZED",
+    "key": "ui.keepExistingSecret",
+    "zh": "保持现有 机密值",
+    "en": "Keep existing secret"
+  },
+  "修复": {
+    "classification": "LOCALIZED",
+    "key": "ui.repair",
+    "zh": "修复",
+    "en": "Repair"
+  },
+  "修复 Provider": {
+    "classification": "LOCALIZED",
+    "key": "ui.repairProvider",
+    "zh": "修复 提供器",
+    "en": "Repair provider"
+  },
+  "修改 Remote 访问地址": {
+    "classification": "LOCALIZED",
+    "key": "ui.changeRemoteURL",
+    "zh": "修改 远端 访问地址",
+    "en": "Change remote URL"
+  },
+  "修改同一仓库的 Remote 访问地址": {
+    "classification": "LOCALIZED",
+    "key": "ui.changeTheRemoteURLForThisRepository",
+    "zh": "修改同一仓库的 远端 访问地址",
+    "en": "Change the remote URL for this repository"
+  },
+  "值": {
+    "classification": "LOCALIZED",
+    "key": "ui.value",
+    "zh": "值",
+    "en": "Value"
+  },
+  "停用": {
+    "classification": "LOCALIZED",
+    "key": "ui.disable",
+    "zh": "停用",
+    "en": "Disable"
+  },
+  "先保存 Task，再配置这些独立提交的资源。": {
+    "classification": "LOCALIZED",
+    "key": "ui.saveTheTaskFirstThenConfigureTheseSeparatelySavedResources",
+    "zh": "先保存 任务，再配置这些独立提交的资源。",
+    "en": "Save the task first, then configure these separately saved resources."
+  },
+  "克隆": {
+    "classification": "LOCALIZED",
+    "key": "ui.clone",
+    "zh": "克隆",
+    "en": "Clone"
+  },
+  "公钥": {
+    "classification": "LOCALIZED",
+    "key": "ui.publicKey",
+    "zh": "公钥",
+    "en": "Public key"
+  },
+  "准备已保存的订阅": {
+    "classification": "LOCALIZED",
+    "key": "ui.prepareSavedSubscription",
+    "zh": "准备已保存的订阅",
+    "en": "Prepare saved subscription"
+  },
+  "创建 Config Asset": {
+    "classification": "LOCALIZED",
+    "key": "ui.createConfigAsset",
+    "zh": "创建 配置资产",
+    "en": "Create config asset"
+  },
+  "创建 Node Environment": {
+    "classification": "LOCALIZED",
+    "key": "ui.createNodeEnvironment",
+    "zh": "创建 Node 环境",
+    "en": "Create Node environment"
+  },
+  "创建 Profile": {
+    "classification": "LOCALIZED",
+    "key": "ui.createProfile",
+    "zh": "创建 配置档",
+    "en": "Create profile"
+  },
+  "创建 Worktree": {
+    "classification": "LOCALIZED",
+    "key": "ui.extra.createWorktree",
+    "zh": "创建工作树",
+    "en": "Create worktree"
+  },
+  "创建仓库": {
+    "classification": "LOCALIZED",
+    "key": "ui.createRepository",
+    "zh": "创建仓库",
+    "en": "Create repository"
+  },
+  "创建凭证": {
+    "classification": "LOCALIZED",
+    "key": "ui.createCredential",
+    "zh": "创建凭证",
+    "en": "Create credential"
+  },
+  "创建备份": {
+    "classification": "LOCALIZED",
+    "key": "ui.createBackup",
+    "zh": "创建备份",
+    "en": "Create backup"
+  },
+  "创建时间": {
+    "classification": "LOCALIZED",
+    "key": "ui.created",
+    "zh": "创建时间",
+    "en": "Created"
+  },
+  "创建环境": {
+    "classification": "LOCALIZED",
+    "key": "ui.createEnvironment",
+    "zh": "创建环境",
+    "en": "Create environment"
+  },
+  "创建用途": {
+    "classification": "LOCALIZED",
+    "key": "ui.purpose",
+    "zh": "创建用途",
+    "en": "Purpose"
+  },
+  "删除": {
+    "classification": "LOCALIZED",
+    "key": "ui.delete",
+    "zh": "删除",
+    "en": "Delete"
+  },
+  "删除 Build": {
+    "classification": "LOCALIZED",
+    "key": "ui.deleteBuild",
+    "zh": "删除 构建",
+    "en": "Delete build"
+  },
+  "删除 Profile": {
+    "classification": "LOCALIZED",
+    "key": "ui.deleteProfile",
+    "zh": "删除 配置档",
+    "en": "Delete profile"
+  },
+  "删除受保护：请先解除 Task 和 Runtime Default 引用。": {
+    "classification": "LOCALIZED",
+    "key": "ui.deletionIsProtectedRemoveTaskAndRuntimeDefaultReferencesFirst",
+    "zh": "删除受保护：请先解除 任务 和 运行时默认值 引用。",
+    "en": "Deletion is protected. Remove task and runtime-default references first."
+  },
+  "删除变量": {
+    "classification": "LOCALIZED",
+    "key": "ui.deleteVariable",
+    "zh": "删除变量",
+    "en": "Delete variable"
+  },
+  "删除工作区？有本地改动、提交或占用时将拒绝。": {
+    "classification": "LOCALIZED",
+    "key": "ui.deleteThisWorktreeLocalChangesCommitsOrActiveUseWillPreventDeletion",
+    "zh": "删除工作区？有本地改动、提交或占用时将拒绝。",
+    "en": "Delete this Worktree? Local changes, commits or active use will prevent deletion."
+  },
+  "删除工具链": {
+    "classification": "LOCALIZED",
+    "key": "ui.deleteToolchain",
+    "zh": "删除工具链",
+    "en": "Delete toolchain"
+  },
+  "删除未使用的构建？": {
+    "classification": "LOCALIZED",
+    "key": "ui.deleteThisUnusedBuild",
+    "zh": "删除未使用的构建？",
+    "en": "Delete this unused build?"
+  },
+  "删除未引用 Build？": {
+    "classification": "LOCALIZED",
+    "key": "ui.deleteThisUnreferencedBuild",
+    "zh": "删除未引用 构建？",
+    "en": "Delete this unreferenced build?"
+  },
+  "删除未引用工具链？": {
+    "classification": "LOCALIZED",
+    "key": "ui.deleteThisUnreferencedToolchain",
+    "zh": "删除未引用工具链？",
+    "en": "Delete this unreferenced toolchain?"
+  },
+  "删除未被引用的 Profile？": {
+    "classification": "LOCALIZED",
+    "key": "ui.deleteThisUnreferencedProfile",
+    "zh": "删除未被引用的 配置档？",
+    "en": "Delete this unreferenced profile?"
+  },
+  "删除构建": {
+    "classification": "LOCALIZED",
+    "key": "ui.deleteBuildVariant457",
+    "zh": "删除构建",
+    "en": "Delete build"
+  },
+  "删除此 Hook？": {
+    "classification": "LOCALIZED",
+    "key": "ui.deleteThisHook",
+    "zh": "删除此 钩子？",
+    "en": "Delete this hook?"
+  },
+  "删除此 Node Runtime？": {
+    "classification": "LOCALIZED",
+    "key": "ui.deleteThisNodeRuntime",
+    "zh": "删除此 Node 运行时？",
+    "en": "Delete this Node runtime?"
+  },
+  "删除此本地备份？": {
+    "classification": "LOCALIZED",
+    "key": "ui.deleteThisLocalBackup",
+    "zh": "删除此本地备份？",
+    "en": "Delete this local backup?"
+  },
+  "删除此环境及其未被占用的构建？": {
+    "classification": "LOCALIZED",
+    "key": "ui.deleteThisEnvironmentAndItsUnusedBuilds",
+    "zh": "删除此环境及其未被占用的构建？",
+    "en": "Delete this environment and its unused builds?"
+  },
+  "删除此绑定？": {
+    "classification": "LOCALIZED",
+    "key": "ui.deleteThisBinding",
+    "zh": "删除此绑定？",
+    "en": "Delete this binding?"
+  },
+  "删除此资源？被引用的资源不能删除。": {
+    "classification": "LOCALIZED",
+    "key": "ui.deleteThisResourceReferencedResourcesCannotBeDeleted",
+    "zh": "删除此资源？被引用的资源不能删除。",
+    "en": "Delete this resource? Referenced resources cannot be deleted."
+  },
+  "删除环境": {
+    "classification": "LOCALIZED",
+    "key": "ui.deleteEnvironment",
+    "zh": "删除环境",
+    "en": "Delete environment"
+  },
+  "删除环境及其 Builds？Runtime、Toolchain 和缓存保留。": {
+    "classification": "LOCALIZED",
+    "key": "ui.deleteTheEnvironmentAndItsBuildsTheRuntimeToolchainAndCacheWillBeRetained",
+    "zh": "删除环境及其 构建？运行时、工具链 和缓存保留。",
+    "en": "Delete the environment and its builds? The runtime, toolchain and cache will be retained."
+  },
+  "删除资产？有绑定时不能删除。": {
+    "classification": "LOCALIZED",
+    "key": "ui.deleteThisAssetExistingBindingsPreventDeletion",
+    "zh": "删除资产？有绑定时不能删除。",
+    "en": "Delete this asset? Existing bindings prevent deletion."
+  },
+  "删除这个变量？": {
+    "classification": "LOCALIZED",
+    "key": "ui.deleteThisVariable",
+    "zh": "删除这个变量？",
+    "en": "Delete this variable?"
+  },
+  "刷新": {
+    "classification": "LOCALIZED",
+    "key": "ui.refresh",
+    "zh": "刷新",
+    "en": "Refresh"
+  },
+  "刷新 Node Catalog": {
+    "classification": "LOCALIZED",
+    "key": "ui.refreshNodeCatalog",
+    "zh": "刷新 Node 目录",
+    "en": "Refresh Node catalog"
+  },
+  "刷新版本列表": {
+    "classification": "LOCALIZED",
+    "key": "ui.refreshVersionList",
+    "zh": "刷新版本列表",
+    "en": "Refresh version list"
+  },
+  "加密口令": {
+    "classification": "LOCALIZED",
+    "key": "ui.encryptionPassphrase",
+    "zh": "加密口令",
+    "en": "Encryption passphrase"
+  },
+  "加密导出": {
+    "classification": "LOCALIZED",
+    "key": "ui.exportEncryptedBackup",
+    "zh": "加密导出",
+    "en": "Export encrypted backup"
+  },
+  "单位": {
+    "classification": "LOCALIZED",
+    "key": "ui.unit",
+    "zh": "单位",
+    "en": "Unit"
+  },
+  "发现未登记到数据库的 Git Worktree": {
+    "classification": "LOCALIZED",
+    "key": "ui.unregisteredGitWorktreesFound",
+    "zh": "发现未登记到数据库的 Git 工作树",
+    "en": "Unregistered Git Worktrees found"
+  },
+  "发现未登记目录；需要人工核对，平台未接管。": {
+    "classification": "LOCALIZED",
+    "key": "ui.unregisteredDirectoriesFoundReviewThemManuallyThePlatformHasNotAdoptedThem",
+    "zh": "发现未登记目录；需要人工核对，平台未接管。",
+    "en": "Unregistered directories found. Review them manually; the platform has not adopted them."
+  },
+  "取消": {
+    "classification": "LOCALIZED",
+    "key": "ui.cancel",
+    "zh": "取消",
+    "en": "Cancel"
+  },
+  "取消待恢复请求": {
+    "classification": "LOCALIZED",
+    "key": "ui.cancelPendingRestore",
+    "zh": "取消待恢复请求",
+    "en": "Cancel pending restore"
+  },
+  "取消操作": {
+    "classification": "LOCALIZED",
+    "key": "ui.cancelOperation",
+    "zh": "取消操作",
+    "en": "Cancel operation"
+  },
+  "变量": {
+    "classification": "LOCALIZED",
+    "key": "ui.variables",
+    "zh": "变量",
+    "en": "Variables"
+  },
+  "变量名": {
+    "classification": "LOCALIZED",
+    "key": "ui.variableName",
+    "zh": "变量名",
+    "en": "Variable name"
+  },
+  "只接受归一化后身份相同的安全 URL。更换 Credential 不需要修改 URL 或重新 clone。": {
+    "classification": "LOCALIZED",
+    "key": "ui.onlySafeURLsWithTheSameNormalizedRepositoryIdentityAreAcceptedChangingCredentialsDoesNotRequireChang",
+    "zh": "只接受归一化后身份相同的安全 URL。更换 凭证 不需要修改 URL 或重新 clone。",
+    "en": "Only safe URLs with the same normalized repository identity are accepted. Changing credentials does not require changing the URL or cloning again."
+  },
+  "同时删除关联任务（保留 scripts 和工作区）": {
+    "classification": "LOCALIZED",
+    "key": "ui.alsoDeleteAssociatedTasksRetainScriptsAndWorktrees",
+    "zh": "同时删除关联任务（保留 scripts 和工作区）",
+    "en": "Also delete associated tasks (retain scripts and Worktrees)"
+  },
+  "名称": {
+    "classification": "LOCALIZED",
+    "key": "ui.name",
+    "zh": "名称",
+    "en": "Name"
+  },
+  "启用": {
+    "classification": "LOCALIZED",
+    "key": "ui.enable",
+    "zh": "启用",
+    "en": "Enable"
+  },
+  "备份与恢复": {
+    "classification": "LOCALIZED",
+    "key": "ui.backupAndRestore",
+    "zh": "备份与恢复",
+    "en": "Backup and restore"
+  },
+  "备份包含 Git、本地工作区、配置和运行历史。便携文件使用口令加密；托管运行时和依赖环境需在恢复后显式重建。": {
+    "classification": "LOCALIZED",
+    "key": "ui.backupsIncludeGitLocalWorktreesConfigurationAndRunHistoryPortableBackupsArePassphraseEncryptedManage",
+    "zh": "备份包含 Git、本地工作区、配置和运行历史。便携文件使用口令加密；托管运行时和依赖环境需在恢复后显式重建。",
+    "en": "Backups include Git, local Worktrees, configuration and run history. Portable backups are passphrase-encrypted; managed runtimes and dependency environments must be explicitly rebuilt after restore."
+  },
+  "备份文件": {
+    "classification": "LOCALIZED",
+    "key": "ui.backupFile",
+    "zh": "备份文件",
+    "en": "Backup file"
+  },
+  "备份详情": {
+    "classification": "LOCALIZED",
+    "key": "ui.backupDetails",
+    "zh": "备份详情",
+    "en": "Backup details"
+  },
+  "安装 Node 依赖可能以平台进程的 OS 权限执行第三方生命周期脚本。此功能不是沙箱。": {
+    "classification": "LOCALIZED",
+    "key": "ui.installingNodeDependenciesMayRunThirdPartyLifecycleScriptsWithThePlatformProcessSOSPermissionsThisFe",
+    "zh": "安装 Node 依赖可能以平台进程的 OS 权限执行第三方生命周期脚本。此功能不是沙箱。",
+    "en": "Installing Node dependencies may run third-party lifecycle scripts with the platform process's OS permissions. This feature is not a sandbox."
+  },
+  "安装 Node.js": {
+    "classification": "LOCALIZED",
+    "key": "ui.installNodeJs",
+    "zh": "安装 Node.js",
+    "en": "Install Node.js"
+  },
+  "安装 Package Manager": {
+    "classification": "LOCALIZED",
+    "key": "ui.installPackageManager",
+    "zh": "安装 包管理器",
+    "en": "Install package manager"
+  },
+  "安装 Python": {
+    "classification": "LOCALIZED",
+    "key": "ui.installPython",
+    "zh": "安装 Python",
+    "en": "Install Python"
+  },
+  "完整 Commit SHA": {
+    "classification": "LOCALIZED",
+    "key": "ui.fullCommitSHA",
+    "zh": "完整 提交 SHA",
+    "en": "Full commit SHA"
+  },
+  "导入加密备份": {
+    "classification": "LOCALIZED",
+    "key": "ui.importEncryptedBackup",
+    "zh": "导入加密备份",
+    "en": "Import encrypted backup"
+  },
+  "导入文件已验证": {
+    "classification": "LOCALIZED",
+    "key": "ui.importedFileVerified",
+    "zh": "导入文件已验证",
+    "en": "Imported file verified"
+  },
+  "导出": {
+    "classification": "LOCALIZED",
+    "key": "ui.export",
+    "zh": "导出",
+    "en": "Export"
+  },
+  "导出 Resolved Requirements": {
+    "classification": "LOCALIZED",
+    "key": "ui.exportResolvedRequirements",
+    "zh": "导出 已解析依赖",
+    "en": "Export resolved requirements"
+  },
+  "将删除": {
+    "classification": "LOCALIZED",
+    "key": "ui.willDelete",
+    "zh": "将删除",
+    "en": "Will delete"
+  },
+  "工作区": {
+    "classification": "LOCALIZED",
+    "key": "ui.workspace",
+    "zh": "工作区",
+    "en": "Workspace"
+  },
+  "已保存": {
+    "classification": "LOCALIZED",
+    "key": "ui.saved",
+    "zh": "已保存",
+    "en": "Saved"
+  },
+  "已验证的 known_hosts": {
+    "classification": "LOCALIZED",
+    "key": "ui.verifiedKnownHosts",
+    "zh": "已验证的 known_hosts",
+    "en": "Verified known_hosts"
+  },
+  "引用": {
+    "classification": "LOCALIZED",
+    "key": "ui.references",
+    "zh": "引用",
+    "en": "References"
+  },
+  "当前页面会话的操作结果；后端系统日志保留资源操作记录。": {
+    "classification": "LOCALIZED",
+    "key": "ui.resultsFromThisPageSessionBackendSystemLogsRetainResourceOperationRecords",
+    "zh": "当前页面会话的操作结果；后端系统日志保留资源操作记录。",
+    "en": "Results from this page session. Backend system logs retain resource operation records."
+  },
+  "打开订阅": {
+    "classification": "LOCALIZED",
+    "key": "ui.openSubscription",
+    "zh": "打开订阅",
+    "en": "Open subscription"
+  },
+  "持久 Git 工作区。Fetch 更新远端引用，Update Worktree 才快进本地分支；任务和 Code Workspace 直接使用注册 Worktree。": {
+    "classification": "LOCALIZED",
+    "key": "ui.persistentGitWorktreesFetchUpdatesRemoteReferencesUpdateWorktreeFastForwardsTheLocalBranchTasksAndTh",
+    "zh": "持久 Git 工作区。获取 更新远端引用，更新工作树 才快进本地分支；任务和 代码工作区 直接使用注册 工作树。",
+    "en": "Persistent Git Worktrees. Fetch updates remote references; Update Worktree fast-forwards the local branch. Tasks and the code workspace use registered Worktrees directly."
+  },
+  "按上方保留天数预览；0 表示禁用。每小时检查一次。": {
+    "classification": "LOCALIZED",
+    "key": "ui.previewUsingTheRetentionPeriodAboveZeroDisablesCleanupCheckedHourly",
+    "zh": "按上方保留天数预览；0 表示禁用。每小时检查一次。",
+    "en": "Preview using the retention period above. Zero disables cleanup. Checked hourly."
+  },
+  "操作": {
+    "classification": "LOCALIZED",
+    "key": "ui.action",
+    "zh": "操作",
+    "en": "Action"
+  },
+  "操作失败，请刷新状态后重试。": {
+    "classification": "LOCALIZED",
+    "key": "ui.operationFailedRefreshTheStatusBeforeRetrying",
+    "zh": "操作失败，请刷新状态后重试。",
+    "en": "Operation failed. Refresh the status before retrying."
+  },
+  "操作请求失败，请查看状态后重试。": {
+    "classification": "LOCALIZED",
+    "key": "ui.requestFailedCheckTheStatusBeforeRetrying",
+    "zh": "操作请求失败，请查看状态后重试。",
+    "en": "Request failed. Check the status before retrying."
+  },
+  "支持 HTTPS、SSH 和 Generic Git；URL 中不可包含 Token 或密码。保存后 Remote 固定。": {
+    "classification": "LOCALIZED",
+    "key": "ui.supportsHTTPSSSHAndGenericGitURLsMustNotIncludeTokensOrPasswordsTheRemoteIdentityIsFixedAfterSaving",
+    "zh": "支持 HTTPS、SSH 和 通用 Git；URL 中不可包含 令牌 或密码。保存后 远端 固定。",
+    "en": "Supports HTTPS, SSH and generic Git. URLs must not include tokens or passwords. The remote identity is fixed after saving."
+  },
+  "放弃未保存的更改？": {
+    "classification": "LOCALIZED",
+    "key": "ui.discardUnsavedChanges",
+    "zh": "放弃未保存的更改？",
+    "en": "Discard unsaved changes?"
+  },
+  "放弃此文件未保存的更改？": {
+    "classification": "LOCALIZED",
+    "key": "ui.discardUnsavedChangesToThisFile",
+    "zh": "放弃此文件未保存的更改？",
+    "en": "Discard unsaved changes to this file?"
+  },
+  "文件": {
+    "classification": "LOCALIZED",
+    "key": "ui.file",
+    "zh": "文件",
+    "en": "File"
+  },
+  "文件结构已改变。请在绑定订阅的 Discovery 中显式 Apply；保存文件不会自动运行任务。": {
+    "classification": "LOCALIZED",
+    "key": "ui.theFileStructureHasChangedApplyDiscoveryExplicitlyInTheLinkedSubscriptionSavingFilesDoesNotRunTasksA",
+    "zh": "文件结构已改变。请在绑定订阅的 发现 中显式 应用；保存文件不会自动运行任务。",
+    "en": "The file structure has changed. Apply discovery explicitly in the linked subscription. Saving files does not run tasks automatically."
+  },
+  "新的写入已暂停。请重启后端以离线应用恢复，或取消待恢复请求。": {
+    "classification": "LOCALIZED",
+    "key": "ui.newWritesArePausedRestartTheBackendToApplyTheRestoreOfflineOrCancelThePendingRestore",
+    "zh": "新的写入已暂停。请重启后端以离线应用恢复，或取消待恢复请求。",
+    "en": "New writes are paused. Restart the backend to apply the restore offline, or cancel the pending restore."
+  },
+  "日志": {
+    "classification": "LOCALIZED",
+    "key": "ui.log",
+    "zh": "日志",
+    "en": "Log"
+  },
+  "时间": {
+    "classification": "LOCALIZED",
+    "key": "ui.time",
+    "zh": "时间",
+    "en": "Time"
+  },
+  "显示日志末尾 64 KiB；完整日志由平台保存。": {
+    "classification": "LOCALIZED",
+    "key": "ui.showingTheLast64KiBThePlatformRetainsTheFullLog",
+    "zh": "显示日志末尾 64 KiB；完整日志由平台保存。",
+    "en": "Showing the last 64 KiB. The platform retains the full log."
+  },
+  "暂存恢复": {
+    "classification": "LOCALIZED",
+    "key": "ui.stageRestore",
+    "zh": "暂存恢复",
+    "en": "Stage restore"
+  },
+  "更新 Provider": {
+    "classification": "LOCALIZED",
+    "key": "ui.updateProvider",
+    "zh": "更新 提供器",
+    "en": "Update provider"
+  },
+  "替换 Secret": {
+    "classification": "LOCALIZED",
+    "key": "ui.replaceSecret",
+    "zh": "替换 机密值",
+    "en": "Replace secret"
+  },
+  "最近测试": {
+    "classification": "LOCALIZED",
+    "key": "ui.lastTest",
+    "zh": "最近测试",
+    "en": "Last test"
+  },
+  "有效值": {
+    "classification": "LOCALIZED",
+    "key": "ui.effectiveValue",
+    "zh": "有效值",
+    "en": "Effective value"
+  },
+  "有旧订阅引用时，Remote 地址保持固定，以保护原 clone 路径；凭证可在仓库管理页修改。": {
+    "classification": "LOCALIZED",
+    "key": "ui.remoteURLsRemainFixedWhileReferencedByOlderSubscriptionsProtectingExistingClonePathsCredentialsCanBe",
+    "zh": "有旧订阅引用时，远端 地址保持固定，以保护原 clone 路径；凭证可在仓库管理页修改。",
+    "en": "Remote URLs remain fixed while referenced by older subscriptions, protecting existing clone paths. Credentials can be changed in repository settings."
+  },
+  "来源": {
+    "classification": "LOCALIZED",
+    "key": "ui.source",
+    "zh": "来源",
+    "en": "Source"
+  },
+  "构建 Desired": {
+    "classification": "LOCALIZED",
+    "key": "ui.buildDesiredRevision",
+    "zh": "构建 期望修订",
+    "en": "Build desired revision"
+  },
+  "查看操作日志": {
+    "classification": "LOCALIZED",
+    "key": "ui.viewOperationLog",
+    "zh": "查看操作日志",
+    "en": "View operation log"
+  },
+  "查看环境": {
+    "classification": "LOCALIZED",
+    "key": "ui.viewEnvironment",
+    "zh": "查看环境",
+    "en": "View environment"
+  },
+  "每": {
+    "classification": "LOCALIZED",
+    "key": "ui.every",
+    "zh": "每",
+    "en": "Every"
+  },
+  "比较构建": {
+    "classification": "LOCALIZED",
+    "key": "ui.compareBuilds",
+    "zh": "比较构建",
+    "en": "Compare builds"
+  },
+  "测试已保存的仓库": {
+    "classification": "LOCALIZED",
+    "key": "ui.testSavedRepository",
+    "zh": "测试已保存的仓库",
+    "en": "Test saved repository"
+  },
+  "测试访问": {
+    "classification": "LOCALIZED",
+    "key": "ui.testAccess",
+    "zh": "测试访问",
+    "en": "Test access"
+  },
+  "添加": {
+    "classification": "LOCALIZED",
+    "key": "ui.add",
+    "zh": "添加",
+    "en": "Add"
+  },
+  "添加 Config Binding": {
+    "classification": "LOCALIZED",
+    "key": "ui.addConfigBinding",
+    "zh": "添加 配置绑定",
+    "en": "Add config binding"
+  },
+  "添加依赖": {
+    "classification": "LOCALIZED",
+    "key": "ui.addDependency",
+    "zh": "添加依赖",
+    "en": "Add dependency"
+  },
+  "添加变量": {
+    "classification": "LOCALIZED",
+    "key": "ui.addVariable",
+    "zh": "添加变量",
+    "en": "Add variable"
+  },
+  "状态": {
+    "classification": "LOCALIZED",
+    "key": "ui.status",
+    "zh": "状态",
+    "en": "Status"
+  },
+  "环境变量": {
+    "classification": "LOCALIZED",
+    "key": "ui.environmentVariable",
+    "zh": "环境变量",
+    "en": "Environment variable"
+  },
+  "环境变量已保存": {
+    "classification": "LOCALIZED",
+    "key": "ui.environmentVariablesSaved",
+    "zh": "环境变量已保存",
+    "en": "Environment variables saved"
+  },
+  "用户名": {
+    "classification": "LOCALIZED",
+    "key": "ui.username",
+    "zh": "用户名",
+    "en": "Username"
+  },
+  "留空时手动运行。": {
+    "classification": "LOCALIZED",
+    "key": "ui.leaveBlankForManualRuns",
+    "zh": "留空时手动运行。",
+    "en": "Leave blank for manual runs."
+  },
+  "目录缺失且 Git 注册已清理时可移除记录；本地提交仍受保护。": {
+    "classification": "LOCALIZED",
+    "key": "ui.recordsCanBeRemovedAfterMissingDirectoriesArePrunedFromGitLocalCommitsRemainProtected",
+    "zh": "目录缺失且 Git 注册已清理时可移除记录；本地提交仍受保护。",
+    "en": "Records can be removed after missing directories are pruned from Git. Local commits remain protected."
+  },
+  "确认口令": {
+    "classification": "LOCALIZED",
+    "key": "ui.confirmPassphrase",
+    "zh": "确认口令",
+    "en": "Confirm passphrase"
+  },
+  "禁用": {
+    "classification": "LOCALIZED",
+    "key": "ui.disableVariant535",
+    "zh": "禁用",
+    "en": "Disable"
+  },
+  "移除": {
+    "classification": "LOCALIZED",
+    "key": "ui.remove",
+    "zh": "移除",
+    "en": "Remove"
+  },
+  "简体中文": {
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Provider identifier, protocol token, technical example or language autonym; not translated."
+  },
+  "管理 Environment Profiles": {
+    "classification": "LOCALIZED",
+    "key": "ui.manageEnvironmentProfiles",
+    "zh": "管理 环境配置档",
+    "en": "Manage environment profiles"
+  },
+  "管理仓库与凭据": {
+    "classification": "LOCALIZED",
+    "key": "ui.manageRepositoriesAndCredentials",
+    "zh": "管理仓库与凭据",
+    "en": "Manage repositories and credentials"
+  },
+  "类型": {
+    "classification": "LOCALIZED",
+    "key": "ui.type",
+    "zh": "类型",
+    "en": "Type"
+  },
+  "绑定操作": {
+    "classification": "LOCALIZED",
+    "key": "ui.bindingOperation",
+    "zh": "绑定操作",
+    "en": "Binding operation"
+  },
+  "结果": {
+    "classification": "LOCALIZED",
+    "key": "ui.result",
+    "zh": "结果",
+    "en": "Result"
+  },
+  "编译需要本机工具和开发库；具体缺失项请查看构建日志。平台不会自动安装系统软件包。": {
+    "classification": "LOCALIZED",
+    "key": "ui.compilationRequiresNativeToolsAndDevelopmentLibrariesCheckBuildLogsForMissingRequirementsThePlatform",
+    "zh": "编译需要本机工具和开发库；具体缺失项请查看构建日志。平台不会自动安装系统软件包。",
+    "en": "Compilation requires native tools and development libraries. Check build logs for missing requirements. The platform does not install system packages automatically."
+  },
+  "编辑": {
+    "classification": "LOCALIZED",
+    "key": "ui.edit",
+    "zh": "编辑",
+    "en": "Edit"
+  },
+  "编辑 Profile": {
+    "classification": "LOCALIZED",
+    "key": "ui.editProfile",
+    "zh": "编辑 配置档",
+    "en": "Edit profile"
+  },
+  "编辑依赖": {
+    "classification": "LOCALIZED",
+    "key": "ui.editDependencies",
+    "zh": "编辑依赖",
+    "en": "Edit dependencies"
+  },
+  "编辑依赖并构建": {
+    "classification": "LOCALIZED",
+    "key": "ui.editDependenciesAndBuild",
+    "zh": "编辑依赖并构建",
+    "en": "Edit dependencies and build"
+  },
+  "编辑信息": {
+    "classification": "LOCALIZED",
+    "key": "ui.editDetails",
+    "zh": "编辑信息",
+    "en": "Edit details"
+  },
+  "编辑变量": {
+    "classification": "LOCALIZED",
+    "key": "ui.editVariable",
+    "zh": "编辑变量",
+    "en": "Edit variable"
+  },
+  "编辑环境信息": {
+    "classification": "LOCALIZED",
+    "key": "ui.editEnvironmentDetails",
+    "zh": "编辑环境信息",
+    "en": "Edit environment details"
+  },
+  "编辑环境变量": {
+    "classification": "LOCALIZED",
+    "key": "ui.editEnvironmentVariables",
+    "zh": "编辑环境变量",
+    "en": "Edit environment variables"
+  },
+  "能力": {
+    "classification": "LOCALIZED",
+    "key": "ui.capability",
+    "zh": "能力",
+    "en": "Capability"
+  },
+  "草稿仅保存在页面内存，关闭或浏览器崩溃会丢失。Ctrl/Cmd+F 查找，Ctrl/Cmd+H 替换。user.env 只作为普通文件编辑。": {
+    "classification": "LOCALIZED",
+    "key": "ui.draftsAreStoredOnlyInPageMemoryAndAreLostIfThePageClosesOrTheBrowserCrashesCtrlCmdFToFindCtrlCmdHToR",
+    "zh": "草稿仅保存在页面内存，关闭或浏览器崩溃会丢失。Ctrl/Cmd+F 查找，Ctrl/Cmd+H 替换。user.env 只作为普通文件编辑。",
+    "en": "Drafts are stored only in page memory and are lost if the page closes or the browser crashes. Ctrl/Cmd+F to find, Ctrl/Cmd+H to replace. user.env is edited as an ordinary file."
+  },
+  "订阅同步日志保留天数；0 表示禁用，TaskRun 日志不在清理范围内": {
+    "classification": "LOCALIZED",
+    "key": "ui.subscriptionSyncLogRetentionInDaysZeroDisablesCleanupRunLogsAreExcluded",
+    "zh": "订阅同步日志保留天数；0 表示禁用，执行记录 日志不在清理范围内",
+    "en": "Subscription sync log retention in days. Zero disables cleanup. Run logs are excluded."
+  },
+  "订阅同步日志清理": {
+    "classification": "LOCALIZED",
+    "key": "ui.subscriptionSyncLogCleanup",
+    "zh": "订阅同步日志清理",
+    "en": "Subscription sync log cleanup"
+  },
+  "订阅引用": {
+    "classification": "LOCALIZED",
+    "key": "ui.subscriptionReferences",
+    "zh": "订阅引用",
+    "en": "Subscription references"
+  },
+  "订阅数": {
+    "classification": "LOCALIZED",
+    "key": "ui.subscriptions",
+    "zh": "订阅数",
+    "en": "Subscriptions"
+  },
+  "认证方式": {
+    "classification": "LOCALIZED",
+    "key": "ui.authenticationMethod",
+    "zh": "认证方式",
+    "en": "Authentication method"
+  },
+  "认证类型": {
+    "classification": "LOCALIZED",
+    "key": "ui.authenticationType",
+    "zh": "认证类型",
+    "en": "Authentication type"
+  },
+  "设为 Current": {
+    "classification": "LOCALIZED",
+    "key": "ui.setAsCurrent",
+    "zh": "设为 当前构建",
+    "en": "Set as current"
+  },
+  "设置 Provider": {
+    "classification": "LOCALIZED",
+    "key": "ui.configureProvider",
+    "zh": "设置 提供器",
+    "en": "Configure provider"
+  },
+  "详情": {
+    "classification": "LOCALIZED",
+    "key": "ui.details",
+    "zh": "详情",
+    "en": "Details"
+  },
+  "请求失败，请查看错误与资源状态": {
+    "classification": "LOCALIZED",
+    "key": "ui.requestFailedCheckTheErrorAndResourceStatus",
+    "zh": "请求失败，请查看错误与资源状态",
+    "en": "Request failed. Check the error and resource status."
+  },
+  "请输入使用此凭证访问的仓库 URL。测试只读取远端引用。": {
+    "classification": "LOCALIZED",
+    "key": "ui.enterARepositoryURLToTestWithThisCredentialTheTestOnlyReadsRemoteReferences",
+    "zh": "请输入使用此凭证访问的仓库 URL。测试只读取远端引用。",
+    "en": "Enter a repository URL to test with this credential. The test only reads remote references."
+  },
+  "请选择加密备份文件": {
+    "classification": "LOCALIZED",
+    "key": "ui.selectAnEncryptedBackupFile",
+    "zh": "请选择加密备份文件",
+    "en": "Select an encrypted backup file."
+  },
+  "请通过可信渠道核对主机公钥。SSH 连接强制校验主机身份。": {
+    "classification": "LOCALIZED",
+    "key": "ui.verifyTheHostPublicKeyThroughATrustedChannelSSHConnectionsEnforceHostIdentityVerification",
+    "zh": "请通过可信渠道核对主机公钥。SSH 连接强制校验主机身份。",
+    "en": "Verify the host public key through a trusted channel. SSH connections enforce host identity verification."
+  },
+  "路径由系统生成。每个远端分支默认只有一个 managed Worktree；Commit/Tag 使用 Detached HEAD。": {
+    "classification": "LOCALIZED",
+    "key": "ui.pathsAreGeneratedByTheSystemEachRemoteBranchHasOneManagedWorktreeByDefaultCommitsAndTagsUseDetachedH",
+    "zh": "路径由系统生成。每个远端分支默认只有一个 托管 工作树；提交/标签 使用 分离 HEAD。",
+    "en": "Paths are generated by the system. Each remote branch has one managed Worktree by default. Commits and tags use detached HEAD."
+  },
+  "输入 RESTORE": {
+    "classification": "LOCALIZED",
+    "key": "ui.enterRESTORE",
+    "zh": "输入 RESTORE",
+    "en": "Enter RESTORE"
+  },
+  "选择 Repository": {
+    "classification": "LOCALIZED",
+    "key": "ui.selectRepository",
+    "zh": "选择 Repository",
+    "en": "Select repository"
+  },
+  "选择 Task": {
+    "classification": "LOCALIZED",
+    "key": "ui.selectTask",
+    "zh": "选择 任务",
+    "en": "Select task"
+  },
+  "选择 Worktree": {
+    "classification": "LOCALIZED",
+    "key": "ui.selectWorktree",
+    "zh": "选择 工作树",
+    "en": "Select Worktree"
+  },
+  "选择两个 Build 比较": {
+    "classification": "LOCALIZED",
+    "key": "ui.selectTwoBuildsToCompare",
+    "zh": "选择两个 构建 比较",
+    "en": "Select two builds to compare"
+  },
+  "选择文件开始编辑。": {
+    "classification": "LOCALIZED",
+    "key": "ui.selectAFileToStartEditing",
+    "zh": "选择文件开始编辑。",
+    "en": "Select a file to start editing."
+  },
+  "配置资产独立于 Git；每次内容修改创建不可变 Revision。Secret 内容仅可替换，不会返回浏览器。": {
+    "classification": "LOCALIZED",
+    "key": "ui.configAssetsAreIndependentOfGitEachContentChangeCreatesAnImmutableRevisionSecretContentCanOnlyBeRepl",
+    "zh": "配置资产独立于 Git；每次内容修改创建不可变 修订。机密值 内容仅可替换，不会返回浏览器。",
+    "en": "Config assets are independent of Git. Each content change creates an immutable revision. Secret content can only be replaced and is never returned to the browser."
+  },
+  "重启后将切换数据目录，现有数据保留在隔离目录。": {
+    "classification": "LOCALIZED",
+    "key": "ui.restartingSwitchesTheDataDirectoryExistingDataIsRetainedInAnIsolatedDirectory",
+    "zh": "重启后将切换数据目录，现有数据保留在隔离目录。",
+    "en": "Restarting switches the data directory. Existing data is retained in an isolated directory."
+  },
+  "重建缺失的托管资源": {
+    "classification": "LOCALIZED",
+    "key": "ui.rebuildMissingManagedResources",
+    "zh": "重建缺失的托管资源",
+    "en": "Rebuild missing managed resources"
+  },
+  "重新下载精确版本并隔离旧目录？有引用时拒绝。": {
+    "classification": "LOCALIZED",
+    "key": "ui.downloadTheExactVersionAgainAndIsolateTheOldDirectoryExistingReferencesPreventThisOperation",
+    "zh": "重新下载精确版本并隔离旧目录？有引用时拒绝。",
+    "en": "Download the exact version again and isolate the old directory? Existing references prevent this operation."
+  },
+  "重新构建": {
+    "classification": "LOCALIZED",
+    "key": "ui.rebuild",
+    "zh": "重新构建",
+    "en": "Rebuild"
+  },
+  "重新获取 Provider？已安装 Python 会保留。": {
+    "classification": "LOCALIZED",
+    "key": "ui.fetchTheProviderAgainInstalledPythonVersionsWillBeRetained",
+    "zh": "重新获取 提供器？已安装 Python 会保留。",
+    "en": "Fetch the provider again? Installed Python versions will be retained."
+  },
+  "重试": {
+    "classification": "LOCALIZED",
+    "key": "ui.retry",
+    "zh": "重试",
+    "en": "Retry"
+  },
+  "预览有效 Config": {
+    "classification": "LOCALIZED",
+    "key": "ui.previewEffectiveConfig",
+    "zh": "预览有效 配置",
+    "en": "Preview effective config"
+  },
+  "预览有效环境": {
+    "classification": "LOCALIZED",
+    "key": "ui.previewEffectiveEnvironment",
+    "zh": "预览有效环境",
+    "en": "Preview effective environment"
+  },
+  "预览清理": {
+    "classification": "LOCALIZED",
+    "key": "ui.previewCleanup",
+    "zh": "预览清理",
+    "en": "Preview cleanup"
+  },
+  "验证": {
+    "classification": "LOCALIZED",
+    "key": "ui.verify",
+    "zh": "验证",
+    "en": "Verify"
+  },
+  "验证 / Test": {
+    "classification": "LOCALIZED",
+    "key": "ui.verifyTest",
+    "zh": "验证 / 测试",
+    "en": "Verify / Test"
+  },
+  "验证 Build": {
+    "classification": "LOCALIZED",
+    "key": "ui.verifyBuild",
+    "zh": "验证 构建",
+    "en": "Verify build"
+  },
+  "验证 Provider": {
+    "classification": "LOCALIZED",
+    "key": "ui.verifyProvider",
+    "zh": "验证 提供器",
+    "en": "Verify provider"
+  },
+  "验证导入": {
+    "classification": "LOCALIZED",
+    "key": "ui.verifyImport",
+    "zh": "验证导入",
+    "en": "Verify import"
+  },
+  "验证工具链": {
+    "classification": "LOCALIZED",
+    "key": "ui.verifyToolchain",
+    "zh": "验证工具链",
+    "en": "Verify toolchain"
+  },
+  "验证构建": {
+    "classification": "LOCALIZED",
+    "key": "ui.verifyBuildVariant585",
+    "zh": "验证构建",
+    "en": "Verify build"
+  },
+  "默认使用公开 PyPI；暂不支持私有认证源、URL、VCS 或本地路径。": {
+    "classification": "LOCALIZED",
+    "key": "ui.usesPublicPyPIByDefaultPrivateAuthenticatedIndexesURLsVCSAndLocalPathsAreNotSupported",
+    "zh": "默认使用公开 PyPI；暂不支持私有认证源、URL、VCS 或本地路径。",
+    "en": "Uses public PyPI by default. Private authenticated indexes, URLs, VCS and local paths are not supported."
+  },
+  "默认凭证": {
+    "classification": "LOCALIZED",
+    "key": "ui.defaultCredential",
+    "zh": "默认凭证",
+    "en": "Default credential"
+  },
+  "`Node Environment · ${selected?.name ?? ''}`": {
+    "classification": "LOCALIZED",
+    "key": "ui.template.nodeEnvironmentValue",
+    "zh": "Node 环境 · {p0}",
+    "en": "Node Environment · {p0}"
+  },
+  "`Build #${x.id}`": {
+    "classification": "LOCALIZED",
+    "key": "ui.template.buildValue",
+    "zh": "构建 #{p0}",
+    "en": "Build #{p0}"
+  },
+  "`Build #${r.id} snapshots`": {
+    "classification": "LOCALIZED",
+    "key": "ui.template.buildValueSnapshots",
+    "zh": "构建 #{p0} 的快照",
+    "en": "Build #{p0} snapshots"
+  },
+  "`Environment: ${environment.name}`": {
+    "classification": "LOCALIZED",
+    "key": "ui.template.environmentValue",
+    "zh": "环境：{p0}",
+    "en": "Environment: {p0}"
+  },
+  "`Run ${id ?? ''}`": {
+    "classification": "LOCALIZED",
+    "key": "ui.template.runValue",
+    "zh": "执行记录 {p0}",
+    "en": "Run {p0}"
+  },
+  "`Profile: ${preview.profile?.name || 'none'} · 选择来源: ${preview.metadata.selected_by}`": {
+    "classification": "LOCALIZED",
+    "key": "ui.template.profileValueSelectionSourceValue",
+    "zh": "配置档：{p0} · 选择来源：{p1}",
+    "en": "Profile: {p0} · Selection source: {p1}"
+  },
+  "`Used by Tasks: ${references?.tasks_count ?? '…'}`": {
+    "classification": "LOCALIZED",
+    "key": "ui.template.usedByTasksValue",
+    "zh": "引用任务：{p0}",
+    "en": "Used by tasks: {p0}"
+  },
+  "`Storage: ${data?.storage.run_count ?? 0} runs · ${\n          data?.storage.log_bytes ?? 0\n        } log bytes · ${\n          data?.storage.delivery_count ?? 0\n        } delivery attempts. Automatic history deletion is OFF.`": {
+    "classification": "LOCALIZED",
+    "key": "ui.template.storageValueRunsValueLogBytesValueDeliveryAttemptsAutomaticHistoryDeletionIsOFF",
+    "zh": "存储：{p0} 条执行记录 · {p1} 字节日志 · {p2} 次投递。自动清理历史记录已关闭。",
+    "en": "Storage: {p0} runs · {p1} log bytes · {p2} delivery attempts. Automatic history deletion is OFF."
+  },
+  "`Owner: ${parsed.owner || '—'} / Repository: ${\n                    parsed.repository_name\n                  } / Path: ${parsed.path}`": {
+    "classification": "LOCALIZED",
+    "key": "ui.template.ownerValueRepositoryValuePathValue",
+    "zh": "所有者：{p0} / 仓库：{p1} / 路径：{p2}",
+    "en": "Owner: {p0} / Repository: {p1} / Path: {p2}"
+  },
+  "`测试凭证：${testTarget?.name || ''}`": {
+    "classification": "LOCALIZED",
+    "key": "ui.template.testCredentialValue",
+    "zh": "测试凭证：{p0}",
+    "en": "Test credential: {p0}"
+  },
+  "`${label}完成`": {
+    "classification": "LOCALIZED",
+    "key": "ui.template.valueCompleted",
+    "zh": "{p0}完成",
+    "en": "{p0} completed"
+  },
+  "`仓库占用中：${\n            diagnostics.lock.owner?.operation || 'operation'\n          }`": {
+    "classification": "LOCALIZED",
+    "key": "ui.template.repositoryIsBusyValue",
+    "zh": "仓库占用中：{p0}",
+    "en": "Repository is busy: {p0}"
+  },
+  "`Worktree：${detail?.name || ''}`": {
+    "classification": "LOCALIZED",
+    "key": "ui.template.worktreeValue",
+    "zh": "工作树：{p0}",
+    "en": "Worktree: {p0}"
+  },
+  "`修复 Python ${row.version}？当前目录会保留到隔离区，再重新安装。`": {
+    "classification": "LOCALIZED",
+    "key": "ui.template.repairPythonValueTheCurrentDirectoryWillBeQuarantinedBeforeReinstalling",
+    "zh": "修复 Python {p0}？当前目录会保留到隔离区，再重新安装。",
+    "en": "Repair Python {p0}? The current directory will be quarantined before reinstalling."
+  },
+  "`删除 Python ${row.version}？该安装目录将被删除；有引用时会拒绝。`": {
+    "classification": "LOCALIZED",
+    "key": "ui.template.deletePythonValueItsInstallationDirectoryWillBeRemovedReferencedInstallationsCannotBeDeleted",
+    "zh": "删除 Python {p0}？该安装目录将被删除；有引用时会拒绝。",
+    "en": "Delete Python {p0}? Its installation directory will be removed. Referenced installations cannot be deleted."
+  },
+  "`Host: ${diagnostics?.host_os ?? '—'} / ${\n                      diagnostics?.architecture ?? '—'\n                    } · 可用空间: ${bytes(\n                      diagnostics?.available_disk_bytes ?? undefined,\n                    )}`": {
+    "classification": "LOCALIZED",
+    "key": "ui.template.hostValueValueAvailableSpaceValue",
+    "zh": "主机：{p0} / {p1} · 可用空间：{p2}",
+    "en": "Host: {p0} / {p1} · Available space: {p2}"
+  },
+  "`Runtime Operation #${selected ?? ''}`": {
+    "classification": "LOCALIZED",
+    "key": "ui.template.runtimeOperationValue",
+    "zh": "运行时操作 #{p0}",
+    "en": "Runtime operation #{p0}"
+  },
+  "`${r.name} (${r.profiles_count} Profiles)`": {
+    "classification": "LOCALIZED",
+    "key": "ui.template.valueValueProfiles",
+    "zh": "{p0}（{p1} 个配置档）",
+    "en": "{p0} ({p1} profiles)"
+  },
+  "`${t.name || t.id} (${t.variables_count} Overrides)`": {
+    "classification": "LOCALIZED",
+    "key": "ui.template.valueValueOverrides",
+    "zh": "{p0}（{p1} 项覆盖）",
+    "en": "{p0} ({p1} overrides)"
+  },
+  "`Last reconcile: ${policy.last_reconciled_at}`": {
+    "classification": "LOCALIZED",
+    "key": "ui.template.lastReconcileValue",
+    "zh": "上次协调：{p0}",
+    "en": "Last reconcile: {p0}"
+  },
+  "`确认${\n        record.is_disabled === 1 ? intl.get('启用') : intl.get('禁用')\n      }`": {
+    "classification": "LOCALIZED",
+    "key": "ui.template.confirmValue",
+    "zh": "确认{p0}",
+    "en": "Confirm {p0}"
+  },
+  "`Worktree #${r.data.worktree_id} 已准备`": {
+    "classification": "LOCALIZED",
+    "key": "ui.template.worktreeValueIsReady",
+    "zh": "工作树 #{p0} 已就绪",
+    "en": "Worktree #{p0} is ready"
+  },
+  "`${scope.name} Runtime Default`": {
+    "classification": "LOCALIZED",
+    "key": "ui.template.valueRuntimeDefault",
+    "zh": "{p0} 运行时默认值",
+    "en": "{p0} runtime default"
+  },
+  "`${tree.name} · Repository ${tree.repository_id} · ${tree.ref_name}`": {
+    "classification": "LOCALIZED",
+    "key": "ui.template.valueRepositoryValueValue",
+    "zh": "{p0} · 仓库 {p1} · {p2}",
+    "en": "{p0} · Repository {p1} · {p2}"
+  },
+  "`${kind} · Configured Resources`": {
+    "classification": "LOCALIZED",
+    "key": "ui.template.valueConfiguredResources",
+    "zh": "{p0} · 已配置资源",
+    "en": "{p0} · Configured resources"
+  },
+  "`${\n                            kind === 'PYTHON' ? 'Python' : 'Node'\n                          } Environment`": {
+    "classification": "LOCALIZED",
+    "key": "ui.template.valueEnvironment",
+    "zh": "{p0} 环境",
+    "en": "{p0} environment"
+  },
+  "`${env.name} · ${\n                                  env.state\n                                } · Current Build ${\n                                  env.current_build_id ?? 'none'\n                                }`": {
+    "classification": "LOCALIZED",
+    "key": "ui.template.valueValueCurrentBuildValue",
+    "zh": "{p0} · {p1} · 当前构建 {p2}",
+    "en": "{p0} · {p1} · Current build {p2}"
+  },
+  "`Delete ${entry.path}?`": {
+    "classification": "LOCALIZED",
+    "key": "ui.template.deleteValue",
+    "zh": "删除 {p0}？",
+    "en": "Delete {p0}?"
+  },
+  "`${diff?.staged ? 'Staged' : 'Working'} diff: ${\n          diff?.path || ''\n        }`": {
+    "classification": "LOCALIZED",
+    "key": "ui.template.valueDiffValue",
+    "zh": "{p0} 差异：{p1}",
+    "en": "{p0} diff: {p1}"
+  },
+  "编辑 Node Dependencies": {
+    "classification": "LOCALIZED",
+    "key": "ui.extra.editNodeDependencies",
+    "zh": "编辑 Node 依赖",
+    "en": "Edit Node dependencies"
+  },
+  "保存 Revision 并构建": {
+    "classification": "LOCALIZED",
+    "key": "ui.extra.saveRevisionAndBuild",
+    "zh": "保存修订并构建",
+    "en": "Save revision and build"
+  },
+  "安装": {
+    "classification": "LOCALIZED",
+    "key": "ui.extra.install",
+    "zh": "安装",
+    "en": "Install"
+  },
+  "Verified": {
+    "classification": "LOCALIZED",
+    "key": "ui.extra.verified",
+    "zh": "已验证",
+    "en": "Verified"
+  },
+  "Unverified": {
+    "classification": "LOCALIZED",
+    "key": "ui.extra.unverified",
+    "zh": "未验证",
+    "en": "Unverified"
+  },
+  "创建 Python Environment": {
+    "classification": "LOCALIZED",
+    "key": "ui.extra.createPythonEnvironment",
+    "zh": "创建 Python 环境",
+    "en": "Create Python environment"
+  },
+  "克隆 Environment": {
+    "classification": "LOCALIZED",
+    "key": "ui.extra.cloneEnvironment",
+    "zh": "克隆环境",
+    "en": "Clone environment"
+  },
+  "编辑 Environment": {
+    "classification": "LOCALIZED",
+    "key": "ui.extra.editEnvironment",
+    "zh": "编辑环境",
+    "en": "Edit environment"
+  },
+  "保存": {
+    "classification": "LOCALIZED",
+    "key": "ui.extra.save",
+    "zh": "保存",
+    "en": "Save"
+  },
+  "保存并构建": {
+    "classification": "LOCALIZED",
+    "key": "ui.extra.saveAndBuild",
+    "zh": "保存并构建",
+    "en": "Save and build"
+  },
+  "Task Overrides / Masks": {
+    "classification": "LOCALIZED",
+    "key": "ui.extra.taskOverridesAndMasks",
+    "zh": "任务覆盖与屏蔽",
+    "en": "Task overrides and masks"
+  },
+  "Repository Config Bindings": {
+    "classification": "LOCALIZED",
+    "key": "ui.extra.repositoryConfigBindings",
+    "zh": "仓库配置绑定",
+    "en": "Repository config bindings"
+  },
+  "新 Secret 值": {
+    "classification": "LOCALIZED",
+    "key": "ui.extra.newSecretValue",
+    "zh": "新的机密值",
+    "en": "New secret value"
+  },
+  "值（允许空字符串）": {
+    "classification": "LOCALIZED",
+    "key": "ui.extra.valueEmptyStringAllowed",
+    "zh": "值（允许空字符串）",
+    "en": "Value (empty string allowed)"
+  },
+  "Unavailable — 无仓库上下文": {
+    "classification": "LOCALIZED",
+    "key": "ui.extra.unavailableNoRepositoryContext",
+    "zh": "不可用 — 无仓库上下文",
+    "en": "Unavailable — no repository context"
+  },
+  "编辑 Config Asset": {
+    "classification": "LOCALIZED",
+    "key": "ui.extra.editConfigAsset",
+    "zh": "编辑配置资产",
+    "en": "Edit config asset"
+  },
+  "Keep Existing": {
+    "classification": "LOCALIZED",
+    "key": "ui.extra.keepExisting",
+    "zh": "保留现有值",
+    "en": "Keep existing"
+  },
+  "Replace": {
+    "classification": "LOCALIZED",
+    "key": "ui.extra.replace",
+    "zh": "替换",
+    "en": "Replace"
+  },
+  "Delivery history is retained. Pending deliveries will fail with CHANNEL_DISABLED.": {
+    "classification": "LOCALIZED",
+    "key": "ui.extra.deliveryHistoryIsRetainedPendingDeliveriesWillFailWithCHANNELDISABLED",
+    "zh": "保留投递历史。待发送的通知会以 CHANNEL_DISABLED 结束。",
+    "en": "Delivery history is retained. Pending deliveries will fail with CHANNEL_DISABLED."
+  },
+  "仓库信息": {
+    "classification": "LOCALIZED",
+    "key": "ui.extra.repositoryDetails",
+    "zh": "仓库信息",
+    "en": "Repository details"
+  },
+  "Git 凭证": {
+    "classification": "LOCALIZED",
+    "key": "ui.extra.gitCredentials",
+    "zh": "Git 凭证",
+    "en": "Git credentials"
+  },
+  "Repository Workspace": {
+    "classification": "LOCALIZED",
+    "key": "ui.extra.repositoryWorkspace",
+    "zh": "仓库工作区",
+    "en": "Repository workspace"
+  },
+  "Anonymous": {
+    "classification": "LOCALIZED",
+    "key": "ui.extra.anonymous",
+    "zh": "匿名",
+    "en": "Anonymous"
+  },
+  "尚未初始化": {
+    "classification": "LOCALIZED",
+    "key": "ui.extra.notInitialized",
+    "zh": "尚未初始化",
+    "en": "Not initialized"
+  },
+  "Update Worktree": {
+    "classification": "LOCALIZED",
+    "key": "ui.extra.updateWorktree",
+    "zh": "更新工作树",
+    "en": "Update worktree"
+  },
+  "Delete Worktree": {
+    "classification": "LOCALIZED",
+    "key": "ui.extra.deleteWorktree",
+    "zh": "删除工作树",
+    "en": "Delete worktree"
+  },
+  "Detached": {
+    "classification": "LOCALIZED",
+    "key": "ui.extra.detached",
+    "zh": "分离状态",
+    "en": "Detached"
+  },
+  "无占用": {
+    "classification": "LOCALIZED",
+    "key": "ui.extra.notInUse",
+    "zh": "未被占用",
+    "en": "Not in use"
+  },
+  "尚未安装": {
+    "classification": "LOCALIZED",
+    "key": "ui.extra.notInstalled",
+    "zh": "尚未安装",
+    "en": "Not installed"
+  },
+  "读取日志中…": {
+    "classification": "LOCALIZED",
+    "key": "ui.extra.loadingLogs",
+    "zh": "读取日志中…",
+    "en": "Loading logs…"
+  },
+  "清除 Default": {
+    "classification": "LOCALIZED",
+    "key": "ui.extra.clearDefault",
+    "zh": "清除默认值",
+    "en": "Clear default"
+  },
+  "设为 Default": {
+    "classification": "LOCALIZED",
+    "key": "ui.extra.setAsDefault",
+    "zh": "设为默认值",
+    "en": "Set as default"
+  },
+  "确认恢复": {
+    "classification": "LOCALIZED",
+    "key": "ui.extra.confirmRestore",
+    "zh": "确认恢复",
+    "en": "Confirm restore"
+  },
+  "确认移出 IP 黑名单": {
+    "classification": "LOCALIZED",
+    "key": "ui.extra.confirmRemovalFromIPBlocklist",
+    "zh": "确认移出 IP 黑名单",
+    "en": "Confirm removal from IP blocklist"
+  },
+  "确认加入 IP 黑名单": {
+    "classification": "LOCALIZED",
+    "key": "ui.extra.confirmAddingToIPBlocklist",
+    "zh": "确认加入 IP 黑名单",
+    "en": "Confirm adding to IP blocklist"
+  },
+  "编辑订阅": {
+    "classification": "LOCALIZED",
+    "key": "ui.extra.editSubscription",
+    "zh": "编辑订阅",
+    "en": "Edit subscription"
+  },
+  "创建订阅": {
+    "classification": "LOCALIZED",
+    "key": "ui.extra.createSubscription",
+    "zh": "创建订阅",
+    "en": "Create subscription"
+  },
+  "未同步": {
+    "classification": "LOCALIZED",
+    "key": "ui.extra.notSynced",
+    "zh": "未同步",
+    "en": "Not synced"
+  },
+  "Unbound": {
+    "classification": "LOCALIZED",
+    "key": "ui.extra.unbound",
+    "zh": "未绑定",
+    "en": "Unbound"
+  },
+  "Backoff": {
+    "classification": "LOCALIZED",
+    "key": "ui.extra.backoff",
+    "zh": "退避策略",
+    "en": "Backoff"
+  },
+  "Concurrency": {
+    "classification": "LOCALIZED",
+    "key": "ui.extra.concurrency",
+    "zh": "并发策略",
+    "en": "Concurrency"
+  },
+  "— (disabled)": {
+    "classification": "LOCALIZED",
+    "key": "ui.extra.disabled",
+    "zh": "—（已禁用）",
+    "en": "— (disabled)"
+  },
+  "Yes": {
+    "classification": "LOCALIZED",
+    "key": "ui.extra.yes",
+    "zh": "是",
+    "en": "Yes"
+  },
+  "No": {
+    "classification": "LOCALIZED",
+    "key": "ui.extra.no",
+    "zh": "否",
+    "en": "No"
+  },
+  "Edit trigger": {
+    "classification": "LOCALIZED",
+    "key": "ui.extra.editTrigger",
+    "zh": "编辑触发器",
+    "en": "Edit trigger"
+  },
+  "origin / select branch": {
+    "classification": "LOCALIZED",
+    "key": "ui.extra.originSelectBranch",
+    "zh": "origin / 选择分支",
+    "en": "origin / select branch"
+  },
+  "Detached HEAD": {
+    "classification": "LOCALIZED",
+    "key": "ui.extra.detachedHEAD",
+    "zh": "分离 HEAD",
+    "en": "Detached HEAD"
+  },
+  "WORKTREE_BUSY：任务或同步正在占用 Worktree，请稍后重试。": {
+    "classification": "LOCALIZED",
+    "key": "ui.extra.theWorktreeIsInUseByATaskOrSyncTryAgainLater",
+    "zh": "工作树正在被任务或同步占用，请稍后重试。",
+    "en": "The worktree is in use by a task or sync. Try again later."
+  },
+  "(truncated)": {
+    "classification": "LOCALIZED",
+    "key": "ui.extra.truncated",
+    "zh": "（已截断）",
+    "en": "(truncated)"
+  },
+  "No diff": {
+    "classification": "LOCALIZED",
+    "key": "ui.extra.noDiff",
+    "zh": "没有差异",
+    "en": "No diff"
+  },
+  "新 Revision 已保存": {
+    "classification": "LOCALIZED",
+    "key": "ui.extra.newRevisionSaved",
+    "zh": "新修订已保存",
+    "en": "New revision saved"
+  },
+  "元数据已保存": {
+    "classification": "LOCALIZED",
+    "key": "ui.extra.metadataSaved",
+    "zh": "元数据已保存",
+    "en": "Metadata saved"
+  },
+  "请输入内容，可为空字符串": {
+    "classification": "LOCALIZED",
+    "key": "ui.extra.enterContentEmptyStringAllowed",
+    "zh": "请输入内容，可为空字符串",
+    "en": "Enter content (empty string allowed)"
+  },
+  "未测试": {
+    "classification": "LOCALIZED",
+    "key": "ui.extra.notTested",
+    "zh": "未测试",
+    "en": "Not tested"
+  },
+  "完成": {
+    "classification": "LOCALIZED",
+    "key": "ui.extra.completed",
+    "zh": "完成",
+    "en": "Completed"
+  },
+  "失败": {
+    "classification": "LOCALIZED",
+    "key": "ui.extra.failed",
+    "zh": "失败",
+    "en": "Failed"
+  },
+  "订阅工作区": {
+    "classification": "LOCALIZED",
+    "key": "ui.extra.subscriptionWorktree",
+    "zh": "订阅工作区",
+    "en": "Subscription worktree"
+  },
+  "用户工作区": {
+    "classification": "LOCALIZED",
+    "key": "ui.extra.userWorktree",
+    "zh": "用户工作区",
+    "en": "User worktree"
+  },
+  "未绑定（保留工作区）": {
+    "classification": "LOCALIZED",
+    "key": "ui.extra.unboundWorktreeRetained",
+    "zh": "未绑定（保留工作区）",
+    "en": "Unbound (worktree retained)"
+  },
+  "Repair Worktree": {
+    "classification": "LOCALIZED",
+    "key": "ui.extra.repairWorktree",
+    "zh": "修复工作树",
+    "en": "Repair worktree"
+  },
+  "Change Remote": {
+    "classification": "LOCALIZED",
+    "key": "ui.extra.changeRemote",
+    "zh": "更改远端",
+    "en": "Change remote"
+  },
+  "unknown entry": {
+    "classification": "LOCALIZED",
+    "key": "ui.extra.unknownEntry",
+    "zh": "未知条目",
+    "en": "Unknown entry"
+  },
+  "移出黑名单": {
+    "classification": "LOCALIZED",
+    "key": "ui.extra.removeFromBlocklist",
+    "zh": "移出黑名单",
+    "en": "Remove from blocklist"
+  },
+  "加入黑名单": {
+    "classification": "LOCALIZED",
+    "key": "ui.extra.addToBlocklist",
+    "zh": "加入黑名单",
+    "en": "Add to blocklist"
+  },
+  "更新订阅成功": {
+    "classification": "LOCALIZED",
+    "key": "ui.extra.subscriptionUpdated",
+    "zh": "更新订阅成功",
+    "en": "Subscription updated"
+  },
+  "创建订阅成功": {
+    "classification": "LOCALIZED",
+    "key": "ui.extra.subscriptionCreated",
+    "zh": "创建订阅成功",
+    "en": "Subscription created"
+  },
+  "Source required": {
+    "classification": "LOCALIZED",
+    "key": "ui.extra.sourceRequired",
+    "zh": "需要配置来源",
+    "en": "Source required"
+  },
+  "No runs": {
+    "classification": "LOCALIZED",
+    "key": "ui.extra.noRuns",
+    "zh": "暂无执行记录",
+    "en": "No runs"
+  },
+  "草稿仅保存在当前页面内存中。": {
+    "classification": "LOCALIZED",
+    "key": "ui.extra.draftsAreKeptOnlyInThisPageSMemory",
+    "zh": "草稿仅保存在当前页面内存中。",
+    "en": "Drafts are kept only in this page's memory."
+  },
+  "磁盘文件已更改。Reload 将丢弃当前草稿；Cancel 保留草稿供手工比较。": {
+    "classification": "LOCALIZED",
+    "key": "ui.extra.theFileOnDiskChangedReloadDiscardsTheCurrentDraftCancelKeepsItForManualComparison",
+    "zh": "磁盘文件已更改。重新加载会丢弃当前草稿；取消则保留草稿供手工比较。",
+    "en": "The file on disk changed. Reload discards the current draft; Cancel keeps it for manual comparison."
+  },
+  "仅删除文件或空目录。": {
+    "classification": "LOCALIZED",
+    "key": "ui.extra.onlyFilesOrEmptyDirectoriesCanBeDeleted",
+    "zh": "仅删除文件或空目录。",
+    "en": "Only files or empty directories can be deleted."
+  },
+  "配置资产": {
+    "classification": "LOCALIZED",
+    "key": "ui.extra.configAssets",
+    "zh": "配置资产",
+    "en": "Config assets"
+  },
+  "Runtime · Python": {
+    "classification": "LOCALIZED",
+    "key": "ui.extra.runtimePython",
+    "zh": "运行时 · Python",
+    "en": "Runtime · Python"
+  },
+  "Direct": {
+    "classification": "LOCALIZED",
+    "key": "ui.presentation.Direct",
+    "zh": "直接依赖",
+    "en": "Direct"
+  },
+  "Transitive": {
+    "classification": "LOCALIZED",
+    "key": "ui.presentation.Transitive",
+    "zh": "间接依赖",
+    "en": "Transitive"
+  },
+  "Transitive / Toolchain": {
+    "classification": "LOCALIZED",
+    "key": "ui.presentation.TransitiveToolchain",
+    "zh": "间接依赖 / 工具链",
+    "en": "Transitive / Toolchain"
+  },
+  "Read-only": {
+    "classification": "LOCALIZED",
+    "key": "ui.presentation.Readonly",
+    "zh": "只读",
+    "en": "Read-only"
+  },
+  "Plain": {
+    "classification": "LOCALIZED",
+    "key": "ui.presentation.Plain",
+    "zh": "普通值",
+    "en": "Plain"
+  },
+  "Configured": {
+    "classification": "LOCALIZED",
+    "key": "ui.presentation.Configured",
+    "zh": "已配置",
+    "en": "Configured"
+  },
+  "Missing": {
+    "classification": "LOCALIZED",
+    "key": "ui.presentation.Missing",
+    "zh": "缺失",
+    "en": "Missing"
+  },
+  "BUSY": {
+    "classification": "LOCALIZED",
+    "key": "ui.presentation.Busy",
+    "zh": "占用中",
+    "en": "Busy"
+  },
+  "available": {
+    "classification": "LOCALIZED",
+    "key": "ui.presentation.available",
+    "zh": "可用",
+    "en": "available"
+  },
+  "missing": {
+    "classification": "LOCALIZED",
+    "key": "ui.presentation.missing",
+    "zh": "缺失",
+    "en": "missing"
+  }
+}

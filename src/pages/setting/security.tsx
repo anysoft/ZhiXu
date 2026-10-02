@@ -1,3 +1,4 @@
+import { useLocale as useI18nLocale } from '@/utils/i18n';
 import intl from 'react-intl-universal';
 import React, { useEffect, useState } from 'react';
 import { Typography, Input, Form, Button, message, Avatar, Upload } from 'antd';
@@ -14,6 +15,7 @@ import type { UploadChangeParam, UploadFile } from 'antd/es/upload/interface';
 const { Title, Link } = Typography;
 
 const SecuritySettings = ({ user, userChange }: any) => {
+  useI18nLocale();
   const [loading, setLoading] = useState(false);
   const [twoFactorActivated, setTwoFactorActivated] = useState<boolean>();
   const [twoFactoring, setTwoFactoring] = useState(false);

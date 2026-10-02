@@ -1,3 +1,8 @@
+import { fieldLabel, fieldValue } from '@/utils/presentation';
+import { translateEnum, translateError } from '@/utils/i18n';
+import { formatDateTime, formatDuration, formatBytes } from '@/utils/format';
+import { useLocale as useI18nLocale } from '@/utils/i18n';
+import { t as tr } from '@/utils/i18n';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   Alert,
@@ -22,6 +27,7 @@ export async function obsGet(path: string) {
   return r.data;
 }
 export function DeliveryTable({ runId }: { runId?: number }) {
+  useI18nLocale();
   const [rows, setRows] = useState<any[]>([]),
     [attempts, setAttempts] = useState<any[]>(),
     [cursor, setCursor] = useState<number>();
@@ -40,33 +46,44 @@ export function DeliveryTable({ runId }: { runId?: number }) {
   }, [runId, cursor]);
   return (
     <>
-      <Button onClick={load}>Refresh deliveries</Button>
+      <Button onClick={load}>{tr('ui.refreshDeliveries')}</Button>
       <Table
         rowKey="id"
         dataSource={rows}
         columns={[
-          { title: 'Delivery', dataIndex: 'id' },
-          { title: 'Event', dataIndex: 'event_type' },
-          { title: 'Channel', dataIndex: 'channel_name' },
+          { title: tr('ui.delivery'), dataIndex: 'id' },
           {
-            title: 'Run',
+            title: tr('ui.event'),
+            dataIndex: 'event_type',
+            render: (value: unknown) =>
+              translateEnum('notificationEvent', value),
+          },
+          { title: tr('ui.channel'), dataIndex: 'channel_name' },
+          {
+            title: tr('ui.run'),
             dataIndex: 'task_run_id',
             render: (id) =>
               id ? (
                 <a href={`${config.baseUrl}runs?run=${id}`}>{id}</a>
               ) : (
-                'Test'
+                tr('ui.test')
               ),
           },
           {
-            title: 'Status',
+            title: tr('ui.status'),
             dataIndex: 'status',
-            render: (s) => <Tag>{s}</Tag>,
+            render: (s) => (
+              <Tag>{translateEnum('notificationDelivery', s)}</Tag>
+            ),
           },
-          { title: 'Attempts', dataIndex: 'attempt_count' },
-          { title: 'Error', dataIndex: 'last_error_code' },
+          { title: tr('ui.attempts'), dataIndex: 'attempt_count' },
           {
-            title: 'Actions',
+            title: tr('ui.error'),
+            dataIndex: 'last_error_code',
+            render: (value: unknown) => (value ? translateError(value) : '—'),
+          },
+          {
+            title: tr('ui.actions'),
             render: (_, r) => (
               <Space>
                 <Button
@@ -76,7 +93,7 @@ export function DeliveryTable({ runId }: { runId?: number }) {
                     )
                   }
                 >
-                  History
+                  {tr('ui.history')}
                 </Button>
                 {['DEAD', 'RETRY'].includes(r.status) && (
                   <Button
@@ -88,7 +105,7 @@ export function DeliveryTable({ runId }: { runId?: number }) {
                       await load();
                     }}
                   >
-                    Retry notification
+                    {tr('ui.retryNotification')}
                   </Button>
                 )}
               </Space>
@@ -98,19 +115,21 @@ export function DeliveryTable({ runId }: { runId?: number }) {
         pagination={false}
       />
       <Space>
-        <Button onClick={() => setCursor(undefined)}>Newest deliveries</Button>
+        <Button onClick={() => setCursor(undefined)}>
+          {tr('ui.newestDeliveries')}
+        </Button>
         <Button
           disabled={rows.length < 100}
           onClick={() => setCursor(rows[rows.length - 1].id)}
         >
-          Older deliveries
+          {tr('ui.olderDeliveries')}
         </Button>
       </Space>
       <Modal
         open={!!attempts}
         onCancel={() => setAttempts(undefined)}
         footer={null}
-        title="Delivery attempts"
+        title={tr('ui.deliveryAttempts')}
       >
         <Table
           rowKey="attempt"
@@ -121,13 +140,19 @@ export function DeliveryTable({ runId }: { runId?: number }) {
             'finished_at',
             'result',
             'error_code',
-          ].map((dataIndex) => ({ title: dataIndex, dataIndex }))}
+          ].map((dataIndex) => ({
+            title: fieldLabel(dataIndex),
+            render: (value: any) =>
+              fieldValue(dataIndex, value, 'notificationAttempt'),
+            dataIndex,
+          }))}
         />
       </Modal>
     </>
   );
 }
 export function RunLogs({ id }: { id: number }) {
+  useI18nLocale();
   const [content, setContent] = useState(''),
     [error, setError] = useState('');
   const cursor = useRef<string | null>(null);
@@ -160,8 +185,7 @@ export function RunLogs({ id }: { id: number }) {
             cursor: cursor.current,
           });
       } catch {
-        if (!disposed)
-          setError('Log follow interrupted; retrying from the last cursor.');
+        if (!disposed) setError('LOG_FOLLOW_INTERRUPTED');
       } finally {
         busy = false;
       }
@@ -181,9 +205,9 @@ export function RunLogs({ id }: { id: number }) {
   }, [id]);
   return (
     <>
-      {error && <Alert message={error} />}
+      {error && <Alert message={translateError(error)} />}
       <Typography.Text type="secondary">
-        Redacted run log · live following · display keeps the latest 2 MiB
+        {tr('ui.redactedRunLogLiveFollowingDisplayKeepsTheLatest2MiB')}
       </Typography.Text>
       <pre
         data-testid="run-log"
@@ -208,6 +232,7 @@ export function RunDetail({
   id?: number;
   onClose: () => void;
 }) {
+  useI18nLocale();
   const [run, setRun] = useState<any>(),
     [attempts, setAttempts] = useState<any[]>([]),
     [events, setEvents] = useState<any[]>([]),
@@ -239,7 +264,7 @@ export function RunDetail({
   return (
     <>
       <Modal
-        title={`Run ${id ?? ''}`}
+        title={tr('ui.template.runValue', { p0: id ?? '' })}
         open={!!id}
         onCancel={onClose}
         footer={null}
@@ -250,7 +275,7 @@ export function RunDetail({
           items={[
             {
               key: 'overview',
-              label: 'Overview',
+              label: tr('ui.overview'),
               children: run && (
                 <>
                   <Descriptions bordered column={2}>
@@ -273,8 +298,8 @@ export function RunDetail({
                       'last_log_at',
                       'log_truncated',
                     ].map((k) => (
-                      <Descriptions.Item key={k} label={k}>
-                        {String(run[k] ?? '—')}
+                      <Descriptions.Item key={k} label={fieldLabel(k)}>
+                        {fieldValue(k, run[k])}
                       </Descriptions.Item>
                     ))}
                   </Descriptions>
@@ -287,7 +312,7 @@ export function RunDetail({
                         )
                       }
                     >
-                      View Trigger Event
+                      {tr('ui.viewTriggerEvent')}
                     </Button>
                   )}
                 </>
@@ -295,7 +320,7 @@ export function RunDetail({
             },
             {
               key: 'attempts',
-              label: 'Attempts',
+              label: tr('ui.attempts'),
               children: (
                 <Table
                   rowKey="id"
@@ -316,23 +341,28 @@ export function RunDetail({
                     'error_code',
                     'retry_decision',
                     'retry_delay',
-                  ].map((dataIndex) => ({ title: dataIndex, dataIndex }))}
+                  ].map((dataIndex) => ({
+                    title: fieldLabel(dataIndex),
+                    render: (value: any) =>
+                      fieldValue(dataIndex, value, 'taskRunAttempt'),
+                    dataIndex,
+                  }))}
                   scroll={{ x: 950 }}
                 />
               ),
             },
             {
               key: 'timeline',
-              label: 'Timeline',
+              label: tr('ui.timeline'),
               children: (
                 <>
                   <Timeline>
                     {events.map((e) => (
                       <Timeline.Item key={e.sequence}>
                         <strong>
-                          {e.sequence}. {e.type}
+                          {e.sequence}. {translateEnum('runEvent', e.type)}
                         </strong>{' '}
-                        · {e.created_at}
+                        · {formatDateTime(e.created_at)}
                         <div>{JSON.stringify(e.metadata)}</div>
                       </Timeline.Item>
                     ))}
@@ -341,26 +371,36 @@ export function RunDetail({
                     disabled={events.length < 200}
                     onClick={() => setAfter(events[events.length - 1].sequence)}
                   >
-                    Next events
+                    {tr('ui.nextEvents')}
                   </Button>
-                  <Button onClick={() => setAfter(0)}>First events</Button>
+                  <Button onClick={() => setAfter(0)}>
+                    {tr('ui.firstEvents')}
+                  </Button>
                 </>
               ),
             },
             {
               key: 'resources',
-              label: 'Resources',
+              label: tr('ui.resources'),
               children: (
                 <>
-                  <Alert message="Resource identities and immutable revisions only. Secret values are never included." />
+                  <Alert
+                    message={tr(
+                      'ui.resourceIdentitiesAndImmutableRevisionsOnlySecretValuesAreNeverIncluded',
+                    )}
+                  />
                   <pre>{JSON.stringify(run?.snapshot_metadata, null, 2)}</pre>
                 </>
               ),
             },
-            { key: 'logs', label: 'Logs', children: id && <RunLogs id={id} /> },
+            {
+              key: 'logs',
+              label: tr('ui.logs'),
+              children: id && <RunLogs id={id} />,
+            },
             {
               key: 'notifications',
-              label: 'Notifications',
+              label: tr('ui.notifications'),
               children: <DeliveryTable runId={id} />,
             },
           ]}
@@ -368,7 +408,7 @@ export function RunDetail({
       </Modal>
       <Modal
         open={!!trigger}
-        title="Trigger Event"
+        title={tr('ui.triggerEvent')}
         footer={null}
         onCancel={() => setTrigger(undefined)}
       >
@@ -378,6 +418,7 @@ export function RunDetail({
   );
 }
 export function RunsTable({ taskId }: { taskId?: number }) {
+  useI18nLocale();
   const [rows, setRows] = useState<any[]>([]),
     [next, setNext] = useState<string | null>(),
     [selected, setSelected] = useState<number>(),
@@ -402,8 +443,8 @@ export function RunsTable({ taskId }: { taskId?: number }) {
       <Space wrap style={{ marginBottom: 16 }}>
         {!taskId && (
           <Input
-            aria-label="Task filter"
-            placeholder="Task ID"
+            aria-label={tr('ui.taskFilter')}
+            placeholder={tr('ui.taskID')}
             onChange={(e) =>
               setFilters((v) => ({ ...v, task_id: e.target.value }))
             }
@@ -412,8 +453,8 @@ export function RunsTable({ taskId }: { taskId?: number }) {
         )}
         <Select
           value={filters.status || undefined}
-          aria-label="Run status filter"
-          placeholder="Status"
+          aria-label={tr('ui.runStatusFilter')}
+          placeholder={tr('ui.status')}
           allowClear
           style={{ width: 170 }}
           options={[
@@ -426,30 +467,30 @@ export function RunsTable({ taskId }: { taskId?: number }) {
             'CANCELLED',
             'SKIPPED',
             'RECOVERY_REQUIRED',
-          ].map((value) => ({ value, label: value }))}
+          ].map((value) => ({ value, label: translateEnum('taskRun', value) }))}
           onChange={(v) => setFilters((f) => ({ ...f, status: v ?? '' }))}
         />
         <Select
-          aria-label="Trigger filter"
-          placeholder="Trigger"
+          aria-label={tr('ui.triggerFilter')}
+          placeholder={tr('ui.trigger')}
           allowClear
           style={{ width: 150 }}
           options={['MANUAL', 'API', 'CRON', 'WEBHOOK', 'GIT_UPDATE'].map(
-            (value) => ({ value, label: value }),
+            (value) => ({ value, label: translateEnum('triggerType', value) }),
           )}
           onChange={(v) => setFilters((f) => ({ ...f, trigger_type: v ?? '' }))}
         />
         <Input
           type="datetime-local"
-          aria-label="From"
+          aria-label={tr('ui.from')}
           onChange={(e) => setFilters((f) => ({ ...f, from: e.target.value }))}
         />
         <Input
           type="datetime-local"
-          aria-label="To"
+          aria-label={tr('ui.to')}
           onChange={(e) => setFilters((f) => ({ ...f, to: e.target.value }))}
         />
-        <Button onClick={() => load()}>Refresh runs</Button>
+        <Button onClick={() => load()}>{tr('ui.refreshRuns')}</Button>
       </Space>
       <Table
         rowKey="id"
@@ -464,7 +505,8 @@ export function RunsTable({ taskId }: { taskId?: number }) {
           'finished_at',
           'attempt_count',
         ].map((dataIndex) => ({
-          title: dataIndex,
+          title: fieldLabel(dataIndex),
+          render: (value: any) => fieldValue(dataIndex, value),
           dataIndex,
           ...(dataIndex === 'id'
             ? {
@@ -478,7 +520,7 @@ export function RunsTable({ taskId }: { taskId?: number }) {
         }))}
       />
       <Button disabled={!next} onClick={() => load(next!)}>
-        Next page
+        {tr('ui.nextPage')}
       </Button>
       <RunDetail id={selected} onClose={() => setSelected(undefined)} />
     </>

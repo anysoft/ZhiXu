@@ -1,3 +1,8 @@
+import { fieldLabel, fieldValue } from '@/utils/presentation';
+import { translateEnum, translateError } from '@/utils/i18n';
+import { formatDateTime, formatDuration, formatBytes } from '@/utils/format';
+import { useLocale as useI18nLocale } from '@/utils/i18n';
+import { t as tr } from '@/utils/i18n';
 import React, { useEffect, useState } from 'react';
 import {
   Alert,
@@ -18,6 +23,7 @@ import { request } from '@/utils/http';
 import config from '@/utils/config';
 const base = config.apiPrefix;
 export default function BackupSettings() {
+  useI18nLocale();
   const [rows, setRows] = useState<any[]>([]),
     [restore, setRestore] = useState<any>(),
     [operation, setOperation] = useState<any>();
@@ -85,7 +91,7 @@ export default function BackupSettings() {
     if (!dialog) return;
     if (dialog.kind === 'import') {
       if (!file) {
-        message.error('请选择加密备份文件');
+        message.error(tr('ui.selectAnEncryptedBackupFile'));
         return;
       }
       const data = new FormData();
@@ -114,19 +120,20 @@ export default function BackupSettings() {
         maxHeight: 'calc(100vh - 200px)',
       }}
     >
-      <Typography.Title level={4}>
-        Backup &amp; Restore / 备份与恢复
-      </Typography.Title>
+      <Typography.Title level={4}>{tr('ui.backupAmpRestore')}</Typography.Title>
       <Typography.Paragraph>
-        备份包含
-        Git、本地工作区、配置和运行历史。便携文件使用口令加密；托管运行时和依赖环境需在恢复后显式重建。
+        {tr(
+          'ui.backupsIncludeGitLocalWorktreesConfigurationAndRunHistoryPortableBackupsArePassphraseEncryptedManage',
+        )}
       </Typography.Paragraph>
       {restore?.stage === 'PENDING' && (
         <Alert
           type="warning"
           showIcon
-          message="RESTORE_PENDING — 等待重启恢复"
-          description="新的写入已暂停。请重启后端以离线应用恢复，或取消待恢复请求。"
+          message={tr('ui.restorePendingRestartToRestore')}
+          description={tr(
+            'ui.newWritesArePausedRestartTheBackendToApplyTheRestoreOfflineOrCancelThePendingRestore',
+          )}
           action={
             <Button
               onClick={async () => {
@@ -135,7 +142,7 @@ export default function BackupSettings() {
                 await refresh();
               }}
             >
-              取消待恢复请求
+              {tr('ui.cancelPendingRestore')}
             </Button>
           }
         />
@@ -143,7 +150,9 @@ export default function BackupSettings() {
       {restore && (
         <Alert
           type={restore.stage === 'COMPLETE' ? 'success' : 'info'}
-          message={'Restore: ' + restore.stage}
+          message={tr('ui.restoreStatus', {
+            status: translateEnum('restoreStage', restore.stage),
+          })}
         />
       )}
       <Space wrap>
@@ -152,12 +161,12 @@ export default function BackupSettings() {
           disabled={active || restore?.stage === 'PENDING'}
           onClick={() => start('backups')}
         >
-          创建备份
+          {tr('ui.createBackup')}
         </Button>
         <Button disabled={active} onClick={() => setDialog({ kind: 'import' })}>
-          导入加密备份
+          {tr('ui.importEncryptedBackup')}
         </Button>
-        <Button onClick={refresh}>刷新</Button>
+        <Button onClick={refresh}>{tr('ui.refresh')}</Button>
       </Space>
       {operation && (
         <Alert
@@ -168,13 +177,20 @@ export default function BackupSettings() {
               ? 'success'
               : 'info'
           }
-          message={`${operation.kind || 'Operation'}: ${operation.status}`}
+          message={tr('ui.operationStatus', {
+            kind: operation.kind
+              ? translateEnum('backupKind', operation.kind)
+              : tr('ui.operation'),
+            status: translateEnum('backupOperation', operation.status),
+          })}
           description={
             <Space direction="vertical">
               <span>
-                {operation.error_code || operation.phase} ·{' '}
-                {operation.processed_files || 0} files ·{' '}
-                {operation.processed_bytes || 0} bytes
+                {operation.error_code
+                  ? translateError(operation.error_code)
+                  : translateEnum('runtimeStage', operation.phase)}{' '}
+                · {operation.processed_files || 0} {tr('ui.files')}{' '}
+                {operation.processed_bytes || 0} {tr('ui.bytesVariant404')}
               </span>
               {operation.kind === 'EXPORT' &&
                 operation.status === 'SUCCESS' && (
@@ -187,7 +203,7 @@ export default function BackupSettings() {
                       saveAs(blob, operation.result + '.platform-backup');
                     }}
                   >
-                    下载加密备份
+                    {tr('ui.downloadEncryptedBackup')}
                   </Button>
                 )}
             </Space>
@@ -200,16 +216,26 @@ export default function BackupSettings() {
         pagination={{ pageSize: 10 }}
         scroll={{ x: 950 }}
         columns={[
-          { title: '创建时间', dataIndex: 'created_at' },
           {
-            title: '状态',
-            dataIndex: 'status',
-            render: (value) => <Tag color="green">{value}</Tag>,
+            title: tr('ui.created'),
+            dataIndex: 'created_at',
+            render: (value: any) => formatDateTime(value),
           },
-          { title: 'Schema', dataIndex: 'schema' },
-          { title: 'Bytes', dataIndex: 'size' },
           {
-            title: '操作',
+            title: tr('ui.status'),
+            dataIndex: 'status',
+            render: (value) => (
+              <Tag color="green">{translateEnum('backupOperation', value)}</Tag>
+            ),
+          },
+          { title: tr('ui.schema'), dataIndex: 'schema' },
+          {
+            title: tr('ui.bytes'),
+            dataIndex: 'size',
+            render: (value: number) => formatBytes(value),
+          },
+          {
+            title: tr('ui.action'),
             render: (_, row) => (
               <Space wrap>
                 <Button
@@ -220,31 +246,31 @@ export default function BackupSettings() {
                     )
                   }
                 >
-                  详情
+                  {tr('ui.details')}
                 </Button>
                 <Button
                   size="small"
                   disabled={active}
                   onClick={() => start(`backups/${row.id}/validate`)}
                 >
-                  验证
+                  {tr('ui.verify')}
                 </Button>
                 <Button
                   size="small"
                   disabled={active}
                   onClick={() => setDialog({ kind: 'export', id: row.id })}
                 >
-                  加密导出
+                  {tr('ui.exportEncryptedBackup')}
                 </Button>
                 <Popconfirm
-                  title="删除此本地备份？"
+                  title={tr('ui.deleteThisLocalBackup')}
                   onConfirm={async () => {
                     await request.delete(base + 'backups/' + row.id);
                     await refresh();
                   }}
                 >
                   <Button size="small" danger disabled={active}>
-                    删除
+                    {tr('ui.delete')}
                   </Button>
                 </Popconfirm>
               </Space>
@@ -255,7 +281,7 @@ export default function BackupSettings() {
       {importId && (
         <Alert
           type="success"
-          message="导入文件已验证"
+          message={tr('ui.importedFileVerified')}
           description={
             <Space>
               <Typography.Text code>{importId}</Typography.Text>
@@ -263,14 +289,14 @@ export default function BackupSettings() {
                 disabled={active}
                 onClick={() => start(`restores/${importId}/validate`)}
               >
-                验证导入
+                {tr('ui.verifyImport')}
               </Button>
               <Button
                 danger
                 disabled={active || restore?.stage === 'PENDING'}
                 onClick={() => setDialog({ kind: 'stage', id: importId })}
               >
-                暂存恢复
+                {tr('ui.stageRestore')}
               </Button>
             </Space>
           }
@@ -279,11 +305,11 @@ export default function BackupSettings() {
       {restore?.rebuild_plan && (
         <>
           <Typography.Title level={5}>
-            Missing Managed Resources / 待重建资源
+            {tr('ui.missingManagedResources')}
           </Typography.Title>
           <Descriptions bordered size="small" column={1}>
             {Object.entries(restore.rebuild_plan).map(([key, items]) => (
-              <Descriptions.Item key={key} label={key}>
+              <Descriptions.Item key={key} label={fieldLabel(key)}>
                 {(items as any[])
                   .map(
                     (item) =>
@@ -299,17 +325,17 @@ export default function BackupSettings() {
             disabled={active || restore.stage !== 'COMPLETE'}
             onClick={() => start('restore/rebuild')}
           >
-            重建缺失的托管资源
+            {tr('ui.rebuildMissingManagedResources')}
           </Button>
         </>
       )}
       <Modal
         title={
           dialog?.kind === 'import'
-            ? '导入加密备份'
+            ? tr('ui.importEncryptedBackup')
             : dialog?.kind === 'export'
-            ? '加密导出'
-            : '确认恢复'
+            ? tr('ui.exportEncryptedBackup')
+            : tr('ui.extra.confirmRestore')
         }
         open={!!dialog}
         onCancel={close}
@@ -319,9 +345,9 @@ export default function BackupSettings() {
       >
         <Form form={form} layout="vertical" preserve={false}>
           {dialog?.kind === 'import' && (
-            <Form.Item label="备份文件">
+            <Form.Item label={tr('ui.backupFile')}>
               <input
-                aria-label="备份文件"
+                aria-label={tr('ui.backupFile')}
                 type="file"
                 accept=".platform-backup"
                 onChange={(e) => setFile(e.target.files?.[0])}
@@ -332,17 +358,19 @@ export default function BackupSettings() {
             <>
               <Alert
                 type="warning"
-                message="重启后将切换数据目录，现有数据保留在隔离目录。"
+                message={tr(
+                  'ui.restartingSwitchesTheDataDirectoryExistingDataIsRetainedInAnIsolatedDirectory',
+                )}
               />
               <Form.Item
                 name="confirmation"
-                label="输入 RESTORE"
+                label={tr('ui.enterRESTORE')}
                 rules={[
                   {
                     validator: (_, value) =>
                       value === 'RESTORE'
                         ? Promise.resolve()
-                        : Promise.reject(new Error('请输入 RESTORE')),
+                        : Promise.reject(new Error(tr('validation.restore'))),
                   },
                 ]}
               >
@@ -353,7 +381,7 @@ export default function BackupSettings() {
             <>
               <Form.Item
                 name="passphrase"
-                label="加密口令"
+                label={tr('ui.encryptionPassphrase')}
                 rules={[{ required: true, min: 12 }]}
               >
                 <Input.Password autoComplete="new-password" />
@@ -361,7 +389,7 @@ export default function BackupSettings() {
               {dialog?.kind === 'export' && (
                 <Form.Item
                   name="confirm"
-                  label="确认口令"
+                  label={tr('ui.confirmPassphrase')}
                   dependencies={['passphrase']}
                   rules={[
                     { required: true },
@@ -369,7 +397,9 @@ export default function BackupSettings() {
                       validator: (_, value) =>
                         value === form.getFieldValue('passphrase')
                           ? Promise.resolve()
-                          : Promise.reject(new Error('两次口令不一致')),
+                          : Promise.reject(
+                              new Error(tr('validation.passphraseMatch')),
+                            ),
                     },
                   ]}
                 >
@@ -381,7 +411,7 @@ export default function BackupSettings() {
         </Form>
       </Modal>
       <Modal
-        title="备份详情"
+        title={tr('ui.backupDetails')}
         open={!!detail}
         onCancel={() => setDetail(null)}
         footer={null}
@@ -389,10 +419,10 @@ export default function BackupSettings() {
         <Descriptions column={1}>
           {detail &&
             Object.entries(detail).map(([key, value]) => (
-              <Descriptions.Item key={key} label={key}>
+              <Descriptions.Item key={key} label={fieldLabel(key)}>
                 {typeof value === 'object'
                   ? JSON.stringify(value)
-                  : String(value)}
+                  : fieldValue(key, value, 'backupOperation')}
               </Descriptions.Item>
             ))}
         </Descriptions>

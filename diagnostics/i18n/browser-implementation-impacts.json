@@ -1,0 +1,629 @@
+[
+  {
+    "file": "diagnostics/phase12/browser-e2e.cjs",
+    "name": "delay",
+    "result": {
+      "error": "Target 'delay' not found",
+      "target": {
+        "name": "delay"
+      },
+      "direction": "upstream",
+      "impactedCount": null,
+      "risk": "UNKNOWN"
+    }
+  },
+  {
+    "file": "diagnostics/phase12/browser-e2e.cjs",
+    "name": "flushBrowser",
+    "result": {
+      "error": "Target 'flushBrowser' not found",
+      "target": {
+        "name": "flushBrowser"
+      },
+      "direction": "upstream",
+      "impactedCount": null,
+      "risk": "UNKNOWN"
+    }
+  },
+  {
+    "file": "diagnostics/phase12/browser-e2e.cjs",
+    "name": "mark",
+    "result": {
+      "error": "Target 'mark' not found",
+      "target": {
+        "name": "mark"
+      },
+      "direction": "upstream",
+      "impactedCount": null,
+      "risk": "UNKNOWN"
+    }
+  },
+  {
+    "file": "diagnostics/phase12/browser-e2e.cjs",
+    "name": "port",
+    "result": {
+      "error": "Target 'port' not found",
+      "target": {
+        "name": "port"
+      },
+      "direction": "upstream",
+      "impactedCount": null,
+      "risk": "UNKNOWN"
+    }
+  },
+  {
+    "file": "diagnostics/phase12/browser-e2e.cjs",
+    "name": "stop",
+    "result": {
+      "error": "Target 'stop' not found",
+      "target": {
+        "name": "stop"
+      },
+      "direction": "upstream",
+      "impactedCount": null,
+      "risk": "UNKNOWN"
+    }
+  },
+  {
+    "file": "diagnostics/phase12/browser-e2e.cjs",
+    "name": "until",
+    "result": {
+      "error": "Target 'until' not found",
+      "target": {
+        "name": "until"
+      },
+      "direction": "upstream",
+      "impactedCount": null,
+      "risk": "UNKNOWN"
+    }
+  },
+  {
+    "file": "diagnostics/phase12/browser-e2e.cjs",
+    "name": "git",
+    "result": {
+      "error": "Target 'git' not found",
+      "target": {
+        "name": "git"
+      },
+      "direction": "upstream",
+      "impactedCount": null,
+      "risk": "UNKNOWN"
+    }
+  },
+  {
+    "file": "diagnostics/phase12/browser-e2e.cjs",
+    "name": "start",
+    "result": {
+      "error": "Target 'start' not found",
+      "target": {
+        "name": "start"
+      },
+      "direction": "upstream",
+      "impactedCount": null,
+      "risk": "UNKNOWN"
+    }
+  },
+  {
+    "file": "diagnostics/phase12/browser-e2e.cjs",
+    "name": "login",
+    "result": {
+      "error": "Target 'login' not found",
+      "target": {
+        "name": "login"
+      },
+      "direction": "upstream",
+      "impactedCount": null,
+      "risk": "UNKNOWN"
+    }
+  },
+  {
+    "file": "diagnostics/phase12/browser-e2e.cjs",
+    "name": "api",
+    "result": {
+      "error": "Target 'api' not found",
+      "target": {
+        "name": "api"
+      },
+      "direction": "upstream",
+      "impactedCount": null,
+      "risk": "UNKNOWN"
+    }
+  },
+  {
+    "file": "diagnostics/phase12/browser-e2e.cjs",
+    "name": "checked",
+    "result": {
+      "error": "Target 'checked' not found",
+      "target": {
+        "name": "checked"
+      },
+      "direction": "upstream",
+      "impactedCount": null,
+      "risk": "UNKNOWN"
+    }
+  },
+  {
+    "file": "diagnostics/phase12/browser-e2e.cjs",
+    "name": "replace",
+    "result": {
+      "error": "Target 'replace' not found",
+      "target": {
+        "name": "replace"
+      },
+      "direction": "upstream",
+      "impactedCount": null,
+      "risk": "UNKNOWN"
+    }
+  },
+  {
+    "file": "diagnostics/phase12/browser-e2e.cjs",
+    "name": "cli",
+    "result": {
+      "error": "Target 'cli' not found",
+      "target": {
+        "name": "cli"
+      },
+      "direction": "upstream",
+      "impactedCount": null,
+      "risk": "UNKNOWN"
+    }
+  },
+  {
+    "file": "diagnostics/phase14/platform-e2e.cjs",
+    "name": "delay",
+    "result": {
+      "error": "Target 'delay' not found",
+      "target": {
+        "name": "delay"
+      },
+      "direction": "upstream",
+      "impactedCount": null,
+      "risk": "UNKNOWN"
+    }
+  },
+  {
+    "file": "diagnostics/phase14/platform-e2e.cjs",
+    "name": "flushBrowser",
+    "result": {
+      "error": "Target 'flushBrowser' not found",
+      "target": {
+        "name": "flushBrowser"
+      },
+      "direction": "upstream",
+      "impactedCount": null,
+      "risk": "UNKNOWN"
+    }
+  },
+  {
+    "file": "diagnostics/phase14/platform-e2e.cjs",
+    "name": "mark",
+    "result": {
+      "error": "Target 'mark' not found",
+      "target": {
+        "name": "mark"
+      },
+      "direction": "upstream",
+      "impactedCount": null,
+      "risk": "UNKNOWN"
+    }
+  },
+  {
+    "file": "diagnostics/phase14/platform-e2e.cjs",
+    "name": "port",
+    "result": {
+      "error": "Target 'port' not found",
+      "target": {
+        "name": "port"
+      },
+      "direction": "upstream",
+      "impactedCount": null,
+      "risk": "UNKNOWN"
+    }
+  },
+  {
+    "file": "diagnostics/phase14/platform-e2e.cjs",
+    "name": "stop",
+    "result": {
+      "error": "Target 'stop' not found",
+      "target": {
+        "name": "stop"
+      },
+      "direction": "upstream",
+      "impactedCount": null,
+      "risk": "UNKNOWN"
+    }
+  },
+  {
+    "file": "diagnostics/phase14/platform-e2e.cjs",
+    "name": "until",
+    "result": {
+      "error": "Target 'until' not found",
+      "target": {
+        "name": "until"
+      },
+      "direction": "upstream",
+      "impactedCount": null,
+      "risk": "UNKNOWN"
+    }
+  },
+  {
+    "file": "diagnostics/phase14/platform-e2e.cjs",
+    "name": "git",
+    "result": {
+      "error": "Target 'git' not found",
+      "target": {
+        "name": "git"
+      },
+      "direction": "upstream",
+      "impactedCount": null,
+      "risk": "UNKNOWN"
+    }
+  },
+  {
+    "file": "diagnostics/phase14/platform-e2e.cjs",
+    "name": "start",
+    "result": {
+      "error": "Target 'start' not found",
+      "target": {
+        "name": "start"
+      },
+      "direction": "upstream",
+      "impactedCount": null,
+      "risk": "UNKNOWN"
+    }
+  },
+  {
+    "file": "diagnostics/phase14/platform-e2e.cjs",
+    "name": "login",
+    "result": {
+      "error": "Target 'login' not found",
+      "target": {
+        "name": "login"
+      },
+      "direction": "upstream",
+      "impactedCount": null,
+      "risk": "UNKNOWN"
+    }
+  },
+  {
+    "file": "diagnostics/phase14/platform-e2e.cjs",
+    "name": "api",
+    "result": {
+      "error": "Target 'api' not found",
+      "target": {
+        "name": "api"
+      },
+      "direction": "upstream",
+      "impactedCount": null,
+      "risk": "UNKNOWN"
+    }
+  },
+  {
+    "file": "diagnostics/phase14/platform-e2e.cjs",
+    "name": "choose",
+    "result": {
+      "error": "Target 'choose' not found",
+      "target": {
+        "name": "choose"
+      },
+      "direction": "upstream",
+      "impactedCount": null,
+      "risk": "UNKNOWN"
+    }
+  },
+  {
+    "file": "diagnostics/phase14/platform-e2e.cjs",
+    "name": "confirm",
+    "result": {
+      "error": "Target 'confirm' not found",
+      "target": {
+        "name": "confirm"
+      },
+      "direction": "upstream",
+      "impactedCount": null,
+      "risk": "UNKNOWN"
+    }
+  },
+  {
+    "file": "diagnostics/phase14/platform-e2e.cjs",
+    "name": "repositoryAction",
+    "result": {
+      "error": "Target 'repositoryAction' not found",
+      "target": {
+        "name": "repositoryAction"
+      },
+      "direction": "upstream",
+      "impactedCount": null,
+      "risk": "UNKNOWN"
+    }
+  },
+  {
+    "file": "diagnostics/phase14/platform-e2e.cjs",
+    "name": "variable",
+    "result": {
+      "error": "Target 'variable' not found",
+      "target": {
+        "name": "variable"
+      },
+      "direction": "upstream",
+      "impactedCount": null,
+      "risk": "UNKNOWN"
+    }
+  },
+  {
+    "file": "diagnostics/phase14/platform-e2e.cjs",
+    "name": "checked",
+    "result": {
+      "error": "Target 'checked' not found",
+      "target": {
+        "name": "checked"
+      },
+      "direction": "upstream",
+      "impactedCount": null,
+      "risk": "UNKNOWN"
+    }
+  },
+  {
+    "file": "diagnostics/phase14/platform-e2e.cjs",
+    "name": "operation",
+    "result": {
+      "error": "Target 'operation' not found",
+      "target": {
+        "name": "operation"
+      },
+      "direction": "upstream",
+      "impactedCount": null,
+      "risk": "UNKNOWN"
+    }
+  },
+  {
+    "file": "diagnostics/phase14/platform-e2e.cjs",
+    "name": "dialog",
+    "result": {
+      "error": "Target 'dialog' not found",
+      "target": {
+        "name": "dialog"
+      },
+      "direction": "upstream",
+      "impactedCount": null,
+      "risk": "UNKNOWN"
+    }
+  },
+  {
+    "file": "diagnostics/phase14/platform-e2e.cjs",
+    "name": "taskTab",
+    "result": {
+      "error": "Target 'taskTab' not found",
+      "target": {
+        "name": "taskTab"
+      },
+      "direction": "upstream",
+      "impactedCount": null,
+      "risk": "UNKNOWN"
+    }
+  },
+  {
+    "file": "diagnostics/phase14/platform-e2e.cjs",
+    "name": "edit",
+    "result": {
+      "error": "Target 'edit' not found",
+      "target": {
+        "name": "edit"
+      },
+      "direction": "upstream",
+      "impactedCount": null,
+      "risk": "UNKNOWN"
+    }
+  },
+  {
+    "file": "diagnostics/phase14/platform-e2e.cjs",
+    "name": "save",
+    "result": {
+      "error": "Target 'save' not found",
+      "target": {
+        "name": "save"
+      },
+      "direction": "upstream",
+      "impactedCount": null,
+      "risk": "UNKNOWN"
+    }
+  },
+  {
+    "file": "diagnostics/phase14/platform-e2e.cjs",
+    "name": "addTrigger",
+    "result": {
+      "error": "Target 'addTrigger' not found",
+      "target": {
+        "name": "addTrigger"
+      },
+      "direction": "upstream",
+      "impactedCount": null,
+      "risk": "UNKNOWN"
+    }
+  },
+  {
+    "file": "diagnostics/phase14/platform-e2e.cjs",
+    "name": "hookRequest",
+    "result": {
+      "error": "Target 'hookRequest' not found",
+      "target": {
+        "name": "hookRequest"
+      },
+      "direction": "upstream",
+      "impactedCount": null,
+      "risk": "UNKNOWN"
+    }
+  },
+  {
+    "file": "tests/ci/browser-tab.test.cjs",
+    "name": "fixture",
+    "result": {
+      "target": {
+        "id": "Function:tests/ci/browser-tab.test.cjs:fixture",
+        "name": "fixture",
+        "type": "Function",
+        "filePath": "tests/ci/browser-tab.test.cjs"
+      },
+      "direction": "upstream",
+      "impactedCount": 0,
+      "risk": "UNKNOWN",
+      "riskSharedAxes": "UNKNOWN",
+      "riskScale": {
+        "comparableAcrossKinds": true,
+        "unusedAxes": []
+      },
+      "riskNote": "No callers resolved. Absence of edges is not evidence the symbol is unused: a caller reaching it through a reference class this index does not record — plain-object property access, a bare-identifier read of a module-scope const — produces no edge to find. Confirm with a text search before treating the change as safe.",
+      "epistemic": "exact",
+      "summary": {
+        "direct": 0,
+        "processes_affected": 0,
+        "modules_affected": 0
+      },
+      "byDepthCounts": {},
+      "affected_processes": [],
+      "affected_modules": []
+    }
+  },
+  {
+    "file": "tests/ci/browser-tab.test.cjs",
+    "name": "Fixture",
+    "result": {
+      "status": "ambiguous",
+      "message": "Found 2 symbols matching 'Fixture'. Blast radius differs per candidate (max 0 impacted at risk UNKNOWN). Disambiguate with target_uid (or file_path/kind) for a single authoritative result.",
+      "target": {
+        "name": "Fixture"
+      },
+      "direction": "upstream",
+      "totalCandidates": 2,
+      "impactedCount": null,
+      "risk": "UNKNOWN",
+      "maxImpactedCount": 0,
+      "maxRisk": "UNKNOWN",
+      "candidates": [
+        {
+          "uid": "Function:tests/ci/browser-tab.test.cjs:fn@58:101.fn@68:24.Fixture@70:6",
+          "name": "Fixture",
+          "kind": "Function",
+          "filePath": "tests/ci/browser-tab.test.cjs",
+          "line": 71,
+          "score": 0.96,
+          "impactedCount": 0,
+          "risk": "UNKNOWN",
+          "riskSharedAxes": "UNKNOWN",
+          "riskScale": {
+            "comparableAcrossKinds": false,
+            "unusedAxes": [
+              {
+                "axis": "processes",
+                "reason": "enrichment-skipped"
+              },
+              {
+                "axis": "modules",
+                "reason": "enrichment-skipped"
+              }
+            ]
+          },
+          "direct": 0,
+          "riskNote": "No callers resolved. Absence of edges is not evidence the symbol is unused: a caller reaching it through a reference class this index does not record — plain-object property access, a bare-identifier read of a module-scope const — produces no edge to find. Confirm with a text search before treating the change as safe."
+        },
+        {
+          "uid": "Function:tests/ci/browser-tab.test.cjs:fn@87:102.fn@96:24.Fixture@98:6",
+          "name": "Fixture",
+          "kind": "Function",
+          "filePath": "tests/ci/browser-tab.test.cjs",
+          "line": 99,
+          "score": 0.96,
+          "impactedCount": 0,
+          "risk": "UNKNOWN",
+          "riskSharedAxes": "UNKNOWN",
+          "riskScale": {
+            "comparableAcrossKinds": false,
+            "unusedAxes": [
+              {
+                "axis": "processes",
+                "reason": "enrichment-skipped"
+              },
+              {
+                "axis": "modules",
+                "reason": "enrichment-skipped"
+              }
+            ]
+          },
+          "direct": 0,
+          "riskNote": "No callers resolved. Absence of edges is not evidence the symbol is unused: a caller reaching it through a reference class this index does not record — plain-object property access, a bare-identifier read of a module-scope const — produces no edge to find. Confirm with a text search before treating the change as safe."
+        }
+      ]
+    }
+  },
+  {
+    "file": "scripts/ci/ci.cjs",
+    "name": "browser",
+    "result": {
+      "status": "ambiguous",
+      "message": "Found 2 symbols matching 'browser'. Blast radius differs per candidate (max 4 impacted at risk UNKNOWN; LOW among the candidates that resolved, and at least one could not be walked). Disambiguate with target_uid (or file_path/kind) for a single authoritative result.",
+      "target": {
+        "name": "browser"
+      },
+      "direction": "upstream",
+      "totalCandidates": 2,
+      "impactedCount": null,
+      "risk": "UNKNOWN",
+      "maxImpactedCount": 4,
+      "maxRisk": "UNKNOWN",
+      "knownMaxRisk": "LOW",
+      "candidates": [
+        {
+          "uid": "Function:scripts/ci/ci.cjs:browser",
+          "name": "browser",
+          "kind": "Function",
+          "filePath": "scripts/ci/ci.cjs",
+          "line": 342,
+          "score": 0.96,
+          "impactedCount": 4,
+          "risk": "LOW",
+          "riskSharedAxes": "LOW",
+          "riskScale": {
+            "comparableAcrossKinds": false,
+            "unusedAxes": [
+              {
+                "axis": "processes",
+                "reason": "enrichment-skipped"
+              },
+              {
+                "axis": "modules",
+                "reason": "enrichment-skipped"
+              }
+            ]
+          },
+          "direct": 2
+        },
+        {
+          "uid": "Property:scripts/ci/ci.cjs:main.browser@573:4",
+          "name": "browser",
+          "kind": "",
+          "filePath": "scripts/ci/ci.cjs",
+          "line": 574,
+          "score": 0.9,
+          "impactedCount": 0,
+          "risk": "UNKNOWN",
+          "riskSharedAxes": "UNKNOWN",
+          "riskScale": {
+            "comparableAcrossKinds": false,
+            "unusedAxes": [
+              {
+                "axis": "processes",
+                "reason": "enrichment-skipped"
+              },
+              {
+                "axis": "modules",
+                "reason": "enrichment-skipped"
+              }
+            ]
+          },
+          "direct": 0,
+          "riskNote": "No callers resolved. Absence of edges is not evidence the symbol is unused: a caller reaching it through a reference class this index does not record — plain-object property access, a bare-identifier read of a module-scope const — produces no edge to find. Confirm with a text search before treating the change as safe."
+        }
+      ]
+    }
+  }
+]

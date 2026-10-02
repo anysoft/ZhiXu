@@ -1,3 +1,4 @@
+import { useLocale as useI18nLocale } from '@/utils/i18n';
 import intl from 'react-intl-universal';
 import React, { useRef, useState, useEffect } from 'react';
 import { Tooltip, Typography, message } from 'antd';
@@ -7,6 +8,7 @@ import { CopyToClipboard } from 'react-copy-to-clipboard';
 const { Link } = Typography;
 
 const Copy = ({ text }: { text: string }) => {
+  useI18nLocale();
   const [copied, setCopied] = useState(false);
   const copyIdRef = useRef<number>();
 

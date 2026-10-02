@@ -1,3 +1,4 @@
+import { useLocale as useI18nLocale } from '@/utils/i18n';
 import intl from 'react-intl-universal';
 import React, { useEffect, useState } from 'react';
 import { Modal, message, Input, Form, Statistic, Button } from 'antd';
@@ -22,7 +23,8 @@ const SubscriptionLogModal = ({
   data?: string;
   logUrl?: string;
 }) => {
-  const [value, setValue] = useState<string>(intl.get('启动中...'));
+  useI18nLocale();
+  const [value, setValue] = useState<string>('');
   const [loading, setLoading] = useState<any>(true);
   const [executing, setExecuting] = useState<any>(true);
   const [isPhone, setIsPhone] = useState(false);
@@ -43,7 +45,7 @@ const SubscriptionLogModal = ({
           localStorage.getItem('logSubscription') === String(subscription.id)
         ) {
           const log = data as string;
-          setValue(log || intl.get('暂无日志'));
+          setValue(log);
           setExecuting(log && !logEnded(log));
           if (log && !logEnded(log)) {
             setTimeout(() => {
@@ -121,7 +123,9 @@ const SubscriptionLogModal = ({
                 : {}
             }
           >
-            <Ansi>{value}</Ansi>
+            <Ansi>
+              {value || intl.get(executing ? '启动中...' : '暂无日志')}
+            </Ansi>
           </pre>
         )}
       </div>

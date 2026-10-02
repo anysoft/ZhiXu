@@ -1,7 +1,9 @@
+import { t as tr } from '@/utils/i18n';
+import { getEffectiveLocale } from './i18n';
 import intl from 'react-intl-universal';
 const baseUrl = window.__ENV__QlBaseUrl || '/';
 
-export default {
+const buildConfig = () => ({
   siteName: intl.get('枝序'),
   baseUrl,
   apiPrefix: `${baseUrl}api/`,
@@ -55,7 +57,7 @@ export default {
     { value: 'pushPlus', label: 'PushPlus' },
     { value: 'wePlusBot', label: intl.get('微加机器人') },
     { value: 'wxPusherBot', label: 'wxPusher' },
-    { value: 'wxPusherSpt', label: 'WxPusher(极简推送SPT-推荐)' },
+    { value: 'wxPusherSpt', label: tr('ui.wxpusherSimpleSPTRecommended') },
     { value: 'openiLink', label: 'OpeniLink' },
     { value: 'wpush', label: 'WPUSH' },
     { value: 'chat', label: intl.get('群晖chat') },
@@ -406,9 +408,7 @@ export default {
       },
       {
         label: 'larkSecret',
-        tip: intl.get(
-          '飞书群组机器人加签密钥，安全设置中开启签名校验后获得',
-        ),
+        tip: intl.get('飞书群组机器人加签密钥，安全设置中开启签名校验后获得'),
       },
     ],
     email: [
@@ -516,11 +516,23 @@ export default {
     '/env': intl.get('环境变量'),
     '/subscription': intl.get('订阅管理'),
     '/config': intl.get('配置文件'),
-    '/workspace': 'Code Workspace',
+    '/workspace': tr('ui.codeWorkspace'),
     '/log': intl.get('日志管理'),
     '/setting': intl.get('系统设置'),
     '/error': intl.get('错误日志'),
-    '/runtime-python': 'Runtime · Python',
+    '/runtime-python': tr('ui.extra.runtimePython'),
     '/dashboard': intl.get('仪表盘'),
   },
-};
+});
+let cachedLocale = '';
+let cached: ReturnType<typeof buildConfig>;
+export default new Proxy({} as ReturnType<typeof buildConfig>, {
+  get(_target, property) {
+    const locale = getEffectiveLocale();
+    if (!cached || cachedLocale !== locale) {
+      cached = buildConfig();
+      cachedLocale = locale;
+    }
+    return Reflect.get(cached, property);
+  },
+});

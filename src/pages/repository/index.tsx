@@ -1,3 +1,7 @@
+import { translateEnum, translateError } from '@/utils/i18n';
+import { formatDateTime, formatDuration, formatBytes } from '@/utils/format';
+import { useLocale as useI18nLocale } from '@/utils/i18n';
+import { t as tr } from '@/utils/i18n';
 import React, { useEffect, useState } from 'react';
 import {
   Alert,
@@ -18,6 +22,7 @@ import { request } from '@/utils/http';
 import config from '@/utils/config';
 
 export default function RepositoryPage() {
+  useI18nLocale();
   const [repositories, setRepositories] = useState<any[]>([]);
   const [credentials, setCredentials] = useState<any[]>([]);
   const [editor, setEditor] = useState<{
@@ -89,7 +94,7 @@ export default function RepositoryPage() {
         setEditor(null);
         form.resetFields();
         await load();
-        message.success('已保存');
+        message.success(tr('ui.saved'));
       }
     } catch {
     } finally {
@@ -122,17 +127,27 @@ export default function RepositoryPage() {
     }
   };
   const credentialOptions = [
-    { value: null, label: 'Anonymous / 无凭证' },
+    { value: null, label: tr('ui.anonymous') },
     ...credentials.map((c) => ({
       value: c.id,
-      label: `${c.name} (${c.auth_type}, ${c.status})`,
+      label: `${c.name} (${c.auth_type}, ${translateEnum(
+        'credentialState',
+        c.status,
+      )})`,
     })),
   ];
   const actions = (kind: 'repositories' | 'git-credentials', row: any) => (
     <Space wrap>
-      {kind === 'repositories' && <Button size="small" href={`${config.baseUrl}repository-workspace?id=${row.id}`}>工作区</Button>}
+      {kind === 'repositories' && (
+        <Button
+          size="small"
+          href={`${config.baseUrl}repository-workspace?id=${row.id}`}
+        >
+          {tr('ui.workspace')}
+        </Button>
+      )}
       <Button size="small" onClick={() => open(kind, row)}>
-        编辑
+        {tr('ui.edit')}
       </Button>
       <Button
         size="small"
@@ -143,10 +158,10 @@ export default function RepositoryPage() {
             : (setTestTarget(row), setTestUrl(''))
         }
       >
-        测试访问
+        {tr('ui.testAccess')}
       </Button>
       <Popconfirm
-        title="删除此资源？被引用的资源不能删除。"
+        title={tr('ui.deleteThisResourceReferencedResourcesCannotBeDeleted')}
         onConfirm={() => remove(kind, row.id)}
       >
         <Button
@@ -158,44 +173,54 @@ export default function RepositoryPage() {
               : row.used_by?.total > 0
           }
         >
-          删除
+          {tr('ui.delete')}
         </Button>
       </Popconfirm>
     </Space>
   );
   return (
     <div style={{ padding: 24 }}>
-      <h2>仓库管理</h2>
-      <Button href={`${config.baseUrl}scoped-env`}>Environment Profiles</Button>
+      <h2>{tr('ui.repositoriesVariant425')}</h2>
+      <Button href={`${config.baseUrl}scoped-env`}>
+        {tr('ui.environmentProfiles')}
+      </Button>
       <Tabs
         items={[
           {
             key: 'repositories',
-            label: 'Repositories / 仓库',
+            label: tr('ui.repositories'),
             children: (
               <>
                 <Button type="primary" onClick={() => open('repositories')}>
-                  创建仓库
+                  {tr('ui.createRepository')}
                 </Button>
                 <Table
                   rowKey="id"
                   dataSource={repositories}
                   scroll={{ x: 1000 }}
                   columns={[
-                    { title: '名称', dataIndex: 'name' },
-                    { title: 'Provider', dataIndex: 'provider' },
-                    { title: 'Remote', dataIndex: 'remote_url' },
+                    { title: tr('ui.name'), dataIndex: 'name' },
+                    { title: tr('ui.provider'), dataIndex: 'provider' },
+                    { title: tr('ui.remote'), dataIndex: 'remote_url' },
                     {
-                      title: '默认凭证',
+                      title: tr('ui.defaultCredential'),
                       render: (_, r) =>
                         credentials.find(
                           (c) => c.id === r.default_credential_id,
-                        )?.name || 'Anonymous',
+                        )?.name || tr('ui.extra.anonymous'),
                     },
-                    { title: '订阅数', dataIndex: 'subscriptions_count' },
-                    { title: '状态', dataIndex: 'status' },
                     {
-                      title: '操作',
+                      title: tr('ui.subscriptions'),
+                      dataIndex: 'subscriptions_count',
+                    },
+                    {
+                      title: tr('ui.status'),
+                      dataIndex: 'status',
+                      render: (value: unknown) =>
+                        translateEnum('repositoryAvailability', value),
+                    },
+                    {
+                      title: tr('ui.action'),
                       render: (_, r) => actions('repositories', r),
                     },
                   ]}
@@ -205,47 +230,64 @@ export default function RepositoryPage() {
           },
           {
             key: 'credentials',
-            label: 'Credentials / 凭证',
+            label: tr('ui.credentials'),
             children: (
               <>
                 <Button type="primary" onClick={() => open('git-credentials')}>
-                  创建凭证
+                  {tr('ui.createCredential')}
                 </Button>
                 <Table
                   rowKey="id"
                   dataSource={credentials}
                   scroll={{ x: 1200 }}
                   columns={[
-                    { title: '名称', dataIndex: 'name' },
-                    { title: 'Provider', dataIndex: 'provider' },
-                    { title: '认证类型', dataIndex: 'auth_type' },
-                    { title: '用户名', dataIndex: 'username' },
+                    { title: tr('ui.name'), dataIndex: 'name' },
+                    { title: tr('ui.provider'), dataIndex: 'provider' },
                     {
-                      title: '能力',
+                      title: tr('ui.authenticationType'),
+                      dataIndex: 'auth_type',
+                    },
+                    { title: tr('ui.username'), dataIndex: 'username' },
+                    {
+                      title: tr('ui.capability'),
                       dataIndex: 'capability',
-                      render: (v) => <Tag>{v}</Tag>,
+                      render: (v) => (
+                        <Tag>{translateEnum('credentialCapability', v)}</Tag>
+                      ),
                     },
                     {
-                      title: 'Secret',
+                      title: tr('ui.secret'),
                       render: (_, r) => (r.has_secret ? '••••••••' : '—'),
                     },
                     {
-                      title: '引用',
+                      title: tr('ui.references'),
                       render: (_, r) =>
-                        `${r.used_by.repositories} 仓库`,
+                        tr('ui.presentation.repositoryCount', {
+                          count: r.used_by.repositories,
+                        }),
                     },
-                    { title: '状态', dataIndex: 'status' },
                     {
-                      title: '最近测试',
+                      title: tr('ui.status'),
+                      dataIndex: 'status',
+                      render: (value: unknown) =>
+                        translateEnum('repositoryAvailability', value),
+                    },
+                    {
+                      title: tr('ui.lastTest'),
                       render: (_, r) =>
                         r.last_test_at
-                          ? `${r.last_test_result} · ${new Date(
-                              r.last_test_at,
-                            ).toLocaleString()}`
-                          : '未测试',
+                          ? `${
+                              r.last_test_result
+                                ? translateEnum(
+                                    'repositoryAvailability',
+                                    r.last_test_result,
+                                  )
+                                : '—'
+                            } · ${formatDateTime(r.last_test_at)}`
+                          : tr('ui.extra.notTested'),
                     },
                     {
-                      title: '操作',
+                      title: tr('ui.action'),
                       render: (_, r) => actions('git-credentials', r),
                     },
                   ]}
@@ -257,7 +299,11 @@ export default function RepositoryPage() {
       />
       <Modal
         open={!!editor}
-        title={editor?.kind === 'repositories' ? '仓库信息' : 'Git 凭证'}
+        title={
+          editor?.kind === 'repositories'
+            ? tr('ui.extra.repositoryDetails')
+            : tr('ui.extra.gitCredentials')
+        }
         onCancel={() => {
           setEditor(null);
           form.resetFields();
@@ -267,16 +313,22 @@ export default function RepositoryPage() {
         destroyOnClose
       >
         <Form form={form} layout="vertical" preserve={false}>
-          <Form.Item name="name" label="名称" rules={[{ required: true }]}>
+          <Form.Item
+            name="name"
+            label={tr('ui.name')}
+            rules={[{ required: true }]}
+          >
             <Input maxLength={255} />
           </Form.Item>
           {editor?.kind === 'repositories' ? (
             <>
               <Form.Item
                 name="remote_url"
-                label="Remote URL"
+                label={tr('ui.remoteURL')}
                 rules={[{ required: true }]}
-                extra="支持 HTTPS、SSH 和 Generic Git；URL 中不可包含 Token 或密码。保存后 Remote 固定。"
+                extra={tr(
+                  'ui.supportsHTTPSSSHAndGenericGitURLsMustNotIncludeTokensOrPasswordsTheRemoteIdentityIsFixedAfterSaving',
+                )}
               >
                 <Input
                   disabled={!!editor.row.id}
@@ -297,13 +349,21 @@ export default function RepositoryPage() {
                 <Alert
                   type="info"
                   message={`${parsed.provider} · ${parsed.host}`}
-                  description={`Owner: ${parsed.owner || '—'} / Repository: ${
-                    parsed.repository_name
-                  } / Path: ${parsed.path}`}
+                  description={tr(
+                    'ui.template.ownerValueRepositoryValuePathValue',
+                    {
+                      p0: parsed.owner || '—',
+                      p1: parsed.repository_name,
+                      p2: parsed.path,
+                    },
+                  )}
                   style={{ marginBottom: 16 }}
                 />
               )}
-              <Form.Item name="default_credential_id" label="默认凭证">
+              <Form.Item
+                name="default_credential_id"
+                label={tr('ui.defaultCredential')}
+              >
                 <Select options={credentialOptions} />
               </Form.Item>
               {editor.row.id && (
@@ -311,16 +371,16 @@ export default function RepositoryPage() {
                   loading={busy}
                   onClick={() => test('repositories', editor.row.id)}
                 >
-                  测试已保存的仓库
+                  {tr('ui.testSavedRepository')}
                 </Button>
               )}
-              {!editor.row.id && <p>保存后可测试访问。</p>}
+              {!editor.row.id && <p>{tr('ui.saveBeforeTestingAccess')}</p>}
             </>
           ) : (
             <>
               <Form.Item
                 name="provider"
-                label="Provider"
+                label={tr('ui.provider')}
                 rules={[{ required: true }]}
               >
                 <Select
@@ -329,7 +389,7 @@ export default function RepositoryPage() {
                   )}
                 />
               </Form.Item>
-              <Form.Item name="auth_type" label="认证方式">
+              <Form.Item name="auth_type" label={tr('ui.authenticationMethod')}>
                 <Select
                   disabled={!!editor?.row.id}
                   options={['anonymous', 'https_token', 'ssh_key'].map(
@@ -337,43 +397,49 @@ export default function RepositoryPage() {
                   )}
                 />
               </Form.Item>
-              <Form.Item name="username" label="用户名">
+              <Form.Item name="username" label={tr('ui.username')}>
                 <Input autoComplete="off" />
               </Form.Item>
-              <Form.Item name="capability" label="能力">
+              <Form.Item name="capability" label={tr('ui.capability')}>
                 <Select
                   options={[
-                    { value: 'READ', label: 'READ' },
-                    { value: 'WRITE', label: 'WRITE' },
+                    {
+                      value: 'READ',
+                      label: translateEnum('credentialCapability', 'READ'),
+                    },
+                    {
+                      value: 'WRITE',
+                      label: translateEnum('credentialCapability', 'WRITE'),
+                    },
                   ]}
                 />
               </Form.Item>
-              <Form.Item name="status" label="状态">
+              <Form.Item name="status" label={tr('ui.status')}>
                 <Select
                   options={[
-                    { value: 'enabled', label: '启用' },
-                    { value: 'disabled', label: '停用' },
+                    { value: 'enabled', label: tr('ui.enable') },
+                    { value: 'disabled', label: tr('ui.disable') },
                   ]}
                 />
               </Form.Item>
               {auth !== 'anonymous' && (
                 <Form.Item
                   name="replace_secret"
-                  label="Secret"
+                  label={tr('ui.secret')}
                   initialValue={!editor?.row.id}
                 >
                   <Radio.Group>
                     <Radio value={false} disabled={!editor?.row.id}>
-                      保持现有 Secret
+                      {tr('ui.keepExistingSecret')}
                     </Radio>
-                    <Radio value={true}>替换 Secret</Radio>
+                    <Radio value={true}>{tr('ui.replaceSecret')}</Radio>
                   </Radio.Group>
                 </Form.Item>
               )}
               {replace && auth === 'https_token' && (
                 <Form.Item
                   name="token"
-                  label="Token"
+                  label={tr('ui.token')}
                   rules={[{ required: true }]}
                 >
                   <Input.Password autoComplete="new-password" />
@@ -383,12 +449,15 @@ export default function RepositoryPage() {
                 <>
                   <Form.Item
                     name="private_key"
-                    label="SSH Private Key"
+                    label={tr('ui.sshPrivateKey')}
                     rules={[{ required: true }]}
                   >
                     <Input.TextArea rows={5} autoComplete="off" />
                   </Form.Item>
-                  <Form.Item name="passphrase" label="Passphrase（可选）">
+                  <Form.Item
+                    name="passphrase"
+                    label={tr('ui.passphraseOptional')}
+                  >
                     <Input.Password autoComplete="new-password" />
                   </Form.Item>
                 </>
@@ -396,15 +465,17 @@ export default function RepositoryPage() {
               {(auth === 'ssh_key' || auth === 'anonymous') && (
                 <Form.Item
                   name="known_hosts"
-                  label="已验证的 known_hosts"
+                  label={tr('ui.verifiedKnownHosts')}
                   rules={[{ required: auth === 'ssh_key' }]}
-                  extra="请通过可信渠道核对主机公钥。SSH 连接强制校验主机身份。"
+                  extra={tr(
+                    'ui.verifyTheHostPublicKeyThroughATrustedChannelSSHConnectionsEnforceHostIdentityVerification',
+                  )}
                 >
                   <Input.TextArea rows={3} />
                 </Form.Item>
               )}
               {editor?.row.public_key && (
-                <Form.Item label="公钥">
+                <Form.Item label={tr('ui.publicKey')}>
                   <Input.TextArea readOnly value={editor.row.public_key} />
                 </Form.Item>
               )}
@@ -414,12 +485,18 @@ export default function RepositoryPage() {
       </Modal>
       <Modal
         open={!!testTarget}
-        title={`测试凭证：${testTarget?.name || ''}`}
+        title={tr('ui.template.testCredentialValue', {
+          p0: testTarget?.name || '',
+        })}
         confirmLoading={busy}
         onCancel={() => setTestTarget(null)}
         onOk={() => test('git-credentials', testTarget.id, testUrl)}
       >
-        <p>请输入使用此凭证访问的仓库 URL。测试只读取远端引用。</p>
+        <p>
+          {tr(
+            'ui.enterARepositoryURLToTestWithThisCredentialTheTestOnlyReadsRemoteReferences',
+          )}
+        </p>
         <Input
           value={testUrl}
           onChange={(e) => setTestUrl(e.target.value)}

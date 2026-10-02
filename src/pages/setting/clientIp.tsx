@@ -1,3 +1,4 @@
+import { useLocale as useI18nLocale } from '@/utils/i18n';
 import React, { useEffect, useState } from 'react';
 import intl from 'react-intl-universal';
 import {
@@ -53,6 +54,7 @@ function parseSetting(setting: string) {
 }
 
 const ClientIp = () => {
+  useI18nLocale();
   const [configInfo, setConfigInfo] = useState<TrustProxyConfig>();
   const [diagnostic, setDiagnostic] = useState<ClientIpDiagnostic>();
   const [mode, setMode] = useState<TrustProxyMode>('direct');

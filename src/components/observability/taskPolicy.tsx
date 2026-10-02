@@ -1,3 +1,7 @@
+import { fieldLabel, fieldValue } from '@/utils/presentation';
+import { translateEnum, translateError } from '@/utils/i18n';
+import { useLocale as useI18nLocale } from '@/utils/i18n';
+import { t as tr } from '@/utils/i18n';
 import React, { useEffect, useState } from 'react';
 import {
   Alert,
@@ -13,6 +17,7 @@ import { request } from '@/utils/http';
 import config from '@/utils/config';
 import { obsGet } from './index';
 export function TaskHealth({ id }: { id: number }) {
+  useI18nLocale();
   const [health, setHealth] = useState<any>();
   useEffect(() => {
     const load = () => obsGet(`tasks/${id}/health`).then(setHealth);
@@ -22,11 +27,15 @@ export function TaskHealth({ id }: { id: number }) {
   }, [id]);
   return (
     <>
-      <Alert message="Health describes completed executions; readiness describes whether a task can execute." />
+      <Alert
+        message={tr(
+          'ui.healthDescribesCompletedExecutionsReadinessDescribesWhetherATaskCanExecute',
+        )}
+      />
       <Descriptions column={1}>
         {Object.entries(health ?? {}).map(([key, value]) => (
-          <Descriptions.Item key={key} label={key}>
-            {String(value ?? '—')}
+          <Descriptions.Item key={key} label={fieldLabel(key)}>
+            {fieldValue(key, value)}
           </Descriptions.Item>
         ))}
       </Descriptions>
@@ -43,6 +52,7 @@ const flags = [
   'notify_recovery',
 ];
 export default function TaskPolicy({ id }: { id: number }) {
+  useI18nLocale();
   const [policy, setPolicy] = useState<any>(),
     [channels, setChannels] = useState<any[]>([]);
   const [form] = Form.useForm();
@@ -60,11 +70,14 @@ export default function TaskPolicy({ id }: { id: number }) {
   }, [id]);
   return (
     <Form form={form} layout="vertical">
-      <Form.Item label="Preset">
+      <Form.Item label={tr('ui.preset')}>
         <Select
-          placeholder="CUSTOM"
+          placeholder={tr('ui.custom')}
           options={['NONE', 'FAILURE', 'SUCCESS', 'ALWAYS', 'CUSTOM'].map(
-            (value) => ({ value, label: value }),
+            (value) => ({
+              value,
+              label: translateEnum('notificationPolicy', value),
+            }),
           )}
           onChange={(mode) => {
             if (mode === 'CUSTOM') return;
@@ -85,31 +98,31 @@ export default function TaskPolicy({ id }: { id: number }) {
       {flags.map((k) => (
         <Form.Item
           key={k}
-          label={k.replaceAll('_', ' ')}
+          label={fieldLabel(k)}
           name={k}
           valuePropName="checked"
         >
           <Switch />
         </Form.Item>
       ))}
-      <Form.Item name="failure_threshold" label="Failure threshold">
+      <Form.Item name="failure_threshold" label={tr('ui.failureThreshold')}>
         <InputNumber min={1} max={1000} />
       </Form.Item>
       <Form.Item
         name="repeat_every_failures"
-        label="Repeat every failures (0 = once per incident)"
+        label={tr('ui.repeatEveryFailures0OncePerIncident')}
       >
         <InputNumber min={0} max={1000} />
       </Form.Item>
-      <Form.Item name="channel_mode" label="Channel mode">
+      <Form.Item name="channel_mode" label={tr('ui.channelMode')}>
         <Select
           options={['DEFAULT', 'EXPLICIT', 'NONE'].map((value) => ({
             value,
-            label: value,
+            label: translateEnum('channelMode', value),
           }))}
         />
       </Form.Item>
-      <Form.Item name="channels" label="Explicit channels">
+      <Form.Item name="channels" label={tr('ui.explicitChannels')}>
         <Select
           mode="multiple"
           options={channels
@@ -126,12 +139,12 @@ export default function TaskPolicy({ id }: { id: number }) {
             { ...v, expected_version: policy.version },
           );
           if (r.code === 200) {
-            message.success('Notification policy saved');
+            message.success(tr('ui.notificationPolicySaved'));
             await load();
-          } else message.error(r.error_code);
+          } else message.error(translateError(r.error_code));
         }}
       >
-        Save notification policy
+        {tr('ui.saveNotificationPolicy')}
       </Button>
     </Form>
   );

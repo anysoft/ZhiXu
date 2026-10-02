@@ -1,0 +1,230 @@
+[
+  {
+    "file": "src/components/NodeRuntime/index.tsx",
+    "value": "`${r.metadata.platform ?? '—'} / ${\n                          r.metadata.architecture ?? '—'\n                        }`",
+    "classification": "USER_CONTENT_TEMPLATE",
+    "reason": "Runtime platform, architecture, exact version, package manager and LTS codename are technical identities."
+  },
+  {
+    "file": "src/components/NodeRuntime/index.tsx",
+    "value": "`${x.version}${x.lts ? ' · LTS ' + x.lts : ''}`",
+    "classification": "USER_CONTENT_TEMPLATE",
+    "reason": "Runtime platform, architecture, exact version, package manager and LTS codename are technical identities."
+  },
+  {
+    "file": "src/components/NodeRuntime/index.tsx",
+    "value": "`${x.manager_type} ${x.version}`",
+    "classification": "USER_CONTENT_TEMPLATE",
+    "reason": "Runtime platform, architecture, exact version, package manager and LTS codename are technical identities."
+  },
+  {
+    "file": "src/components/NodeRuntime/index.tsx",
+    "value": "`${r.metadata.node_version ?? ''} / ${\n                              r.metadata.manager_type ?? ''\n                            } ${r.metadata.manager_version ?? ''}`",
+    "classification": "USER_CONTENT_TEMPLATE",
+    "reason": "Runtime platform, architecture, exact version, package manager and LTS codename are technical identities."
+  },
+  {
+    "file": "src/components/PythonEnvironments/index.tsx",
+    "value": "`#${x}`",
+    "classification": "USER_CONTENT_TEMPLATE",
+    "reason": "Build identity/package counts or version tuple; state and health are translated before composition."
+  },
+  {
+    "file": "src/components/PythonEnvironments/index.tsx",
+    "value": "`${row.direct_packages} / ${row.resolved_packages}`",
+    "classification": "USER_CONTENT_TEMPLATE",
+    "reason": "Build identity/package counts or version tuple; state and health are translated before composition."
+  },
+  {
+    "file": "src/components/PythonEnvironments/index.tsx",
+    "value": "`${translateEnum('pythonBuild', x.state)} / ${translateEnum('health', x.health)}`",
+    "classification": "USER_CONTENT_TEMPLATE",
+    "reason": "Build identity/package counts or version tuple; state and health are translated before composition."
+  },
+  {
+    "file": "src/components/PythonEnvironments/index.tsx",
+    "value": "`CPython ${x.version} (#${x.id})`",
+    "classification": "USER_CONTENT_TEMPLATE",
+    "reason": "Build identity/package counts or version tuple; state and health are translated before composition."
+  },
+  {
+    "file": "src/components/config-bindings.tsx",
+    "value": "`${translateEnum('bindingBase', row.target_base)}/${row.target_path}`",
+    "classification": "USER_CONTENT_TEMPLATE",
+    "reason": "User path or asset name; binding-base and secret suffix are translated before composition."
+  },
+  {
+    "file": "src/components/config-bindings.tsx",
+    "value": "`${translateEnum('bindingBase', row.binding.target_base)}/${row.binding.target_path}`",
+    "classification": "USER_CONTENT_TEMPLATE",
+    "reason": "User path or asset name; binding-base and secret suffix are translated before composition."
+  },
+  {
+    "file": "src/components/config-bindings.tsx",
+    "value": "`${asset.name}${asset.is_secret ? tr('common.secretSuffix') : ''}`",
+    "classification": "USER_CONTENT_TEMPLATE",
+    "reason": "User path or asset name; binding-base and secret suffix are translated before composition."
+  },
+  {
+    "file": "src/components/scoped-environment.tsx",
+    "value": "`${p.name}${p.is_default ? tr('common.defaultSuffix') : ''}${p.status === 'disabled' ? tr('common.disabledSuffix') : ''}`",
+    "classification": "USER_CONTENT_TEMPLATE",
+    "reason": "User profile name with localized default/disabled suffixes."
+  },
+  {
+    "file": "src/pages/login/index.tsx",
+    "value": "`${intl.get('用户名')}${\n                  isDemoEnv ? ': admin' : ''\n                }`",
+    "classification": "USER_CONTENT_TEMPLATE",
+    "reason": "Translated field labels with literal demo credential examples; user data is not translated."
+  },
+  {
+    "file": "src/pages/login/index.tsx",
+    "value": "`${intl.get('密码')}${isDemoEnv ? ': 123' : ''}`",
+    "classification": "USER_CONTENT_TEMPLATE",
+    "reason": "Translated field labels with literal demo credential examples; user data is not translated."
+  },
+  {
+    "file": "src/pages/repository/index.tsx",
+    "value": "`${c.name} (${c.auth_type}, ${translateEnum('credentialState', c.status)})`",
+    "classification": "USER_CONTENT_TEMPLATE",
+    "reason": "User credential identity or provider/host; status and timestamp are localized before composition."
+  },
+  {
+    "file": "src/pages/repository/index.tsx",
+    "value": "`${r.last_test_result ? translateEnum('repositoryAvailability', r.last_test_result) : '—'} · ${formatDateTime(r.last_test_at)}`",
+    "classification": "USER_CONTENT_TEMPLATE",
+    "reason": "User credential identity or provider/host; status and timestamp are localized before composition."
+  },
+  {
+    "file": "src/pages/repository/index.tsx",
+    "value": "`${parsed.provider} · ${parsed.host}`",
+    "classification": "USER_CONTENT_TEMPLATE",
+    "reason": "User credential identity or provider/host; status and timestamp are localized before composition."
+  },
+  {
+    "file": "src/pages/repository-workspace.tsx",
+    "value": "`PID ${diagnostics.lock.owner?.pid || '—'}`",
+    "classification": "USER_CONTENT_TEMPLATE",
+    "reason": "Git user ref or numeric process/lease/ahead/behind diagnostics; ref type is localized before composition."
+  },
+  {
+    "file": "src/pages/repository-workspace.tsx",
+    "value": "`${translateEnum('refType', r.ref_type)}: ${r.ref_name}`",
+    "classification": "USER_CONTENT_TEMPLATE",
+    "reason": "Git user ref or numeric process/lease/ahead/behind diagnostics; ref type is localized before composition."
+  },
+  {
+    "file": "src/pages/repository-workspace.tsx",
+    "value": "`${r.status_snapshot?.ahead ?? '—'} / ${\n                          r.status_snapshot?.behind ?? '—'\n                        }`",
+    "classification": "USER_CONTENT_TEMPLATE",
+    "reason": "Git user ref or numeric process/lease/ahead/behind diagnostics; ref type is localized before composition."
+  },
+  {
+    "file": "src/pages/repository-workspace.tsx",
+    "value": "`${detail.lease.owner?.operation} · ${detail.lease.owner?.owner_type}/${detail.lease.owner?.owner_id} · PID ${detail.lease.owner?.pid}`",
+    "classification": "USER_CONTENT_TEMPLATE",
+    "reason": "Git user ref or numeric process/lease/ahead/behind diagnostics; ref type is localized before composition."
+  },
+  {
+    "file": "src/pages/runtime-python.tsx",
+    "value": "pyenv",
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "pyenv provider name or Python version, both technical identities."
+  },
+  {
+    "file": "src/pages/runtime-python.tsx",
+    "value": "`Python ${detail?.version ?? ''}`",
+    "classification": "USER_CONTENT_TEMPLATE",
+    "reason": "pyenv provider name or Python version, both technical identities."
+  },
+  {
+    "file": "src/pages/setting/clientIp.tsx",
+    "value": "`${value} ${intl.get('跳')}`",
+    "classification": "USER_CONTENT_TEMPLATE",
+    "reason": "Numeric proxy hop count with existing translated unit."
+  },
+  {
+    "file": "src/pages/setting/progress.tsx",
+    "value": "`${title}${\n          percent >= 100 ? intl.get('成功') : intl.get('中...')\n        }`",
+    "classification": "USER_CONTENT_TEMPLATE",
+    "reason": "Caller-provided localized title and translated progress suffix."
+  },
+  {
+    "file": "src/pages/setting/progress.tsx",
+    "value": "`${title}${\n          percent >= 100 ? intl.get('成功') : intl.get('中...')\n        }`",
+    "classification": "USER_CONTENT_TEMPLATE",
+    "reason": "Caller-provided localized title and translated progress suffix."
+  },
+  {
+    "file": "src/pages/subscription/index.tsx",
+    "value": "`${translateEnum('subscriptionPhase', row.last_sync_phase)} ${\n                row.last_sync_error ? translateError(row.last_sync_error) : ''\n              } ${formatDateTime(row.last_sync_at)} ${row.last_synced_commit || ''}`",
+    "classification": "USER_CONTENT_TEMPLATE",
+    "reason": "Localized sync phase/error/time plus raw commit identity."
+  },
+  {
+    "file": "src/pages/tasks/triggers.tsx",
+    "value": "/hooks/",
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Internal webhook URL path segment, not a UI label."
+  },
+  {
+    "file": "src/pages/workspace.tsx",
+    "value": "`${w.name} (#${w.id})`",
+    "classification": "USER_CONTENT_TEMPLATE",
+    "reason": "User worktree name and numeric identity, or source line number."
+  },
+  {
+    "file": "src/pages/workspace.tsx",
+    "value": "`:${r.line}`",
+    "classification": "USER_CONTENT_TEMPLATE",
+    "reason": "User worktree name and numeric identity, or source line number."
+  },
+  {
+    "file": "src/components/PythonEnvironments/index.tsx",
+    "value": "`${translateEnum(\n                              'pythonBuild',\n                              x.state,\n                            )} / ${translateEnum('health', x.health)}`",
+    "classification": "USER_CONTENT_TEMPLATE",
+    "reason": "Formatted composition of user data or technical identifiers with previously reviewed localized wrappers; raw user data remains unchanged."
+  },
+  {
+    "file": "src/components/config-bindings.tsx",
+    "value": "`${translateEnum('bindingBase', row.binding.target_base)}/${\n                    row.binding.target_path\n                  }`",
+    "classification": "USER_CONTENT_TEMPLATE",
+    "reason": "Formatted composition of user data or technical identifiers with previously reviewed localized wrappers; raw user data remains unchanged."
+  },
+  {
+    "file": "src/components/config-bindings.tsx",
+    "value": "`${asset.name}${\n                  asset.is_secret ? tr('common.secretSuffix') : ''\n                }`",
+    "classification": "USER_CONTENT_TEMPLATE",
+    "reason": "Formatted composition of user data or technical identifiers with previously reviewed localized wrappers; raw user data remains unchanged."
+  },
+  {
+    "file": "src/components/scoped-environment.tsx",
+    "value": "`${p.name}${\n                  p.is_default ? tr('common.defaultSuffix') : ''\n                }${p.status === 'disabled' ? tr('common.disabledSuffix') : ''}`",
+    "classification": "USER_CONTENT_TEMPLATE",
+    "reason": "Formatted composition of user data or technical identifiers with previously reviewed localized wrappers; raw user data remains unchanged."
+  },
+  {
+    "file": "src/pages/repository/index.tsx",
+    "value": "`${c.name} (${c.auth_type}, ${translateEnum(\n        'credentialState',\n        c.status,\n      )})`",
+    "classification": "USER_CONTENT_TEMPLATE",
+    "reason": "Formatted composition of user data or technical identifiers with previously reviewed localized wrappers; raw user data remains unchanged."
+  },
+  {
+    "file": "src/pages/repository/index.tsx",
+    "value": "`${\n                              r.last_test_result\n                                ? translateEnum(\n                                    'repositoryAvailability',\n                                    r.last_test_result,\n                                  )\n                                : '—'\n                            } · ${formatDateTime(r.last_test_at)}`",
+    "classification": "USER_CONTENT_TEMPLATE",
+    "reason": "Formatted composition of user data or technical identifiers with previously reviewed localized wrappers; raw user data remains unchanged."
+  },
+  {
+    "file": "src/pages/repository-workspace.tsx",
+    "value": "`${translateEnum('refType', r.ref_type)}: ${\n                          r.ref_name\n                        }`",
+    "classification": "USER_CONTENT_TEMPLATE",
+    "reason": "Formatted composition of user data or technical identifiers with previously reviewed localized wrappers; raw user data remains unchanged."
+  },
+  {
+    "file": "src/pages/subscription/index.tsx",
+    "value": "`${translateEnum(\n                'subscriptionPhase',\n                row.last_sync_phase,\n              )} ${\n                row.last_sync_error ? translateError(row.last_sync_error) : ''\n              } ${formatDateTime(row.last_sync_at)} ${\n                row.last_synced_commit || ''\n              }`",
+    "classification": "USER_CONTENT_TEMPLATE",
+    "reason": "Formatted composition of user data or technical identifiers with previously reviewed localized wrappers; raw user data remains unchanged."
+  }
+]

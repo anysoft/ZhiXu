@@ -30,7 +30,8 @@ async function fixture(page, broken = false) {
 }
 
 test('focus-time layout shift loses the old click; focus-before-click activates with one click', async () => {
-  const page = await browser.newPage();
+  const page = await browser.newPage({ locale: 'en-US' });
+  await page.addInitScript(() => localStorage.setItem('lang', 'en-US'));
   try {
     await fixture(page);
     const tab = page.getByRole('tab', { name: 'Runtime' });
@@ -44,7 +45,7 @@ test('focus-time layout shift loses the old click; focus-before-click activates 
 });
 
 test('broken activation still fails, reports selected stage, excludes form values and never retries click', async () => {
-  const page = await browser.newPage();
+  const page = await browser.newPage({ locale: 'en-US' });
   try {
     await fixture(page, true);
     await assert.rejects(activateTab(page.getByRole('dialog'), 'Runtime', { timeout: 700 }), error => {
@@ -86,7 +87,7 @@ test('real Ant Design modal with overflowing tabs switches Source, Runtime and S
 });
 
 test('select in animated nested Ant Design modal picks its own option and fails for missing options', async () => {
-  const page = await browser.newPage();
+  const page = await browser.newPage({ locale: 'en-US' });
   try {
     await page.setContent('<div id="root"></div>');
     await page.addStyleTag({path: require.resolve('antd/dist/antd.css')});

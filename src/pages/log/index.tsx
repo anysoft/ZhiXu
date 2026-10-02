@@ -1,3 +1,4 @@
+import { useLocale as useI18nLocale } from '@/utils/i18n';
 import useFilterTreeData from '@/hooks/useFilterTreeData';
 import { SharedContext } from '@/layouts';
 import { depthFirstSearch } from '@/utils';
@@ -22,7 +23,7 @@ import {
 import { saveAs } from 'file-saver';
 import debounce from 'lodash/debounce';
 import uniq from 'lodash/uniq';
-import prettyBytes from 'pretty-bytes';
+import { formatBytes } from '@/utils/format';
 import { Key, useCallback, useEffect, useRef, useState } from 'react';
 import intl from 'react-intl-universal';
 import SplitPane from 'react-split-pane';
@@ -31,9 +32,17 @@ import styles from './index.module.less';
 const { Text } = Typography;
 
 const Log = () => {
+  useI18nLocale();
   const { headerStyle, isPhone, theme } = useOutletContext<SharedContext>();
-  const [value, setValue] = useState(intl.get('请选择日志文件'));
-  const [select, setSelect] = useState<string>(intl.get('请选择日志文件'));
+  const [value, setValue] = useState('');
+  const [select, setSelect] = useState<string>('');
+  const [contentState, setContentState] = useState<
+    'empty' | 'loading' | 'loaded'
+  >('empty');
+  const displayValue =
+    contentState === 'loaded'
+      ? value
+      : intl.get(contentState === 'loading' ? '加载中...' : '请选择日志文件');
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [height, setHeight] = useState<number>();
@@ -64,6 +73,7 @@ const Log = () => {
       .then(({ code, data }) => {
         if (code === 200) {
           setValue(data);
+          setContentState('loaded');
         }
       });
   };
@@ -92,11 +102,11 @@ const Log = () => {
     setSelect(value);
 
     if (node.type === 'directory') {
-      setValue(intl.get('请选择日志文件'));
+      setContentState('empty');
       return;
     }
 
-    setValue(intl.get('加载中...'));
+    setContentState('loading');
     getLog(node);
   };
 
@@ -181,7 +191,8 @@ const Log = () => {
   const initState = () => {
     setSelect('');
     setCurrentNode(null);
-    setValue(intl.get('请选择脚本文件'));
+    setValue('');
+    setContentState('empty');
   };
 
   const onExpand = (expKeys: any) => {
@@ -203,7 +214,7 @@ const Log = () => {
       className="ql-container-wrapper log-wrapper"
       title={
         <>
-          {select}
+          {select || intl.get('请选择日志文件')}
           {currentNode?.type === 'file' && (
             <span
               style={{
@@ -214,7 +225,7 @@ const Log = () => {
                 height: 14,
               }}
             >
-              {prettyBytes(currentNode.size)}
+              {formatBytes(currentNode.size)}
             </span>
           )}
         </>
@@ -307,7 +318,7 @@ const Log = () => {
             <Editor
               language="shell"
               theme={theme}
-              value={value}
+              value={displayValue}
               options={{
                 readOnly: true,
                 fontSize: 12,
@@ -321,7 +332,7 @@ const Log = () => {
         )}
         {isPhone && (
           <CodeMirror
-            value={value}
+            value={displayValue}
             readOnly={true}
             theme={theme.includes('dark') ? 'dark' : 'light'}
             onChange={(value, viewUpdate) => {

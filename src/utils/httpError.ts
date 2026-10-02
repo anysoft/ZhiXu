@@ -1,3 +1,4 @@
+import { translateError } from './i18n';
 export interface ValidationErrorResponse {
   errors?: Array<{ message?: string; value?: unknown }>;
   validation?: Record<
@@ -6,25 +7,13 @@ export interface ValidationErrorResponse {
   >;
 }
 
+// Only explicitly typed error codes reach UI. Validation values and raw messages may contain secrets.
 export const getErrorDetails = (data?: ValidationErrorResponse) => {
-  const details =
-    data?.errors?.map((item) =>
-      item.value === undefined
-        ? item.message
-        : `${item.message} (${String(item.value)})`,
-    ) || [];
-
-  Object.values(data?.validation || {}).forEach((validation) => {
-    if (validation.keys?.length) {
-      validation.keys.forEach((key) => {
-        details.push(
-          validation.message ? `${key}: ${validation.message}` : key,
-        );
-      });
-    } else if (validation.message) {
-      details.push(validation.message);
-    }
-  });
-
-  return details.filter((detail): detail is string => Boolean(detail));
+  const codes = (data?.errors || [])
+    .map((item) => item.message)
+    .filter(
+      (value): value is string =>
+        typeof value === 'string' && /^[A-Z][A-Z0-9_]{1,100}$/.test(value),
+    );
+  return [...new Set(codes)].map(translateError);
 };

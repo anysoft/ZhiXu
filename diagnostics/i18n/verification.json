@@ -1,0 +1,74 @@
+{
+  "status": "PASS",
+  "environment": {
+    "platform": "macOS",
+    "node": "22.23.3",
+    "browser": "real Chrome via Playwright",
+    "managed_python": "3.13.15",
+    "hosted_ci_run": false
+  },
+  "checks": {
+    "typescript": "PASS",
+    "frontend_build": "PASS",
+    "backend_build": "PASS",
+    "platform": {
+      "passed": 407,
+      "failed": 0,
+      "skipped": 0
+    },
+    "frontend_i18n_ci": {
+      "passed": 22,
+      "failed": 0
+    },
+    "browser_tabs": {
+      "passed": 4,
+      "failed": 0
+    }
+  },
+  "browsers": {
+    "phase12": {
+      "browser-e2e.json": {
+        "status": "PASS",
+        "steps": 16
+      }
+    },
+    "phase14": {
+      "platform-e2e.json": {
+        "status": "PASS",
+        "steps": 54
+      }
+    },
+    "i18n-zh-CN": {
+      "platform-e2e.json": {
+        "status": "PASS",
+        "steps": 63
+      },
+      "i18n-browser.json": {
+        "status": "PASS",
+        "steps": 9
+      }
+    },
+    "i18n-en-US": {
+      "platform-e2e.json": {
+        "status": "PASS",
+        "steps": 63
+      },
+      "i18n-browser.json": {
+        "status": "PASS",
+        "steps": 9
+      }
+    },
+    "focused-zh-CN": {
+      "i18n-browser.json": {
+        "status": "PASS",
+        "steps": 9
+      }
+    },
+    "focused-en-US": {
+      "i18n-browser.json": {
+        "status": "PASS",
+        "steps": 9
+      }
+    }
+  }
+}

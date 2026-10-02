@@ -1,3 +1,7 @@
+import { translateEnum, translateError } from '@/utils/i18n';
+import { formatDateTime, formatDuration, formatBytes } from '@/utils/format';
+import { useLocale as useI18nLocale } from '@/utils/i18n';
+import { t as tr } from '@/utils/i18n';
 import React, { useEffect, useState } from 'react';
 import {
   Alert,
@@ -30,6 +34,7 @@ export default function PythonEnvironments({
   busy,
   onOperation,
 }: Props) {
+  useI18nLocale();
   const [rows, setRows] = useState<any[]>([]),
     [selected, setSelected] = useState<number>(),
     [environment, setEnvironment] = useState<any>(),
@@ -81,7 +86,7 @@ export default function PythonEnvironments({
     setError('');
   };
   useEffect(() => {
-    load().catch(() => setError('无法读取 Python Environment，请重试。'));
+    load().catch(() => setError('PYTHON_ENV_REQUEST_FAILED'));
     const timer = setInterval(() => load().catch(() => {}), 2000);
     return () => clearInterval(timer);
   }, [selected]);
@@ -94,7 +99,7 @@ export default function PythonEnvironments({
       onOperation(op.id);
       await load();
     } catch {
-      message.error('操作失败，请刷新状态后重试。');
+      message.error(tr('ui.operationFailedRefreshTheStatusBeforeRetrying'));
     } finally {
       setSubmitting(false);
     }
@@ -163,7 +168,9 @@ export default function PythonEnvironments({
       await load();
     } catch {
       message.error(
-        '保存或构建失败；请检查输入并刷新，已保存的定义可重新构建。',
+        tr(
+          'ui.saveOrBuildFailedCheckYourInputAndRefreshSavedDefinitionsCanBeRebuilt',
+        ),
       );
     } finally {
       setSubmitting(false);
@@ -183,12 +190,12 @@ export default function PythonEnvironments({
       {error && (
         <Alert
           type="error"
-          message={error}
-          action={<Button onClick={() => load()}>重试</Button>}
+          message={translateError(error)}
+          action={<Button onClick={() => load()}>{tr('ui.retry')}</Button>}
         />
       )}
       <Card
-        title="Python Environments"
+        title={tr('ui.pythonEnvironments')}
         extra={
           <Button
             type="primary"
@@ -200,7 +207,7 @@ export default function PythonEnvironments({
               )
             }
           >
-            创建环境
+            {tr('ui.createEnvironment')}
           </Button>
         }
       >
@@ -211,7 +218,7 @@ export default function PythonEnvironments({
           scroll={{ x: 900 }}
           columns={[
             {
-              title: 'Name',
+              title: tr('ui.name'),
               dataIndex: 'name',
               render: (name: string, row: any) => (
                 <Button
@@ -227,41 +234,46 @@ export default function PythonEnvironments({
             },
             { title: 'Python', dataIndex: 'runtime_version' },
             {
-              title: 'Status',
+              title: tr('ui.status'),
               render: (_: any, row: any) => (
                 <Tag>
-                  {row.state} / {row.health}
+                  {translateEnum('pythonEnvironment', row.state)} /{' '}
+                  {translateEnum('health', row.health)}
                 </Tag>
               ),
             },
             {
-              title: 'Current Build',
+              title: tr('ui.currentBuild'),
               dataIndex: 'current_build_id',
               render: (x: number) => (x ? `#${x}` : '—'),
             },
             {
-              title: 'Direct / Resolved',
+              title: tr('ui.directResolved'),
               render: (_: any, row: any) =>
                 `${row.direct_packages} / ${row.resolved_packages}`,
             },
-            { title: 'Updated', dataIndex: 'updatedAt' },
+            {
+              title: tr('ui.updated'),
+              dataIndex: 'updatedAt',
+              render: (value: any) => formatDateTime(value),
+            },
           ]}
         />
       </Card>
       {environment && (
         <Card
-          title={`Environment: ${environment.name}`}
+          title={tr('ui.template.environmentValue', { p0: environment.name })}
           style={{ marginTop: 16 }}
           extra={
             <Space>
               <Button disabled={disabled} onClick={() => edit('metadata')}>
-                编辑信息
+                {tr('ui.editDetails')}
               </Button>
               <Button disabled={disabled} onClick={() => edit('clone')}>
-                克隆
+                {tr('ui.clone')}
               </Button>
               <Popconfirm
-                title="删除此环境及其未被占用的构建？"
+                title={tr('ui.deleteThisEnvironmentAndItsUnusedBuilds')}
                 onConfirm={async () => {
                   await act(`/${environment.id}`, true);
                   setSelected(undefined);
@@ -269,7 +281,7 @@ export default function PythonEnvironments({
                 }}
               >
                 <Button danger disabled={disabled || taskReferencesBlocked}>
-                  删除环境
+                  {tr('ui.deleteEnvironment')}
                 </Button>
               </Popconfirm>
             </Space>
@@ -279,53 +291,64 @@ export default function PythonEnvironments({
             items={[
               {
                 key: 'overview',
-                label: 'Overview',
+                label: tr('ui.overview'),
                 children: (
                   <>
-                    <TaskResourceReferences kind="python" id={environment.id} onBlocked={setTaskReferencesBlocked} />
+                    <TaskResourceReferences
+                      kind="python"
+                      id={environment.id}
+                      onBlocked={setTaskReferencesBlocked}
+                    />
                     <Descriptions column={2}>
-                      <Descriptions.Item label="Environment ID">
+                      <Descriptions.Item label={tr('ui.environmentID')}>
                         {environment.id}
                       </Descriptions.Item>
-                      <Descriptions.Item label="Runtime ID">
+                      <Descriptions.Item label={tr('ui.runtimeID')}>
                         {environment.runtime_id}
                       </Descriptions.Item>
-                      <Descriptions.Item label="State">
-                        {environment.state}
+                      <Descriptions.Item label={tr('ui.state')}>
+                        {translateEnum('pythonEnvironment', environment.state)}
                       </Descriptions.Item>
-                      <Descriptions.Item label="Current Build">
+                      <Descriptions.Item label={tr('ui.currentBuild')}>
                         {environment.current_build_id ?? '—'}
                       </Descriptions.Item>
-                      <Descriptions.Item label="Desired Revision">
+                      <Descriptions.Item label={tr('ui.desiredRevision')}>
                         {environment.current_revision_id}
                       </Descriptions.Item>
-                      <Descriptions.Item label="Build Health">
-                        {current?.health ?? 'UNVERIFIED'}
+                      <Descriptions.Item label={tr('ui.buildHealth')}>
+                        {translateEnum(
+                          'health',
+                          current?.health ?? 'UNVERIFIED',
+                        )}
                       </Descriptions.Item>
-                      <Descriptions.Item label="Disk Usage">
-                        {current?.metadata.disk_bytes ?? 0} bytes
+                      <Descriptions.Item label={tr('ui.diskUsage')}>
+                        {current?.metadata.disk_bytes ?? 0}{' '}
+                        {tr('ui.bytesVariant404')}
                       </Descriptions.Item>
-                      <Descriptions.Item label="Python executable">
+                      <Descriptions.Item label={tr('ui.pythonExecutable')}>
                         {current?.health === 'HEALTHY'
-                          ? 'Verified'
-                          : 'Unverified'}
+                          ? tr('ui.extra.verified')
+                          : tr('ui.extra.unverified')}
                       </Descriptions.Item>
                     </Descriptions>
                     {environment.last_error && (
-                      <Alert type="warning" message={environment.last_error} />
+                      <Alert
+                        type="warning"
+                        message={translateError(environment.last_error)}
+                      />
                     )}
                     <Button
                       disabled={disabled}
                       onClick={() => act(`/${environment.id}/rebuild`)}
                     >
-                      重新构建
+                      {tr('ui.rebuild')}
                     </Button>
                   </>
                 ),
               },
               {
                 key: 'dependencies',
-                label: 'Dependencies',
+                label: tr('ui.dependencies'),
                 children: (
                   <>
                     <Space>
@@ -333,7 +356,7 @@ export default function PythonEnvironments({
                         disabled={disabled}
                         onClick={() => edit('dependencies')}
                       >
-                        编辑依赖并构建
+                        {tr('ui.editDependenciesAndBuild')}
                       </Button>
                       <Button
                         disabled={!current}
@@ -343,7 +366,7 @@ export default function PythonEnvironments({
                             `/${environment.id}/builds/${current.id}/freeze`,
                           );
                           Modal.info({
-                            title: 'Resolved Requirements',
+                            title: tr('ui.resolvedRequirements'),
                             width: 700,
                             content: (
                               <Typography.Paragraph
@@ -355,11 +378,13 @@ export default function PythonEnvironments({
                           });
                         }}
                       >
-                        导出 Resolved Requirements
+                        {tr('ui.exportResolvedRequirements')}
                       </Button>
                     </Space>
                     <Typography.Paragraph>
-                      依赖变更会创建新的 Revision 和 Build；已发布构建保持完整。
+                      {tr(
+                        'ui.dependencyChangesCreateANewRevisionAndBuildPublishedBuildsRemainIntact',
+                      )}
                     </Typography.Paragraph>
                     <Table
                       size="small"
@@ -368,11 +393,11 @@ export default function PythonEnvironments({
                       dataSource={desired?.dependencies ?? []}
                       columns={[
                         {
-                          title: 'Direct Package',
+                          title: tr('ui.directPackage'),
                           dataIndex: 'normalized_name',
                         },
                         {
-                          title: 'Desired Requirement',
+                          title: tr('ui.desiredRequirement'),
                           dataIndex: 'requirement',
                         },
                       ]}
@@ -383,15 +408,20 @@ export default function PythonEnvironments({
                       pagination={false}
                       dataSource={current?.resolved ?? []}
                       columns={[
-                        { title: 'Resolved Package', dataIndex: 'name' },
-                        { title: 'Version', dataIndex: 'version' },
+                        { title: tr('ui.resolvedPackage'), dataIndex: 'name' },
+                        { title: tr('ui.version'), dataIndex: 'version' },
                         {
-                          title: 'Relation',
+                          title: tr('ui.relation'),
                           dataIndex: 'direct',
                           render: (x: boolean) =>
-                            x ? 'Direct' : 'Transitive / Toolchain',
+                            x
+                              ? tr('ui.presentation.Direct')
+                              : tr('ui.presentation.TransitiveToolchain'),
                         },
-                        { title: 'Index Policy', dataIndex: 'source_index' },
+                        {
+                          title: tr('ui.indexPolicy'),
+                          dataIndex: 'source_index',
+                        },
                       ]}
                     />
                   </>
@@ -399,19 +429,19 @@ export default function PythonEnvironments({
               },
               {
                 key: 'builds',
-                label: 'Builds',
+                label: tr('ui.builds'),
                 children: (
                   <>
                     <Space>
                       <Select
                         mode="multiple"
-                        placeholder="选择两个 Build 比较"
+                        placeholder={tr('ui.selectTwoBuildsToCompare')}
                         style={{ minWidth: 250 }}
                         value={pair}
                         onChange={(x) => setPair(x.slice(-2))}
                         options={builds.map((x) => ({
                           value: x.id,
-                          label: `Build #${x.id}`,
+                          label: tr('ui.template.buildValue', { p0: x.id }),
                         }))}
                       />
                       <Button
@@ -425,16 +455,17 @@ export default function PythonEnvironments({
                           )
                         }
                       >
-                        比较构建
+                        {tr('ui.compareBuilds')}
                       </Button>
                     </Space>
                     {comparison && (
                       <div
-                        aria-label="Build dependency diff"
+                        aria-label={tr('ui.buildDependencyDiff')}
                         style={{ margin: '12px 0' }}
                       >
                         <Typography.Text>
-                          Build #{comparison.from} → #{comparison.to}
+                          {tr('ui.buildVariant30')} {comparison.from} → #
+                          {comparison.to}
                         </Typography.Text>
                         <Table
                           size="small"
@@ -460,10 +491,15 @@ export default function PythonEnvironments({
                             })),
                           ]}
                           columns={[
-                            { title: 'Package', dataIndex: 'name' },
-                            { title: 'Before', dataIndex: 'from' },
-                            { title: 'After', dataIndex: 'to' },
-                            { title: 'Change', dataIndex: 'change' },
+                            { title: tr('ui.package'), dataIndex: 'name' },
+                            { title: tr('ui.before'), dataIndex: 'from' },
+                            { title: tr('ui.after'), dataIndex: 'to' },
+                            {
+                              title: tr('ui.change'),
+                              dataIndex: 'change',
+                              render: (value: unknown) =>
+                                translateEnum('dependencyChange', value),
+                            },
                           ]}
                         />
                       </div>
@@ -475,32 +511,39 @@ export default function PythonEnvironments({
                       scroll={{ x: 1000, y: 300 }}
                       columns={[
                         {
-                          title: 'Build',
+                          title: tr('ui.build'),
                           dataIndex: 'id',
                           render: (x: number) => (
                             <span>
                               #{x}{' '}
                               {x === environment.current_build_id && (
-                                <Tag color="green">Current</Tag>
+                                <Tag color="green">{tr('ui.current')}</Tag>
                               )}
                             </span>
                           ),
                         },
-                        { title: 'Revision', dataIndex: 'revision_id' },
-                        { title: 'Runtime', dataIndex: 'runtime_id' },
+                        { title: tr('ui.revision'), dataIndex: 'revision_id' },
+                        { title: tr('ui.runtime'), dataIndex: 'runtime_id' },
                         {
-                          title: 'Status',
+                          title: tr('ui.status'),
                           render: (_: any, x: any) =>
-                            `${x.state} / ${x.health}`,
+                            `${translateEnum(
+                              'pythonBuild',
+                              x.state,
+                            )} / ${translateEnum('health', x.health)}`,
                         },
                         {
-                          title: 'Packages',
+                          title: tr('ui.packages'),
                           dataIndex: 'resolved',
                           render: (x: any[]) => x.length,
                         },
-                        { title: 'Created', dataIndex: 'createdAt' },
                         {
-                          title: 'Actions',
+                          title: tr('ui.created'),
+                          dataIndex: 'createdAt',
+                          render: (value: any) => formatDateTime(value),
+                        },
+                        {
+                          title: tr('ui.actions'),
                           render: (_: any, x: any) => (
                             <Space>
                               <Button
@@ -511,7 +554,7 @@ export default function PythonEnvironments({
                                   )
                                 }
                               >
-                                验证构建
+                                {tr('ui.verifyBuildVariant585')}
                               </Button>
                               <Button
                                 disabled={
@@ -525,10 +568,10 @@ export default function PythonEnvironments({
                                   )
                                 }
                               >
-                                设为 Current
+                                {tr('ui.setAsCurrent')}
                               </Button>
                               <Popconfirm
-                                title="删除未使用的构建？"
+                                title={tr('ui.deleteThisUnusedBuild')}
                                 onConfirm={() =>
                                   act(`/${environment.id}/builds/${x.id}`, true)
                                 }
@@ -540,7 +583,7 @@ export default function PythonEnvironments({
                                     x.id === environment.current_build_id
                                   }
                                 >
-                                  删除构建
+                                  {tr('ui.deleteBuildVariant457')}
                                 </Button>
                               </Popconfirm>
                             </Space>
@@ -553,7 +596,7 @@ export default function PythonEnvironments({
               },
               {
                 key: 'operations',
-                label: 'Operations',
+                label: tr('ui.operations'),
                 children: (
                   <Table
                     rowKey="id"
@@ -561,14 +604,29 @@ export default function PythonEnvironments({
                     pagination={false}
                     columns={[
                       { title: 'ID', dataIndex: 'id' },
-                      { title: 'Operation', dataIndex: 'operation_type' },
-                      { title: 'Status', dataIndex: 'status' },
-                      { title: 'Stage', dataIndex: 'stage' },
                       {
-                        title: 'Log',
+                        title: tr('ui.operation'),
+                        dataIndex: 'operation_type',
+                        render: (value: unknown) =>
+                          translateEnum('runtimeOperationType', value),
+                      },
+                      {
+                        title: tr('ui.status'),
+                        dataIndex: 'status',
+                        render: (value: unknown) =>
+                          translateEnum('runtimeOperation', value),
+                      },
+                      {
+                        title: tr('ui.stage'),
+                        dataIndex: 'stage',
+                        render: (value: unknown) =>
+                          translateEnum('runtimeStage', value),
+                      },
+                      {
+                        title: tr('ui.log'),
                         render: (_: any, x: any) => (
                           <Button onClick={() => onOperation(x.id)}>
-                            查看操作日志
+                            {tr('ui.viewOperationLog')}
                           </Button>
                         ),
                       },
@@ -583,32 +641,36 @@ export default function PythonEnvironments({
       <Modal
         title={
           editor === 'create'
-            ? '创建 Python Environment'
+            ? tr('ui.extra.createPythonEnvironment')
             : editor === 'dependencies'
-            ? '编辑依赖并构建'
+            ? tr('ui.editDependenciesAndBuild')
             : editor === 'clone'
-            ? '克隆 Environment'
-            : '编辑 Environment'
+            ? tr('ui.extra.cloneEnvironment')
+            : tr('ui.extra.editEnvironment')
         }
         open={!!editor}
         onCancel={() => setEditor(undefined)}
         onOk={save}
         confirmLoading={submitting}
-        okText={editor === 'metadata' ? '保存' : '保存并构建'}
+        okText={
+          editor === 'metadata'
+            ? tr('ui.extra.save')
+            : tr('ui.extra.saveAndBuild')
+        }
         destroyOnClose
       >
         <Form form={form} layout="vertical">
           {editor !== 'dependencies' && (
             <Form.Item
               name="name"
-              label="Environment Name"
+              label={tr('ui.environmentName')}
               rules={[{ required: true, max: 100 }]}
             >
               <Input />
             </Form.Item>
           )}
           {(editor === 'create' || editor === 'metadata') && (
-            <Form.Item name="description" label="Description">
+            <Form.Item name="description" label={tr('ui.description')}>
               <Input.TextArea maxLength={1000} />
             </Form.Item>
           )}
@@ -616,7 +678,7 @@ export default function PythonEnvironments({
             <>
               <Form.Item
                 name="runtime_id"
-                label="Python Runtime"
+                label={tr('ui.pythonRuntime')}
                 rules={[{ required: true }]}
               >
                 <Select
@@ -632,7 +694,7 @@ export default function PythonEnvironments({
               </Form.Item>
               <Form.Item
                 name="requirements"
-                label="Dependencies — 每行一个 PEP 508 requirement"
+                label={tr('ui.dependenciesOnePEP508RequirementPerLine')}
               >
                 <Input.TextArea
                   rows={6}
@@ -641,7 +703,9 @@ export default function PythonEnvironments({
               </Form.Item>
               <Alert
                 type="info"
-                message="默认使用公开 PyPI；暂不支持私有认证源、URL、VCS 或本地路径。"
+                message={tr(
+                  'ui.usesPublicPyPIByDefaultPrivateAuthenticatedIndexesURLsVCSAndLocalPathsAreNotSupported',
+                )}
               />
             </>
           )}

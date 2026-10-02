@@ -1,3 +1,6 @@
+import { t as tr } from '@/utils/i18n';
+import { formatDateTime } from '@/utils/format';
+import { useLocale as useI18nLocale } from '@/utils/i18n';
 import intl from 'react-intl-universal';
 import React, { Fragment, useEffect, useState } from 'react';
 import {
@@ -24,6 +27,7 @@ const { Countdown } = Statistic;
 const isDemoEnv = window.__ENV__DeployEnv === 'demo';
 
 const Login = () => {
+  useI18nLocale();
   const { reloadUser } = useOutletContext<SharedContext>();
   const [loading, setLoading] = useState(false);
   const [waitTime, setWaitTime] = useState<any>();
@@ -88,7 +92,7 @@ const Login = () => {
           <>
             <div>
               {intl.get('上次登录时间：')}
-              {lastlogon ? dayjs(lastlogon).format('YYYY-MM-DD HH:mm:ss') : '-'}
+              {lastlogon ? formatDateTime(lastlogon) : '-'}
             </div>
             <div>
               {intl.get('上次登录地点：')}
@@ -104,7 +108,9 @@ const Login = () => {
             </div>
             <div>
               {intl.get('上次登录状态：')}
-              {retries > 0 ? `失败${retries}次` : intl.get('成功')}
+              {retries > 0
+                ? tr('ui.presentation.loginFailures', { count: retries })
+                : intl.get('成功')}
             </div>
           </>
         ),
@@ -145,11 +151,7 @@ const Login = () => {
     <div className={styles.container}>
       <div className={styles.top}>
         <div className={styles.header}>
-          <img
-            alt="logo"
-            className={styles.logo}
-            src={logo}
-          />
+          <img alt="logo" className={styles.logo} src={logo} />
           <span className={styles.title}>
             {twoFactor ? intl.get('两步验证') : config.siteName}
           </span>

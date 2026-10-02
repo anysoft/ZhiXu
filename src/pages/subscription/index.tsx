@@ -1,3 +1,7 @@
+import { translateEnum, translateError } from '@/utils/i18n';
+import { formatDateTime } from '@/utils/format';
+import { useLocale as useI18nLocale } from '@/utils/i18n';
+import { t as tr } from '@/utils/i18n';
 import intl from 'react-intl-universal';
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
@@ -56,24 +60,36 @@ export enum IntervalSchedule {
 }
 
 export const Subscription = () => {
+  useI18nLocale();
   const { headerStyle, isPhone } = useOutletContext<SharedContext>();
 
-  const [repositoryNames, setRepositoryNames] = useState<Record<number, string>>({});
+  const [repositoryNames, setRepositoryNames] = useState<
+    Record<number, string>
+  >({});
   useEffect(() => {
-    request.get(`${config.apiPrefix}repositories`).then(result => {
-      if (result.code === 200) setRepositoryNames(Object.fromEntries(result.data.map((repo: any) => [repo.id, repo.name])));
-    }).catch(() => {});
+    request
+      .get(`${config.apiPrefix}repositories`)
+      .then((result) => {
+        if (result.code === 200)
+          setRepositoryNames(
+            Object.fromEntries(
+              result.data.map((repo: any) => [repo.id, repo.name]),
+            ),
+          );
+      })
+      .catch(() => {});
   }, []);
   const columns: any = [
     {
-      title: 'Git 同步',
+      title: tr('ui.gitSync'),
       key: 'repository',
       width: 190,
       render: (_: any, row: any) => (
         <Space direction="vertical" size={0}>
           {row.repository_id && (
             <a href={`${config.baseUrl}repository`}>
-              {repositoryNames[row.repository_id] || 'Repository'} #{row.repository_id}
+              {repositoryNames[row.repository_id] || tr('ui.repository')} #
+              {row.repository_id}
             </a>
           )}
           {row.worktree_id && (
@@ -85,9 +101,14 @@ export const Subscription = () => {
           )}
           {row.last_sync_state && (
             <Tooltip
-              title={`${row.last_sync_phase || ''} ${
-                row.last_sync_error || ''
-              } ${row.last_sync_at || ''} ${row.last_synced_commit || ''}`}
+              title={`${translateEnum(
+                'subscriptionPhase',
+                row.last_sync_phase,
+              )} ${
+                row.last_sync_error ? translateError(row.last_sync_error) : ''
+              } ${formatDateTime(row.last_sync_at)} ${
+                row.last_synced_commit || ''
+              }`}
             >
               <Tag
                 color={
@@ -98,7 +119,7 @@ export const Subscription = () => {
                     : 'processing'
                 }
               >
-                {row.last_sync_state}
+                {translateEnum('subscriptionState', row.last_sync_state)}
               </Tag>
             </Tooltip>
           )}
@@ -130,7 +151,10 @@ export const Subscription = () => {
       render: (text: string, record: any) => {
         if (record.schedule_type === 'interval') {
           const { type, value } = record.interval_schedule;
-          return `每${value}${(IntervalSchedule as any)[type]}`;
+          return tr('ui.scheduleEvery', {
+            value,
+            unit: translateEnum('timeUnit', type),
+          });
         }
         return record.schedule;
       },
@@ -350,7 +374,7 @@ export const Subscription = () => {
           {intl.get('吗')}
           <div style={{ marginTop: 20 }}>
             <Checkbox onChange={onCheckChange}>
-              {'同时删除关联任务（保留 scripts 和工作区）'}
+              {tr('ui.alsoDeleteAssociatedTasksRetainScriptsAndWorktrees')}
             </Checkbox>
           </div>
         </>
@@ -378,9 +402,9 @@ export const Subscription = () => {
 
   const enabledOrDisabledSubscription = (record: any, index: number) => {
     Modal.confirm({
-      title: `确认${
-        record.is_disabled === 1 ? intl.get('启用') : intl.get('禁用')
-      }`,
+      title: tr('ui.template.confirmValue', {
+        p0: record.is_disabled === 1 ? intl.get('启用') : intl.get('禁用'),
+      }),
       content: (
         <>
           {intl.get('确认')}

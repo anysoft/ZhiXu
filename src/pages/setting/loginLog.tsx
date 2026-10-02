@@ -1,3 +1,6 @@
+import { formatDateTime } from '@/utils/format';
+import { t as tr } from '@/utils/i18n';
+import { useLocale as useI18nLocale } from '@/utils/i18n';
 import intl from 'react-intl-universal';
 import React, { useEffect, useState } from 'react';
 import { Table, Tag, Button, Popconfirm, message } from 'antd';
@@ -16,6 +19,7 @@ enum LoginStatusColor {
 }
 
 const LoginLog = ({ data, height }: { data: Array<any>; height: number }) => {
+  useI18nLocale();
   const [blockedIps, setBlockedIps] = useState<string[]>([]);
 
   const getIpBlacklist = () => {
@@ -40,7 +44,7 @@ const LoginLog = ({ data, height }: { data: Array<any>; height: number }) => {
       : await request.put(`${config.apiPrefix}user/ip-blacklist`, { ip });
     if (response.code === 200) {
       setBlockedIps(response.data || []);
-      message.success(response.message);
+      message.success(intl.get('更新成功'));
     }
   };
 
@@ -55,8 +59,7 @@ const LoginLog = ({ data, height }: { data: Array<any>; height: number }) => {
       dataIndex: 'timestamp',
       key: 'timestamp',
       width: 120,
-      render: (text: string, record: any) =>
-        dayjs(record.timestamp).format('YYYY-MM-DD HH:mm:ss'),
+      render: (text: string, record: any) => formatDateTime(record.timestamp),
     },
     {
       title: intl.get('登录地址'),
@@ -96,16 +99,20 @@ const LoginLog = ({ data, height }: { data: Array<any>; height: number }) => {
           return null;
         }
         const blocked = blockedIps.includes(record.ip);
-        const label = blocked ? '移出黑名单' : '加入黑名单';
+        const label = blocked
+          ? tr('ui.extra.removeFromBlocklist')
+          : tr('ui.extra.addToBlocklist');
         return (
           <Popconfirm
-            title={intl.get(
-              blocked ? '确认移出 IP 黑名单' : '确认加入 IP 黑名单',
-            )}
+            title={
+              blocked
+                ? tr('ui.extra.confirmRemovalFromIPBlocklist')
+                : tr('ui.extra.confirmAddingToIPBlocklist')
+            }
             onConfirm={() => updateIpBlacklist(record.ip, blocked)}
           >
             <Button type="link" danger={!blocked} size="small">
-              {intl.get(label)}
+              {label}
             </Button>
           </Popconfirm>
         );

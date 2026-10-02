@@ -629,5 +629,17 @@
   {
     "path": "tests/ci/foundation.test.cjs",
     "classification": "PLATFORM_CORE"
+  },
+  {
+    "path": "tests/i18n/language.test.cjs",
+    "classification": "PLATFORM_CORE"
+  },
+  {
+    "path": "tests/i18n/resources.test.cjs",
+    "classification": "PLATFORM_CORE"
+  },
+  {
+    "path": "tests/i18n/presentation.test.cjs",
+    "classification": "PLATFORM_CORE"
   }
 ]

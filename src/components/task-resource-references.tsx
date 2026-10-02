@@ -1,3 +1,5 @@
+import { useLocale as useI18nLocale } from '@/utils/i18n';
+import { t as tr } from '@/utils/i18n';
 import React, { useEffect, useState } from 'react';
 import { Alert, Button, Card, Space, Typography } from 'antd';
 import { request } from '@/utils/http';
@@ -11,6 +13,7 @@ export function TaskResourceReferences({
   id: number;
   onBlocked?: (blocked: boolean) => void;
 }) {
+  useI18nLocale();
   const [references, setReferences] = useState<any>();
   const load = async () => {
     const response = await request.get(
@@ -29,10 +32,12 @@ export function TaskResourceReferences({
   return (
     <Card
       size="small"
-      title={`Used by Tasks: ${references?.tasks_count ?? '…'}`}
+      title={tr('ui.template.usedByTasksValue', {
+        p0: references?.tasks_count ?? '…',
+      })}
       extra={
         <Button size="small" onClick={load}>
-          Refresh references
+          {tr('ui.refreshReferences')}
         </Button>
       }
     >
@@ -42,22 +47,28 @@ export function TaskResourceReferences({
             key={task.id}
             href={`${config.baseUrl}tasks?task_id=${task.id}`}
           >
-            {task.name} · Task {task.id}
+            {task.name} {tr('ui.taskVariant411')} {task.id}
           </Typography.Link>
         ))}
         {references?.defaults.map((binding: any) => (
           <span key={binding.id}>
             {binding.repository_id
-              ? `Repository ${binding.repository_id}`
-              : `Subscription ${binding.subscription_id}`}{' '}
-            Runtime Default · {binding.kind}
+              ? tr('ui.presentation.repositoryId', {
+                  id: binding.repository_id,
+                })
+              : tr('ui.presentation.subscriptionId', {
+                  id: binding.subscription_id,
+                })}{' '}
+            {tr('ui.runtimeDefault')} {binding.kind}
           </span>
         ))}
         {references &&
           references.tasks_count + references.defaults_count > 0 && (
             <Alert
               type="info"
-              message="删除受保护：请先解除 Task 和 Runtime Default 引用。"
+              message={tr(
+                'ui.deletionIsProtectedRemoveTaskAndRuntimeDefaultReferencesFirst',
+              )}
             />
           )}
       </Space>
