@@ -1827,5 +1827,14 @@
   "ui.brandProxyDistance": "Distance from {productName}",
   "ui.brandRuntimeBanner": "{productName} runtime environment:\n\nSystem: {system}\nBrowser: {browser}\nEngine: {engine}",
   "ui.repositoryAccessSucceeded": "Repository access succeeded",
-  "ui.repositoryAccessFailed": "Repository access failed; verify credentials, host key and connectivity"
+  "ui.repositoryAccessFailed": "Repository access failed; verify credentials, host key and connectivity",
+  "ui.auth.loginRequired": "Please log in to continue",
+  "ui.auth.expired": "Your session has expired. Please log in again.",
+  "ui.auth.invalid": "Your session is no longer valid. Please log in again.",
+  "ui.auth.loginRejected": "Login verification failed. Check your username, password or verification code.",
+  "ui.setup.previous": "Previous",
+  "ui.setup.next": "Next",
+  "ui.setup.review": "Review settings",
+  "ui.setup.reviewHint": "Review your account settings. You can go back to make changes. The administrator account is created only after confirmation.",
+  "ui.setup.confirm": "Confirm and finish setup"
 }

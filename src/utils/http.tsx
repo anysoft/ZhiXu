@@ -1,5 +1,5 @@
-import { translateError } from './i18n';
-import intl from 'react-intl-universal';
+import { translateError, t as tr } from './i18n';
+import { unauthorizedDecision } from './authFailure';
 import { message, notification } from 'antd';
 import config from './config';
 import { history } from '@umijs/max';
@@ -51,11 +51,7 @@ const errorHandler = function (
     if ([502, 504].includes(responseStatus)) {
       history.push('/error');
     } else if (responseStatus === 401) {
-      if (history.location.pathname !== '/login') {
-        message.error(intl.get('登录已过期，请重新登录'));
-        localStorage.removeItem(config.authKey);
-        history.push('/login');
-      }
+      handleUnauthorized(error.config);
     } else {
       if (typeof error.config?.onError === 'function') {
         return error.config?.onError(error.response);
@@ -94,6 +90,42 @@ const apiWhiteList = [
   `${config.baseUrl}api/user/notification/init`,
 ];
 
+function handleUnauthorized(requestConfig?: InternalAxiosRequestConfig) {
+  const url = (requestConfig?.url || '').split(/[?#]/)[0];
+  const authorization = requestConfig?.headers?.Authorization;
+  const requestToken =
+    typeof authorization === 'string' && /^Bearer /i.test(authorization)
+      ? authorization.slice(7)
+      : null;
+  const decision = unauthorizedDecision({
+    pathname:
+      window.location.pathname.slice(
+        config.baseUrl.replace(/\/$/, '').length,
+      ) || '/',
+    publicRequest: apiWhiteList.includes(url),
+    loginRequest: [
+      `${config.baseUrl}api/user/login`,
+      `${config.baseUrl}api/user/two-factor/login`,
+    ].includes(url),
+    requestToken,
+    currentToken: localStorage.getItem(config.authKey),
+  });
+  if (!decision) return;
+  if (decision.clear) localStorage.removeItem(config.authKey);
+  message.error({
+    key: 'authentication-failure',
+    content:
+      decision.reason === 'ui.auth.loginRequired'
+        ? tr('ui.auth.loginRequired')
+        : decision.reason === 'ui.auth.expired'
+        ? tr('ui.auth.expired')
+        : decision.reason === 'ui.auth.loginRejected'
+        ? tr('ui.auth.loginRejected')
+        : tr('ui.auth.invalid'),
+  });
+  if (decision.redirect) history.push('/login');
+}
+
 _request.interceptors.request.use((_config) => {
   const token = localStorage.getItem(config.authKey);
   if (token && !apiWhiteList.includes(_config.url!)) {
@@ -108,10 +140,7 @@ _request.interceptors.response.use(async (response) => {
   if ([502, 504].includes(responseStatus)) {
     history.push('/error');
   } else if (responseStatus === 401) {
-    if (history.location.pathname !== '/login') {
-      localStorage.removeItem(config.authKey);
-      history.push('/login');
-    }
+    handleUnauthorized(response.config);
   } else {
     try {
       const res = response.data;

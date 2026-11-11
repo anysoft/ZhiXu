@@ -13,7 +13,8 @@ services:
       - backup:/backup
     read_only: true
     tmpfs:
-      - /tmp:rw,nosuid,nodev,mode=1777
+      # Git credentials use executable, private GIT_ASKPASS helpers under /tmp.
+      - /tmp:rw,nosuid,nodev,exec,mode=1777
     cap_drop:
       - ALL
     security_opt:

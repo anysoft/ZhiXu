@@ -28,9 +28,11 @@ Open <http://127.0.0.1:5700> and create the first administrator. The port is loo
 | `/data/home` | Controlled Git/runtime home |
 | `/data/.platform-jwt` | Persisted private JWT signing secret, mode 0600 |
 | `/backup` | Separate persistent `BACKUP_DIR` volume |
-| `/tmp` | Temporary writable `tmpfs` removed with the container |
+| `/tmp` | Temporary writable, executable `tmpfs` removed with the container |
 
 Restore atomically renames the live data directory, so the volume mounts at `/data` while `DATA_DIR` is `/data/state`. Run one active instance per data volume. Never share a live SQLite directory between replicas.
+
+Keep `exec` in the `/tmp` tmpfs mount options. Git authentication creates private, executable `GIT_ASKPASS` helpers there; `noexec` blocks HTTPS token authentication and SSH passphrase prompts even when public repository access succeeds. Retain `nosuid,nodev,mode=1777` and the non-root container identity.
 
 Named volumes inherit the image's non-root ownership. Prepare UID/GID 10001 access for administrator-provided bind mounts. Startup deliberately avoids recursively changing ownership of user data. The platform runs as `10001:10001`, drops all capabilities, enables `no-new-privileges`, and uses a read-only root filesystem. It does not require a Docker socket, privileged mode, host PID, or host networking.
 

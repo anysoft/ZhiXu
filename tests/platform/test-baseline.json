@@ -653,5 +653,13 @@
   {
     "path": "tests/i18n/toasts.test.cjs",
     "classification": "PLATFORM_CORE"
+  },
+  {
+    "path": "tests/i18n/auth-failure.test.cjs",
+    "classification": "PLATFORM_CORE"
+  },
+  {
+    "path": "tests/i18n/initialization.test.cjs",
+    "classification": "PLATFORM_CORE"
   }
 ]

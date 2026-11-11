@@ -1,21 +1,22 @@
 import { PRODUCT_NAME } from '@/utils/brand';
 import { useLocale as useI18nLocale } from '@/utils/i18n';
 import intl from 'react-intl-universal';
-import React, { Fragment, useEffect, useState } from 'react';
-import { Button, Row, Input, Form, message, Typography, Steps } from 'antd';
+import React, { useEffect, useRef, useState } from 'react';
+import { Button, Row, Input, Form, Typography, Steps } from 'antd';
 import config from '@/utils/config';
-import { history } from '@umijs/max';
 import styles from './index.less';
 import { request } from '@/utils/http';
 import logo from '@/assets/zhixu-logo.svg';
 
-const FormItem = Form.Item;
 const { Step } = Steps;
 const { Link } = Typography;
 
 const Initialization = () => {
   useI18nLocale();
   const [loading, setLoading] = useState(false);
+  const [account, setAccount] = useState<Record<string, string>>({});
+  const [completed, setCompleted] = useState(false);
+  const submitting = useRef(false);
   const [current, setCurrent] = React.useState(0);
 
   const next = () => {
@@ -26,19 +27,33 @@ const Initialization = () => {
     setCurrent(current - 1);
   };
 
-  const submitAccountSetting = (values: any) => {
+  const submitAccountSetting = (values: Record<string, string>) => {
+    setAccount(values);
+    next();
+  };
+
+  const completeInstallation = () => {
+    if (submitting.current || completed) return;
+    submitting.current = true;
     setLoading(true);
     request
       .put(`${config.apiPrefix}user/init`, {
-        username: values.username,
-        password: values.password,
+        username: account.username,
+        password: account.password,
       })
-      .then(({ code, data }) => {
+      .then(({ code }) => {
         if (code === 200) {
-          next();
+          setCompleted(true);
+          setAccount({});
         }
       })
-      .finally(() => setLoading(false));
+      .catch(() => {
+        /* The HTTP interceptor presents the request error. */
+      })
+      .finally(() => {
+        submitting.current = false;
+        setLoading(false);
+      });
   };
 
   useEffect(() => {
@@ -51,7 +66,9 @@ const Initialization = () => {
       content: (
         <div className={styles.top} style={{ marginTop: 30 }}>
           <div className={styles.header}>
-            <span className={styles.title}>{intl.get('ui.brandWelcome', { productName: PRODUCT_NAME })}</span>
+            <span className={styles.title}>
+              {intl.get('ui.brandWelcome', { productName: PRODUCT_NAME })}
+            </span>
             <span className={styles.desc}>
               {intl.get(
                 '支持python3、javascript、shell、typescript 的定时任务管理面板',
@@ -74,7 +91,12 @@ const Initialization = () => {
     {
       title: intl.get('账户设置'),
       content: (
-        <Form onFinish={submitAccountSetting} layout="vertical">
+        <Form
+          onFinish={submitAccountSetting}
+          layout="vertical"
+          initialValues={account}
+          onValuesChange={(_, values) => setAccount(values)}
+        >
           <Form.Item
             label={intl.get('用户名')}
             name="username"
@@ -122,15 +144,46 @@ const Initialization = () => {
           >
             <Input.Password placeholder={intl.get('确认密码')} />
           </Form.Item>
-          <Button type="primary" htmlType="submit" loading={loading}>
-            {intl.get('提交')}
+          <Button onClick={prev} style={{ marginRight: 12 }}>
+            {intl.get('ui.setup.previous')}
+          </Button>
+          <Button type="primary" htmlType="submit">
+            {intl.get('ui.setup.next')}
           </Button>
         </Form>
       ),
     },
     {
-      title: intl.get('完成安装'),
-      content: (
+      title: completed ? intl.get('完成安装') : intl.get('ui.setup.review'),
+      content: !completed ? (
+        <div style={{ marginTop: 30 }}>
+          <Typography.Paragraph>
+            {intl.get('ui.setup.reviewHint')}
+          </Typography.Paragraph>
+          <Form layout="vertical">
+            <Form.Item label={intl.get('用户名')}>
+              <Input value={account.username} readOnly />
+            </Form.Item>
+            <Form.Item label={intl.get('密码')}>
+              <Input.Password
+                value={account.password}
+                readOnly
+                visibilityToggle={false}
+              />
+            </Form.Item>
+          </Form>
+          <Button onClick={prev} disabled={loading} style={{ marginRight: 12 }}>
+            {intl.get('ui.setup.previous')}
+          </Button>
+          <Button
+            type="primary"
+            onClick={completeInstallation}
+            loading={loading}
+          >
+            {intl.get('ui.setup.confirm')}
+          </Button>
+        </div>
+      ) : (
         <div className={styles.top} style={{ marginTop: 80 }}>
           <div className={styles.header}>
             <span className={styles.title}>{intl.get('恭喜安装完成！')}</span>

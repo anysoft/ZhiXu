@@ -1827,5 +1827,14 @@
   "ui.brandProxyDistance": "距离{productName}",
   "ui.brandRuntimeBanner": "{productName} 运行环境:\n\n系统：{system}\n浏览器：{browser}\n内核：{engine}",
   "ui.repositoryAccessSucceeded": "仓库访问成功",
-  "ui.repositoryAccessFailed": "仓库访问失败，请检查凭证、主机密钥和网络连接"
+  "ui.repositoryAccessFailed": "仓库访问失败，请检查凭证、主机密钥和网络连接",
+  "ui.auth.loginRequired": "请先登录后再操作",
+  "ui.auth.expired": "登录已过期，请重新登录",
+  "ui.auth.invalid": "登录凭据已失效，请重新登录",
+  "ui.auth.loginRejected": "登录验证失败，请检查账号、密码或验证码",
+  "ui.setup.previous": "上一步",
+  "ui.setup.next": "下一步",
+  "ui.setup.review": "确认设置",
+  "ui.setup.reviewHint": "请确认账户设置。你可以返回上一步修改，确认后才会创建管理员账户。",
+  "ui.setup.confirm": "确认并完成安装"
 }
