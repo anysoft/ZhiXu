@@ -1,0 +1,61 @@
+{
+  "status": "PASS",
+  "cases": [
+    {
+      "locale": "zh-CN",
+      "kind": "repository",
+      "status": "available",
+      "text": "仓库访问成功",
+      "result": "PASS"
+    },
+    {
+      "locale": "zh-CN",
+      "kind": "repository",
+      "status": "unreachable",
+      "text": "仓库访问失败，请检查凭证、主机密钥和网络连接",
+      "result": "PASS"
+    },
+    {
+      "locale": "zh-CN",
+      "kind": "credential",
+      "status": "available",
+      "text": "仓库访问成功",
+      "result": "PASS"
+    },
+    {
+      "locale": "zh-CN",
+      "kind": "credential",
+      "status": "unreachable",
+      "text": "仓库访问失败，请检查凭证、主机密钥和网络连接",
+      "result": "PASS"
+    },
+    {
+      "locale": "en-US",
+      "kind": "repository",
+      "status": "available",
+      "text": "Repository access succeeded",
+      "result": "PASS"
+    },
+    {
+      "locale": "en-US",
+      "kind": "repository",
+      "status": "unreachable",
+      "text": "Repository access failed; verify credentials, host key and connectivity",
+      "result": "PASS"
+    },
+    {
+      "locale": "en-US",
+      "kind": "credential",
+      "status": "available",
+      "text": "Repository access succeeded",
+      "result": "PASS"
+    },
+    {
+      "locale": "en-US",
+      "kind": "credential",
+      "status": "unreachable",
+      "text": "Repository access failed; verify credentials, host key and connectivity",
+      "result": "PASS"
+    }
+  ]
+}

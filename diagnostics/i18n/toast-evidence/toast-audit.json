@@ -1,0 +1,333 @@
+{
+  "status": "PASS",
+  "resource_keys": {
+    "zh": 1829,
+    "en": 1829
+  },
+  "duplicates": [],
+  "missing": [],
+  "parity": [],
+  "primary_toast_count": 45,
+  "unlocalized_primary_toasts": [],
+  "calls": [
+    {
+      "file": "src/components/NodeRuntime/index.tsx",
+      "line": 99,
+      "callee": "message.error",
+      "content": "tr('ui.requestFailedCheckTheErrorAndResourceStatus')",
+      "localized": true
+    },
+    {
+      "file": "src/components/PythonEnvironments/index.tsx",
+      "line": 102,
+      "callee": "message.error",
+      "content": "tr('ui.operationFailedRefreshTheStatusBeforeRetrying')",
+      "localized": true
+    },
+    {
+      "file": "src/components/PythonEnvironments/index.tsx",
+      "line": 170,
+      "callee": "message.error",
+      "content": "tr(\n          'ui.saveOrBuildFailedCheckYourInputAndRefreshSavedDefinitionsCanBeRebuilt',\n        )",
+      "localized": true
+    },
+    {
+      "file": "src/components/config-bindings.tsx",
+      "line": 85,
+      "callee": "message.success",
+      "content": "tr('ui.configBindingSaved')",
+      "localized": true
+    },
+    {
+      "file": "src/components/copy.tsx",
+      "line": 18,
+      "callee": "message.success",
+      "content": "intl.get('复制成功')",
+      "localized": true
+    },
+    {
+      "file": "src/components/observability/taskPolicy.tsx",
+      "line": 142,
+      "callee": "message.success",
+      "content": "tr('ui.notificationPolicySaved')",
+      "localized": true
+    },
+    {
+      "file": "src/components/observability/taskPolicy.tsx",
+      "line": 144,
+      "callee": "message.error",
+      "content": "translateError(r.error_code)",
+      "localized": true
+    },
+    {
+      "file": "src/components/scoped-environment.tsx",
+      "line": 73,
+      "callee": "message.success",
+      "content": "tr('ui.environmentVariablesSaved')",
+      "localized": true
+    },
+    {
+      "file": "src/components/scoped-environment.tsx",
+      "line": 257,
+      "callee": "message.success",
+      "content": "tr('ui.profileBindingSaved')",
+      "localized": true
+    },
+    {
+      "file": "src/components/task-hooks.tsx",
+      "line": 67,
+      "callee": "message.success",
+      "content": "tr('ui.hookSaved')",
+      "localized": true
+    },
+    {
+      "file": "src/pages/config/index.tsx",
+      "line": 68,
+      "callee": "message.success",
+      "content": "replace\n            ? tr('ui.extra.newRevisionSaved')\n            : tr('ui.extra.metadataSaved')",
+      "localized": true
+    },
+    {
+      "file": "src/pages/log/index.tsx",
+      "line": 168,
+      "callee": "message.success",
+      "content": "intl.get('删除成功')",
+      "localized": true
+    },
+    {
+      "file": "src/pages/login/index.tsx",
+      "line": 89,
+      "callee": "notification.success",
+      "content": "intl.get('登录成功！')",
+      "localized": true
+    },
+    {
+      "file": "src/pages/notifications/index.tsx",
+      "line": 76,
+      "callee": "message.error",
+      "content": "translateError(r.error_code)",
+      "localized": true
+    },
+    {
+      "file": "src/pages/notifications/index.tsx",
+      "line": 78,
+      "callee": "message.error",
+      "content": "tr('ui.checkTheChannelFieldsAndSecretJSON')",
+      "localized": true
+    },
+    {
+      "file": "src/pages/notifications/index.tsx",
+      "line": 136,
+      "callee": "message.info",
+      "content": "tr('ui.testNotificationQueuedSeeDeliveries')",
+      "localized": true
+    },
+    {
+      "file": "src/pages/repository/index.tsx",
+      "line": 97,
+      "callee": "message.success",
+      "content": "tr('ui.saved')",
+      "localized": true
+    },
+    {
+      "file": "src/pages/repository/index.tsx",
+      "line": 118,
+      "callee": "(r.data.status === 'available' ? message.success : message.warning)",
+      "content": "r.data.status === 'available'\n            ? tr('ui.repositoryAccessSucceeded')\n            : tr('ui.repositoryAccessFailed')",
+      "localized": true
+    },
+    {
+      "file": "src/pages/repository-workspace.tsx",
+      "line": 88,
+      "callee": "message.success",
+      "content": "tr('ui.template.valueCompleted', { p0: tr(label) })",
+      "localized": true
+    },
+    {
+      "file": "src/pages/runtime-python.tsx",
+      "line": 115,
+      "callee": "message.error",
+      "content": "tr('ui.requestFailedCheckTheStatusBeforeRetrying')",
+      "localized": true
+    },
+    {
+      "file": "src/pages/setting/appModal.tsx",
+      "line": 33,
+      "callee": "message.success",
+      "content": "app ? intl.get('更新应用成功') : intl.get('创建应用成功')",
+      "localized": true
+    },
+    {
+      "file": "src/pages/setting/backup.tsx",
+      "line": 94,
+      "callee": "message.error",
+      "content": "tr('ui.selectAnEncryptedBackupFile')",
+      "localized": true
+    },
+    {
+      "file": "src/pages/setting/clientIp.tsx",
+      "line": 108,
+      "callee": "message.error",
+      "content": "intl.get('请输入可信代理地址或网段')",
+      "localized": true
+    },
+    {
+      "file": "src/pages/setting/clientIp.tsx",
+      "line": 119,
+      "callee": "message.success",
+      "content": "intl.get('更新成功')",
+      "localized": true
+    },
+    {
+      "file": "src/pages/setting/index.tsx",
+      "line": 181,
+      "callee": "message.success",
+      "content": "intl.get('删除成功')",
+      "localized": true
+    },
+    {
+      "file": "src/pages/setting/index.tsx",
+      "line": 212,
+      "callee": "message.success",
+      "content": "intl.get('重置成功')",
+      "localized": true
+    },
+    {
+      "file": "src/pages/setting/loginLog.tsx",
+      "line": 47,
+      "callee": "message.success",
+      "content": "intl.get('更新成功')",
+      "localized": true
+    },
+    {
+      "file": "src/pages/setting/other.tsx",
+      "line": 102,
+      "callee": "message.success",
+      "content": "intl.get('更新成功')",
+      "localized": true
+    },
+    {
+      "file": "src/pages/setting/other.tsx",
+      "line": 154,
+      "callee": "message.success",
+      "content": "intl.get('清理完成')",
+      "localized": true
+    },
+    {
+      "file": "src/pages/setting/security.tsx",
+      "line": 73,
+      "callee": "message.success",
+      "content": "intl.get('激活成功')",
+      "localized": true
+    },
+    {
+      "file": "src/pages/setting/security.tsx",
+      "line": 78,
+      "callee": "message.success",
+      "content": "intl.get('验证失败')",
+      "localized": true
+    },
+    {
+      "file": "src/pages/setting/systemLog.tsx",
+      "line": 58,
+      "callee": "message.success",
+      "content": "intl.get('删除成功')",
+      "localized": true
+    },
+    {
+      "file": "src/pages/subscription/discovery.tsx",
+      "line": 90,
+      "callee": "message.success",
+      "content": "tr('ui.discoveryPolicySaved')",
+      "localized": true
+    },
+    {
+      "file": "src/pages/subscription/discovery.tsx",
+      "line": 109,
+      "callee": "message.success",
+      "content": "tr('ui.discoveryApplied')",
+      "localized": true
+    },
+    {
+      "file": "src/pages/subscription/index.tsx",
+      "line": 390,
+      "callee": "message.success",
+      "content": "intl.get('删除成功')",
+      "localized": true
+    },
+    {
+      "file": "src/pages/subscription/modal.tsx",
+      "line": 89,
+      "callee": "message.success",
+      "content": "subscription\n            ? tr('ui.extra.subscriptionUpdated')\n            : tr('ui.extra.subscriptionCreated')",
+      "localized": true
+    },
+    {
+      "file": "src/pages/subscription/modal.tsx",
+      "line": 237,
+      "callee": "message.success",
+      "content": "tr('ui.template.worktreeValueIsReady', {\n                      p0: r.data.worktree_id,\n                    })",
+      "localized": true
+    },
+    {
+      "file": "src/pages/tasks/index.tsx",
+      "line": 144,
+      "callee": "message.success",
+      "content": "tr('ui.runtimeDefaultSaved')",
+      "localized": true
+    },
+    {
+      "file": "src/pages/tasks/index.tsx",
+      "line": 253,
+      "callee": "message.error",
+      "content": "tr('ui.argumentsMustBeAJSONArrayOfStrings')",
+      "localized": true
+    },
+    {
+      "file": "src/pages/tasks/index.tsx",
+      "line": 296,
+      "callee": "message.success",
+      "content": "tr('ui.taskSaved')",
+      "localized": true
+    },
+    {
+      "file": "src/pages/tasks/triggers.tsx",
+      "line": 91,
+      "callee": "message.error",
+      "content": "translateError(result.error_code ?? result.message)",
+      "localized": true
+    },
+    {
+      "file": "src/utils/http.tsx",
+      "line": 55,
+      "callee": "message.error",
+      "content": "intl.get('登录已过期，请重新登录')",
+      "localized": true
+    },
+    {
+      "file": "src/utils/http.tsx",
+      "line": 65,
+      "callee": "notification.error",
+      "content": "msg",
+      "localized": true
+    },
+    {
+      "file": "src/utils/http.tsx",
+      "line": 77,
+      "callee": "message.error",
+      "content": "translateError('NETWORK_ERROR')",
+      "localized": true
+    },
+    {
+      "file": "src/utils/http.tsx",
+      "line": 119,
+      "callee": "notification.error",
+      "content": "translateError(res.error_code ?? res.message)",
+      "localized": true
+    }
+  ],
+  "description_review": {
+    "login": "Labels use locale resources; time uses centralized formatter. Address, IP and device are user metadata and stay unchanged.",
+    "http_errors": "Details are restricted to safe typed error codes and translated with translateError; arbitrary backend messages and validation values are not shown."
+  }
+}

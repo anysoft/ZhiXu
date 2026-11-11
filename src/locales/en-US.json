@@ -1825,5 +1825,7 @@
   "ui.brandTitleHelp": "Customize the panel site title. Leave blank to use the default title \"{productName}\"",
   "ui.brandProxyChain": "{productName} checks the proxy chain from the nearest hop to the farthest and uses the first untrusted address as the client IP.",
   "ui.brandProxyDistance": "Distance from {productName}",
-  "ui.brandRuntimeBanner": "{productName} runtime environment:\n\nSystem: {system}\nBrowser: {browser}\nEngine: {engine}"
+  "ui.brandRuntimeBanner": "{productName} runtime environment:\n\nSystem: {system}\nBrowser: {browser}\nEngine: {engine}",
+  "ui.repositoryAccessSucceeded": "Repository access succeeded",
+  "ui.repositoryAccessFailed": "Repository access failed; verify credentials, host key and connectivity"
 }

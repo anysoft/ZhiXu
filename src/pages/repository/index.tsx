@@ -116,7 +116,9 @@ export default function RepositoryPage() {
       );
       if (r.code === 200) {
         (r.data.status === 'available' ? message.success : message.warning)(
-          r.data.message,
+          r.data.status === 'available'
+            ? tr('ui.repositoryAccessSucceeded')
+            : tr('ui.repositoryAccessFailed'),
         );
         setTestTarget(null);
         await load();

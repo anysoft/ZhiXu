@@ -1825,5 +1825,7 @@
   "ui.brandTitleHelp": "自定义面板的站点标题，留空使用默认值“{productName}”",
   "ui.brandProxyChain": "系统从离{productName}最近的一跳开始，由右向左检查代理链，并把第一个不可信地址作为客户端 IP。",
   "ui.brandProxyDistance": "距离{productName}",
-  "ui.brandRuntimeBanner": "{productName} 运行环境:\n\n系统：{system}\n浏览器：{browser}\n内核：{engine}"
+  "ui.brandRuntimeBanner": "{productName} 运行环境:\n\n系统：{system}\n浏览器：{browser}\n内核：{engine}",
+  "ui.repositoryAccessSucceeded": "仓库访问成功",
+  "ui.repositoryAccessFailed": "仓库访问失败，请检查凭证、主机密钥和网络连接"
 }

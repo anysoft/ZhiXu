@@ -3,6 +3,7 @@ const fs = require('node:fs'),
   path = require('node:path'),
   ts = require('typescript');
 const root = path.resolve(__dirname, '../..');
+const { inspectToasts } = require('./toasts.cjs');
 const walk = (directory) =>
   fs
     .readdirSync(directory, { withFileTypes: true })
@@ -32,6 +33,7 @@ const uiProps = new Set([
 ]);
 function inventory() {
   const literals = [],
+    toasts = [],
     calls = [];
   for (const full of walk(path.join(root, 'src')).filter((file) =>
     /\.[jt]sx?$/.test(file),
@@ -43,6 +45,7 @@ function inventory() {
         ts.ScriptTarget.Latest,
         true,
       );
+    toasts.push(...inspectToasts(sf).map((toast) => ({ file, ...toast })));
     const add = (n, value, kind) =>
       literals.push({
         file,
@@ -115,7 +118,7 @@ function inventory() {
     }
     visit(sf);
   }
-  return { literals, calls };
+  return { literals, calls, toasts };
 }
 function check() {
   const resources = {},
@@ -136,7 +139,7 @@ function check() {
     visit(sf);
     resources[locale] = JSON.parse(raw);
   }
-  const { literals, calls } = inventory(),
+  const { literals, calls, toasts } = inventory(),
     zh = resources['zh-CN'],
     en = resources['en-US'];
   const missing = calls.filter(
@@ -193,6 +196,7 @@ function check() {
       parity.length ||
       semanticErrors.length ||
       missingPresentation.length ||
+      toasts.some((toast) => !toast.localized) ||
       classified.some((x) => x.classification === 'UNCLASSIFIED')
         ? 'FAIL'
         : 'PASS',
@@ -202,6 +206,7 @@ function check() {
     parity,
     semanticErrors,
     missingPresentation,
+    toasts,
     literals: classified,
   };
 }
