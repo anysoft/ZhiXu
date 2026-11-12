@@ -663,6 +663,10 @@
     "classification": "PLATFORM_CORE"
   },
   {
+    "path": "tests/i18n/login-error.test.cjs",
+    "classification": "PLATFORM_CORE"
+  },
+  {
     "path": "tests/notifications/channel-form.test.cjs",
     "classification": "PLATFORM_CORE"
   },

@@ -1846,6 +1846,7 @@
   "ui.setup.review": "确认设置",
   "ui.setup.reviewHint": "请确认账户设置。你可以返回上一步修改，确认后才会创建管理员账户。",
   "ui.setup.confirm": "确认并完成安装",
+  "error.AUTH_INVALID_CREDENTIALS": "账号或密码错误，请重试",
   "notifications.field.url": "Webhook 地址",
   "notifications.help.url": "使用 HTTP 或 HTTPS 地址。",
   "notifications.field.authorization": "Authorization 请求头",

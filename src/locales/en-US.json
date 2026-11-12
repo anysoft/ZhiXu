@@ -1846,6 +1846,7 @@
   "ui.setup.review": "Review settings",
   "ui.setup.reviewHint": "Review your account settings. You can go back to make changes. The administrator account is created only after confirmation.",
   "ui.setup.confirm": "Confirm and finish setup",
+  "error.AUTH_INVALID_CREDENTIALS": "Incorrect username or password. Please try again.",
   "notifications.field.url": "Webhook URL",
   "notifications.help.url": "Use an HTTP or HTTPS endpoint.",
   "notifications.field.authorization": "Authorization header",

@@ -244,7 +244,11 @@ export default class UserService {
           data: waitTime,
         };
       } else {
-        return { code: 400, message: t('错误的用户名密码，请重试') };
+        return {
+          code: 400,
+          error_code: 'AUTH_INVALID_CREDENTIALS',
+          message: t('错误的用户名密码，请重试'),
+        };
       }
     }
   }
