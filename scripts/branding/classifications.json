@@ -27208,5 +27208,70 @@
     "classification": "TEST_FIXTURE_REVIEW",
     "action": "KEEP",
     "reason": "CI regression checks the existing acceptance output environment contract matches the stage receipt name; not a product display label."
+  },
+  "ed8e7d64d23305bf7a11623ceb35849a2086061f3d323418fefbcf44de08f384": {
+    "classification": "INTERNAL_IDENTITY_KEEP",
+    "action": "KEEP",
+    "reason": "Existing browser acceptance harness environment variable for isolated fixture roots, browser runtime or evidence output; not a product display label or a compatibility layer."
+  },
+  "a84654a11d3abacecce45f9033002e2234518490c4cbd7f4f8e0726d0fcf9c1a": {
+    "classification": "INTERNAL_IDENTITY_KEEP",
+    "action": "KEEP",
+    "reason": "Existing browser acceptance harness environment variable for isolated fixture roots, browser runtime or evidence output; not a product display label or a compatibility layer."
+  },
+  "31f4e51d4f1e13b626d402fbf6bcd0c06e5c1cf86c8a62d295dcd787a766491b": {
+    "classification": "INTERNAL_IDENTITY_KEEP",
+    "action": "KEEP",
+    "reason": "Existing browser acceptance harness environment variable for isolated fixture roots, browser runtime or evidence output; not a product display label or a compatibility layer."
+  },
+  "4efc55fde0cc3f8f4a34e57eef6e920ecee89bda3cd0330c91c7df3b58c83bd3": {
+    "classification": "INTERNAL_IDENTITY_KEEP",
+    "action": "KEEP",
+    "reason": "Existing browser acceptance harness environment variable for isolated fixture roots, browser runtime or evidence output; not a product display label or a compatibility layer."
+  },
+  "253818121d9e7790163a592ac3b8c9b7ebb57c8394fe8810df4e04a054879dae": {
+    "classification": "INTERNAL_IDENTITY_KEEP",
+    "action": "KEEP",
+    "reason": "Existing browser acceptance harness environment variable for isolated fixture roots, browser runtime or evidence output; not a product display label or a compatibility layer."
+  },
+  "5eaed6d2fa9b6894459eec0f968ae94429bafa593c0dbb0e4deb85c62c106b97": {
+    "classification": "INTERNAL_IDENTITY_KEEP",
+    "action": "KEEP",
+    "reason": "Existing browser acceptance harness environment variable for isolated fixture roots, browser runtime or evidence output; not a product display label or a compatibility layer."
+  },
+  "a4163f5ddec2fda867ce69cff9eaed38b60c3f75a65aee845e865e818ca34a1f": {
+    "classification": "INTERNAL_IDENTITY_KEEP",
+    "action": "KEEP",
+    "reason": "Existing browser acceptance harness environment variable for isolated fixture roots, browser runtime or evidence output; not a product display label or a compatibility layer."
+  },
+  "3c0d9bb80824f1fc709b7b0274bd635d8e6d8072171ab9b1aa170a8a2f24b352": {
+    "classification": "TEST_FIXTURE_REVIEW",
+    "action": "KEEP",
+    "reason": "Credential browser acceptance harness uses the existing internal environment variables to isolate fresh fixture data, select the test browser runtime, and save sanitized evidence; no user-visible brand or compatibility behavior."
+  },
+  "94b9bf3a8a93f78821cf7f80ee834175e1df0b08fb7736689c316068543d9534": {
+    "classification": "TEST_FIXTURE_REVIEW",
+    "action": "KEEP",
+    "reason": "Credential browser acceptance harness uses the existing internal environment variables to isolate fresh fixture data, select the test browser runtime, and save sanitized evidence; no user-visible brand or compatibility behavior."
+  },
+  "4d59e979dd25853b9e8a06963253951a6dfe81c14c8a502c6bb4bfb025ca1198": {
+    "classification": "TEST_FIXTURE_REVIEW",
+    "action": "KEEP",
+    "reason": "Credential browser acceptance harness uses the existing internal environment variables to isolate fresh fixture data, select the test browser runtime, and save sanitized evidence; no user-visible brand or compatibility behavior."
+  },
+  "8a85b9aae5018ea53c9414140f60c807f5ab332975318fa97a47746e18fd7cee": {
+    "classification": "TEST_FIXTURE_REVIEW",
+    "action": "KEEP",
+    "reason": "Credential browser acceptance harness uses the existing internal environment variables to isolate fresh fixture data, select the test browser runtime, and save sanitized evidence; no user-visible brand or compatibility behavior."
+  },
+  "452049fb03c3bbcf237a7c5b2085c3cef8e9dfdbaf4eb864027c0cf885872428": {
+    "classification": "TEST_FIXTURE_REVIEW",
+    "action": "KEEP",
+    "reason": "Credential browser acceptance harness uses the existing internal environment variables to isolate fresh fixture data, select the test browser runtime, and save sanitized evidence; no user-visible brand or compatibility behavior."
+  },
+  "15cfbf525512392a8037da2352e5f91d4e274d59014d3d191da9edcf1dea8518": {
+    "classification": "TEST_FIXTURE_REVIEW",
+    "action": "KEEP",
+    "reason": "Credential browser acceptance harness uses the existing internal environment variables to isolate fresh fixture data, select the test browser runtime, and save sanitized evidence; no user-visible brand or compatibility behavior."
   }
 }

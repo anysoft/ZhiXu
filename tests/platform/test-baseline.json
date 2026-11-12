@@ -669,5 +669,13 @@
   {
     "path": "tests/notifications/provider-schemas.test.cjs",
     "classification": "PLATFORM_CORE"
+  },
+  {
+    "path": "tests/repository/credential-form.test.cjs",
+    "classification": "PLATFORM_CORE"
+  },
+  {
+    "path": "tests/repository/credential-service.test.cjs",
+    "classification": "PLATFORM_CORE"
   }
 ]

@@ -11,7 +11,6 @@ import {
   message,
   Modal,
   Popconfirm,
-  Radio,
   Select,
   Space,
   Table,
@@ -20,9 +19,10 @@ import {
 } from 'antd';
 import { request } from '@/utils/http';
 import config from '@/utils/config';
+import { serializeCredentialInput } from '@/features/repository/credentialForm';
 
 export default function RepositoryPage() {
-  useI18nLocale();
+  const locale = useI18nLocale();
   const [repositories, setRepositories] = useState<any[]>([]);
   const [credentials, setCredentials] = useState<any[]>([]);
   const [editor, setEditor] = useState<{
@@ -35,7 +35,18 @@ export default function RepositoryPage() {
   const [testUrl, setTestUrl] = useState('');
   const [form] = Form.useForm();
   const auth = Form.useWatch('auth_type', form);
-  const replace = Form.useWatch('replace_secret', form);
+  const privateKey = Form.useWatch('private_key', form);
+  const token = Form.useWatch('token', form);
+  const hasSecret = !!editor?.row.id && !!editor.row.has_secret;
+  const secretRequired = !hasSecret;
+  useEffect(() => {
+    if (!editor) return;
+    const names = form
+      .getFieldsError()
+      .filter((field) => field.errors.length)
+      .map((field) => field.name);
+    if (names.length) void form.validateFields(names).catch(() => {});
+  }, [locale]);
   const load = async () => {
     const [r, c] = await Promise.all([
       request.get(`${config.apiPrefix}repositories`),
@@ -67,25 +78,18 @@ export default function RepositoryPage() {
             known_hosts: row.known_hosts,
             capability: row.capability || 'READ',
             status: row.status || 'enabled',
-            replace_secret: !row.id,
           },
     );
   };
   const save = async () => {
     try {
-      const values = await form.validateFields();
+      const fields = await form.validateFields();
       if (!editor) return;
+      const values =
+        editor.kind === 'git-credentials'
+          ? serializeCredentialInput(fields, editor.row)
+          : fields;
       setBusy(true);
-      if (editor.kind === 'git-credentials') {
-        if (values.auth_type === 'anonymous' || !values.replace_secret) {
-          delete values.token;
-          delete values.private_key;
-          delete values.passphrase;
-        } else if (values.auth_type === 'https_token') {
-          delete values.private_key;
-          delete values.passphrase;
-        } else delete values.token;
-      }
       const result = await request[editor.row.id ? 'put' : 'post'](
         `${config.apiPrefix}${editor.kind}`,
         { ...values, ...(editor.row.id ? { id: editor.row.id } : {}) },
@@ -394,6 +398,16 @@ export default function RepositoryPage() {
               <Form.Item name="auth_type" label={tr('ui.authenticationMethod')}>
                 <Select
                   disabled={!!editor?.row.id}
+                  onChange={() => {
+                    form.setFields([
+                      ...[
+                        'token',
+                        'private_key',
+                        'passphrase',
+                        'known_hosts',
+                      ].map((name) => ({ name, value: undefined, errors: [] })),
+                    ]);
+                  }}
                   options={['anonymous', 'https_token', 'ssh_key'].map(
                     (value) => ({ value, label: value }),
                   )}
@@ -402,6 +416,104 @@ export default function RepositoryPage() {
               <Form.Item name="username" label={tr('ui.username')}>
                 <Input autoComplete="off" />
               </Form.Item>
+              {auth === 'https_token' && (
+                <Form.Item
+                  name="token"
+                  label={tr('credentials.form.accessToken')}
+                  preserve={false}
+                  rules={[
+                    {
+                      required: secretRequired,
+                      message: tr('credentials.form.required'),
+                    },
+                  ]}
+                  extra={
+                    hasSecret ? tr('credentials.form.replaceHint') : undefined
+                  }
+                >
+                  <Input.Password
+                    autoComplete="new-password"
+                    placeholder={
+                      hasSecret
+                        ? tr('credentials.form.keepExisting')
+                        : undefined
+                    }
+                  />
+                </Form.Item>
+              )}
+              {auth === 'ssh_key' && (
+                <>
+                  <Form.Item
+                    name="private_key"
+                    label={tr('credentials.form.privateKey')}
+                    preserve={false}
+                    rules={[
+                      {
+                        required: secretRequired,
+                        message: tr('credentials.form.required'),
+                      },
+                    ]}
+                    extra={
+                      hasSecret ? tr('credentials.form.replaceHint') : undefined
+                    }
+                  >
+                    <Input.TextArea
+                      rows={5}
+                      autoComplete="off"
+                      placeholder={
+                        hasSecret
+                          ? tr('credentials.form.keepExisting')
+                          : undefined
+                      }
+                      onChange={(e) => {
+                        if (!e.target.value)
+                          form.setFieldValue('passphrase', undefined);
+                      }}
+                    />
+                  </Form.Item>
+                  {(!editor?.row.id || !!privateKey) && (
+                    <Form.Item
+                      name="passphrase"
+                      label={tr('credentials.form.passphrase')}
+                      preserve={false}
+                    >
+                      <Input.Password autoComplete="new-password" />
+                    </Form.Item>
+                  )}
+                </>
+              )}
+              {(auth === 'https_token' || auth === 'ssh_key') && (
+                <div style={{ marginBottom: 16 }}>
+                  <Tag color={hasSecret ? 'success' : 'warning'}>
+                    {tr(
+                      hasSecret
+                        ? 'credentials.form.configured'
+                        : 'credentials.form.notConfigured',
+                    )}
+                  </Tag>
+                  {hasSecret &&
+                    (auth === 'https_token' ? token : privateKey) && (
+                      <span>{tr('credentials.form.replacing')}</span>
+                    )}
+                </div>
+              )}
+              {(auth === 'ssh_key' || auth === 'anonymous') && (
+                <Form.Item
+                  name="known_hosts"
+                  label={tr('ui.verifiedKnownHosts')}
+                  rules={[{ required: auth === 'ssh_key' }]}
+                  extra={tr(
+                    'ui.verifyTheHostPublicKeyThroughATrustedChannelSSHConnectionsEnforceHostIdentityVerification',
+                  )}
+                >
+                  <Input.TextArea rows={3} />
+                </Form.Item>
+              )}
+              {editor?.row.public_key && (
+                <Form.Item label={tr('ui.publicKey')}>
+                  <Input.TextArea readOnly value={editor.row.public_key} />
+                </Form.Item>
+              )}
               <Form.Item name="capability" label={tr('ui.capability')}>
                 <Select
                   options={[
@@ -424,63 +536,6 @@ export default function RepositoryPage() {
                   ]}
                 />
               </Form.Item>
-              {auth !== 'anonymous' && (
-                <Form.Item
-                  name="replace_secret"
-                  label={tr('ui.secret')}
-                  initialValue={!editor?.row.id}
-                >
-                  <Radio.Group>
-                    <Radio value={false} disabled={!editor?.row.id}>
-                      {tr('ui.keepExistingSecret')}
-                    </Radio>
-                    <Radio value={true}>{tr('ui.replaceSecret')}</Radio>
-                  </Radio.Group>
-                </Form.Item>
-              )}
-              {replace && auth === 'https_token' && (
-                <Form.Item
-                  name="token"
-                  label={tr('ui.token')}
-                  rules={[{ required: true }]}
-                >
-                  <Input.Password autoComplete="new-password" />
-                </Form.Item>
-              )}
-              {replace && auth === 'ssh_key' && (
-                <>
-                  <Form.Item
-                    name="private_key"
-                    label={tr('ui.sshPrivateKey')}
-                    rules={[{ required: true }]}
-                  >
-                    <Input.TextArea rows={5} autoComplete="off" />
-                  </Form.Item>
-                  <Form.Item
-                    name="passphrase"
-                    label={tr('ui.passphraseOptional')}
-                  >
-                    <Input.Password autoComplete="new-password" />
-                  </Form.Item>
-                </>
-              )}
-              {(auth === 'ssh_key' || auth === 'anonymous') && (
-                <Form.Item
-                  name="known_hosts"
-                  label={tr('ui.verifiedKnownHosts')}
-                  rules={[{ required: auth === 'ssh_key' }]}
-                  extra={tr(
-                    'ui.verifyTheHostPublicKeyThroughATrustedChannelSSHConnectionsEnforceHostIdentityVerification',
-                  )}
-                >
-                  <Input.TextArea rows={3} />
-                </Form.Item>
-              )}
-              {editor?.row.public_key && (
-                <Form.Item label={tr('ui.publicKey')}>
-                  <Input.TextArea readOnly value={editor.row.public_key} />
-                </Form.Item>
-              )}
             </>
           )}
         </Form>

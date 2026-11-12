@@ -93,7 +93,7 @@ export default class GitCredentialService {
         }
         if (
           data.auth_type === 'https_token' &&
-          (!secret.token || /[\r\n\0]/.test(secret.token))
+          (!secret.token?.trim() || /[\r\n\0]/.test(secret.token))
         )
           throw new GitResourceError('A valid token is required');
         if (

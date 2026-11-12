@@ -1,4 +1,13 @@
 {
+  "credentials.form.accessToken": "访问令牌（Token）",
+  "credentials.form.privateKey": "SSH 私钥",
+  "credentials.form.passphrase": "私钥密码（可选）",
+  "credentials.form.keepExisting": "留空则保持现有密钥",
+  "credentials.form.replaceHint": "填写新值将替换现有密钥",
+  "credentials.form.configured": "已配置密钥",
+  "credentials.form.notConfigured": "尚未配置密钥",
+  "credentials.form.required": "必须填写密钥",
+  "credentials.form.replacing": "保存后将替换现有密钥",
   "1. 宿主机执行 docker run --rm -v\n                  /var/run/docker.sock:/var/run/docker.sock\n                  containrrr/watchtower -cR <容器名>": "1. 宿主机执行 docker run --rm -v\n                  /var/run/docker.sock:/var/run/docker.sock\n                  containrrr/watchtower -cR <容器名>",
   "2. 容器内执行 ql check、ql update": "2. 容器内执行 ql check、ql update",
   "24小时未运行": "24小时未运行",
