@@ -661,5 +661,13 @@
   {
     "path": "tests/i18n/initialization.test.cjs",
     "classification": "PLATFORM_CORE"
+  },
+  {
+    "path": "tests/notifications/channel-form.test.cjs",
+    "classification": "PLATFORM_CORE"
+  },
+  {
+    "path": "tests/notifications/provider-schemas.test.cjs",
+    "classification": "PLATFORM_CORE"
   }
 ]

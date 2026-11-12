@@ -278,7 +278,8 @@ async function until(fn) {
   await page
     .getByLabel(ui('确认密码'), { exact: true })
     .fill(acceptance.secret('e2e-fixture-password'));
-  await page.getByRole('button', { name: pattern('提交') }).click();
+  await page.getByRole('button', { name: ui('ui.setup.next'), exact: true }).click();
+  await page.getByRole('button', { name: ui('ui.setup.confirm'), exact: true }).click();
   await page.getByRole('button', { name: buttonName('去登录'), exact: true }).click();
   async function login() {
     await page.getByLabel(ui('用户名'), { exact: true }).fill('platform-owner');
@@ -771,8 +772,10 @@ async function until(fn) {
     process.exitCode = 1;
   })
   .finally(async () => {
-    flushBrowser();await browser?.close();
+    flushBrowser();
+    // Close application WebSockets before waiting for Chromium shutdown.
     await stop();
+    await browser?.close();
     for (const c of connections) c.destroy();
     await new Promise((r) => (ssh ? ssh.close(r) : r()));
     fs.writeFileSync(

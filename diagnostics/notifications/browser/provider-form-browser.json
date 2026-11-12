@@ -1,0 +1,279 @@
+{
+  "status": "PASS",
+  "providerCases": [
+    {
+      "id": "WEBHOOK",
+      "renderedFields": [
+        "url",
+        "authorization"
+      ],
+      "requiredValidation": "PASS",
+      "serialization": "PASS"
+    },
+    {
+      "id": "gotify",
+      "renderedFields": [
+        "gotifyUrl",
+        "gotifyToken",
+        "gotifyPriority"
+      ],
+      "requiredValidation": "PASS",
+      "serialization": "PASS"
+    },
+    {
+      "id": "goCqHttpBot",
+      "renderedFields": [
+        "goCqHttpBotUrl",
+        "goCqHttpBotQq",
+        "goCqHttpBotToken"
+      ],
+      "requiredValidation": "PASS",
+      "serialization": "PASS"
+    },
+    {
+      "id": "serverChan",
+      "renderedFields": [
+        "serverChanKey"
+      ],
+      "requiredValidation": "PASS",
+      "serialization": "PASS"
+    },
+    {
+      "id": "pushDeer",
+      "renderedFields": [
+        "pushDeerKey",
+        "pushDeerUrl"
+      ],
+      "requiredValidation": "PASS",
+      "serialization": "PASS"
+    },
+    {
+      "id": "chat",
+      "renderedFields": [
+        "synologyChatUrl"
+      ],
+      "requiredValidation": "PASS",
+      "serialization": "PASS"
+    },
+    {
+      "id": "bark",
+      "renderedFields": [
+        "barkPush",
+        "barkIcon",
+        "barkSound",
+        "barkGroup",
+        "barkLevel",
+        "barkUrl",
+        "barkArchive"
+      ],
+      "requiredValidation": "PASS",
+      "serialization": "PASS"
+    },
+    {
+      "id": "telegramBot",
+      "renderedFields": [
+        "telegramBotToken",
+        "telegramBotUserId",
+        "telegramBotApiHost",
+        "telegramBotProxyHost",
+        "telegramBotProxyPort",
+        "telegramBotProxyAuth"
+      ],
+      "requiredValidation": "PASS",
+      "serialization": "PASS"
+    },
+    {
+      "id": "dingtalkBot",
+      "renderedFields": [
+        "dingtalkBotToken",
+        "dingtalkBotSecret"
+      ],
+      "requiredValidation": "PASS",
+      "serialization": "PASS"
+    },
+    {
+      "id": "weWorkBot",
+      "renderedFields": [
+        "weWorkBotKey",
+        "weWorkOrigin"
+      ],
+      "requiredValidation": "PASS",
+      "serialization": "PASS"
+    },
+    {
+      "id": "weWorkApp",
+      "renderedFields": [
+        "corpId",
+        "corpSecret",
+        "toUser",
+        "agentId",
+        "messageType",
+        "weWorkOrigin"
+      ],
+      "requiredValidation": "PASS",
+      "serialization": "PASS"
+    },
+    {
+      "id": "aibotk",
+      "renderedFields": [
+        "aibotkKey",
+        "aibotkType",
+        "aibotkName"
+      ],
+      "requiredValidation": "PASS",
+      "serialization": "PASS"
+    },
+    {
+      "id": "iGot",
+      "renderedFields": [
+        "iGotPushKey"
+      ],
+      "requiredValidation": "PASS",
+      "serialization": "PASS"
+    },
+    {
+      "id": "pushPlus",
+      "renderedFields": [
+        "pushPlusToken",
+        "pushPlusUser",
+        "pushPlusTemplate",
+        "pushplusChannel",
+        "pushplusWebhook",
+        "pushplusCallbackUrl",
+        "pushplusTo"
+      ],
+      "requiredValidation": "PASS",
+      "serialization": "PASS"
+    },
+    {
+      "id": "wePlusBot",
+      "renderedFields": [
+        "wePlusBotToken",
+        "wePlusBotReceiver",
+        "wePlusBotVersion"
+      ],
+      "requiredValidation": "PASS",
+      "serialization": "PASS"
+    },
+    {
+      "id": "email",
+      "renderedFields": [
+        "emailMode",
+        "emailService",
+        "emailUser",
+        "emailPass",
+        "emailTo"
+      ],
+      "requiredValidation": "PASS",
+      "serialization": "PASS"
+    },
+    {
+      "id": "pushMe",
+      "renderedFields": [
+        "pushMeKey",
+        "pushMeUrl"
+      ],
+      "requiredValidation": "PASS",
+      "serialization": "PASS"
+    },
+    {
+      "id": "webhook",
+      "renderedFields": [
+        "webhookMethod",
+        "webhookContentType",
+        "webhookUrl",
+        "webhookHeaders",
+        "webhookBody"
+      ],
+      "requiredValidation": "PASS",
+      "serialization": "PASS"
+    },
+    {
+      "id": "lark",
+      "renderedFields": [
+        "larkKey",
+        "larkSecret"
+      ],
+      "requiredValidation": "PASS",
+      "serialization": "PASS"
+    },
+    {
+      "id": "chronocat",
+      "renderedFields": [
+        "chronocatURL",
+        "chronocatQQ",
+        "chronocatToken"
+      ],
+      "requiredValidation": "PASS",
+      "serialization": "PASS"
+    },
+    {
+      "id": "ntfy",
+      "renderedFields": [
+        "ntfyTopic",
+        "ntfyUrl",
+        "ntfyAuthMode",
+        "ntfyPriority",
+        "ntfyActions"
+      ],
+      "requiredValidation": "PASS",
+      "serialization": "PASS"
+    },
+    {
+      "id": "wxPusherBot",
+      "renderedFields": [
+        "wxPusherBotAppToken",
+        "wxPusherBotTopicIds",
+        "wxPusherBotUids"
+      ],
+      "requiredValidation": "PASS",
+      "separatorOnlyRecipientsValidation": "PASS",
+      "serialization": "PASS"
+    },
+    {
+      "id": "wxPusherSpt",
+      "renderedFields": [
+        "wxPusherSptList"
+      ],
+      "requiredValidation": "PASS",
+      "serialization": "PASS"
+    },
+    {
+      "id": "openiLink",
+      "renderedFields": [
+        "openiLinkAppToken",
+        "openiLinkHubUrl",
+        "openiLinkContextToken"
+      ],
+      "requiredValidation": "PASS",
+      "serialization": "PASS"
+    },
+    {
+      "id": "wpush",
+      "renderedFields": [
+        "wpushApiKey",
+        "wpushChannel",
+        "wpushTopicCode"
+      ],
+      "requiredValidation": "PASS",
+      "serialization": "PASS"
+    }
+  ],
+  "cases": [
+    "25-provider-render-validation-serialization-and-no-readback",
+    "edit-keep-no-secret",
+    "edit-replace-full-config",
+    "edit-delete-explicit-confirmation",
+    "provider-switch-forces-replace-and-no-cross-provider-fields",
+    "email-smtp-number-boolean-conditional",
+    "ntfy-auth-mode-clears-inactive-token",
+    "weworkapp-textcard-and-mpnews-conditional-wire-mapping",
+    "live-locale-switch-updates-errors-retains-draft-and-close-reopen-clears",
+    "english-webhook-local-delivery-and-exact-authorization",
+    "uppercase-lowercase-webhook-distinct-forms",
+    "mobile-dialog-footer-accessible",
+    "no-secret-readback-storage-or-pageerrors"
+  ],
+  "browserErrors": [],
+  "cleanup": "PASS"
+}

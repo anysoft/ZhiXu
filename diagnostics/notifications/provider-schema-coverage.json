@@ -1,0 +1,846 @@
+{
+  "entryHead": "9bf9419973e1f041df405dd5dfdb7c95dc09768b",
+  "backendProviders": 25,
+  "frontendSchemas": 25,
+  "uiFields": 88,
+  "wireFieldOccurrences": 81,
+  "missingProviders": [],
+  "missingFields": [],
+  "contractTest": "tests/notifications/provider-schemas.test.cjs (AST comparison against actual backend)",
+  "providers": [
+    {
+      "id": "WEBHOOK",
+      "required": [
+        "url"
+      ],
+      "wireFields": [
+        "url",
+        "authorization"
+      ],
+      "uiFields": [
+        {
+          "name": "url",
+          "type": "url",
+          "required": true
+        },
+        {
+          "name": "authorization",
+          "type": "password",
+          "required": false
+        }
+      ]
+    },
+    {
+      "id": "gotify",
+      "required": [
+        "gotifyUrl",
+        "gotifyToken"
+      ],
+      "wireFields": [
+        "gotifyUrl",
+        "gotifyToken",
+        "gotifyPriority"
+      ],
+      "uiFields": [
+        {
+          "name": "gotifyUrl",
+          "type": "url",
+          "required": true
+        },
+        {
+          "name": "gotifyToken",
+          "type": "password",
+          "required": true
+        },
+        {
+          "name": "gotifyPriority",
+          "type": "number",
+          "required": false,
+          "defaultValue": 1
+        }
+      ]
+    },
+    {
+      "id": "goCqHttpBot",
+      "required": [
+        "goCqHttpBotUrl",
+        "goCqHttpBotQq"
+      ],
+      "wireFields": [
+        "goCqHttpBotUrl",
+        "goCqHttpBotQq",
+        "goCqHttpBotToken"
+      ],
+      "uiFields": [
+        {
+          "name": "goCqHttpBotUrl",
+          "type": "url",
+          "required": true
+        },
+        {
+          "name": "goCqHttpBotQq",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "goCqHttpBotToken",
+          "type": "password",
+          "required": false
+        }
+      ]
+    },
+    {
+      "id": "serverChan",
+      "required": [
+        "serverChanKey"
+      ],
+      "wireFields": [
+        "serverChanKey"
+      ],
+      "uiFields": [
+        {
+          "name": "serverChanKey",
+          "type": "password",
+          "required": true
+        }
+      ]
+    },
+    {
+      "id": "pushDeer",
+      "required": [
+        "pushDeerKey"
+      ],
+      "wireFields": [
+        "pushDeerKey",
+        "pushDeerUrl"
+      ],
+      "uiFields": [
+        {
+          "name": "pushDeerKey",
+          "type": "password",
+          "required": true
+        },
+        {
+          "name": "pushDeerUrl",
+          "type": "url",
+          "required": false,
+          "defaultValue": "https://api2.pushdeer.com/message/push"
+        }
+      ]
+    },
+    {
+      "id": "chat",
+      "required": [
+        "synologyChatUrl"
+      ],
+      "wireFields": [
+        "synologyChatUrl"
+      ],
+      "uiFields": [
+        {
+          "name": "synologyChatUrl",
+          "type": "url",
+          "required": true
+        }
+      ]
+    },
+    {
+      "id": "bark",
+      "required": [
+        "barkPush"
+      ],
+      "wireFields": [
+        "barkPush",
+        "barkIcon",
+        "barkSound",
+        "barkGroup",
+        "barkLevel",
+        "barkUrl",
+        "barkArchive"
+      ],
+      "uiFields": [
+        {
+          "name": "barkPush",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "barkIcon",
+          "type": "url",
+          "required": false
+        },
+        {
+          "name": "barkSound",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "barkGroup",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "barkLevel",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "barkUrl",
+          "type": "url",
+          "required": false
+        },
+        {
+          "name": "barkArchive",
+          "type": "select",
+          "required": false
+        }
+      ]
+    },
+    {
+      "id": "telegramBot",
+      "required": [
+        "telegramBotToken",
+        "telegramBotUserId"
+      ],
+      "wireFields": [
+        "telegramBotToken",
+        "telegramBotUserId",
+        "telegramBotApiHost",
+        "telegramBotProxyHost",
+        "telegramBotProxyPort",
+        "telegramBotProxyAuth"
+      ],
+      "uiFields": [
+        {
+          "name": "telegramBotToken",
+          "type": "password",
+          "required": true
+        },
+        {
+          "name": "telegramBotUserId",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "telegramBotApiHost",
+          "type": "url",
+          "required": false,
+          "defaultValue": "https://api.telegram.org"
+        },
+        {
+          "name": "telegramBotProxyHost",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "telegramBotProxyPort",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "telegramBotProxyAuth",
+          "type": "password",
+          "required": false
+        }
+      ]
+    },
+    {
+      "id": "dingtalkBot",
+      "required": [
+        "dingtalkBotToken"
+      ],
+      "wireFields": [
+        "dingtalkBotToken",
+        "dingtalkBotSecret"
+      ],
+      "uiFields": [
+        {
+          "name": "dingtalkBotToken",
+          "type": "password",
+          "required": true
+        },
+        {
+          "name": "dingtalkBotSecret",
+          "type": "password",
+          "required": false
+        }
+      ]
+    },
+    {
+      "id": "weWorkBot",
+      "required": [
+        "weWorkBotKey"
+      ],
+      "wireFields": [
+        "weWorkBotKey",
+        "weWorkOrigin"
+      ],
+      "uiFields": [
+        {
+          "name": "weWorkBotKey",
+          "type": "password",
+          "required": true
+        },
+        {
+          "name": "weWorkOrigin",
+          "type": "url",
+          "required": false,
+          "defaultValue": "https://qyapi.weixin.qq.com"
+        }
+      ]
+    },
+    {
+      "id": "weWorkApp",
+      "required": [
+        "weWorkAppKey"
+      ],
+      "wireFields": [
+        "weWorkAppKey",
+        "weWorkOrigin"
+      ],
+      "uiFields": [
+        {
+          "name": "corpId",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "corpSecret",
+          "type": "password",
+          "required": true
+        },
+        {
+          "name": "toUser",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "agentId",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "messageType",
+          "type": "select",
+          "required": true,
+          "defaultValue": "text"
+        },
+        {
+          "name": "thumbMediaId",
+          "type": "text",
+          "required": true,
+          "visibleWhen": {
+            "field": "messageType",
+            "equals": "mpnews"
+          }
+        },
+        {
+          "name": "weWorkOrigin",
+          "type": "url",
+          "required": false,
+          "defaultValue": "https://qyapi.weixin.qq.com"
+        }
+      ]
+    },
+    {
+      "id": "aibotk",
+      "required": [
+        "aibotkKey",
+        "aibotkType",
+        "aibotkName"
+      ],
+      "wireFields": [
+        "aibotkKey",
+        "aibotkType",
+        "aibotkName"
+      ],
+      "uiFields": [
+        {
+          "name": "aibotkKey",
+          "type": "password",
+          "required": true
+        },
+        {
+          "name": "aibotkType",
+          "type": "select",
+          "required": true,
+          "defaultValue": "room"
+        },
+        {
+          "name": "aibotkName",
+          "type": "text",
+          "required": true
+        }
+      ]
+    },
+    {
+      "id": "iGot",
+      "required": [
+        "iGotPushKey"
+      ],
+      "wireFields": [
+        "iGotPushKey"
+      ],
+      "uiFields": [
+        {
+          "name": "iGotPushKey",
+          "type": "password",
+          "required": true
+        }
+      ]
+    },
+    {
+      "id": "pushPlus",
+      "required": [
+        "pushPlusToken"
+      ],
+      "wireFields": [
+        "pushPlusToken",
+        "pushPlusUser",
+        "pushPlusTemplate",
+        "pushplusChannel",
+        "pushplusWebhook",
+        "pushplusCallbackUrl",
+        "pushplusTo"
+      ],
+      "uiFields": [
+        {
+          "name": "pushPlusToken",
+          "type": "password",
+          "required": true
+        },
+        {
+          "name": "pushPlusUser",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "pushPlusTemplate",
+          "type": "text",
+          "required": false,
+          "defaultValue": "html"
+        },
+        {
+          "name": "pushplusChannel",
+          "type": "text",
+          "required": false,
+          "defaultValue": "wechat"
+        },
+        {
+          "name": "pushplusWebhook",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "pushplusCallbackUrl",
+          "type": "url",
+          "required": false
+        },
+        {
+          "name": "pushplusTo",
+          "type": "password",
+          "required": false
+        }
+      ]
+    },
+    {
+      "id": "wePlusBot",
+      "required": [
+        "wePlusBotToken"
+      ],
+      "wireFields": [
+        "wePlusBotToken",
+        "wePlusBotReceiver",
+        "wePlusBotVersion"
+      ],
+      "uiFields": [
+        {
+          "name": "wePlusBotToken",
+          "type": "password",
+          "required": true
+        },
+        {
+          "name": "wePlusBotReceiver",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "wePlusBotVersion",
+          "type": "select",
+          "required": false,
+          "defaultValue": "pro"
+        }
+      ]
+    },
+    {
+      "id": "email",
+      "required": [
+        "emailUser",
+        "emailPass"
+      ],
+      "wireFields": [
+        "emailService",
+        "emailHost",
+        "emailPort",
+        "emailSecure",
+        "emailUser",
+        "emailPass",
+        "emailTo"
+      ],
+      "uiFields": [
+        {
+          "name": "emailMode",
+          "type": "select",
+          "required": true,
+          "defaultValue": "service"
+        },
+        {
+          "name": "emailService",
+          "type": "text",
+          "required": true,
+          "visibleWhen": {
+            "field": "emailMode",
+            "equals": "service"
+          }
+        },
+        {
+          "name": "emailHost",
+          "type": "text",
+          "required": true,
+          "visibleWhen": {
+            "field": "emailMode",
+            "equals": "smtp"
+          }
+        },
+        {
+          "name": "emailPort",
+          "type": "number",
+          "required": false,
+          "defaultValue": 587,
+          "visibleWhen": {
+            "field": "emailMode",
+            "equals": "smtp"
+          }
+        },
+        {
+          "name": "emailSecure",
+          "type": "boolean",
+          "required": false,
+          "defaultValue": false,
+          "visibleWhen": {
+            "field": "emailMode",
+            "equals": "smtp"
+          }
+        },
+        {
+          "name": "emailUser",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "emailPass",
+          "type": "password",
+          "required": true
+        },
+        {
+          "name": "emailTo",
+          "type": "text",
+          "required": false
+        }
+      ]
+    },
+    {
+      "id": "pushMe",
+      "required": [
+        "pushMeKey"
+      ],
+      "wireFields": [
+        "pushMeKey",
+        "pushMeUrl"
+      ],
+      "uiFields": [
+        {
+          "name": "pushMeKey",
+          "type": "password",
+          "required": true
+        },
+        {
+          "name": "pushMeUrl",
+          "type": "url",
+          "required": false,
+          "defaultValue": "https://push.i-i.me/"
+        }
+      ]
+    },
+    {
+      "id": "webhook",
+      "required": [
+        "webhookMethod",
+        "webhookContentType",
+        "webhookUrl"
+      ],
+      "wireFields": [
+        "webhookMethod",
+        "webhookContentType",
+        "webhookUrl",
+        "webhookHeaders",
+        "webhookBody"
+      ],
+      "uiFields": [
+        {
+          "name": "webhookMethod",
+          "type": "select",
+          "required": true,
+          "defaultValue": "GET"
+        },
+        {
+          "name": "webhookContentType",
+          "type": "select",
+          "required": true,
+          "defaultValue": "application/json"
+        },
+        {
+          "name": "webhookUrl",
+          "type": "url",
+          "required": true
+        },
+        {
+          "name": "webhookHeaders",
+          "type": "keyValue",
+          "required": false
+        },
+        {
+          "name": "webhookBody",
+          "type": "textarea",
+          "required": false
+        }
+      ]
+    },
+    {
+      "id": "lark",
+      "required": [
+        "larkKey"
+      ],
+      "wireFields": [
+        "larkKey",
+        "larkSecret"
+      ],
+      "uiFields": [
+        {
+          "name": "larkKey",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "larkSecret",
+          "type": "password",
+          "required": false
+        }
+      ]
+    },
+    {
+      "id": "chronocat",
+      "required": [
+        "chronocatURL",
+        "chronocatQQ",
+        "chronocatToken"
+      ],
+      "wireFields": [
+        "chronocatURL",
+        "chronocatQQ",
+        "chronocatToken"
+      ],
+      "uiFields": [
+        {
+          "name": "chronocatURL",
+          "type": "url",
+          "required": true
+        },
+        {
+          "name": "chronocatQQ",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "chronocatToken",
+          "type": "password",
+          "required": true
+        }
+      ]
+    },
+    {
+      "id": "ntfy",
+      "required": [
+        "ntfyTopic"
+      ],
+      "wireFields": [
+        "ntfyTopic",
+        "ntfyUrl",
+        "ntfyToken",
+        "ntfyUsername",
+        "ntfyPassword",
+        "ntfyPriority",
+        "ntfyActions"
+      ],
+      "uiFields": [
+        {
+          "name": "ntfyTopic",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "ntfyUrl",
+          "type": "url",
+          "required": false,
+          "defaultValue": "https://ntfy.sh"
+        },
+        {
+          "name": "ntfyAuthMode",
+          "type": "select",
+          "required": false,
+          "defaultValue": "none"
+        },
+        {
+          "name": "ntfyToken",
+          "type": "password",
+          "required": true,
+          "visibleWhen": {
+            "field": "ntfyAuthMode",
+            "equals": "token"
+          }
+        },
+        {
+          "name": "ntfyUsername",
+          "type": "text",
+          "required": true,
+          "visibleWhen": {
+            "field": "ntfyAuthMode",
+            "equals": "basic"
+          }
+        },
+        {
+          "name": "ntfyPassword",
+          "type": "password",
+          "required": true,
+          "visibleWhen": {
+            "field": "ntfyAuthMode",
+            "equals": "basic"
+          }
+        },
+        {
+          "name": "ntfyPriority",
+          "type": "select",
+          "required": false,
+          "defaultValue": "3"
+        },
+        {
+          "name": "ntfyActions",
+          "type": "textarea",
+          "required": false
+        }
+      ]
+    },
+    {
+      "id": "wxPusherBot",
+      "required": [
+        "wxPusherBotAppToken"
+      ],
+      "wireFields": [
+        "wxPusherBotAppToken",
+        "wxPusherBotTopicIds",
+        "wxPusherBotUids"
+      ],
+      "uiFields": [
+        {
+          "name": "wxPusherBotAppToken",
+          "type": "password",
+          "required": true
+        },
+        {
+          "name": "wxPusherBotTopicIds",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "wxPusherBotUids",
+          "type": "text",
+          "required": false
+        }
+      ]
+    },
+    {
+      "id": "wxPusherSpt",
+      "required": [
+        "wxPusherSptList"
+      ],
+      "wireFields": [
+        "wxPusherSptList"
+      ],
+      "uiFields": [
+        {
+          "name": "wxPusherSptList",
+          "type": "password",
+          "required": true
+        }
+      ]
+    },
+    {
+      "id": "openiLink",
+      "required": [
+        "openiLinkAppToken"
+      ],
+      "wireFields": [
+        "openiLinkAppToken",
+        "openiLinkHubUrl",
+        "openiLinkContextToken"
+      ],
+      "uiFields": [
+        {
+          "name": "openiLinkAppToken",
+          "type": "password",
+          "required": true
+        },
+        {
+          "name": "openiLinkHubUrl",
+          "type": "url",
+          "required": false,
+          "defaultValue": "https://hub.openilink.com"
+        },
+        {
+          "name": "openiLinkContextToken",
+          "type": "password",
+          "required": false
+        }
+      ]
+    },
+    {
+      "id": "wpush",
+      "required": [
+        "wpushApiKey"
+      ],
+      "wireFields": [
+        "wpushApiKey",
+        "wpushChannel",
+        "wpushTopicCode"
+      ],
+      "uiFields": [
+        {
+          "name": "wpushApiKey",
+          "type": "password",
+          "required": true
+        },
+        {
+          "name": "wpushChannel",
+          "type": "text",
+          "required": false,
+          "defaultValue": "wechat"
+        },
+        {
+          "name": "wpushTopicCode",
+          "type": "text",
+          "required": false
+        }
+      ]
+    }
+  ]
+}
