@@ -4,6 +4,7 @@ import { createHash, randomUUID } from 'crypto';
 import { fail, errorCode, positiveId } from './errors';
 import { WorkspaceStore } from './store';
 import { WorkspaceRootResolver } from './roots';
+import { assertWorkspaceJournalIsolation } from './journals';
 import { WorkspaceLeaseService, WorkspaceLease } from './lease';
 import {
   GitWorkspaceInput,
@@ -84,7 +85,14 @@ export async function workspaceReferences(
 
 export async function assertNoResidualMaterialization(
   roots: WorkspaceRootResolver,
+  store?: WorkspaceStore,
+  workspaceId?: number,
+  allowCurrentOwner = false,
 ) {
+  if (store && workspaceId !== undefined)
+    return assertWorkspaceJournalIsolation(store, roots, workspaceId, {
+      allowCurrentOwner,
+    });
   try {
     for (const relative of [
       'tmp/config-materialization',
@@ -400,7 +408,12 @@ export class WorkspaceLifecycleService {
       drainTimeoutMs > 300000
     )
       fail('INVALID_REQUEST', 400);
-    await assertNoResidualMaterialization(this.roots);
+    await assertNoResidualMaterialization(
+      this.roots,
+      this.store,
+      id,
+      !unarchive,
+    );
     const request = requestIdentity(requestKey, {
       id,
       expectedVersion,
@@ -552,7 +565,11 @@ export class WorkspaceLifecycleService {
       try {
         if (Date.now() > deadline) fail('WORKSPACE_BUSY');
         return await this.withArchiveLease(op, async (lease) => {
-          await assertNoResidualMaterialization(this.roots);
+          await assertNoResidualMaterialization(
+            this.roots,
+            this.store,
+            op.workspace_id,
+          );
           const row = await this.store.workspace(op.workspace_id);
           await this.roots.requireReady(
             row,

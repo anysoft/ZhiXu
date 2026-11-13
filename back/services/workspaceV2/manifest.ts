@@ -252,6 +252,7 @@ export class WorkspaceBackupDomain {
     for (const relative of [
       'tmp/config-materialization',
       'tmp/execution/node-bindings',
+      'tmp/execution/workspace-owners',
       'tmp/workspace-v2',
       'runtime/python/quarantine',
       'runtime/node/quarantine',

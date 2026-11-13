@@ -7,6 +7,7 @@ import { VIEW_LIMIT, WorkspaceFiles } from '../workspaceFiles';
 import { privateJson, readJson, syncDirectory } from '../backup/files';
 import { WorkspaceStore } from './store';
 import { WorkspaceRootResolver } from './roots';
+import { assertWorkspaceJournalIsolation } from './journals';
 import { WorkspaceLease, WorkspaceLeaseService } from './lease';
 import { errorCode, fail, WorkspaceFoundationError } from './errors';
 import { workspaceLimits, WorkspaceLimits } from './limits';
@@ -102,28 +103,7 @@ export class WorkspaceFileService {
   }
 
   private async guardJournals(id: number) {
-    for (const relative of [
-      'tmp/config-materialization',
-      'tmp/execution/node-bindings',
-    ]) {
-      let directory: string;
-      try {
-        directory = await this.roots.directory(relative);
-      } catch (error: unknown) {
-        if (
-          error &&
-          typeof error === 'object' &&
-          'code' in error &&
-          error.code === 'ENOENT'
-        )
-          continue;
-        fail('WORKSPACE_RECOVERY_REQUIRED');
-      }
-      const entries = await fs.readdir(directory);
-      // S1.A never produces these journals. Any residual entry has an unknown
-      // binding/secret lifetime and cannot safely be attributed from its name.
-      if (entries.length) fail('WORKSPACE_RECOVERY_REQUIRED');
-    }
+    await assertWorkspaceJournalIsolation(this.store, this.roots, id);
     const completed = await this.store.all<{ journal_key: string | null }>(
       "SELECT journal_key FROM WorkspaceOperations WHERE workspace_id=? AND operation_type='FILE_MUTATION' AND status='SUCCEEDED'",
       [id],
@@ -369,15 +349,23 @@ export class WorkspaceFileService {
   }
 
   private async references(id: number, relative: string) {
-    const references = await this.store.all<{ relative_entrypoint: string }>(
-      'SELECT relative_entrypoint FROM TaskSources WHERE workspace_id=?',
+    const references = await this.store.all<{
+      relative_entrypoint: string;
+      cwd_mode: string;
+      cwd_relative_path: string | null;
+    }>(
+      'SELECT relative_entrypoint,cwd_mode,cwd_relative_path FROM TaskSources WHERE workspace_id=?',
       [id],
     );
     if (
       references.some(
         (ref) =>
           ref.relative_entrypoint === relative ||
-          ref.relative_entrypoint.startsWith(relative + '/'),
+          ref.relative_entrypoint.startsWith(relative + '/') ||
+          (ref.cwd_mode === 'CUSTOM_RELATIVE' &&
+            ref.cwd_relative_path !== null &&
+            (ref.cwd_relative_path === relative ||
+              ref.cwd_relative_path.startsWith(relative + '/'))),
       )
     )
       fail('WORKSPACE_FILE_REFERENCED');

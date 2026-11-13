@@ -29,7 +29,7 @@ try {
       )
     : fs
         .readdirSync(__dirname)
-        .filter((name) => name.endsWith('.test.cjs'))
+        .filter((name) => name.endsWith('.test.cjs') && !name.startsWith('s2-'))
         .sort()
         .map((name) => path.join(__dirname, name));
   if (!files.length) throw Error('S1A_TEST_FILES_REQUIRED');

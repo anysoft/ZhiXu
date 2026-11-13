@@ -22,11 +22,20 @@ const stat = (file: string) =>
   });
 /** Exclusive Worktree lease protects an owned, recoverable root module binding. */
 export default class ExecutionNodeBinding {
-  constructor(private paths = new ExecutionPaths()) {}
+  constructor(
+    private paths = new ExecutionPaths(),
+    private options: {
+      journalPrefix?: 'worktree' | 'workspace';
+      checkpoint?: (
+        phase: string,
+        details: Record<string, unknown>,
+      ) => Promise<void>;
+    } = {},
+  ) {}
   private async journal(worktreeId: number) {
     return path.join(
       await this.paths.directory('tmp/execution/node-bindings', true),
-      `worktree-${worktreeId}.json`,
+      `${this.options.journalPrefix ?? 'worktree'}-${worktreeId}.json`,
     );
   }
   async recover(worktreeId: number, root: string, lease: MaterializationLease) {
@@ -38,6 +47,9 @@ export default class ExecutionNodeBinding {
       throw new ExecutionError('NODE_BINDING_LEASE_REQUIRED');
     const file = await this.journal(worktreeId);
     if (!(await stat(file))) return;
+    await this.options.checkpoint?.('NODE_BEFORE_CLEANUP', {
+      resourceId: worktreeId,
+    });
     const journal = (await this.paths.readJson(file)) as BindingJournal;
     if (
       journal.version !== 1 ||
@@ -64,12 +76,26 @@ export default class ExecutionNodeBinding {
     }
     await fs.unlink(file);
     await syncDirectory(path.dirname(file));
+    await this.options.checkpoint?.('NODE_CLEANUP_COMPLETE', {
+      resourceId: worktreeId,
+    });
   }
   async prepare(context: ExecutionContext, lease: MaterializationLease) {
-    const id = context.source.worktreeId,
-      root = context.workspace.workspaceRoot;
+    return this.prepareResource(
+      context.source.worktreeId,
+      context.workspace.workspaceRoot,
+      context.runtime.nodeModulesRoot,
+      lease,
+    );
+  }
+  /** Generic resource entry; old Worktree callers retain their default journal/key. */
+  async prepareResource(
+    id: number,
+    root: string,
+    destination: string | undefined,
+    lease: MaterializationLease,
+  ) {
     await this.recover(id, root, lease);
-    const destination = context.runtime.nodeModulesRoot;
     if (!destination) return { cleanup: async () => {} };
     // Imported local files can reside anywhere in the Worktree, not only next
     // to the entrypoint. Reject nested module trees without following symlinks.
@@ -89,6 +115,7 @@ export default class ExecutionNodeBinding {
       staging = '.platform-node-' + randomUUID();
     const journal: BindingJournal = { version: 1, root, destination, staging };
     await atomicPrivateWrite(file, JSON.stringify(journal));
+    await this.options.checkpoint?.('NODE_JOURNAL_DURABLE', { resourceId: id });
     try {
       const temporary = path.join(root, staging);
       await fs.symlink(destination, temporary);
@@ -96,6 +123,9 @@ export default class ExecutionNodeBinding {
       const identity = await fs.lstat(temporary);
       journal.identity = { ino: identity.ino, dev: identity.dev };
       await atomicPrivateWrite(file, JSON.stringify(journal));
+      await this.options.checkpoint?.('NODE_STAGING_DURABLE', {
+        resourceId: id,
+      });
       const installed = await new HookExecutor(lease.processLeaseFds ?? []).run(
         '/usr/bin/python3',
         [
@@ -114,6 +144,7 @@ export default class ExecutionNodeBinding {
         throw new ExecutionError('NODE_BINDING_INSTALL_FAILED');
       await fs.unlink(temporary);
       await syncDirectory(root);
+      await this.options.checkpoint?.('NODE_INSTALLED', { resourceId: id });
       return { cleanup: () => this.recover(id, root, lease) };
     } catch (error) {
       await this.recover(id, root, lease);

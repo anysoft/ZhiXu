@@ -7,6 +7,10 @@ import config from '../config';
 import ConfigAssetService from './configAsset';
 import HookExecutor from './hookExecutor';
 import { ResolvedConfig } from './taskConfig';
+export type MaterializationConfig = Pick<
+  ResolvedConfig,
+  'revision' | 'binding'
+>;
 import {
   ConfigAssetError,
   privateDirectory,
@@ -52,9 +56,26 @@ const exists = async (file: string) =>
   });
 const checksum = (value: Buffer) =>
   createHash('sha256').update(value).digest('hex');
+export interface ConfigMaterializationOptions {
+  journalRoot?: string;
+  checkpoint?: (
+    phase: string,
+    details: Record<string, unknown>,
+  ) => Promise<void>;
+}
 export default class ConfigMaterializationService {
-  readonly root = path.join(config.dataPath, 'tmp', 'config-materialization');
-  constructor(private assets = new ConfigAssetService()) {}
+  readonly root: string;
+  constructor(
+    private assets: Pick<
+      ConfigAssetService,
+      'readRevision'
+    > = new ConfigAssetService(),
+    private options: ConfigMaterializationOptions = {},
+  ) {
+    this.root =
+      options.journalRoot ??
+      path.join(config.dataPath, 'tmp', 'config-materialization');
+  }
   async journalRoot(workspace: TaskWorkspace) {
     if (!/^[a-f0-9]{64}$/.test(workspace.resourceKey))
       throw new ConfigAssetError('CONFIG_WORKSPACE_INVALID');
@@ -109,7 +130,7 @@ export default class ConfigMaterializationService {
   }
   async prepare(
     workspace: TaskWorkspace,
-    bindings: ResolvedConfig[],
+    bindings: MaterializationConfig[],
     lease: MaterializationLease,
   ) {
     await this.requireLease(workspace, lease);
@@ -125,6 +146,7 @@ export default class ConfigMaterializationService {
         JSON.stringify(journal),
       );
     await write();
+    await this.options.checkpoint?.('CONFIG_JOURNAL_DURABLE', { directory });
     const targets = new Set<string>();
     try {
       for (const [index, resolved] of bindings.entries()) {
@@ -197,6 +219,10 @@ export default class ConfigMaterializationService {
           await syncDirectory(directory);
           entry.phase = 'BACKED_UP';
           await write();
+          await this.options.checkpoint?.('CONFIG_ORIGINAL_BACKED_UP', {
+            directory,
+            index,
+          });
         }
         if (binding.materialization_mode === 'SYMLINK')
           await fs.symlink(copy, temporary);
@@ -211,6 +237,10 @@ export default class ConfigMaterializationService {
         const staged = await fs.lstat(temporary);
         entry.installed = { ino: staged.ino, dev: staged.dev };
         await write();
+        await this.options.checkpoint?.('CONFIG_STAGED_DURABLE', {
+          directory,
+          index,
+        });
         // Recheck parents and unexpected target creation before the atomic install.
         await safeParents(root, binding.target_path);
         if (await exists(target))
@@ -243,6 +273,10 @@ export default class ConfigMaterializationService {
         await syncDirectory(path.dirname(target));
         entry.phase = 'INSTALLED';
         await write();
+        await this.options.checkpoint?.('CONFIG_INSTALLED', {
+          directory,
+          index,
+        });
       }
       return {
         directory,
@@ -265,6 +299,7 @@ export default class ConfigMaterializationService {
     lease: MaterializationLease,
   ) {
     await this.requireLease(journal.workspace, lease);
+    await this.options.checkpoint?.('CONFIG_BEFORE_RESTORE', { directory });
     for (const [index, entry] of [...journal.entries.entries()].reverse()) {
       if (
         entry.backup !== path.join(directory, `backup-${index}`) ||
@@ -337,6 +372,10 @@ export default class ConfigMaterializationService {
         await fs.unlink(entry.backup);
         await syncDirectory(path.dirname(target));
         await syncDirectory(directory);
+        await this.options.checkpoint?.('CONFIG_ORIGINAL_RESTORED', {
+          directory,
+          index,
+        });
       }
       const temporary = await exists(entry.temporary);
       if (temporary) {
@@ -357,5 +396,6 @@ export default class ConfigMaterializationService {
       }
     }
     await fs.rm(directory, { recursive: true, force: true });
+    await this.options.checkpoint?.('CONFIG_CLEANUP_COMPLETE', { directory });
   }
 }

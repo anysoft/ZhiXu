@@ -8,7 +8,10 @@ import type { TaskWorkspace } from './configMaterialization';
 import { TaskHook, HookPhase } from '../data/configAsset';
 import { ConfigAssetError, atomicPrivateWrite } from '../shared/configAssets';
 export interface LifecycleOptions {
-  event?: (type: string, metadata: {phase?:string; hook_id?:number}) => Promise<void>;
+  event?: (
+    type: string,
+    metadata: { phase?: string; hook_id?: number },
+  ) => Promise<void>;
   main: (
     environment: NodeJS.ProcessEnv,
     output: (text: string) => Promise<void>,
@@ -21,7 +24,7 @@ export interface LifecycleOptions {
   redactor?: ExecutionRedactor;
 }
 export interface HookLifecyclePlan {
-  environment: ResolvedTaskEnvironment;
+  environment: Pick<ResolvedTaskEnvironment, 'variables' | 'secretNames'>;
   secretValues: string[];
   workspace: TaskWorkspace;
   hooks: TaskHook[];
@@ -95,7 +98,7 @@ export default class TaskHookLifecycle {
     });
     const phase = async (name: HookPhase) => {
       const eventPhase = name.startsWith('AFTER') ? 'AFTER' : name;
-      await options.event?.(eventPhase + '_STARTED', {phase:name});
+      await options.event?.(eventPhase + '_STARTED', { phase: name });
       for (const hook of plan.hooks
         .filter((x) => x.phase === name)
         .sort((a, b) => a.position - b.position || a.id - b.id)) {
@@ -172,7 +175,7 @@ export default class TaskHookLifecycle {
             break;
         }
       }
-      await options.event?.(eventPhase + '_FINISHED', {phase:name});
+      await options.event?.(eventPhase + '_FINISHED', { phase: name });
     };
     try {
       await phase('BEFORE');

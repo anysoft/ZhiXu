@@ -2,11 +2,22 @@ import path from 'path';
 import { ExecutionContext, ExecutionError } from '../shared/execution';
 import HookExecutor from './hookExecutor';
 
+/** The process runner consumes resolved argv/resources, not persistence identities. */
+export type RunnerInput = Pick<
+  ExecutionContext,
+  'runtime' | 'args' | 'settings'
+> & {
+  source: Pick<
+    ExecutionContext['source'],
+    'absoluteEntrypoint' | 'language' | 'cwd'
+  >;
+};
+
 /** Program and argv come exclusively from an immutable managed resolution. */
 export default class RunnerV2 {
   constructor(private executor: HookExecutor) {}
   async run(
-    context: ExecutionContext,
+    context: RunnerInput,
     environment: NodeJS.ProcessEnv,
     output: (text: string) => Promise<void>,
   ) {

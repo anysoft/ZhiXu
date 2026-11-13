@@ -113,7 +113,10 @@ async function seedRepository(fixture, id = 1) {
   git(['add', 'main.py'], source);
   git(['commit', '-m', 'isolated fixture'], source);
   const commit = git(['rev-parse', 'HEAD'], source);
-  await fs.mkdir(path.join(fixture.dataRoot, 'git'), { mode: 0o700 });
+  await fs.mkdir(path.join(fixture.dataRoot, 'git'), {
+    recursive: true,
+    mode: 0o700,
+  });
   const bare = path.join(fixture.dataRoot, 'git', 'repository-' + id + '.git');
   git(['clone', '--no-hardlinks', '--bare', source, bare], fixture.root);
   await fixture.store.run(
