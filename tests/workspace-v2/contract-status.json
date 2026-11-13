@@ -1,0 +1,884 @@
+{
+  "stage": "S1.A_INTERNAL_CANDIDATE",
+  "production_wiring": "NONE",
+  "contract": "docs/architecture/v2/contracts/api-contracts.json",
+  "internal_interfaces": [
+    {
+      "interface": "WorkspaceStore / full frozen-schema validation",
+      "status": "IMPLEMENTED",
+      "evidence": "back/services/workspaceV2/store.ts"
+    },
+    {
+      "interface": "Workspace LOCAL/GIT creation, recovery and identity",
+      "status": "IMPLEMENTED",
+      "evidence": "back/services/workspaceV2/lifecycle.ts"
+    },
+    {
+      "interface": "WorkspaceRootResolver / owner and physical identity",
+      "status": "IMPLEMENTED",
+      "evidence": "back/services/workspaceV2/roots.ts"
+    },
+    {
+      "interface": "WorkspaceLease / stable key and inherited FD ownership",
+      "status": "IMPLEMENTED",
+      "evidence": "back/services/workspaceV2/lease.ts"
+    },
+    {
+      "interface": "WorkspaceFileService / CRUD, CAS, search, bounds and recovery",
+      "status": "IMPLEMENTED",
+      "evidence": "back/services/workspaceV2/files.ts"
+    },
+    {
+      "interface": "GitWorkspace initial checkout / private ref / detach",
+      "status": "IMPLEMENTED",
+      "evidence": "back/services/workspaceV2/gitStorage.ts"
+    },
+    {
+      "interface": "Archive / unarchive / candidate reference guards",
+      "status": "IMPLEMENTED",
+      "evidence": "back/services/workspaceV2/lifecycle.ts"
+    },
+    {
+      "interface": "Delete / tombstone / owned source reclaim",
+      "status": "IMPLEMENTED",
+      "evidence": "back/services/workspaceV2/reclaim.ts"
+    },
+    {
+      "interface": "Workspace manifest / domain proof / snapshot",
+      "status": "IMPLEMENTED",
+      "evidence": "back/services/workspaceV2/manifest.ts"
+    },
+    {
+      "interface": "Preservation hold / catalog GC guard / usage / portable dependencies",
+      "status": "IMPLEMENTED",
+      "evidence": "back/services/workspaceV2/preservation.ts"
+    },
+    {
+      "interface": "Candidate root restore / rollback / fresh-process recovery",
+      "status": "IMPLEMENTED",
+      "evidence": "back/services/workspaceV2/restore.ts"
+    },
+    {
+      "interface": "Offline Runtime restore readiness invalidation",
+      "status": "IMPLEMENTED",
+      "evidence": "back/services/workspaceV2/restore.ts"
+    },
+    {
+      "interface": "Immutable Config asset file size/checksum verification",
+      "status": "IMPLEMENTED",
+      "evidence": "back/services/workspaceV2/manifest.ts"
+    },
+    {
+      "interface": "All READY Repository asset verification and cross-root relocation",
+      "status": "IMPLEMENTED",
+      "evidence": "back/services/workspaceV2/repositoryAssets.ts"
+    },
+    {
+      "interface": "Final metadata purge / hold transfer or release",
+      "status": "PARTIAL",
+      "evidence": "Frozen SQL guards retained; no destructive purge/hold-release service is exposed in S1.A."
+    },
+    {
+      "interface": "Production fresh-v2 schema initialization and epoch switch",
+      "status": "PARTIAL",
+      "evidence": "Full schema runs only in isolated fixture; no production initializer or v9 switch."
+    },
+    {
+      "interface": "TaskSource application service / TaskRun queue / ExecutionResolver / Runner",
+      "status": "DEFERRED_TO_S2",
+      "evidence": "Candidate SQL reference fixtures are not execution."
+    },
+    {
+      "interface": "Runtime / ENV / Config inheritance and materialization integration",
+      "status": "DEFERRED_TO_S2",
+      "evidence": "Backup records candidate references; runtime execution integration is absent."
+    },
+    {
+      "interface": "Git Sync scheduling / Discovery / GitUpdate Outbox dispatch / Subscription removal",
+      "status": "DEFERRED_TO_S3",
+      "evidence": "Only candidate metadata validation and initial Git storage are present."
+    },
+    {
+      "interface": "Panel/Open API handlers / authorization / Editor / Task wizard / navigation",
+      "status": "DEFERRED_TO_S4",
+      "evidence": "Existing v9 routes and UI remain unchanged."
+    }
+  ],
+  "public_route_count": 129,
+  "public_routes": [
+    {
+      "method": "GET",
+      "path": "/workspaces",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "POST",
+      "path": "/workspaces",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "GET",
+      "path": "/workspaces/:id",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "PATCH",
+      "path": "/workspaces/:id",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "DELETE",
+      "path": "/workspaces/:id",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "POST",
+      "path": "/workspaces/:id/archive",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "POST",
+      "path": "/workspaces/:id/unarchive",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "POST",
+      "path": "/workspaces/:id/recover",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "GET",
+      "path": "/workspaces/:id/references",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "GET",
+      "path": "/workspaces/:id/operations/:operationId",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "GET",
+      "path": "/workspaces/:id/tree",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "GET",
+      "path": "/workspaces/:id/files",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "GET",
+      "path": "/workspaces/:id/search",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "GET",
+      "path": "/workspaces/:id/entries",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "PUT",
+      "path": "/workspaces/:id/files",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "POST",
+      "path": "/workspaces/:id/files",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "DELETE",
+      "path": "/workspaces/:id/files",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "POST",
+      "path": "/workspaces/:id/directories",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "POST",
+      "path": "/workspaces/:id/rename",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "GET",
+      "path": "/workspaces/:id/git/status",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "GET",
+      "path": "/workspaces/:id/git/diff",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "POST",
+      "path": "/workspaces/:id/git/stage",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "POST",
+      "path": "/workspaces/:id/git/unstage",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "POST",
+      "path": "/workspaces/:id/git/commit",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "POST",
+      "path": "/workspaces/:id/git/push",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "POST",
+      "path": "/workspaces/:id/git/repair",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "PUT",
+      "path": "/system/git-identity",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "GET",
+      "path": "/workspaces/:id/sync-policy",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "PUT",
+      "path": "/workspaces/:id/sync-policy",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "POST",
+      "path": "/workspaces/:id/sync",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "POST",
+      "path": "/workspaces/:id/sync/preview",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "GET",
+      "path": "/workspaces/:id/sync-history",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "GET",
+      "path": "/workspaces/:id/sync-runs/:syncRunId",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "GET",
+      "path": "/workspaces/:id/sync-runs/:syncRunId/log",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "POST",
+      "path": "/workspaces/:id/sync-runs/:syncRunId/cancel",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "GET",
+      "path": "/workspaces/:id/discovery",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "PUT",
+      "path": "/workspaces/:id/discovery",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "POST",
+      "path": "/workspaces/:id/discovery/preview",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "POST",
+      "path": "/workspaces/:id/discovery/apply",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "GET",
+      "path": "/workspaces/:id/discovery/suppressions",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "POST",
+      "path": "/workspaces/:id/discovery/suppressions",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "DELETE",
+      "path": "/workspaces/:id/discovery/suppressions/:discoveryKey",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "GET",
+      "path": "/tasks",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "POST",
+      "path": "/tasks",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "GET",
+      "path": "/tasks/:id",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "PUT",
+      "path": "/tasks/:id",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "DELETE",
+      "path": "/tasks/:id",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "POST",
+      "path": "/tasks/:id/clone",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "PUT",
+      "path": "/tasks/:id/enabled",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "GET",
+      "path": "/tasks/:id/resources",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "POST",
+      "path": "/tasks/:id/validate",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "POST",
+      "path": "/tasks/:id/run",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "POST",
+      "path": "/tasks/:id/stop",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "POST",
+      "path": "/task-runs/:id/cancel",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "GET",
+      "path": "/tasks/:id/runs",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "GET",
+      "path": "/tasks/:id/log",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "GET",
+      "path": "/tasks/:id/logs",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "GET",
+      "path": "/task-runs",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "GET",
+      "path": "/task-runs/:id",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "GET",
+      "path": "/task-runs/:id/attempts",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "GET",
+      "path": "/task-runs/:id/events",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "GET",
+      "path": "/task-runs/:id/log",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "GET",
+      "path": "/observability/summary",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "GET",
+      "path": "/tasks/:id/health",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "GET",
+      "path": "/tasks/:id/stats",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "GET",
+      "path": "/task-resources/:kind/:id/references",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "GET",
+      "path": "/workspaces/:id/runtime-defaults",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "PUT",
+      "path": "/workspaces/:id/runtime-defaults",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "GET",
+      "path": "/scoped-env/workspaces",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "GET",
+      "path": "/scoped-env/tasks",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "GET",
+      "path": "/scoped-env/workspaces/:id/profiles",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "GET",
+      "path": "/scoped-env/profiles/:id",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "GET",
+      "path": "/scoped-env/workspaces/:id/context",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "GET",
+      "path": "/scoped-env/tasks/:id/context",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "GET",
+      "path": "/scoped-env/tasks/:id/preview",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "POST",
+      "path": "/scoped-env/profiles",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "PUT",
+      "path": "/scoped-env/profiles",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "DELETE",
+      "path": "/scoped-env/profiles/:id",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "POST",
+      "path": "/scoped-env/profiles/:id/clone",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "PUT",
+      "path": "/scoped-env/workspaces/:id/profile",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "PUT",
+      "path": "/scoped-env/tasks/:id/profile",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "GET",
+      "path": "/scoped-env/profiles/:id/variables",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "PUT",
+      "path": "/scoped-env/profiles/:id/variables",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "GET",
+      "path": "/scoped-env/tasks/:id/variables",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "PUT",
+      "path": "/scoped-env/tasks/:id/variables",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "GET",
+      "path": "/scoped-env/global/variables",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "PUT",
+      "path": "/scoped-env/global/variables",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "GET",
+      "path": "/workspaces/:id/config-bindings",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "POST",
+      "path": "/workspaces/:id/config-bindings",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "PUT",
+      "path": "/workspaces/:id/config-bindings/:bindingId",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "DELETE",
+      "path": "/workspaces/:id/config-bindings/:bindingId",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "GET",
+      "path": "/tasks/:id/config-bindings",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "POST",
+      "path": "/tasks/:id/config-bindings",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "PUT",
+      "path": "/tasks/:id/config-bindings/:bindingId",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "DELETE",
+      "path": "/tasks/:id/config-bindings/:bindingId",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "GET",
+      "path": "/tasks/:id/config-preview",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "GET",
+      "path": "/tasks/:id/config-context",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "GET",
+      "path": "/tasks/:id/hooks",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "POST",
+      "path": "/tasks/:id/hooks",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "PUT",
+      "path": "/tasks/:id/hooks/:hookId",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "DELETE",
+      "path": "/tasks/:id/hooks/:hookId",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "PUT",
+      "path": "/tasks/:id/hooks/reorder",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "GET",
+      "path": "/tasks/:id/triggers",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "POST",
+      "path": "/tasks/:id/triggers",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "PUT",
+      "path": "/tasks/:id/triggers/:triggerId",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "DELETE",
+      "path": "/tasks/:id/triggers/:triggerId",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "POST",
+      "path": "/tasks/:id/triggers/:triggerId/rotate-secret",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "GET",
+      "path": "/tasks/:id/trigger-events",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "GET",
+      "path": "/trigger-events/:id",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "GET",
+      "path": "/git-credentials",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "GET",
+      "path": "/git-credentials/:id",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "POST",
+      "path": "/git-credentials",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "PUT",
+      "path": "/git-credentials",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "DELETE",
+      "path": "/git-credentials/:id",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "POST",
+      "path": "/git-credentials/:id/test",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "POST",
+      "path": "/repositories/normalize",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "GET",
+      "path": "/repositories",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "GET",
+      "path": "/repositories/:id",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "POST",
+      "path": "/repositories",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "PUT",
+      "path": "/repositories",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "POST",
+      "path": "/repositories/:id/test",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "POST",
+      "path": "/repositories/:id/initialize",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "POST",
+      "path": "/repositories/:id/fetch",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "POST",
+      "path": "/repositories/:id/prune",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "POST",
+      "path": "/repositories/:id/repair",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "GET",
+      "path": "/repositories/:id/refs",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "GET",
+      "path": "/repositories/:id/status",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "POST",
+      "path": "/repositories/:id/remote",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    },
+    {
+      "method": "DELETE",
+      "path": "/repositories/:id",
+      "status": "DEFERRED_TO_S4",
+      "note": "Frozen v2 semantics are not wired to public handlers."
+    }
+  ]
+}

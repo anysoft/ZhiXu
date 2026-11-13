@@ -1,0 +1,588 @@
+{
+  "stage": "S1.A_INTERNAL_CANDIDATE",
+  "timestamp_utc": "2026-11-13T03:18:10.498501+00:00",
+  "branch": "develop",
+  "entry_head": "d527a46095e85b7fc61c83544cd847a6e3f237db",
+  "s0_commit": "3c96fd3aed1ed8de2b4a58b7e94b2f9bf5709105",
+  "sealed_by": "containing S1.A local commit; final SHA reported after commit",
+  "host": {
+    "os": "Darwin",
+    "machine": "arm64",
+    "node": "v26.3.1",
+    "python": "3.11.15",
+    "git": "git version 2.54.0 (Apple Git-157)"
+  },
+  "checks": [
+    {
+      "name": "backend TypeScript",
+      "command": "node node_modules/typescript/bin/tsc -p back/tsconfig.json --noEmit --skipLibCheck --pretty false",
+      "exit_code": 0,
+      "diagnostics": []
+    },
+    {
+      "name": "project TypeScript",
+      "command": "node node_modules/typescript/bin/tsc --noEmit --skipLibCheck --pretty false",
+      "exit_code": 0,
+      "diagnostics": []
+    },
+    {
+      "name": "backend build",
+      "command": "node scripts/build-back.cjs",
+      "exit_code": 0,
+      "diagnostics": []
+    }
+  ],
+  "suites": [
+    {
+      "name": "fresh-v2 foundation",
+      "command": "node tests/workspace-v2/run.cjs",
+      "exit_code": 0,
+      "tests": 68,
+      "pass": 68,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "duration_ms": 248983.107125,
+      "test_names": [
+        "archive waits for real active FILE_MUTATION then closes admission and preserves committed bytes",
+        "pre-admission file mutation wait obeys one deadline and retains the actual owner on timeout",
+        "stable queued candidate metadata survives backup and archive cancels it only after actual owner drain",
+        "real LOCAL source backup, destroy root A, restore root B preserves DB/file identity and rotates physical owner",
+        "verified READY preservation installs real hold, rejects forged and stale proof, prevents GC",
+        "actual catalog FD serializes verified preservation hold installation against concurrent snapshot deletion",
+        "portable encrypted archive authenticates before extraction and validates full imported domain",
+        "config revision key, size and checksum require actual private content; secret bytes survive encrypted portable restore",
+        "portable export/import enforce aggregate retained capacity before allocation and preserve existing assets",
+        "missing source, forged ownership, active journal and finite backup budget fail closed",
+        "real GIT dirty/untracked/private branch and worktree administration survive source destruction and cross-root repair",
+        "reclaimed source travels in authenticated portable preservation dependencies after all original roots are destroyed",
+        "snapshot waits for actual admitted file mutation to drain and blocks new producers",
+        "tampered manifest, malformed catalog receipt, disk budget and ENOSPC preserve source and do not publish READY",
+        "unknown target directory is retained and final-validation failure rolls back to original B bytes",
+        "SIGKILL at restore-after-old-rename recovers durable cross-root rename journal",
+        "SIGKILL at restore-after-candidate-publish recovers durable cross-root rename journal",
+        "preservation matches exact Git index bytes when HEAD, working bytes and porcelain flags remain identical",
+        "LOCAL creation persists identity and independent source, without any Repository or Git metadata",
+        "create idempotency is stable and conflicting request never adopts a second owner",
+        "same Repository/ref creates independent owned checkouts and private branches; LOCAL cannot get Git extension",
+        "archive preserves source, disables task admission, unarchive preserves disabled flags and validates owner",
+        "archive deadline does not change queued/task flags or terminate a lease owner",
+        "real SIGKILL at CREATE_AFTER_DB converges the same candidate identity to READY after reopen",
+        "real SIGKILL at ROOT_STAGE_OWNED converges the same candidate identity to READY after reopen",
+        "real SIGKILL at ROOT_MARKER_DURABLE converges the same candidate identity to READY after reopen",
+        "real SIGKILL at ROOT_PUBLISHED converges the same candidate identity to READY after reopen",
+        "real SIGKILL at CREATE_BEFORE_READY converges the same candidate identity to READY after reopen",
+        "real SIGKILL after archive admission reopens durable DRAINING operation and retains source",
+        "tag and commit Workspaces stay detached at their pinned commit",
+        "archive and unarchive reject residual materialization journals and changed source proof",
+        "real SIGKILL during GIT ROOT_STAGE_OWNED recovers only its proven stage and private branch",
+        "real SIGKILL during GIT ROOT_MARKER_DURABLE recovers only its proven stage and private branch",
+        "real corrupt Git object blocks verified backup and never creates a successful snapshot",
+        "manifest trigger plans preserve source identities while excluding unknown payload and nested secret fields",
+        "nonsecret manifest retains SET/UNSET identities while encrypted portable SQLite preserves actual secret values",
+        "nonempty source requires real exact READY snapshot, failed delete leaves source and lifecycle unchanged",
+        "candidate TaskSources block deletion; historical TaskRun identity remains after owned source reclamation",
+        "unknown canonical replacement and unknown quarantine files survive fail-closed reclamation",
+        "real SIGKILL at DELETE_AFTER_QUARANTINE resumes owned quarantine and preserves tombstone/hold",
+        "real SIGKILL at RECLAIM_ENTRY_REMOVED resumes owned quarantine and preserves tombstone/hold",
+        "real SIGKILL at RECLAIM_BEFORE_COMMIT resumes owned quarantine and preserves tombstone/hold",
+        "GIT reclaim detaches only its owned private branch/admin and keeps another checkout intact",
+        "a stale Git snapshot cannot reclaim unique local commits when source tree bytes are unchanged",
+        "real SIGKILL after Git detach resumes the owned source without adopting another worktree",
+        "directory-only LOCAL requires a real preservation snapshot and hold before reclamation",
+        "reclaimed GIT keeps honest logical tuple while portable held assets preserve actual unique local HEAD after A destruction",
+        "READY unused Repository with missing bare asset cannot produce a successful backup",
+        "real backup of unused Repository survives destroying A and restores a usable generated bare path in B",
+        "missing required HEAD and external config link fail closed for an unused Repository",
+        "unused Repository corruption is detected by real fsck and stale host paths are never followed",
+        "real backup/restore keeps logical runtime identities and immutable build snapshots while blocking missing physical readiness",
+        "durable file CRUD preserves CAS, BOM/CRLF/mode and hashes actual inventory",
+        "text, source, entry, depth and search budgets are independently enforced",
+        "referenced entry and its parent cannot be renamed or deleted",
+        "unsafe names, links and special inodes fail closed without reading external bytes",
+        "root replacement and residual configuration or binding journals block source access",
+        "Workspace EX is shared across service instances and backup waits for admission lifetime",
+        "real SIGKILL at FILE_INTENT_DURABLE recovers one complete source image",
+        "real SIGKILL at FILE_PREPARED recovers one complete source image",
+        "real SIGKILL at FILE_APPLIED recovers one complete source image",
+        "real SIGKILL at FILE_COMMITTED recovers one complete source image",
+        "SIGKILL during native atomic save preserves bytes and retains unproven temporary files",
+        "inherited FD prevents a second Workspace lock while child survives controller SIGKILL",
+        "S1.A explicit Store validates the full frozen schema and serializes transactions",
+        "S1.A Store refuses unknown/v9 or corrupted schemas without changing their bytes",
+        "S1.A Store does not create missing data and rejects symlinked database parents",
+        "detached async work after a transaction cannot enter a later transaction and be lost with its rollback"
+      ],
+      "log_sha256": "00a8a3491617eb3f93de210879f1067b870b66f24958fb79596a2ea8c6f60c08"
+    },
+    {
+      "name": "existing files/locks/barrier/portable/sqlite",
+      "command": "node tests/workspace-v2/run.cjs tests/phase12/files.test.cjs tests/phase2/locks.test.cjs tests/phase14/barrier.test.cjs tests/phase14/portable.test.cjs tests/phase14/sqlite.test.cjs",
+      "exit_code": 0,
+      "tests": 27,
+      "pass": 27,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "duration_ms": 22174.92525,
+      "test_names": [
+        "workspace rejects traversal, Windows/control paths, .git and reserved execution artifacts",
+        "UTF8 BOM CRLF empty executable and literal unusual filenames survive atomic saves",
+        "external changes conflict; stale delete/rename and existing destinations preserve originals",
+        "file and directory rename never overwrite; delete directories only when empty",
+        "symlinks are metadata only, external link hides target; FIFO/hardlink rejected",
+        "binary invalid UTF8 and file size boundaries are explicit",
+        "failed atomic publish leaves original and cleans only owned temporary",
+        "20k files lazy pagination and 10k-file content search stay bounded",
+        "disk write and post-publish directory fsync failures preserve the original bytes and mode",
+        "barrier blocks producers, permits existing queue drain, waits for shared writers, releases on timeout",
+        "barrier rechecks idle under exclusive lock and retains business work on busy timeout",
+        "independent process SIGKILL leaves fail-closed marker and releases FD lock for deterministic recovery",
+        "detached nested operations retain their own lease after the request returns",
+        "inherited process descriptor blocks snapshot after controller releases its lease",
+        "HTTP client disconnect does not release an unfinished async route mutation",
+        "portable archive roundtrip preserves secret bytes and safe links inside authenticated envelope",
+        "wrong passphrase, ciphertext/header/tag tamper, truncation and trailing data fail closed",
+        "archive rejects path traversal, drives, links, special entries and bounded sizes",
+        "symlink followed by parent traversal cannot escape; hardlinked source and symlinked root rejected",
+        "extractor never follows an archived symlink parent and never accepts duplicate entries or trailing bytes",
+        "100 MiB data streams through archive and encryption with bounded process memory",
+        "archive refuses output inside source and preserves a preexisting destination",
+        "SQLite WAL snapshot is self-contained, consistent and FK verified",
+        "SQLite foreign key violation fails validation without modifying database",
+        "cross-process POSIX locks release after owner crash, success and errors",
+        "repository mutation matrix and execution lease exclusivity",
+        "real Git timeout and controller crash during Git release locks after child termination"
+      ],
+      "log_sha256": "3c33c4df248e8029754ccab498009f30710929ce3a90432e6429d048585d1dc7"
+    },
+    {
+      "name": "existing schema/Git/API",
+      "command": "node tests/workspace-v2/run.cjs tests/platform/fresh-schema.test.cjs tests/phase12/git.test.cjs tests/phase12/api.test.cjs",
+      "exit_code": 0,
+      "tests": 14,
+      "pass": 14,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "duration_ms": 53717.16375,
+      "test_names": [
+        "Panel workspace routes reject Open access, unknown fields, absent concurrency tokens and unsafe error output",
+        "real Git literal paths, status, bounded diff, stage/unstage and explicit author commit",
+        "real local origin push success, non-fast-forward and credential write capability",
+        "actual execution lock and recovery journals block reads and mutations",
+        "5k Git changes paginate without full response",
+        "separate process Execution, GitSync, editor and Backup ownership block editor writes",
+        "Git deletion beneath missing parent, rename, binary diff and literal wildcard pathspecs",
+        "Git conflicts reject commit and unborn unstage preserves subsequently edited content",
+        "Git stage refuses hardlinks without adding external bytes to the index",
+        "empty data root creates schema v9 and restarts without schema writes",
+        "unknown nonempty database fails closed and preserves rows and schema",
+        "partial DDL failure rolls back all objects and allows a clean retry",
+        "unexpected schema objects are rejected on restart",
+        "fresh directory bootstrap refuses symlinked database directory"
+      ],
+      "log_sha256": "3d53b42e04c92b429cf3a1fea74a201f3c7d893b890610d4c8d3ab51f25ae126"
+    },
+    {
+      "name": "existing backup/restore components",
+      "command": "node tests/workspace-v2/run.cjs tests/phase14/production.test.cjs tests/phase14/operation-read.test.cjs",
+      "exit_code": 0,
+      "tests": 31,
+      "pass": 31,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "duration_ms": 86756.778917,
+      "test_names": [
+        "operation JSON read reopens an atomically replaced inode and closes every descriptor",
+        "replacement reopening is opt-in and bounded",
+        "symlink",
+        "hardlink",
+        "permissions",
+        "deleted",
+        "replacement path is revalidated: symlink, hardlink, permissions and deletion fail closed",
+        "unsafe owner and nonregular descriptors are not retried, and JSON limits remain enforced",
+        "production snapshot, encrypted transfer and offline restore to an absent different DATA_DIR",
+        "Git local-only refs, dirty, ignored and untracked worktree data survive source destruction",
+        "restore SIGKILL recovery: during-schema-migration",
+        "restore SIGKILL recovery: during-git-repair",
+        "restore SIGKILL recovery: after-candidate-validation",
+        "restore SIGKILL recovery: after-old-rename",
+        "restore SIGKILL recovery: after-candidate-publish",
+        "restore SIGKILL recovery: before-startup-validation",
+        "restore SIGKILL recovery: after-startup-validation",
+        "post-switch validation failure restores original directory and preserves failed candidate",
+        "snapshot and restore reject tampering, unsafe roots and substituted ownership",
+        "100,000 historical Runs and 100 MiB logs snapshot, validate and restore with sampled RSS",
+        "production bootstrap makes SQLite private and unknown runtime data blocks exclusion",
+        "future schema, candidate and quarantine substitution fail closed",
+        "cancel is durable before marker cleanup; logger import never creates DATA_DIR",
+        "real application refuses malformed restore journal before creating a DATA_DIR",
+        "offline restore accepts an explicitly created empty destination without inventing a safety snapshot",
+        "domain validation rejects damaged Config revisions and Git objects before READY",
+        "portable failures clear caller passphrase buffers and publish no partial export",
+        "Run log validation rejects a directory or safe symlink in place of a log",
+        "failed managed resource remains visible and prevents a false successful rebuild",
+        "runtime restore invalidates physical Python provider while retaining logical Node catalog provider",
+        "operation status endpoint reader survives progress publication between open and fstat"
+      ],
+      "log_sha256": "5e8a90ca5d31a3f9d6f22bdf2dd0bb72a00163908a635cb7ee41211ba840c77f"
+    }
+  ],
+  "ddl": {
+    "status": "DYNAMICALLY_VERIFIED",
+    "table_count": 58,
+    "foreign_key_count": 94,
+    "index_count_including_autoindexes": 91,
+    "explicit_index_count": 35,
+    "sql_guard_count": 144,
+    "check_count": 86,
+    "schema_signature": "f466bedcecdad199bfb3ca501800f7fac026300d5fc2ad91ea77038cc782fe4c",
+    "foreign_key_check": [],
+    "integrity_check": "ok"
+  },
+  "foundation_real_sigkill_test_names": [
+    "SIGKILL at restore-after-old-rename recovers durable cross-root rename journal",
+    "SIGKILL at restore-after-candidate-publish recovers durable cross-root rename journal",
+    "real SIGKILL at CREATE_AFTER_DB converges the same candidate identity to READY after reopen",
+    "real SIGKILL at ROOT_STAGE_OWNED converges the same candidate identity to READY after reopen",
+    "real SIGKILL at ROOT_MARKER_DURABLE converges the same candidate identity to READY after reopen",
+    "real SIGKILL at ROOT_PUBLISHED converges the same candidate identity to READY after reopen",
+    "real SIGKILL at CREATE_BEFORE_READY converges the same candidate identity to READY after reopen",
+    "real SIGKILL after archive admission reopens durable DRAINING operation and retains source",
+    "real SIGKILL during GIT ROOT_STAGE_OWNED recovers only its proven stage and private branch",
+    "real SIGKILL during GIT ROOT_MARKER_DURABLE recovers only its proven stage and private branch",
+    "real SIGKILL at DELETE_AFTER_QUARANTINE resumes owned quarantine and preserves tombstone/hold",
+    "real SIGKILL at RECLAIM_ENTRY_REMOVED resumes owned quarantine and preserves tombstone/hold",
+    "real SIGKILL at RECLAIM_BEFORE_COMMIT resumes owned quarantine and preserves tombstone/hold",
+    "real SIGKILL after Git detach resumes the owned source without adopting another worktree",
+    "real SIGKILL at FILE_INTENT_DURABLE recovers one complete source image",
+    "real SIGKILL at FILE_PREPARED recovers one complete source image",
+    "real SIGKILL at FILE_APPLIED recovers one complete source image",
+    "real SIGKILL at FILE_COMMITTED recovers one complete source image",
+    "SIGKILL during native atomic save preserves bytes and retains unproven temporary files",
+    "inherited FD prevents a second Workspace lock while child survives controller SIGKILL"
+  ],
+  "s0_sealed_files_sha256": {
+    "docs/architecture/v2/API_SERVICE_MAPPING.md": "4a7d4338168c05be98f3eec509b79b61e7bd51146b3e4d0797a355944f1b65e0",
+    "docs/architecture/v2/ARCHITECTURE_V2_IMPACT_MATRIX.md": "5d3d77116bd5c5ee941153fda35139c948a1f625fa774b6e8ccf87f276b25ac6",
+    "docs/architecture/v2/ASSESSMENT_REPORT.md": "e6c5569e8933ca053ec20588d794b7e6a004138c1936eb12ccceaf90f5d73ca0",
+    "docs/architecture/v2/CURRENT_ARCHITECTURE.md": "1160ea0e7ac792a155de44a461bbc32e72120555a9aabc51435dd811955d80c1",
+    "docs/architecture/v2/ENTITY_MAPPING.md": "55154d07b8c65f24e7cc1ab02706372d26a0825d100c4fb6278cb36f1edcf819",
+    "docs/architecture/v2/EXECUTION_AND_BACKUP.md": "1b018a7903bfcb7f7089503949c9e8e192fd746b79c5d53302745aedc340cc6a",
+    "docs/architecture/v2/FILE_IMPACT_INVENTORY.md": "3b8366e22d3246bfdca98fafd71210fa2b655382e8e3ce0e4e3ecd36cdc6cd31",
+    "docs/architecture/v2/FRONTEND_INFORMATION_ARCHITECTURE.md": "46bc89e602406f8ecb5b105acac299c101bf1dba51038c1c18d5d83156b1a982",
+    "docs/architecture/v2/IMPACT_MATRIX.md": "53185a8a2916fc35a5e547ece3bbb5af072deeaa753f03bd4da6d7899d77c1d8",
+    "docs/architecture/v2/IMPLEMENTATION_ROADMAP.md": "438cd302e647cebefb657fff9da4331bc5a8c86d9778dde9b25ca621c86a60e9",
+    "docs/architecture/v2/OPEN_DECISIONS.md": "b8d725d11d95df57b72d4bfcd31919d086855f2f1c4e3a8321d4d81b3946af84",
+    "docs/architecture/v2/REVIEW_VALIDATION.md": "da25f9e4603ea11c0412ec97cb098cabcc9f33a52723498190f2cd0848f80859",
+    "docs/architecture/v2/S0_ACCEPTANCE_GATES.md": "015883d4a9db385fad22634a4e9d44d4b7c8fa323a31b828f070d11686444c39",
+    "docs/architecture/v2/S0_API_CONTRACT.md": "dab4c8621fd0f35547e6d7f9857865436e5b2c2fca9a056f52ce33bc3e1b11bc",
+    "docs/architecture/v2/S0_BACKUP_RESTORE_CONTRACT.md": "b0b3ee687b19457b9039fafbba0a40dc893357842ec3f8e0580e9b696c140c42",
+    "docs/architecture/v2/S0_DATABASE_CONTRACT.md": "855b7a0e51ad6fece73b5757e9a113e7b1e454c531e53e42ecc4c3122648d78e",
+    "docs/architecture/v2/S0_DECISION_RECORD.md": "3abba0604312602575e8f7a6836bfeda80c250756400e36d194c79ca0ad58f38",
+    "docs/architecture/v2/S0_ERROR_CODES.md": "f8f472e4569ac40c5ee27a509de047c37bd311442de1136b0ca7f6099f2b3c88",
+    "docs/architecture/v2/S0_EXECUTION_LOCK_CONTRACT.md": "ea4af08926773461c62891fef24533afc19294c1e99eaa6b6436f7ec289c1fd6",
+    "docs/architecture/v2/S0_REVIEW_REPORT.md": "dabf32f48dafaefe221295b946fa375a6cf481d9a555f7ba6559232350565cbe",
+    "docs/architecture/v2/S0_SYNC_EVENT_CONTRACT.md": "d586238e42815442578ffc1aacd506cd344acd48203b8e04501bcf097fc10826",
+    "docs/architecture/v2/S0_TECHNICAL_CONTRACT.md": "8fb2d1c2a279815438d57e0ebd1f107cec87b9d233f16a1f87a17f569dc87885",
+    "docs/architecture/v2/SECURITY_AND_LIFECYCLE.md": "b68eb4b59d50364c3f619683da62c112ea952d09cf35c32959d151787d3e544b",
+    "docs/architecture/v2/SUBSCRIPTION_SYNC_DESIGN.md": "ff2ce6a076a07b4fee24ab49269fc02db0167bbc51cc3bb16e0012de266ff034",
+    "docs/architecture/v2/TARGET_ARCHITECTURE.md": "2e16961c1ddeafeb3a78ca9c2c90af39d9084fe363bc08b57244983f4e5683f5",
+    "docs/architecture/v2/contracts/api-contracts.json": "4801c0da6007c91f06929cda3a93b143a6af595fe50bd8f2e3cb714ef585b710",
+    "docs/architecture/v2/contracts/api.dto.ts": "30ee1c7f6a0f1f2d42ec174e8a4ca78ce20f4d8d52ec7e9a654282986d34fe1c",
+    "docs/architecture/v2/contracts/contract-validation.json": "61b1c47b760e7190853454c6e281dbb5351ce4fb560b0f7e3b161a5513eee439",
+    "docs/architecture/v2/contracts/ddl-validation.json": "d1737f473b0026771092d801abbaeb69a9a0806fbbf4fc7a89a2150297c3e008",
+    "docs/architecture/v2/contracts/dto-validation.json": "2c624fbafe06b726f035d12a0a9d449e9343d99bfa41ee254d6a87855d2056ec",
+    "docs/architecture/v2/contracts/error-codes.json": "bd3b9ce0f29899db7251512514bddb26b23666e013668c87135dc208a7d92274",
+    "docs/architecture/v2/contracts/execution-transitions.json": "5b01e96aa9e25b532cf25718b15cf3ae73ceda54e8f05b09ddcc46881b2f2743",
+    "docs/architecture/v2/contracts/execution.dto.ts": "454258f0062c5a350717a04398646354a39fbd03d97414aacd614040dd7eb246",
+    "docs/architecture/v2/contracts/fresh-v2.sql": "ffa7b469ff5844fab2fc49b6046447b542f0cf6fc2a7a6dc50246ae47b501655",
+    "docs/architecture/v2/contracts/s0-input-fingerprints.json": "ed48f62957b1826c5644b4f5f71fa4e2830f17164ebe30a73217b88368de260e",
+    "docs/architecture/v2/contracts/validate_contracts.py": "bd4250081518b48fd69ed11693580e9039b59365bc05144168b4ea906de564cb",
+    "docs/architecture/v2/contracts/validate_ddl.py": "ea2c0cfe671091e42129f8baa6c08a95260a936c799152f426d57940e8073bca"
+  },
+  "delivery_files_sha256": {
+    "back/services/workspaceV2/backup.ts": "707980bdef9fee888aba79cd64fa3c5d4ee4efad5453ca44a1bc4f3c2432c3bb",
+    "back/services/workspaceV2/errors.ts": "116bb0cca0234ead7749b1736e0caf518d868a095b91de92f28b04538b9bb2a4",
+    "back/services/workspaceV2/files.ts": "7863da4640f595b00bb89505c5793e28b1f074246ba93ddb72a0feb41ffd70be",
+    "back/services/workspaceV2/gitStorage.ts": "801ce9a06d27414b7c068a99e29200b11b85c3bf0c4bdde19639f7301ce53cd4",
+    "back/services/workspaceV2/inventory.ts": "450a3495df1aaef0417073a3ad9b97e68099e122700d63a4d13cdaccf4b9bcb2",
+    "back/services/workspaceV2/lease.ts": "0fdda6ee183e226c3427a0a4911a0a7c3b257bebefe3f3c5414d29ca839ef3ac",
+    "back/services/workspaceV2/lifecycle.ts": "40d13fa3dd9ef0d5fb8e1f1e4a4e560b23d3301067781d3073ea62e369363a33",
+    "back/services/workspaceV2/limits.ts": "806817a6863960f9d3e52179aed03e3b73800fa7229be9887aa5008e11262a84",
+    "back/services/workspaceV2/manifest.ts": "405c65b203172dbd2c487c1934cb86e5686a822bef682490cdec25753d32fd1d",
+    "back/services/workspaceV2/manifestReferences.ts": "74b2f3c99712967b159d1acb460a531e1f7aaa33fb2e22a709263b4a2dee34b8",
+    "back/services/workspaceV2/preservation.ts": "1879183666763bed99de847e3d70dd320597ec32f82db52898aa689b31a7da86",
+    "back/services/workspaceV2/reclaim.ts": "93f7be052a10d92c5547f62a01b22cc44954088e4c51846cd7b4db14b40502c5",
+    "back/services/workspaceV2/repositoryAssets.ts": "278e087314d8df21ed880e8cd65c1a153f0ab028cd35db7de4aa0c9100d8cd4e",
+    "back/services/workspaceV2/restore.ts": "bf5faea61aee549e2cc784c0c91d7841414b24b4c887dafc67c57a25d737588f",
+    "back/services/workspaceV2/roots.ts": "91689f54a83d6ca45b146f8e0c4664cf0decd99e87738d8fd8966cba763d935e",
+    "back/services/workspaceV2/store.ts": "e5df6ad42f4974ebbb02b97af43ffa0a3c55bf873678add23921eb86c5d9c5eb",
+    "back/services/workspaceV2/types.ts": "1cd120733cad37532251fb7d4a5ce5554a763387e42bb27d19bf1faedf4ce7f6",
+    "tests/workspace-v2/README.md": "866374b5fb6c45b44c6778bed446c6b851fe35e412ce8383d3ff22c49247b189",
+    "tests/workspace-v2/archive-active-file.test.cjs": "2f22e50db7c4a1e2b1ce0b1265261f38221c8c8193fbce4b6281ca70351d80a4",
+    "tests/workspace-v2/archive-queue.test.cjs": "1400da578d8015e9a2bc7d616b5fd9e5270a9c376c8036f9f34af396f4291f08",
+    "tests/workspace-v2/backup.test.cjs": "d38c92d926f18dc57618ca29fa4cb26d9acad0f4b14412826a1f6ab7406079d8",
+    "tests/workspace-v2/contract-status.json": "8d9b7f7dcf34c37f9f0d79dbd53568fa6817c2a2b96444aba1918b62dffe27cf",
+    "tests/workspace-v2/fixture.cjs": "a26a5089624528e18028ad02db9b88e3866f4760270b5834806c47a6ebf448b9",
+    "tests/workspace-v2/git-index-preservation.test.cjs": "e869a1c946639ec3b66725fceaa215f9a43795cca6ace12ca5a094846ae8f245",
+    "tests/workspace-v2/lifecycle-crash-worker.cjs": "e07179d35360890d3e213600e337f2084097546372dbdc4d3703601d3fc59e79",
+    "tests/workspace-v2/lifecycle.test.cjs": "db818a7175ca2bff06520180357e0609f289ad04016173602b2185fdfec2654e",
+    "tests/workspace-v2/manifest-references.test.cjs": "afbc97e41890057a0b0537d64e447e046ece5d110e0340089d3377da7ffe015e",
+    "tests/workspace-v2/reclaim.test.cjs": "edc02da91026271ecb80e2028011f6589cc964a02256c785b4a0a58284b4e019",
+    "tests/workspace-v2/reclaimed-git-backup.test.cjs": "969ab6e049aa633bcf472218d6c5de234cafe76e034f78de57cf720bdadc451f",
+    "tests/workspace-v2/repositories.test.cjs": "564a55def6145fe70498c80984f154a734235e109951f584550ae0c7806b8fc1",
+    "tests/workspace-v2/restore-worker.cjs": "7573996370c7c186dfd8b4823baccac55d2082c0e71c26c90dc38e8c5bc9d470",
+    "tests/workspace-v2/run.cjs": "5957b83f045e1aee0c30939927386061c22fbf71f53488fc09b93b6d80508d39",
+    "tests/workspace-v2/runtime-restore.test.cjs": "e07b6ebe3f277888ff2cc4a09d239b72967ffad373ddf92c11c336326ee97179",
+    "tests/workspace-v2/storage-child.cjs": "f17a095b9800eb0d5cb07386ef09b1cf2cd4b8f5626d3a1b335cb159056cbea7",
+    "tests/workspace-v2/storage-worker.cjs": "ff6589accf98bb86df7a996466a9cc66d6df961bcdf8053799a4d32dcdd8823b",
+    "tests/workspace-v2/storage.test.cjs": "0ab7783295724dafcc14f4ba9c564482a884e246251cd1872232d13d2c2cfde9",
+    "tests/workspace-v2/store.test.cjs": "ca652469163a38b8ffe1831d30d9242ba879f6bb3b35e5b7942b82a2c8bbe0cf"
+  },
+  "gitnexus": {
+    "mode": "cached CLI, index-only refresh; no context-file injection",
+    "impact_summaries": [
+      {
+        "target": {
+          "id": "Class:back/services/workspaceV2/gitStorage.ts:GitWorkspaceStorageAdapter",
+          "name": "GitWorkspaceStorageAdapter",
+          "type": "Class",
+          "filePath": "back/services/workspaceV2/gitStorage.ts"
+        },
+        "risk": "HIGH",
+        "impactedCount": 20,
+        "summary": {
+          "direct": 12,
+          "processes_affected": 4,
+          "modules_affected": 1
+        },
+        "epistemic": "exact",
+        "riskNote": null
+      },
+      {
+        "target": {
+          "id": "Class:back/services/workspaceV2/manifest.ts:WorkspaceBackupDomain",
+          "name": "WorkspaceBackupDomain",
+          "type": "Class",
+          "filePath": "back/services/workspaceV2/manifest.ts"
+        },
+        "risk": "CRITICAL",
+        "impactedCount": 12,
+        "summary": {
+          "direct": 6,
+          "processes_affected": 33,
+          "modules_affected": 3
+        },
+        "epistemic": "exact",
+        "riskNote": null
+      },
+      {
+        "target": {
+          "id": "Class:back/services/workspaceV2/backup.ts:WorkspaceBackupService",
+          "name": "WorkspaceBackupService",
+          "type": "Class",
+          "filePath": "back/services/workspaceV2/backup.ts"
+        },
+        "risk": "LOW",
+        "impactedCount": 5,
+        "summary": {
+          "direct": 3,
+          "processes_affected": 1,
+          "modules_affected": 2
+        },
+        "epistemic": "exact",
+        "riskNote": null
+      },
+      {
+        "target": {
+          "id": "Class:back/services/workspaceV2/files.ts:WorkspaceFileService",
+          "name": "WorkspaceFileService",
+          "type": "Class",
+          "filePath": "back/services/workspaceV2/files.ts"
+        },
+        "risk": "UNKNOWN",
+        "impactedCount": 0,
+        "summary": {
+          "direct": 0,
+          "processes_affected": 0,
+          "modules_affected": 0
+        },
+        "epistemic": "exact",
+        "riskNote": "No callers resolved. Absence of edges is not evidence the symbol is unused: a caller reaching it through a reference class this index does not record — plain-object property access, a bare-identifier read of a module-scope const — produces no edge to find. Confirm with a text search before treating the change as safe."
+      },
+      {
+        "target": {
+          "id": "Class:back/services/workspaceV2/lease.ts:WorkspaceLeaseService",
+          "name": "WorkspaceLeaseService",
+          "type": "Class",
+          "filePath": "back/services/workspaceV2/lease.ts"
+        },
+        "risk": "MEDIUM",
+        "impactedCount": 9,
+        "summary": {
+          "direct": 7,
+          "processes_affected": 1,
+          "modules_affected": 1
+        },
+        "epistemic": "exact",
+        "riskNote": null
+      },
+      {
+        "target": {
+          "id": "Class:back/services/workspaceV2/lifecycle.ts:WorkspaceLifecycleService",
+          "name": "WorkspaceLifecycleService",
+          "type": "Class",
+          "filePath": "back/services/workspaceV2/lifecycle.ts"
+        },
+        "risk": "LOW",
+        "impactedCount": 1,
+        "summary": {
+          "direct": 1,
+          "processes_affected": 0,
+          "modules_affected": 0
+        },
+        "epistemic": "exact",
+        "riskNote": null
+      },
+      {
+        "target": {
+          "id": "Class:back/services/workspaceV2/preservation.ts:WorkspacePreservationService",
+          "name": "WorkspacePreservationService",
+          "type": "Class",
+          "filePath": "back/services/workspaceV2/preservation.ts"
+        },
+        "risk": "LOW",
+        "impactedCount": 1,
+        "summary": {
+          "direct": 1,
+          "processes_affected": 0,
+          "modules_affected": 0
+        },
+        "epistemic": "exact",
+        "riskNote": null
+      },
+      {
+        "target": {
+          "id": "Class:back/services/workspaceV2/reclaim.ts:WorkspaceReclaimService",
+          "name": "WorkspaceReclaimService",
+          "type": "Class",
+          "filePath": "back/services/workspaceV2/reclaim.ts"
+        },
+        "risk": "UNKNOWN",
+        "impactedCount": 0,
+        "summary": {
+          "direct": 0,
+          "processes_affected": 0,
+          "modules_affected": 0
+        },
+        "epistemic": "exact",
+        "riskNote": "No callers resolved. Absence of edges is not evidence the symbol is unused: a caller reaching it through a reference class this index does not record — plain-object property access, a bare-identifier read of a module-scope const — produces no edge to find. Confirm with a text search before treating the change as safe."
+      },
+      {
+        "target": {
+          "id": "Class:back/services/workspaceV2/restore.ts:WorkspaceRestoreService",
+          "name": "WorkspaceRestoreService",
+          "type": "Class",
+          "filePath": "back/services/workspaceV2/restore.ts"
+        },
+        "risk": "LOW",
+        "impactedCount": 4,
+        "summary": {
+          "direct": 2,
+          "processes_affected": 1,
+          "modules_affected": 1
+        },
+        "epistemic": "exact",
+        "riskNote": null
+      },
+      {
+        "target": {
+          "id": "Class:back/services/workspaceV2/roots.ts:WorkspaceRootResolver",
+          "name": "WorkspaceRootResolver",
+          "type": "Class",
+          "filePath": "back/services/workspaceV2/roots.ts"
+        },
+        "risk": "CRITICAL",
+        "impactedCount": 27,
+        "summary": {
+          "direct": 13,
+          "processes_affected": 18,
+          "modules_affected": 2
+        },
+        "epistemic": "exact",
+        "riskNote": null
+      },
+      {
+        "target": {
+          "id": "Class:back/services/workspaceV2/store.ts:WorkspaceStore",
+          "name": "WorkspaceStore",
+          "type": "Class",
+          "filePath": "back/services/workspaceV2/store.ts"
+        },
+        "risk": "MEDIUM",
+        "impactedCount": 10,
+        "summary": {
+          "direct": 10,
+          "processes_affected": 2,
+          "modules_affected": 1
+        },
+        "epistemic": "exact",
+        "riskNote": null
+      }
+    ],
+    "limitation": "UNKNOWN/missing edges are not proof of no callers; static production import boundary and Git diff checked separately.",
+    "precommit_detect_changes": {
+      "staged": {
+        "files": 39,
+        "symbols": 392,
+        "affected_processes": 158,
+        "risk": "critical",
+        "note": "Last full-scope precommit check; source/test SHA256 and path scope independently verified. Earlier CLI snapshot reported a larger symbol count and is retained separately."
+      },
+      "compare": {
+        "files": 40,
+        "symbols": 392,
+        "affected_processes": 158,
+        "risk": "critical",
+        "note": "The additional file is the original unstaged user .gitignore change; it is excluded from the S1.A commit."
+      },
+      "staged_first": {
+        "files": 39,
+        "symbols": 742,
+        "affected_processes": 239,
+        "risk": "critical"
+      }
+    }
+  },
+  "isolation": {
+    "user_gitignore_sha256": "78f778aa7cc3494334676046b883b672c9e98f3fb28adfd3868b9aa99aef4893",
+    "user_gitignore_preserved": true,
+    "frozen_s0_files_unchanged": true,
+    "existing_runtime_sources_changed": false,
+    "production_consumers_of_new_namespace": [],
+    "public_local_entry_added": false,
+    "production_schema_changed": false,
+    "s2_s3_s4_wiring_added": false
+  },
+  "stage_status": {
+    "S1A_FOUNDATION": "PASS",
+    "S2": "NOT_STARTED",
+    "S1B_FULL_ASSET_RECOVERY": "NOT_RUN — DEPENDS_ON_S2",
+    "S3": "NOT_STARTED",
+    "S4": "NOT_STARTED",
+    "S5": "NOT_STARTED",
+    "BROWSER_E2E": "NOT_RUN",
+    "MANAGED_RUNTIME": "NOT_RUN",
+    "LINUX_QUALIFICATION": "NOT_RUN",
+    "AMD64_ARM64_CONTAINER_QUALIFICATION": "NOT_RUN"
+  },
+  "ZHI_XU_V2_S1A_FOUNDATION_PASS": "YES",
+  "READY_FOR_S2_REVIEW": "YES"
+}
