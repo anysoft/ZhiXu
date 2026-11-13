@@ -32,6 +32,8 @@ export interface VariableWrite {
   replace_secret?: boolean;
   clear?: boolean;
   position?: number;
+  /** Retained Global ENV metadata; scoped public DTOs do not accept labels. */
+  labels?: string[];
 }
 export interface CandidateEnvironmentSnapshot {
   variables: Readonly<Record<string, string>>;
@@ -386,12 +388,28 @@ export class WorkspaceEnvironmentService {
           )
         )[0];
         if (revision.version !== expectedVersion) fail('ENV_VERSION_CONFLICT');
-        const previous = await tx.all<VariableRow>('SELECT * FROM Envs');
+        const previous = await tx.all<VariableRow & { labels: string }>(
+          'SELECT * FROM Envs',
+        );
         const rows = this.variables(input, previous);
         await tx.run('DELETE FROM Envs');
-        for (const v of rows)
+        for (const v of rows) {
+          const old = previous.find((row) => row.name === v.name);
+          const labels: unknown =
+            v.labels ?? (old?.labels ? JSON.parse(old.labels) : []);
+          if (
+            !Array.isArray(labels) ||
+            labels.length > 1000 ||
+            labels.some(
+              (label) =>
+                typeof label !== 'string' ||
+                label.length > 255 ||
+                label.includes('\0'),
+            )
+          )
+            fail('ENV_VALUE_INVALID', 400);
           await tx.run(
-            'INSERT INTO Envs(name,value,status,operation,is_secret,position,createdAt,updatedAt) VALUES(?,?,?,?,?,?,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP)',
+            'INSERT INTO Envs(name,value,status,operation,is_secret,position,labels,createdAt,updatedAt) VALUES(?,?,?,?,?,?,?,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP)',
             [
               v.name,
               v.value,
@@ -399,8 +417,10 @@ export class WorkspaceEnvironmentService {
               v.operation,
               v.is_secret ? 1 : 0,
               v.position,
+              JSON.stringify(labels),
             ],
           );
+        }
         return (
           await tx.all<{ version: number }>(
             'SELECT version FROM GlobalEnvironmentRevision WHERE singleton_id=1',

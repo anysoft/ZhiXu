@@ -3,7 +3,7 @@ import {
   PythonEnvironmentModel,
   PythonEnvironmentRevisionModel,
   PythonEnvironmentBuildModel,
-} from '../data/pythonEnvironment';
+} from './runtimeDomainScope';
 import { RuntimeError, runtimeId } from '../shared/runtime';
 import type {
   RuntimeReferenceSource,

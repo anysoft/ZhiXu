@@ -1,22 +1,25 @@
-import { PlatformMutation } from './backup/platform';
+import {
+  ScopedRuntimeMutation as PlatformMutation,
+  requireUnusedRuntimeEnvironment,
+} from './runtimeDomainScope';
 import fs from 'fs/promises';
-import TaskReferenceService from './taskReferences';
 import path from 'path';
 import { randomUUID } from 'crypto';
 import { Op, Transaction } from 'sequelize';
-import { sequelize } from '../data';
+import { sequelize } from './runtimeDomainScope';
 import {
-  RuntimeInstallation,
   RuntimeInstallationModel,
   RuntimeProviderModel,
-  RuntimeOperation,
   RuntimeOperationModel,
-} from '../data/runtime';
+} from './runtimeDomainScope';
+import type { RuntimeInstallation, RuntimeOperation } from '../data/runtime';
 import {
   NodeEnvironmentModel as Envs,
   NodeEnvironmentRevisionModel as Revisions,
   NodeEnvironmentBuildModel as Builds,
   NodePackageManagerToolchainModel as Tools,
+} from './runtimeDomainScope';
+import type {
   NodeEnvironment,
   NodeEnvironmentBuild,
   NodeEnvironmentRevision,
@@ -425,7 +428,10 @@ export default class NodeEnvironmentService {
         where: { provider_id: provider.id, implementation: 'NODEJS', version },
         transaction,
       });
-      if (previous && !['REMOVED','MISSING'].includes(previous.get('state') as string))
+      if (
+        previous &&
+        !['REMOVED', 'MISSING'].includes(previous.get('state') as string)
+      )
         throw new RuntimeError('RUNTIME_ALREADY_INSTALLED');
       runtime =
         previous?.get({ plain: true }) ??
@@ -507,7 +513,11 @@ export default class NodeEnvironmentService {
           where: { runtime_id: runtime.id, manager_type: manager, version },
           transaction,
         });
-        if (previous && previous.get('state') !== 'REMOVED' && previous.get('last_error') !== 'RESTORE_REBUILD_REQUIRED')
+        if (
+          previous &&
+          previous.get('state') !== 'REMOVED' &&
+          previous.get('last_error') !== 'RESTORE_REBUILD_REQUIRED'
+        )
           throw new RuntimeError('NODE_TOOLCHAIN_ALREADY_EXISTS');
         const row =
           previous ??
@@ -600,7 +610,7 @@ export default class NodeEnvironmentService {
           { where: { id: env.id }, transaction },
         );
       } else if (type === 'NODE_ENV_DELETE') {
-        await new TaskReferenceService().requireUnusedEnvironment('NODE', env.id, transaction);
+        await requireUnusedRuntimeEnvironment('NODE', env.id, transaction);
         for (const b of await Builds.findAll({
           where: { environment_id: env.id },
           order: [['id', 'ASC']],

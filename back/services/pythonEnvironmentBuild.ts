@@ -1,12 +1,13 @@
 import { Transaction } from 'sequelize';
-import TaskReferenceService from './taskReferences';
+import { requireUnusedRuntimeEnvironment } from './runtimeDomainScope';
 import {
   PythonEnvironmentModel as Environments,
   PythonEnvironmentRevisionModel as Revisions,
   PythonEnvironmentBuildModel as Builds,
-  PythonEnvironmentBuild,
-} from '../data/pythonEnvironment';
-import { RuntimeInstallationModel, RuntimeOperation } from '../data/runtime';
+} from './runtimeDomainScope';
+import type { PythonEnvironmentBuild } from '../data/pythonEnvironment';
+import { RuntimeInstallationModel } from './runtimeDomainScope';
+import type { RuntimeOperation } from '../data/runtime';
 import { RuntimeError, runtimeId } from '../shared/runtime';
 import {
   PythonEnvironmentOperationType,
@@ -85,7 +86,11 @@ export default class PythonEnvironmentBuildService {
         { transaction },
       );
     } else if (type === 'PYTHON_ENV_DELETE') {
-      await new TaskReferenceService().requireUnusedEnvironment('PYTHON', environment.id, transaction);
+      await requireUnusedRuntimeEnvironment(
+        'PYTHON',
+        environment.id,
+        transaction,
+      );
       const builds = await Builds.findAll({
         where: { environment_id: environment.id },
         transaction,

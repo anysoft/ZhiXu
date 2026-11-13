@@ -28,7 +28,10 @@
     "test:platform": "node tests/platform/run.cjs",
     "test:platform:e2e": "node diagnostics/phase10/platform-e2e.cjs",
     "typecheck": "tsc --noEmit --skipLibCheck",
-    "start:platform": "node scripts/platform/start.cjs"
+    "start:platform": "node scripts/platform/start.cjs",
+    "build:v2": "node scripts/build-v2.cjs",
+    "start:v2": "node scripts/start-v2.cjs",
+    "dev:v2": "TS_NODE_PROJECT=back/tsconfig.json node -r ts-node/register/transpile-only back/appV2.ts"
   },
   "gitHooks": {
     "pre-commit": "lint-staged"

@@ -1,4 +1,3 @@
-import { shareStore } from './store';
 
 const messages: Record<string, Record<string, string>> = {
   zh: {},
@@ -153,7 +152,8 @@ let currentLang: string = 'zh';
 
 export function setLang(lang: string) {
   currentLang = lang || 'zh';
-  shareStore.setLang(currentLang);
+  // Persistence belongs to the legacy settings writer; translations stay pure.
+  (require('./store') as typeof import('./store')).shareStore.setLang(currentLang);
 }
 
 /** 系统默认语言：Intl 检测 → 'zh'（仅返回 zh/en） */

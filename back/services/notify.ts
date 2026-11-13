@@ -2,17 +2,16 @@ import { PRODUCT_NAME } from '../shared/brand';
 import crypto from 'crypto';
 import nodemailer from 'nodemailer';
 import { Inject, Service } from 'typedi';
-import { parseBody, parseHeaders } from '../config/util';
+import { parseBody, parseHeaders } from '../shared/notificationPayload';
 import { NotificationInfo } from '../data/notify';
 import { t } from '../shared/i18n';
-import UserService from './user';
 import { httpClient } from '../config/http';
 import { ProxyAgent } from 'undici';
 
 @Service()
 export default class NotificationService {
-  @Inject((type) => UserService)
-  private userService!: UserService;
+  @Inject(() => require('./user').default)
+  private userService!: { getNotificationMode(): Promise<NotificationInfo> };
 
   private modeMap = new Map([
     ['gotify', this.gotify],
@@ -49,7 +48,9 @@ export default class NotificationService {
     retry: 1,
   };
 
-  constructor(private transport: Pick<typeof httpClient, 'post' | 'request'> = httpClient) {}
+  constructor(
+    private transport: Pick<typeof httpClient, 'post' | 'request'> = httpClient,
+  ) {}
 
   public async notify(
     title: string,
@@ -133,11 +134,14 @@ export default class NotificationService {
   private async goCqHttpBot() {
     const { goCqHttpBotQq, goCqHttpBotToken, goCqHttpBotUrl } = this.params;
     try {
-      const res = await this.transport.post(`${goCqHttpBotUrl}?${goCqHttpBotQq}`, {
-        ...this.gotOption,
-        json: { message: `${this.title}\n${this.content}` },
-        headers: { Authorization: 'Bearer ' + goCqHttpBotToken },
-      });
+      const res = await this.transport.post(
+        `${goCqHttpBotUrl}?${goCqHttpBotQq}`,
+        {
+          ...this.gotOption,
+          json: { message: `${this.title}\n${this.content}` },
+          headers: { Authorization: 'Bearer ' + goCqHttpBotToken },
+        },
+      );
       if (res.retcode === 0) {
         return true;
       } else {
@@ -435,7 +439,9 @@ export default class NotificationService {
           roomName: `${aibotkName}`,
           message: {
             type: 1,
-            content: `【${PRODUCT_NAME} ${t('通知')}】\n\n${this.title}\n${this.content}`,
+            content: `【${PRODUCT_NAME} ${t('通知')}】\n\n${this.title}\n${
+              this.content
+            }`,
           },
         };
         break;
@@ -446,7 +452,9 @@ export default class NotificationService {
           name: `${aibotkName}`,
           message: {
             type: 1,
-            content: `【${PRODUCT_NAME} ${t('通知')}】\n\n${this.title}\n${this.content}`,
+            content: `【${PRODUCT_NAME} ${t('通知')}】\n\n${this.title}\n${
+              this.content
+            }`,
           },
         };
         break;
@@ -603,25 +611,47 @@ export default class NotificationService {
   }
 
   private async email() {
-    const { emailPass, emailService, emailUser, emailTo, emailHost, emailPort, emailSecure } = this.params as typeof this.params & {emailHost?:string;emailPort?:number;emailSecure?:boolean};
+    const {
+      emailPass,
+      emailService,
+      emailUser,
+      emailTo,
+      emailHost,
+      emailPort,
+      emailSecure,
+    } = this.params as typeof this.params & {
+      emailHost?: string;
+      emailPort?: number;
+      emailSecure?: boolean;
+    };
     const recipients = this.parseMailRecipients(emailTo) || emailUser;
 
     try {
       const transporter = nodemailer.createTransport({
-        ...(emailHost ? {host:emailHost,port:emailPort??587,secure:emailSecure??false} : {service:emailService}),
-        connectionTimeout: 10000, greetingTimeout: 10000, socketTimeout: 10000,
+        ...(emailHost
+          ? {
+              host: emailHost,
+              port: emailPort ?? 587,
+              secure: emailSecure ?? false,
+            }
+          : { service: emailService }),
+        connectionTimeout: 10000,
+        greetingTimeout: 10000,
+        socketTimeout: 10000,
         auth: {
           user: emailUser,
           pass: emailPass,
         },
       });
 
-      const info = await transporter.sendMail({
-        from: `"${PRODUCT_NAME} ${t('通知')}" <${emailUser}>`,
-        to: recipients,
-        subject: `${this.title}`,
-        html: `${this.content.replace(/\n/g, '<br/>')}`,
-      }).finally(() => transporter.close());
+      const info = await transporter
+        .sendMail({
+          from: `"${PRODUCT_NAME} ${t('通知')}" <${emailUser}>`,
+          to: recipients,
+          subject: `${this.title}`,
+          html: `${this.content.replace(/\n/g, '<br/>')}`,
+        })
+        .finally(() => transporter.close());
 
       if (info.messageId) {
         return true;
@@ -921,7 +951,8 @@ export default class NotificationService {
   private async openiLink() {
     const { openiLinkAppToken, openiLinkHubUrl, openiLinkContextToken } =
       this.params;
-    const baseUrl = openiLinkHubUrl?.replace(/\/$/, '') || 'https://hub.openilink.com';
+    const baseUrl =
+      openiLinkHubUrl?.replace(/\/$/, '') || 'https://hub.openilink.com';
     const url = `${baseUrl}/bot/v1/message/send`;
     const body: Record<string, string> = {
       type: 'text',
@@ -974,5 +1005,4 @@ export default class NotificationService {
       throw new Error(error.response ? error.response.body : error);
     }
   }
-
 }

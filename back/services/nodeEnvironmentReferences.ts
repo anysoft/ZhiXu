@@ -3,7 +3,7 @@ import {
   NodeEnvironmentRevisionModel,
   NodeEnvironmentBuildModel,
   NodePackageManagerToolchainModel,
-} from '../data/nodeEnvironment';
+} from './runtimeDomainScope';
 import type {
   RuntimeReference,
   RuntimeReferenceSource,

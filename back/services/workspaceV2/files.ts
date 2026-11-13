@@ -2,6 +2,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import { createHash, randomUUID } from 'crypto';
 import { TextDecoder } from 'util';
+import { AsyncLocalStorage } from 'async_hooks';
 import config from '../../config';
 import { VIEW_LIMIT, WorkspaceFiles } from '../workspaceFiles';
 import { privateJson, readJson, syncDirectory } from '../backup/files';
@@ -46,6 +47,16 @@ interface FileJournal {
   path: string;
   destination?: string;
 }
+interface MutationReceipt {
+  workspace: WorkspaceRow;
+  entry: {
+    path: string;
+    kind: string;
+    size: number;
+    identity: string;
+    hash: string | null;
+  } | null;
+}
 const sha256 = (value: string | Buffer) =>
   createHash('sha256').update(value).digest('hex');
 
@@ -81,6 +92,10 @@ function isFileJournal(value: unknown): value is FileJournal {
 export class WorkspaceFileService {
   readonly limits: WorkspaceLimits;
   private readonly fault?: FaultHook;
+  private readonly receiptContext = new AsyncLocalStorage<{
+    active: boolean;
+    value?: MutationReceipt;
+  }>();
   constructor(
     readonly store: WorkspaceStore,
     readonly roots: WorkspaceRootResolver,
@@ -91,6 +106,23 @@ export class WorkspaceFileService {
     this.fault = options.fault;
     if (store.dataRoot !== roots.dataRoot || roots.dataRoot !== leases.dataRoot)
       fail('WORKSPACE_PATH_INVALID', 400);
+  }
+
+  /** Capture the one mutation's after-image before its existing Workspace lease
+   * releases. A receipt scope never survives its awaited operation. */
+  async captureMutationReceipt(
+    action: () => Promise<unknown>,
+  ): Promise<MutationReceipt> {
+    const scope: { active: boolean; value?: MutationReceipt } = {
+      active: true,
+    };
+    try {
+      await this.receiptContext.run(scope, action);
+      if (!scope.value) fail('WORKSPACE_OPERATION_FAILED');
+      return scope.value;
+    } finally {
+      scope.active = false;
+    }
   }
 
   private checkPath(relative: string, allowRoot = false) {
@@ -186,14 +218,25 @@ export class WorkspaceFileService {
     operation: string,
     action: (files: WorkspaceFiles, row: WorkspaceRow) => Promise<T>,
     completeInventory = true,
+    publishedInventory = false,
   ): Promise<T> {
     try {
       return await this.leases.withWorkspace(id, operation, async (lease) => {
         const row = await this.store.assertAccessible(id, false);
         await this.guardJournals(id);
         const owned = await this.roots.requireReady(row, lease, true);
-        if (completeInventory)
-          await scanWorkspace(owned.root, row.type, this.limits);
+        if (completeInventory) {
+          const inventory = await scanWorkspace(
+            owned.root,
+            row.type,
+            this.limits,
+          );
+          if (
+            publishedInventory &&
+            inventory.hash !== row.content_inventory_hash
+          )
+            fail('WORKSPACE_VERSION_CONFLICT');
+        }
         const result = await action(this.lowLevel(owned.root, lease), row);
         await this.roots.requireOwned(row);
         await lease.assertHeld();
@@ -207,6 +250,92 @@ export class WorkspaceFileService {
   async read(id: number, relative: string) {
     this.checkPath(relative);
     return this.readOperation(id, 'FILE_READ', (files) => files.read(relative));
+  }
+
+  /** Public DTO adapters capture revision and bytes under the same source lease. */
+  async readSnapshot(id: number, relative: string) {
+    this.checkPath(relative);
+    return this.readOperation(
+      id,
+      'FILE_READ',
+      async (files, workspace) => ({
+        workspace,
+        result: await files.read(relative),
+      }),
+      true,
+      true,
+    );
+  }
+
+  /** The callback cannot outlive the guarded, fully scanned Workspace lease. */
+  async treeSnapshot(id: number, relative = '', offset = 0, limit = 200) {
+    this.checkPath(relative, true);
+    if (
+      !Number.isSafeInteger(offset) ||
+      offset < 0 ||
+      !Number.isSafeInteger(limit) ||
+      limit < 1 ||
+      limit > 1000
+    )
+      fail('WORKSPACE_PATH_INVALID', 400);
+    return this.readOperation(
+      id,
+      'FILE_TREE',
+      async (files, workspace) => {
+        const result = await files.tree(relative, offset, limit);
+        const entries = await Promise.all(
+          result.items.map(async (entry) => ({
+            ...entry,
+            hash:
+              entry.kind === 'file'
+                ? sha256(
+                    (
+                      await files.bytes(
+                        entry.path,
+                        this.limits.maxSourceFileBytes,
+                      )
+                    ).data,
+                  )
+                : null,
+          })),
+        );
+        return { workspace, result: { ...result, entries } };
+      },
+      true,
+      true,
+    );
+  }
+
+  async metadataSnapshot(id: number, relative: string) {
+    this.checkPath(relative);
+    return this.readOperation(
+      id,
+      'FILE_METADATA',
+      async (files, workspace) => {
+        try {
+          const result = await files.metadata(relative);
+          const hash =
+            result.kind === 'file'
+              ? sha256(
+                  (await files.bytes(relative, this.limits.maxSourceFileBytes))
+                    .data,
+                )
+              : null;
+          return { workspace, result: { ...result, hash } };
+        } catch (error: unknown) {
+          if (
+            error &&
+            typeof error === 'object' &&
+            'code' in error &&
+            error.code === 'ENOENT'
+          )
+            return { workspace, result: null };
+          throw error;
+        }
+      },
+      true,
+      true,
+    );
   }
 
   async tree(id: number, relative = '', offset = 0, limit = 200) {
@@ -467,6 +596,11 @@ export class WorkspaceFileService {
     action: (files: WorkspaceFiles) => Promise<T>,
   ): Promise<T> {
     this.checkPath(relative);
+    if (
+      this.receiptContext.getStore()?.active &&
+      this.receiptContext.getStore()?.value
+    )
+      fail('WORKSPACE_OPERATION_FAILED');
     try {
       return await this.leases.withWorkspace(
         id,
@@ -561,13 +695,50 @@ export class WorkspaceFileService {
             );
             if (after.hash !== journal.after_hash)
               fail('WORKSPACE_RECOVERY_REQUIRED');
-            await this.store.transaction(async (tx) => {
-              await tx.updateInventory(id, row.content_revision, after);
+            const receipt = this.receiptContext.getStore();
+            let entry: MutationReceipt['entry'] = null;
+            if (receipt?.active && kind !== 'DELETE') {
+              const target = plan.destination ?? relative,
+                metadata = await files.metadata(target);
+              const hash =
+                metadata.kind === 'file'
+                  ? sha256(
+                      (
+                        await files.bytes(
+                          target,
+                          this.limits.maxSourceFileBytes,
+                        )
+                      ).data,
+                    )
+                  : null;
+              if (
+                metadata.kind === 'file' &&
+                after.entries.find((item) => item.path === target)?.sha256 !==
+                  hash
+              )
+                fail('WORKSPACE_FILE_CONFLICT');
+              entry = {
+                path: metadata.path,
+                kind: metadata.kind,
+                size: metadata.size,
+                identity: metadata.identity,
+                hash,
+              };
+            }
+            const published = await this.store.transaction(async (tx) => {
+              const workspace = await tx.updateInventory(
+                id,
+                row.content_revision,
+                after,
+              );
               await tx.run(
                 "UPDATE WorkspaceOperations SET status='SUCCEEDED',phase='COMPLETE',finished_at=? WHERE id=? AND owner_token=?",
                 [new Date().toISOString(), operationId, token],
               );
+              return workspace;
             });
+            if (receipt?.active)
+              receipt.value = { workspace: published, entry };
             committed = true;
             await this.fault?.('FILE_COMMITTED', {
               workspace_id: id,
@@ -698,6 +869,7 @@ export class WorkspaceFileService {
     relative: string,
     destination: string,
     expectedHash: string,
+    expectedKind?: 'FILE' | 'DIRECTORY',
   ) {
     this.checkPath(destination);
     return this.mutate(
@@ -708,7 +880,12 @@ export class WorkspaceFileService {
         await this.references(id, relative);
         if (destination === relative || destination.startsWith(relative + '/'))
           fail('WORKSPACE_PATH_INVALID', 400);
-        await this.expected(files, relative, expectedHash);
+        const actual = await this.expected(files, relative, expectedHash);
+        if (
+          expectedKind &&
+          actual.kind !== (expectedKind === 'FILE' ? 'file' : 'directory')
+        )
+          fail('INVALID_REQUEST', 400);
         await this.missing(files, destination);
         return { destination };
       },

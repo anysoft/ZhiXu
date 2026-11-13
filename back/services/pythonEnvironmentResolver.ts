@@ -3,8 +3,8 @@ import { createHash } from 'crypto';
 import {
   PythonEnvironmentModel,
   PythonEnvironmentBuildModel,
-} from '../data/pythonEnvironment';
-import { RuntimeInstallationModel } from '../data/runtime';
+} from './runtimeDomainScope';
+import { RuntimeInstallationModel } from './runtimeDomainScope';
 import { RuntimeError, runtimeId } from '../shared/runtime';
 import { RuntimeLease } from './runtimeProcess';
 import RuntimeOperationService from './runtimeOperations';

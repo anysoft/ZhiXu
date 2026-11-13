@@ -1,8 +1,11 @@
 import { PRODUCT_NAME } from './back/shared/brand';
 import { defineConfig } from '@umijs/max';
+import { v2Routes } from './src/v2/routes';
 const CompressionPlugin = require('compression-webpack-plugin');
 
 const baseUrl = process.env.QlBaseUrl || '/';
+const v2Frontend = process.env.ZHIXU_FRONTEND_MODE === 'v2';
+const frontendOutput = v2Frontend ? 'static/dist-v2' : 'static/dist';
 export default defineConfig({
   title: PRODUCT_NAME,
   metas: [
@@ -19,10 +22,15 @@ export default defineConfig({
     // The product language controller resolves navigator.language centrally.
     baseNavigator: false,
   },
-  outputPath: 'static/dist',
+  outputPath: frontendOutput,
+  ...(v2Frontend ? { routes: v2Routes } : {}),
   fastRefresh: true,
   favicons: ['/favicon.svg'],
-  publicPath: process.env.NODE_ENV === 'production' ? './' : '/',
+  publicPath: v2Frontend
+    ? baseUrl
+    : process.env.NODE_ENV === 'production'
+    ? './'
+    : '/',
   proxy: {
     [`${baseUrl}api`]: {
       target: 'http://127.0.0.1:5700/',
@@ -41,11 +49,11 @@ export default defineConfig({
       }),
     );
   }) as any,
-  headScripts: [`./api/env.js`],
+  headScripts: [v2Frontend ? `${baseUrl}api/env.js` : './api/env.js'],
   copy: [
     {
       from: 'node_modules/monaco-editor/min/vs',
-      to: 'static/dist/monaco-editor/min/vs',
+      to: `${frontendOutput}/monaco-editor/min/vs`,
     },
   ],
   npmClient: 'pnpm',

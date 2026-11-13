@@ -94,7 +94,7 @@ async function withGit<T>(
   const fds = [...new Set([...leaseFds, ...inheritedLeaseFds()])];
   const guard = new WorkspaceGuard(
     spawn(
-      'python3',
+      '/usr/bin/python3',
       [
         '-I',
         '-S',

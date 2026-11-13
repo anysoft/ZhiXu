@@ -1,14 +1,14 @@
-import { PlatformMutation } from './backup/platform';
+import { ScopedRuntimeMutation as PlatformMutation } from './runtimeDomainScope';
 import fs from 'fs/promises';
 import path from 'path';
 import { randomUUID, createHash } from 'crypto';
-import { sequelize } from '../data';
+import { sequelize } from './runtimeDomainScope';
 import {
   PythonEnvironmentModel as Environments,
   PythonEnvironmentRevisionModel as Revisions,
   PythonEnvironmentBuildModel as Builds,
-} from '../data/pythonEnvironment';
-import { RuntimeInstallationModel } from '../data/runtime';
+} from './runtimeDomainScope';
+import { RuntimeInstallationModel } from './runtimeDomainScope';
 import { RuntimeError, runtimeId, RUNTIME_TOOL_PATH } from '../shared/runtime';
 import RuntimeOperationService from './runtimeOperations';
 import { RuntimeLease, RuntimeCommand } from './runtimeProcess';

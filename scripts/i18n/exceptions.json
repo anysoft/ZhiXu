@@ -226,5 +226,77 @@
     "value": "`${translateEnum(\n                'subscriptionPhase',\n                row.last_sync_phase,\n              )} ${\n                row.last_sync_error ? translateError(row.last_sync_error) : ''\n              } ${formatDateTime(row.last_sync_at)} ${\n                row.last_synced_commit || ''\n              }`",
     "classification": "USER_CONTENT_TEMPLATE",
     "reason": "Formatted composition of user data or technical identifiers with previously reviewed localized wrappers; raw user data remains unchanged."
+  },
+  {
+    "file": "src/v2/App.tsx",
+    "value": "ZhiXu",
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Canonical product brand and logo alternative text; the brand identity stays ZhiXu in both locales."
+  },
+  {
+    "file": "src/v2/App.tsx",
+    "value": "v2",
+    "classification": "TECHNICAL_TOKEN",
+    "reason": "Exact application architecture mode identifier verified against the backend; translating it would obscure the selected mode."
+  },
+  {
+    "file": "src/v2/features/Files.tsx",
+    "value": "`:${item.line}`",
+    "classification": "USER_CONTENT_TEMPLATE",
+    "reason": "Numeric source-line location suffix using the conventional colon notation, without untranslated linguistic text."
+  },
+  {
+    "file": "src/v2/features/Git.tsx",
+    "value": "`${t('syncHistory')} #${selected.id}`",
+    "classification": "USER_CONTENT_TEMPLATE",
+    "reason": "The heading is translated through the registered v2 useText binding; the remaining value is the immutable SyncRun identifier."
+  },
+  {
+    "file": "src/v2/features/Resources.tsx",
+    "value": "`${item.name} · ${label(item.state)}`",
+    "classification": "USER_CONTENT_TEMPLATE",
+    "reason": "User-provided environment name followed by a state translated through the registered v2 status messages."
+  },
+  {
+    "file": "src/v2/features/RuntimeRevision.tsx",
+    "value": "`${r.manager_type} ${r.version}`",
+    "classification": "USER_CONTENT_TEMPLATE",
+    "reason": "Canonical package-manager identifier and exact installed version; these technical identities remain unchanged."
+  },
+  {
+    "file": "src/v2/features/TaskEditor.tsx",
+    "value": "`${item.name} · ${label(item.type)}`",
+    "classification": "USER_CONTENT_TEMPLATE",
+    "reason": "User-provided workspace name followed by the localized workspace type, with a language-neutral separator."
+  },
+  {
+    "file": "src/v2/features/Triggers.tsx",
+    "value": "`${row.config?.expression} · ${row.config?.timezone}`",
+    "classification": "USER_CONTENT_TEMPLATE",
+    "reason": "Stored Cron expression and IANA timezone identifier must retain their exact scheduling syntax."
+  },
+  {
+    "file": "src/v2/pages/Environment.tsx",
+    "value": "`${r.name} · #${r.id}`",
+    "classification": "USER_CONTENT_TEMPLATE",
+    "reason": "User-provided resource name and persistent numeric resource identifier, without fixed linguistic text."
+  },
+  {
+    "file": "src/v2/pages/Runtime.tsx",
+    "value": "`${r.version} · #${r.id}`",
+    "classification": "USER_CONTENT_TEMPLATE",
+    "reason": "Exact runtime version and persistent installation identifier are technical identities, not translatable copy."
+  },
+  {
+    "file": "src/v2/pages/Runtime.tsx",
+    "value": "`${r.manager_type} ${r.version} · #${r.id}`",
+    "classification": "USER_CONTENT_TEMPLATE",
+    "reason": "Exact package-manager identifier, version and persistent toolchain ID are technical identities."
+  },
+  {
+    "file": "src/v2/pages/Workspaces.tsx",
+    "value": "`${row.git.repository_id} · ${row.git.ref_name}`",
+    "classification": "USER_CONTENT_TEMPLATE",
+    "reason": "Persistent repository ID and user-selected Git ref preserve their exact identity and ref syntax."
   }
 ]

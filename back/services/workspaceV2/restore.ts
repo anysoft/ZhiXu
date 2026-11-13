@@ -31,7 +31,8 @@ type Stage =
   | 'CANDIDATE_PUBLISHED'
   | 'VALIDATING'
   | 'COMPLETE'
-  | 'ROLLED_BACK';
+  | 'ROLLED_BACK'
+  | 'CANCELLED';
 interface Identity {
   dev: number;
   ino: number;
@@ -88,6 +89,7 @@ export async function readWorkspaceRestoreJournal(
       'VALIDATING',
       'COMPLETE',
       'ROLLED_BACK',
+      'CANCELLED',
     ].includes(j.stage) ||
     !['snapshots', 'imports'].includes(j.source)
   )
@@ -212,7 +214,9 @@ export class WorkspaceRestoreService {
     return { root, manifest };
   }
 
-  async restore(
+  /** Persist the validated pending journal while the live backend retains its FD.
+   * The next exclusive backend owner performs the existing offline root swap. */
+  async stage(
     snapshotId: string,
     source: 'snapshots' | 'imports' = 'snapshots',
   ) {
@@ -223,7 +227,10 @@ export class WorkspaceRestoreService {
         () => this.backup.idle(),
         async () => {
           const prior = await this.status();
-          if (prior && !['COMPLETE', 'ROLLED_BACK'].includes(prior.stage))
+          if (
+            prior &&
+            !['COMPLETE', 'ROLLED_BACK', 'CANCELLED'].includes(prior.stage)
+          )
             fail('RESTORE_PENDING', 503);
           // The constructor's explicit Store already proves a supported candidate DB.
           await this.backup.store.verifySchema();
@@ -301,8 +308,41 @@ export class WorkspaceRestoreService {
         },
       ),
     );
+    return this.status();
+  }
+
+  async restore(
+    snapshotId: string,
+    source: 'snapshots' | 'imports' = 'snapshots',
+  ) {
+    await this.stage(snapshotId, source);
     await this.backup.store.close();
     return this.recover();
+  }
+
+  async cancelPending(operationId: string) {
+    return this.backup.withCatalogLock(async () => {
+      const journal = await this.status();
+      if (
+        !journal ||
+        journal.operation_id !== backupId(operationId) ||
+        journal.stage !== 'PENDING'
+      )
+        fail('RESTORE_CANCEL_UNAVAILABLE');
+      const state = await this.backup.barrier.state();
+      if (
+        !state ||
+        state.phase !== 'RESTORE_PENDING' ||
+        state.id !== journal.operation_id ||
+        !same(journal.old_identity, await identity(journal.target)) ||
+        (await identity(journal.candidate))
+      )
+        fail('WORKSPACE_RECOVERY_REQUIRED');
+      journal.stage = 'CANCELLED';
+      await this.write(journal);
+      await this.clearBarrier(journal);
+      return { cancelled: true };
+    });
   }
 
   private async reconcile(root: string) {
@@ -364,6 +404,18 @@ export class WorkspaceRestoreService {
         const j = await this.status();
         if (!j) fail('WORKSPACE_RECOVERY_REQUIRED');
         if (j.stage === 'COMPLETE') {
+          await this.clearBarrier(j);
+          return WorkspaceStore.open(
+            path.join(j.target, 'db/database.sqlite'),
+            j.target,
+          );
+        }
+        if (j.stage === 'CANCELLED') {
+          if (
+            !same(j.old_identity, await identity(j.target)) ||
+            (await identity(j.candidate))
+          )
+            fail('WORKSPACE_RECOVERY_REQUIRED');
           await this.clearBarrier(j);
           return WorkspaceStore.open(
             path.join(j.target, 'db/database.sqlite'),

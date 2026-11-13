@@ -4,9 +4,9 @@ import { promisify } from 'util';
 import path from 'path';
 import { createHash, randomUUID } from 'crypto';
 import config from '../config';
-import ConfigAssetService from './configAsset';
+import type ConfigAssetService from './configAsset';
 import HookExecutor from './hookExecutor';
-import { ResolvedConfig } from './taskConfig';
+import type { ResolvedConfig } from './taskConfig';
 export type MaterializationConfig = Pick<
   ResolvedConfig,
   'revision' | 'binding'
@@ -69,7 +69,7 @@ export default class ConfigMaterializationService {
     private assets: Pick<
       ConfigAssetService,
       'readRevision'
-    > = new ConfigAssetService(),
+    > = new (require('./configAsset').default)(),
     private options: ConfigMaterializationOptions = {},
   ) {
     this.root =

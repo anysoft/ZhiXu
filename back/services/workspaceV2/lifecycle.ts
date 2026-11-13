@@ -13,10 +13,16 @@ import {
 } from './gitStorage';
 import { scanWorkspace, WorkspaceLimits } from './inventory';
 import type { FaultHook, OperationRow, WorkspaceRow } from './types';
+import {
+  normalizeWorkspaceInitialization,
+  applyWorkspaceInitialization,
+  WorkspaceInitialization,
+} from './initialization';
 
 export interface CreateWorkspaceInput {
   name: string;
   requestKey: string;
+  initialization?: WorkspaceInitialization;
 }
 export interface WorkspaceReferenceCounts {
   tasks: number;
@@ -169,10 +175,16 @@ export class WorkspaceLifecycleService {
       fail('INVALID_REQUEST', 400);
     if (git) validateWorkspaceRef(git.refType, git.refName);
     const type = git ? 'GIT' : 'LOCAL';
+    const initialization = normalizeWorkspaceInitialization(
+      input.initialization,
+      git?.refType,
+    );
+    if (initialization && !git) fail('INVALID_REQUEST', 400);
     const request = requestIdentity(input.requestKey, {
       type,
       name,
       git: git ?? null,
+      ...(initialization ? { initialization } : {}),
     });
     return this.store.transaction(async (tx) => {
       const previous = await tx.all<OperationRow>(
@@ -206,7 +218,11 @@ export class WorkspaceLifecycleService {
           request.hash,
           token,
           `workspace-v2/${operationId}.json`,
-          JSON.stringify({ owner_token: token, git: git ?? null }),
+          JSON.stringify({
+            owner_token: token,
+            git: git ?? null,
+            ...(initialization ? { initialization } : {}),
+          }),
           new Date().toISOString(),
         ],
       );
@@ -322,6 +338,14 @@ export class WorkspaceLifecycleService {
         operation_id: op.id,
       });
       await this.store.transaction(async (tx) => {
+        const initialization =
+          payload.initialization === undefined
+            ? undefined
+            : normalizeWorkspaceInitialization(
+                objectJson(payload.initialization),
+                gitInput?.refType,
+              );
+        await applyWorkspaceInitialization(tx, row.id, initialization);
         await tx.run(
           `UPDATE Workspaces SET lifecycle_state='READY',storage_state='PRESENT',root_device=?,root_inode=?,root_owner_token=?,
           content_inventory_hash=?,file_count=?,total_bytes=?,last_error_code=NULL,updatedAt=? WHERE id=?`,

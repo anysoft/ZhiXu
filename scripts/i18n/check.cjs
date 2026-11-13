@@ -45,6 +45,73 @@ function inventory() {
         ts.ScriptTarget.Latest,
         true,
       );
+    const v2Module = path.join(root, 'src/v2/i18n');
+    const v2TextImports = new Set(),
+      v2HookImports = new Set();
+    for (const statement of sf.statements) {
+      if (
+        !ts.isImportDeclaration(statement) ||
+        !ts.isStringLiteral(statement.moduleSpecifier)
+      )
+        continue;
+      if (
+        path
+          .resolve(path.dirname(full), statement.moduleSpecifier.text)
+          .replace(/\.[jt]sx?$/, '') !== v2Module
+      )
+        continue;
+      const bindings = statement.importClause?.namedBindings;
+      if (!bindings || !ts.isNamedImports(bindings)) continue;
+      for (const specifier of bindings.elements) {
+        const exported = (specifier.propertyName || specifier.name).text;
+        if (exported === 'text') v2TextImports.add(specifier.name.text);
+        if (exported === 'useText') v2HookImports.add(specifier.name.text);
+      }
+    }
+    if (full.replace(/\.ts$/, '') === v2Module) v2TextImports.add('text');
+    // Resolve the nearest lexical binding; an unrelated function called `t`
+    // remains checked as before and is never assigned this namespace by path.
+    function isV2TextCall(node) {
+      if (!ts.isIdentifier(node.expression)) return false;
+      const name = node.expression.text;
+      for (let scope = node.parent; scope; scope = scope.parent) {
+        if (
+          ts.isFunctionLike(scope) &&
+          scope.parameters.some(
+            (parameter) =>
+              ts.isIdentifier(parameter.name) && parameter.name.text === name,
+          )
+        )
+          return false;
+        if (!ts.isBlock(scope) && !ts.isSourceFile(scope)) continue;
+        for (const statement of scope.statements) {
+          if (!ts.isVariableStatement(statement)) continue;
+          for (const declaration of statement.declarationList.declarations) {
+            if (
+              !ts.isIdentifier(declaration.name) ||
+              declaration.name.text !== name
+            )
+              continue;
+            const value = declaration.initializer;
+            return (
+              !!value &&
+              ts.isCallExpression(value) &&
+              ts.isIdentifier(value.expression) &&
+              v2HookImports.has(value.expression.text)
+            );
+          }
+        }
+      }
+      return v2TextImports.has(name);
+    }
+    function literalKeys(node) {
+      if (!node) return [];
+      if (ts.isStringLiteral(node) || ts.isNoSubstitutionTemplateLiteral(node))
+        return [node.text];
+      if (ts.isConditionalExpression(node))
+        return [...literalKeys(node.whenTrue), ...literalKeys(node.whenFalse)];
+      return [];
+    }
     toasts.push(...inspectToasts(sf).map((toast) => ({ file, ...toast })));
     const add = (n, value, kind) =>
       literals.push({
@@ -92,16 +159,23 @@ function inventory() {
       return false;
     }
     function visit(n) {
-      if (
-        ts.isCallExpression(n) &&
-        /^(intl\.(get|getHTML)|tr|t)$/.test(n.expression.getText(sf)) &&
-        ts.isStringLiteral(n.arguments[0])
-      )
-        calls.push({
-          file,
-          line: sf.getLineAndCharacterOfPosition(n.getStart(sf)).line + 1,
-          key: n.arguments[0].text,
-        });
+      if (ts.isCallExpression(n)) {
+        const namespaced = isV2TextCall(n);
+        if (
+          namespaced ||
+          /^(intl\.(get|getHTML)|tr|t)$/.test(n.expression.getText(sf))
+        )
+          for (const key of namespaced
+            ? literalKeys(n.arguments[0])
+            : ts.isStringLiteral(n.arguments[0])
+            ? [n.arguments[0].text]
+            : [])
+            calls.push({
+              file,
+              line: sf.getLineAndCharacterOfPosition(n.getStart(sf)).line + 1,
+              key: namespaced ? 'v2.' + key : key,
+            });
+      }
       if (ts.isJsxText(n) && /[A-Za-z\u3400-\u9fff]/.test(n.text))
         add(n, n.text.trim().replace(/\s+/g, ' '), 'jsx-text');
       if (
@@ -124,20 +198,23 @@ function check() {
   const resources = {},
     duplicates = [];
   for (const locale of ['zh-CN', 'en-US']) {
-    const file = path.join(root, 'src/locales', locale + '.json'),
-      raw = fs.readFileSync(file, 'utf8'),
-      sf = ts.parseJsonText(file, raw),
-      seen = new Set();
-    function visit(n) {
-      if (ts.isPropertyAssignment(n)) {
-        const key = n.name.text;
-        if (seen.has(key)) duplicates.push({ locale, key });
-        seen.add(key);
+    const seen = new Set();
+    resources[locale] = {};
+    for (const directory of ['src/locales', 'src/v2/locales']) {
+      const file = path.join(root, directory, locale + '.json'),
+        raw = fs.readFileSync(file, 'utf8'),
+        sf = ts.parseJsonText(file, raw);
+      function visit(n) {
+        if (ts.isPropertyAssignment(n)) {
+          const key = n.name.text;
+          if (seen.has(key)) duplicates.push({ locale, key });
+          seen.add(key);
+        }
+        ts.forEachChild(n, visit);
       }
-      ts.forEachChild(n, visit);
+      visit(sf);
+      Object.assign(resources[locale], JSON.parse(raw));
     }
-    visit(sf);
-    resources[locale] = JSON.parse(raw);
   }
   const { literals, calls, toasts } = inventory(),
     zh = resources['zh-CN'],
@@ -186,7 +263,7 @@ function check() {
   });
   const semanticErrors = Object.keys(zh).filter(
     (key) =>
-      /^(ui|status|error|common|field|validation|settings)\./.test(key) &&
+      /^(ui|status|error|common|field|validation|settings|v2)\./.test(key) &&
       !/^([a-zA-Z][a-zA-Z0-9]*\.)+[A-Za-z0-9_]+$/.test(key),
   );
   return {

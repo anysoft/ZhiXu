@@ -546,8 +546,13 @@ export class TaskService {
       fail('TASK_NOT_READY');
     return this.update(id, expectedVersion, { enabled });
   }
-  async clone(id: number, name?: string) {
+  async clone(id: number, name?: string, expectedVersion?: number) {
     const source = await this.get(id);
+    if (
+      expectedVersion !== undefined &&
+      source.task.version !== expectedVersion
+    )
+      fail('TASK_VERSION_CONFLICT');
     const input: TaskWrite = {
       name: name ?? source.task.name + ' copy',
       description: source.task.description,

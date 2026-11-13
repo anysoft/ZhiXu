@@ -10,8 +10,14 @@ export { resolveLocale, normalizePreference } from './language';
 export type { EffectiveLocale, LanguagePreference } from './language';
 
 export const resources: Record<EffectiveLocale, Record<string, string>> = {
-  'zh-CN': require('../locales/zh-CN.json'),
-  'en-US': require('../locales/en-US.json'),
+  'zh-CN': {
+    ...require('../locales/zh-CN.json'),
+    ...require('../v2/locales/zh-CN.json'),
+  },
+  'en-US': {
+    ...require('../locales/en-US.json'),
+    ...require('../v2/locales/en-US.json'),
+  },
 };
 let frameworkApply: ((locale: EffectiveLocale) => void) | undefined;
 let ready = false;

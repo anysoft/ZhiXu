@@ -158,6 +158,22 @@ export class WorkspaceGitAdapter {
       GIT_ATTR_NOSYSTEM: '1',
     };
   }
+  /** Candidate API command adapters retain the same checked argv and FD supervisor. */
+  withCommands<T>(
+    leases: WorkspaceLease[],
+    options: WorkspaceGitOptions,
+    action: (
+      run: (
+        args: string[],
+        cwd: string,
+        environment?: NodeJS.ProcessEnv,
+        allowFailure?: boolean,
+      ) => Promise<{ code: number; stdout: string; stderr: string }>,
+    ) => Promise<T>,
+  ): Promise<T> {
+    return this.supervised(leases, options, action);
+  }
+
   private async supervised<T>(
     leases: WorkspaceLease[],
     options: WorkspaceGitOptions,
@@ -180,7 +196,7 @@ export class WorkspaceGitAdapter {
     ];
     const guard = new WorkspaceGuard(
       spawn(
-        'python3',
+        '/usr/bin/python3',
         [
           '-I',
           '-S',
