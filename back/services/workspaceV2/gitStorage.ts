@@ -237,7 +237,12 @@ async function repository(
   return { row: rows[0], key, bare, resolver };
 }
 
-async function safeConfiguration(bare: string, cwd: string, fds: number[]) {
+async function safeConfiguration(
+  bare: string,
+  cwd: string,
+  fds: number[],
+  objectFailureCode = 'WORKSPACE_RECOVERY_REQUIRED',
+) {
   await withGit(cwd, fds, async (run) => {
     const text = (
       await run([
@@ -269,7 +274,12 @@ async function safeConfiguration(bare: string, cwd: string, fds: number[]) {
         .stdout !== 'true'
     )
       fail('WORKSPACE_RECOVERY_REQUIRED');
-    await run(['--git-dir', bare, 'fsck', '--full', '--strict']);
+    const objects = await run(
+      ['--git-dir', bare, 'fsck', '--full', '--strict'],
+      undefined,
+      true,
+    );
+    if (objects.code) fail(objectFailureCode);
   });
 }
 
@@ -712,7 +722,12 @@ export async function verifyGitRepositoryAsset(
   store: WorkspaceStore,
   dataRoot: string,
   id: number,
-  options: { relocated?: boolean; leaseFds?: number[] } = {},
+  options: {
+    relocated?: boolean;
+    leaseFds?: number[];
+    /** Candidate sync may distinguish corrupt/missing objects after the same ownership scan. */
+    objectFailureCode?: 'MISSING_OBJECT';
+  } = {},
 ): Promise<GitRepositoryAssetProof> {
   const asset = await repository(
     store,
@@ -783,7 +798,12 @@ export async function verifyGitRepositoryAsset(
         fail('WORKSPACE_RECOVERY_REQUIRED');
     }
   });
-  await safeConfiguration(asset.bare, dataRoot, options.leaseFds ?? []);
+  await safeConfiguration(
+    asset.bare,
+    dataRoot,
+    options.leaseFds ?? [],
+    options.objectFailureCode,
+  );
   const after = await fs.lstat(asset.bare);
   if (
     !after.isDirectory() ||

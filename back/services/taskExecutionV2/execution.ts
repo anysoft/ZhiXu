@@ -19,6 +19,12 @@ import type { FaultHook } from '../workspaceV2/types';
 import { WorkspaceExecutionPaths } from './paths';
 import { WorkspaceExecutionResolver } from './resolver';
 import { WorkspaceAttemptRunner } from './runner';
+import {
+  currentGitAdmission,
+  frozenGitUpdateAdmission,
+  sameAdmission,
+  GitUpdateAdmissionFact,
+} from './gitUpdateAdmission';
 import type {
   AdmissionSnapshot,
   RunRow,
@@ -65,6 +71,9 @@ interface EventRow {
   trigger_id: number | null;
   status: string;
   workspace_update_id: number | null;
+  origin_trigger_id: number;
+  event_key: string;
+  metadata: string;
 }
 
 /** One durable queue: TaskRuns. Memory only tracks locally owned process cancellation. */
@@ -237,9 +246,40 @@ export class TaskExecutionService {
         if (duplicate)
           return this.replay(duplicate, taskId, trigger, mode, options.eventId);
         const selected = await this.resolver.resources.definition(taskId);
-        const expected = await this.resolver.admission(taskId);
+        let expected: AdmissionSnapshot;
+        if (trigger === 'GIT_UPDATE') {
+          const workspace = await this.store.assertAccessible(
+            selected.workspace.id,
+            false,
+          );
+          if (workspace.lifecycle_state !== 'READY')
+            fail('WORKSPACE_NOT_READY');
+          const git = (
+            await tx.all<{
+              last_verified_commit: string | null;
+              applied_commit: string | null;
+              resolved_commit: string;
+            }>(
+              'SELECT last_verified_commit,applied_commit,resolved_commit FROM GitWorkspaces WHERE workspace_id=?',
+              [selected.workspace.id],
+            )
+          )[0];
+          if (!git || selected.workspace.type !== 'GIT')
+            fail('TRIGGER_EVENT_INVALID');
+          expected = currentGitAdmission(
+            selected,
+            git.last_verified_commit ||
+              git.applied_commit ||
+              git.resolved_commit,
+          );
+        } else expected = await this.resolver.admission(taskId);
         let skip: string | null =
           automatic && !selected.task.enabled ? 'TASK_DISABLED' : null;
+        let supersededReason:
+          | 'SOURCE_CHANGED'
+          | 'TASK_CHANGED'
+          | 'RESOURCE_CHANGED'
+          | undefined;
         let event: EventRow | undefined;
         if (options.eventId !== undefined) {
           event = (
@@ -264,31 +304,30 @@ export class TaskExecutionService {
           if (!tr?.enabled) skip = 'TRIGGER_DISABLED';
           if (trigger === 'GIT_UPDATE') {
             const update = (
-              await tx.all<{
-                source_generation: number;
-                content_revision: number;
-                inventory_hash: string;
-                after_commit: string;
-              }>(
-                'SELECT source_generation,content_revision,inventory_hash,after_commit FROM WorkspaceUpdateOutbox WHERE id=? AND workspace_id=?',
+              await tx.all<GitUpdateAdmissionFact>(
+                'SELECT id,workspace_id,source_generation,content_revision,inventory_hash,after_commit,initial,trigger_plan FROM WorkspaceUpdateOutbox WHERE id=? AND workspace_id=?',
                 [event.workspace_update_id, expected.workspace_id],
               )
             )[0];
             if (!update) fail('TRIGGER_EVENT_INVALID');
-            if (
-              update.source_generation !==
-                expected.expected_source_generation ||
-              update.content_revision !== expected.expected_content_revision ||
-              update.inventory_hash !== expected.expected_inventory_hash ||
-              update.after_commit !== expected.expected_git_commit
-            )
+            const pinned = frozenGitUpdateAdmission(event, update, taskId);
+            if (!sameAdmission(expected, pinned)) {
               skip = 'SOURCE_SUPERSEDED';
-            Object.assign(expected, {
-              expected_source_generation: update.source_generation,
-              expected_content_revision: update.content_revision,
-              expected_inventory_hash: update.inventory_hash,
-              expected_git_commit: update.after_commit,
-            });
+              supersededReason =
+                expected.expected_task_definition_version !==
+                pinned.expected_task_definition_version
+                  ? 'TASK_CHANGED'
+                  : expected.expected_source_generation !==
+                      pinned.expected_source_generation ||
+                    expected.expected_content_revision !==
+                      pinned.expected_content_revision ||
+                    expected.expected_inventory_hash !==
+                      pinned.expected_inventory_hash ||
+                    expected.expected_git_commit !== pinned.expected_git_commit
+                  ? 'SOURCE_CHANGED'
+                  : 'RESOURCE_CHANGED';
+            }
+            expected = pinned;
           }
         }
         const pending = (
@@ -367,13 +406,24 @@ export class TaskExecutionService {
         );
         await this.event(result.lastID, 'SUBMISSION_IDENTITY', {
           task_id: taskId,
-          task_definition_version: selected.task.version,
+          task_definition_version: expected.expected_task_definition_version,
         });
-        if (event)
-          await tx.run(
-            'UPDATE TriggerEvents SET task_run_id=?,status=? WHERE id=?',
-            [result.lastID, skip ? 'SKIPPED' : 'SUBMITTED', event.id],
-          );
+        if (supersededReason)
+          await this.event(result.lastID, 'SOURCE_SUPERSEDED', {
+            reason: supersededReason,
+          });
+        if (event) {
+          if (trigger === 'GIT_UPDATE')
+            await tx.run(
+              'UPDATE TriggerEvents SET task_run_id=?,status=?,error_code=?,owner_token=NULL,claimed_at=NULL,claim_expires_at=NULL WHERE id=?',
+              [result.lastID, skip ? 'SKIPPED' : 'SUBMITTED', skip, event.id],
+            );
+          else
+            await tx.run(
+              'UPDATE TriggerEvents SET task_run_id=?,status=? WHERE id=?',
+              [result.lastID, skip ? 'SKIPPED' : 'SUBMITTED', event.id],
+            );
+        }
         return this.get(result.lastID);
       }),
     );
@@ -457,6 +507,8 @@ export class TaskExecutionService {
         });
       const heads = await this.store.all<RunRow>(
         `SELECT r.* FROM TaskRuns r WHERE r.status='QUEUED' AND r.next_eligible_at<=?
+        AND NOT EXISTS(SELECT 1 FROM WorkspaceSyncRuns s JOIN Workspaces w ON w.id=s.workspace_id
+          WHERE s.workspace_id=r.workspace_id AND s.status IN ('RUNNING','RECOVERY_REQUIRED') AND w.lifecycle_state='RECOVERY_REQUIRED')
         AND NOT EXISTS(SELECT 1 FROM TaskRuns q WHERE q.workspace_id=r.workspace_id AND q.status='QUEUED'
           AND (q.submitted_at<r.submitted_at OR q.submitted_at=r.submitted_at AND q.id<r.id)) ORDER BY r.workspace_id LIMIT ?`,
         [now, this.limits.maxQueued],
