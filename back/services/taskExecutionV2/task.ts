@@ -357,7 +357,12 @@ export class TaskService {
         );
         await this.roots.requireReady(row, lease);
         const { validateSourceUnderLease } = await import('./resources');
-        await validateSourceUnderLease(this.store, this.roots, v.source, lease);
+        const verified = await validateSourceUnderLease(
+          this.store,
+          this.roots,
+          v.source,
+          lease,
+        );
         await this.enabledResources(v);
         if (
           discovered &&
@@ -366,9 +371,15 @@ export class TaskService {
             !/^[a-f0-9]{64}$/.test(discovered.discovery_key))
         )
           fail('TASK_IDENTITY_INVALID', 400);
-        const id = await this.store.transaction((tx) =>
-          this.insertTask(tx, input, discovered),
-        );
+        const id = await this.store.transaction(async (tx) => {
+          const id = await this.insertTask(tx, input, discovered);
+          if (verified.git)
+            await tx.run(
+              'UPDATE GitWorkspaces SET last_verified_commit=? WHERE workspace_id=?',
+              [verified.git.head, row.id],
+            );
+          return id;
+        });
         return this.get(id);
       },
     );
@@ -457,6 +468,7 @@ export class TaskService {
     const ids = [
       ...new Set([previous.task.workspace_id, v.source.workspace_id]),
     ].sort((a, b) => a - b);
+    let verifiedGitHead: string | null = null;
     const action = async () =>
       this.store.transaction(async (tx) => {
         const fresh = await loadTaskDefinition(tx, id);
@@ -494,6 +506,11 @@ export class TaskService {
           ],
         );
         await this.saveChildren(tx, id, v.runtime, v.settings);
+        if (verifiedGitHead)
+          await tx.run(
+            'UPDATE GitWorkspaces SET last_verified_commit=? WHERE workspace_id=?',
+            [verifiedGitHead, v.source.workspace_id],
+          );
       });
     const lock = async (index: number): Promise<void> => {
       if (index === ids.length) {
@@ -508,12 +525,13 @@ export class TaskService {
           await this.roots.requireReady(ws, lease);
           if (ids[index] === v.source.workspace_id) {
             const { validateSourceUnderLease } = await import('./resources');
-            await validateSourceUnderLease(
+            const verified = await validateSourceUnderLease(
               this.store,
               this.roots,
               v.source,
               lease,
             );
+            verifiedGitHead = verified.git?.head ?? null;
             await this.enabledResources(v);
           }
           await lock(index + 1);

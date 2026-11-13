@@ -336,9 +336,19 @@ export class WorkspaceRestoreService {
               [row.id],
             )
           )[0];
-          await inspectGitWorkspace(store, root, current, git, {
-            repair: true,
-          });
+          const verified = await inspectGitWorkspace(
+            store,
+            root,
+            current,
+            git,
+            {
+              repair: true,
+            },
+          );
+          await store.run(
+            'UPDATE GitWorkspaces SET last_verified_commit=? WHERE workspace_id=?',
+            [verified.head, row.id],
+          );
         }
       }
       await this.backup.domain.collect(store);
@@ -481,6 +491,9 @@ export class WorkspaceRestoreService {
           });
           await this.reconcile(j.target);
           await this.fault('restore-after-final-validation', {
+            operation_id: j.operation_id,
+          });
+          await this.fault('restore-before-complete', {
             operation_id: j.operation_id,
           });
           j.stage = 'COMPLETE';
