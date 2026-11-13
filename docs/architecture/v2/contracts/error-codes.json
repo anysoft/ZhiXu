@@ -1,0 +1,746 @@
+{
+  "status": "TECHNICAL_CONTRACT_READY_FOR_APPROVAL",
+  "transport_note": "http_status applies to direct request rejection; accepted TaskRun/SyncRun terminal result remains under 200/202 envelope with its own error_code. No blind retry of terminal SKIPPED runs.",
+  "errors": [
+    {
+      "code": "INVALID_REQUEST",
+      "http_status": 400,
+      "retryable": false,
+      "safe_message": "Request fields are invalid.",
+      "affected_resource": "REQUEST",
+      "operation": "VALIDATE",
+      "recovery_action": "Correct the request; unknown fields are rejected.",
+      "current_source_mapping": "back/api/codeWorkspace.ts validate"
+    },
+    {
+      "code": "AUTHENTICATION_REQUIRED",
+      "http_status": 401,
+      "retryable": false,
+      "safe_message": "A valid Panel session is required.",
+      "affected_resource": "SESSION",
+      "operation": "AUTHENTICATE",
+      "recovery_action": "Log in again; do not retry the same invalid credential.",
+      "current_source_mapping": "existing credentials_required / invalid_token normalized at new protected boundary"
+    },
+    {
+      "code": "PANEL_SESSION_REQUIRED",
+      "http_status": 403,
+      "retryable": false,
+      "safe_message": "This operation requires a Panel session.",
+      "affected_resource": "SESSION",
+      "operation": "AUTHORIZE",
+      "recovery_action": "Use an authenticated Panel session; App tokens and webhooks cannot invoke this route.",
+      "current_source_mapping": "existing new-domain wrappers"
+    },
+    {
+      "code": "IDEMPOTENCY_KEY_INVALID",
+      "http_status": 400,
+      "retryable": false,
+      "safe_message": "Idempotency key is invalid.",
+      "affected_resource": "REQUEST",
+      "operation": "ADMIT",
+      "recovery_action": "Use 1..200 visible ASCII characters.",
+      "current_source_mapping": "NEW"
+    },
+    {
+      "code": "IDEMPOTENCY_KEY_CONFLICT",
+      "http_status": 409,
+      "retryable": false,
+      "safe_message": "Idempotency key was used for a different request.",
+      "affected_resource": "REQUEST",
+      "operation": "ADMIT",
+      "recovery_action": "Use a new key only for an intentionally new operation.",
+      "current_source_mapping": "NEW"
+    },
+    {
+      "code": "WORKSPACE_NOT_FOUND",
+      "http_status": 404,
+      "retryable": false,
+      "safe_message": "Workspace was not found.",
+      "affected_resource": "WORKSPACE",
+      "operation": "READ",
+      "recovery_action": "Refresh the resource list; never infer another resource by name.",
+      "current_source_mapping": "NEW"
+    },
+    {
+      "code": "WORKSPACE_TYPE_INVALID",
+      "http_status": 422,
+      "retryable": false,
+      "safe_message": "Workspace type does not support this request.",
+      "affected_resource": "WORKSPACE",
+      "operation": "VALIDATE",
+      "recovery_action": "Choose a valid type/ref combination; LOCAL never receives Git operations.",
+      "current_source_mapping": "NEW"
+    },
+    {
+      "code": "WORKSPACE_NOT_READY",
+      "http_status": 409,
+      "retryable": false,
+      "safe_message": "Workspace is not ready for this operation.",
+      "affected_resource": "WORKSPACE",
+      "operation": "ADMIT",
+      "recovery_action": "Inspect lifecycle/storage state; unarchive or repair explicitly.",
+      "current_source_mapping": "NEW"
+    },
+    {
+      "code": "WORKSPACE_BUSY",
+      "http_status": 409,
+      "retryable": true,
+      "safe_message": "Workspace is in use.",
+      "affected_resource": "WORKSPACE",
+      "operation": "ACQUIRE_LEASE",
+      "recovery_action": "Wait or poll the active operation; preserve unsaved editor buffers.",
+      "current_source_mapping": "existing WORKTREE_BUSY / CONFIG_WORKSPACE_BUSY normalized at Workspace API boundary"
+    },
+    {
+      "code": "WORKSPACE_REFERENCED",
+      "http_status": 409,
+      "retryable": false,
+      "safe_message": "Workspace has references that block deletion.",
+      "affected_resource": "WORKSPACE",
+      "operation": "DELETE",
+      "recovery_action": "Rebind or delete Tasks explicitly and finish active recovery; history alone does not block file reclaim.",
+      "current_source_mapping": "NEW"
+    },
+    {
+      "code": "WORKSPACE_VERSION_CONFLICT",
+      "http_status": 409,
+      "retryable": false,
+      "safe_message": "Workspace version changed.",
+      "affected_resource": "WORKSPACE",
+      "operation": "COMPARE_AND_SWAP",
+      "recovery_action": "Reload and explicitly submit a new version; do not blind-retry.",
+      "current_source_mapping": "NEW"
+    },
+    {
+      "code": "WORKSPACE_PATH_INVALID",
+      "http_status": 400,
+      "retryable": false,
+      "safe_message": "Workspace path is invalid or unsafe.",
+      "affected_resource": "WORKSPACE_PATH",
+      "operation": "VALIDATE",
+      "recovery_action": "Use a normalized relative path; no absolute paths, traversal, links or special files.",
+      "current_source_mapping": "existing PATH_CONFLICT / WORKSPACE_PATH_INVALID mapped without raw path"
+    },
+    {
+      "code": "WORKSPACE_PATH_FORBIDDEN",
+      "http_status": 403,
+      "retryable": false,
+      "safe_message": "This Workspace path is protected.",
+      "affected_resource": "WORKSPACE_PATH",
+      "operation": "AUTHORIZE",
+      "recovery_action": "Do not access Git administration or platform journal paths.",
+      "current_source_mapping": "NEW"
+    },
+    {
+      "code": "WORKSPACE_FILE_NOT_FOUND",
+      "http_status": 404,
+      "retryable": false,
+      "safe_message": "Workspace file was not found.",
+      "affected_resource": "WORKSPACE_FILE",
+      "operation": "READ",
+      "recovery_action": "Refresh the tree and Task readiness.",
+      "current_source_mapping": "NEW"
+    },
+    {
+      "code": "WORKSPACE_FILE_CONFLICT",
+      "http_status": 409,
+      "retryable": false,
+      "safe_message": "Workspace file changed.",
+      "affected_resource": "WORKSPACE_FILE",
+      "operation": "COMPARE_AND_SWAP",
+      "recovery_action": "Keep the draft, read the latest file and compare before saving.",
+      "current_source_mapping": "existing WORKSPACE_FILE_CONFLICT / FILE_CONFLICT normalized"
+    },
+    {
+      "code": "WORKSPACE_DESTINATION_EXISTS",
+      "http_status": 409,
+      "retryable": false,
+      "safe_message": "The destination already exists.",
+      "affected_resource": "WORKSPACE_FILE",
+      "operation": "CREATE_OR_RENAME",
+      "recovery_action": "Choose another destination; no overwrite fallback.",
+      "current_source_mapping": "NEW"
+    },
+    {
+      "code": "WORKSPACE_FILE_REFERENCED",
+      "http_status": 409,
+      "retryable": false,
+      "safe_message": "A Task references this entry.",
+      "affected_resource": "WORKSPACE_FILE",
+      "operation": "DELETE_OR_RENAME",
+      "recovery_action": "Explicitly rebind or delete referenced Tasks first.",
+      "current_source_mapping": "NEW"
+    },
+    {
+      "code": "WORKSPACE_RECOVERY_REQUIRED",
+      "http_status": 409,
+      "retryable": false,
+      "safe_message": "Workspace recovery must complete first.",
+      "affected_resource": "WORKSPACE",
+      "operation": "ADMIT",
+      "recovery_action": "Inspect the safe recovery status; only the recovery owner may continue.",
+      "current_source_mapping": "NEW"
+    },
+    {
+      "code": "WORKSPACE_OPERATION_NOT_FOUND",
+      "http_status": 404,
+      "retryable": false,
+      "safe_message": "Workspace operation was not found.",
+      "affected_resource": "WORKSPACE_OPERATION",
+      "operation": "READ",
+      "recovery_action": "Refresh operation history.",
+      "current_source_mapping": "NEW"
+    },
+    {
+      "code": "WORKSPACE_PRESERVATION_REQUIRED",
+      "http_status": 409,
+      "retryable": false,
+      "safe_message": "A verified preservation backup is required.",
+      "affected_resource": "WORKSPACE",
+      "operation": "RECLAIM",
+      "recovery_action": "Create/validate a backup covering the current generation, revision and inventory; no force bypass.",
+      "current_source_mapping": "NEW"
+    },
+    {
+      "code": "WORKSPACE_FILE_TOO_LARGE",
+      "http_status": 413,
+      "retryable": false,
+      "safe_message": "The file exceeds the configured byte limit.",
+      "affected_resource": "WORKSPACE_FILE",
+      "operation": "WRITE",
+      "recovery_action": "Reduce the file size or explicitly revise validated deployment limits.",
+      "current_source_mapping": "NEW"
+    },
+    {
+      "code": "WORKSPACE_QUOTA_EXCEEDED",
+      "http_status": 422,
+      "retryable": false,
+      "safe_message": "Workspace capacity would be exceeded.",
+      "affected_resource": "WORKSPACE",
+      "operation": "WRITE",
+      "recovery_action": "Free safe capacity or request a validated limit change.",
+      "current_source_mapping": "NEW"
+    },
+    {
+      "code": "WORKSPACE_SEARCH_LIMIT",
+      "http_status": 422,
+      "retryable": false,
+      "safe_message": "Search exceeds the configured scope.",
+      "affected_resource": "WORKSPACE",
+      "operation": "SEARCH",
+      "recovery_action": "Narrow the path/query; a bounded truncated result is preferred when safe.",
+      "current_source_mapping": "NEW"
+    },
+    {
+      "code": "DISK_BUDGET_EXCEEDED",
+      "http_status": 507,
+      "retryable": true,
+      "safe_message": "Insufficient reserved disk budget.",
+      "affected_resource": "STORAGE",
+      "operation": "RESERVE",
+      "recovery_action": "Free capacity; existing user content remains unchanged.",
+      "current_source_mapping": "NEW"
+    },
+    {
+      "code": "GIT_DIRTY",
+      "http_status": 409,
+      "retryable": false,
+      "safe_message": "Git Workspace has uncommitted changes.",
+      "affected_resource": "WORKSPACE",
+      "operation": "SYNC",
+      "recovery_action": "Review and commit changes; no automatic reset or clean.",
+      "current_source_mapping": "WORKTREE_DIRTY in back/services/worktree.ts:359"
+    },
+    {
+      "code": "GIT_DIVERGED",
+      "http_status": 409,
+      "retryable": false,
+      "safe_message": "Git history has diverged.",
+      "affected_resource": "WORKSPACE",
+      "operation": "SYNC",
+      "recovery_action": "Resolve history explicitly; automatic fast-forward is blocked.",
+      "current_source_mapping": "WORKTREE_DIVERGED in back/services/worktree.ts:368"
+    },
+    {
+      "code": "GIT_LOCAL_COMMITS",
+      "http_status": 409,
+      "retryable": false,
+      "safe_message": "Git Workspace contains local commits.",
+      "affected_resource": "WORKSPACE",
+      "operation": "SYNC",
+      "recovery_action": "Preserve/review local commits before updating.",
+      "current_source_mapping": "WORKTREE_LOCAL_COMMITS in back/services/worktree.ts:369"
+    },
+    {
+      "code": "GIT_CONFLICT",
+      "http_status": 409,
+      "retryable": false,
+      "safe_message": "Git Workspace has conflicts.",
+      "affected_resource": "WORKSPACE",
+      "operation": "GIT_MUTATE",
+      "recovery_action": "Resolve conflicts explicitly without overwriting user data.",
+      "current_source_mapping": "WORKTREE_CONFLICT in back/services/worktree.ts:358"
+    },
+    {
+      "code": "GIT_WRITE_REQUIRED",
+      "http_status": 403,
+      "retryable": false,
+      "safe_message": "A write-capable Git credential is required.",
+      "affected_resource": "REPOSITORY",
+      "operation": "GIT_PUSH",
+      "recovery_action": "Select a permitted write credential; never echo credential output.",
+      "current_source_mapping": "NEW"
+    },
+    {
+      "code": "REF_NOT_FOUND",
+      "http_status": 404,
+      "retryable": false,
+      "safe_message": "The selected Git ref was not found.",
+      "affected_resource": "REPOSITORY",
+      "operation": "RESOLVE_REF",
+      "recovery_action": "Refresh remote refs or choose a verified commit.",
+      "current_source_mapping": "existing REF_NOT_FOUND"
+    },
+    {
+      "code": "REPOSITORY_NOT_FOUND",
+      "http_status": 404,
+      "retryable": false,
+      "safe_message": "Repository was not found.",
+      "affected_resource": "REPOSITORY",
+      "operation": "READ",
+      "recovery_action": "Choose an existing Repository.",
+      "current_source_mapping": "existing Repository resource code"
+    },
+    {
+      "code": "SYNC_POLICY_INVALID",
+      "http_status": 422,
+      "retryable": false,
+      "safe_message": "Sync policy is invalid for this Workspace/ref.",
+      "affected_resource": "WORKSPACE_SYNC_POLICY",
+      "operation": "SAVE",
+      "recovery_action": "Use Branch for scheduled sync; Tag/Commit stay pinned.",
+      "current_source_mapping": "NEW"
+    },
+    {
+      "code": "SYNC_ALREADY_RUNNING",
+      "http_status": 409,
+      "retryable": true,
+      "safe_message": "A sync is already active for this Workspace.",
+      "affected_resource": "WORKSPACE_SYNC_RUN",
+      "operation": "ADMIT",
+      "recovery_action": "Poll the existing SyncRun; the same idempotency key returns that run.",
+      "current_source_mapping": "NEW"
+    },
+    {
+      "code": "SYNC_RECOVERY_REQUIRED",
+      "http_status": 409,
+      "retryable": false,
+      "safe_message": "Sync reconciliation must be recovered.",
+      "affected_resource": "WORKSPACE_SYNC_RUN",
+      "operation": "SYNC",
+      "recovery_action": "Resume the journal-owned run; verify actual HEAD, never reset.",
+      "current_source_mapping": "NEW"
+    },
+    {
+      "code": "WORKSPACE_SYNC_RUN_NOT_FOUND",
+      "http_status": 404,
+      "retryable": false,
+      "safe_message": "Sync run was not found.",
+      "affected_resource": "WORKSPACE_SYNC_RUN",
+      "operation": "READ",
+      "recovery_action": "Refresh Workspace sync history.",
+      "current_source_mapping": "NEW"
+    },
+    {
+      "code": "DISCOVERY_PREVIEW_STALE",
+      "http_status": 409,
+      "retryable": false,
+      "safe_message": "Discovery preview is stale.",
+      "affected_resource": "WORKSPACE_DISCOVERY_POLICY",
+      "operation": "APPLY",
+      "recovery_action": "Generate a new preview against current policy, source and Task versions.",
+      "current_source_mapping": "NEW"
+    },
+    {
+      "code": "DISCOVERY_VERSION_CONFLICT",
+      "http_status": 409,
+      "retryable": false,
+      "safe_message": "Discovery policy changed.",
+      "affected_resource": "WORKSPACE_DISCOVERY_POLICY",
+      "operation": "COMPARE_AND_SWAP",
+      "recovery_action": "Reload the policy and request a new preview.",
+      "current_source_mapping": "NEW"
+    },
+    {
+      "code": "DISCOVERY_RECONCILIATION_FAILED",
+      "http_status": 409,
+      "retryable": false,
+      "safe_message": "Discovery reconciliation did not complete.",
+      "affected_resource": "WORKSPACE_SYNC_RUN",
+      "operation": "RECONCILE",
+      "recovery_action": "Inspect safe phase details; applied content remains fenced until recovery.",
+      "current_source_mapping": "NEW"
+    },
+    {
+      "code": "TASK_NOT_FOUND",
+      "http_status": 404,
+      "retryable": false,
+      "safe_message": "Task was not found.",
+      "affected_resource": "TASK",
+      "operation": "READ",
+      "recovery_action": "Refresh Task list.",
+      "current_source_mapping": "existing TASK_NOT_FOUND"
+    },
+    {
+      "code": "TASK_VERSION_CONFLICT",
+      "http_status": 409,
+      "retryable": false,
+      "safe_message": "Task definition changed.",
+      "affected_resource": "TASK",
+      "operation": "COMPARE_AND_SWAP",
+      "recovery_action": "Reload the Task and explicitly reapply the edit.",
+      "current_source_mapping": "NEW"
+    },
+    {
+      "code": "TASK_NOT_READY",
+      "http_status": 409,
+      "retryable": false,
+      "safe_message": "Task resources are not ready.",
+      "affected_resource": "TASK",
+      "operation": "RESOLVE",
+      "recovery_action": "Fix readiness diagnostics; no host runtime fallback.",
+      "current_source_mapping": "existing TASK_NOT_READY"
+    },
+    {
+      "code": "TASK_CONCURRENCY_FORBID",
+      "http_status": 409,
+      "retryable": false,
+      "safe_message": "Task concurrency policy forbids another pending run.",
+      "affected_resource": "TASK_RUN",
+      "operation": "SUBMIT",
+      "recovery_action": "Wait for the prior run; accepted events retain a SKIPPED run.",
+      "current_source_mapping": "existing TASK_CONCURRENCY_FORBID"
+    },
+    {
+      "code": "EXECUTION_QUEUE_FULL",
+      "http_status": 429,
+      "retryable": true,
+      "safe_message": "Execution queue is full.",
+      "affected_resource": "TASK_RUN",
+      "operation": "ADMIT",
+      "recovery_action": "Manual requests may retry later with a new intended request; trigger attempts persist SKIPPED and are not redelivered.",
+      "current_source_mapping": "NEW"
+    },
+    {
+      "code": "WORKSPACE_WAIT_TIMEOUT",
+      "http_status": 409,
+      "retryable": false,
+      "safe_message": "Workspace queue deadline expired.",
+      "affected_resource": "TASK_RUN",
+      "operation": "WAIT",
+      "recovery_action": "The run is SKIPPED; submit a new run explicitly if still intended.",
+      "current_source_mapping": "NEW"
+    },
+    {
+      "code": "SOURCE_MISSING",
+      "http_status": 409,
+      "retryable": false,
+      "safe_message": "Task source is missing.",
+      "affected_resource": "TASK_SOURCE",
+      "operation": "RESOLVE",
+      "recovery_action": "Restore the source or explicitly rebind the Task.",
+      "current_source_mapping": "existing SOURCE_MISSING readiness"
+    },
+    {
+      "code": "SOURCE_SUPERSEDED",
+      "http_status": 409,
+      "retryable": false,
+      "safe_message": "Source changed before execution.",
+      "affected_resource": "TASK_RUN",
+      "operation": "RESOLVE",
+      "recovery_action": "The run is SKIPPED; do not execute latest code under an old event or automatically retry.",
+      "current_source_mapping": "NEW"
+    },
+    {
+      "code": "SOURCE_UNVERIFIED",
+      "http_status": 409,
+      "retryable": false,
+      "safe_message": "Source identity could not be verified.",
+      "affected_resource": "WORKSPACE",
+      "operation": "RESOLVE",
+      "recovery_action": "Fence the Workspace and complete safe recovery; do not spawn a process.",
+      "current_source_mapping": "NEW"
+    },
+    {
+      "code": "ENV_PROFILE_NOT_FOUND",
+      "http_status": 404,
+      "retryable": false,
+      "safe_message": "Environment profile was not found.",
+      "affected_resource": "ENVIRONMENT_PROFILE",
+      "operation": "READ",
+      "recovery_action": "Choose an existing profile.",
+      "current_source_mapping": "existing ENV_PROFILE_NOT_FOUND"
+    },
+    {
+      "code": "ENV_PROFILE_WORKSPACE_MISMATCH",
+      "http_status": 422,
+      "retryable": false,
+      "safe_message": "Profile belongs to another Workspace.",
+      "affected_resource": "ENVIRONMENT_PROFILE",
+      "operation": "BIND",
+      "recovery_action": "Select a profile owned by the Task Workspace.",
+      "current_source_mapping": "ENV_PROFILE_REPOSITORY_MISMATCH / TASK_PROFILE_REPOSITORY_MISMATCH replaced at new owner boundary"
+    },
+    {
+      "code": "ENV_PROFILE_REFERENCED",
+      "http_status": 409,
+      "retryable": false,
+      "safe_message": "Profile is still referenced.",
+      "affected_resource": "ENVIRONMENT_PROFILE",
+      "operation": "DELETE",
+      "recovery_action": "Clear Workspace default and Task selections explicitly.",
+      "current_source_mapping": "NEW"
+    },
+    {
+      "code": "ENV_NAME_INVALID",
+      "http_status": 400,
+      "retryable": false,
+      "safe_message": "Environment variable name is invalid or reserved.",
+      "affected_resource": "ENVIRONMENT_VARIABLE",
+      "operation": "VALIDATE",
+      "recovery_action": "Choose an allowed application variable name.",
+      "current_source_mapping": "existing ENV_NAME_INVALID"
+    },
+    {
+      "code": "ENV_VALUE_INVALID",
+      "http_status": 400,
+      "retryable": false,
+      "safe_message": "Environment variable value is invalid.",
+      "affected_resource": "ENVIRONMENT_VARIABLE",
+      "operation": "VALIDATE",
+      "recovery_action": "Use a valid bounded literal value without NUL.",
+      "current_source_mapping": "existing ENV_VALUE_INVALID"
+    },
+    {
+      "code": "ENV_SECRET_ACTION_INVALID",
+      "http_status": 400,
+      "retryable": false,
+      "safe_message": "Secret update action is invalid.",
+      "affected_resource": "ENVIRONMENT_VARIABLE",
+      "operation": "WRITE",
+      "recovery_action": "Use explicit keep, replace_secret or clear semantics; no ambiguous simultaneous actions.",
+      "current_source_mapping": "NEW"
+    },
+    {
+      "code": "CONFIG_BINDING_INVALID",
+      "http_status": 400,
+      "retryable": false,
+      "safe_message": "Config binding is invalid.",
+      "affected_resource": "CONFIG_BINDING",
+      "operation": "VALIDATE",
+      "recovery_action": "Workspace only ATTACH; Task ATTACH/MASK; MASK has no asset/revision.",
+      "current_source_mapping": "existing CONFIG_BINDING_INVALID"
+    },
+    {
+      "code": "CONFIG_EDIT_CONFLICT",
+      "http_status": 409,
+      "retryable": false,
+      "safe_message": "Config binding changed.",
+      "affected_resource": "CONFIG_BINDING",
+      "operation": "COMPARE_AND_SWAP",
+      "recovery_action": "Reload the binding and explicitly save with its version.",
+      "current_source_mapping": "existing CONFIG_EDIT_CONFLICT"
+    },
+    {
+      "code": "CONFIG_REVISION_NOT_FOUND",
+      "http_status": 404,
+      "retryable": false,
+      "safe_message": "Config revision was not found.",
+      "affected_resource": "CONFIG_ASSET_REVISION",
+      "operation": "RESOLVE",
+      "recovery_action": "Select an immutable revision belonging to the selected asset.",
+      "current_source_mapping": "existing CONFIG_REVISION_NOT_FOUND"
+    },
+    {
+      "code": "PLATFORM_BACKUP_IN_PROGRESS",
+      "http_status": 503,
+      "retryable": true,
+      "safe_message": "Platform backup admission is closed.",
+      "affected_resource": "PLATFORM",
+      "operation": "ADMIT",
+      "recovery_action": "Retry after backup releases its barrier; do not bypass the barrier.",
+      "current_source_mapping": "existing PLATFORM_BACKUP_IN_PROGRESS"
+    },
+    {
+      "code": "RESTORE_PENDING",
+      "http_status": 503,
+      "retryable": false,
+      "safe_message": "Platform restore must finish first.",
+      "affected_resource": "PLATFORM",
+      "operation": "ADMIT",
+      "recovery_action": "Poll safe restore status; do not read source files or submit mutations.",
+      "current_source_mapping": "existing RESTORE_PENDING platform state normalized as safe code"
+    },
+    {
+      "code": "BACKUP_QUOTA_EXCEEDED",
+      "http_status": 422,
+      "retryable": false,
+      "safe_message": "Backup quota would be exceeded.",
+      "affected_resource": "BACKUP",
+      "operation": "SNAPSHOT",
+      "recovery_action": "Free only unheld backups or revise validated limits; preservation holds cannot be bypassed.",
+      "current_source_mapping": "NEW"
+    },
+    {
+      "code": "BACKUP_RECOVERY_REQUIRED",
+      "http_status": 409,
+      "retryable": false,
+      "safe_message": "Recovery must complete before backup.",
+      "affected_resource": "BACKUP",
+      "operation": "SNAPSHOT",
+      "recovery_action": "Recover Config/Node/Workspace journals first.",
+      "current_source_mapping": "existing BACKUP_RECOVERY_REQUIRED"
+    },
+    {
+      "code": "BACKUP_SOURCE_INCOMPLETE",
+      "http_status": 409,
+      "retryable": false,
+      "safe_message": "Backup source inventory is incomplete.",
+      "affected_resource": "BACKUP",
+      "operation": "VALIDATE",
+      "recovery_action": "Restore missing source/ownership consistency before snapshot.",
+      "current_source_mapping": "NEW"
+    },
+    {
+      "code": "WORKSPACE_OPERATION_FAILED",
+      "http_status": 500,
+      "retryable": false,
+      "safe_message": "Workspace operation failed.",
+      "affected_resource": "WORKSPACE_OPERATION",
+      "operation": "EXECUTE",
+      "recovery_action": "Inspect scrubbed diagnostics; do not expose raw exceptions.",
+      "current_source_mapping": "existing fallback WORKSPACE_OPERATION_FAILED"
+    },
+    {
+      "code": "WORKSPACE_ARCHIVED",
+      "http_status": 409,
+      "retryable": false,
+      "safe_message": "Workspace is archived.",
+      "affected_resource": "WORKSPACE",
+      "operation": "ADMIT_OR_ARCHIVE",
+      "recovery_action": "Unarchive explicitly and re-enable intended Tasks/policy; archive completion cancels queued operations without deleting history.",
+      "current_source_mapping": "NEW; queued accepted Run/Sync terminal CANCELLED result code, not a script exit failure"
+    },
+    {
+      "code": "TASK_RUN_NOT_FOUND",
+      "http_status": 404,
+      "retryable": false,
+      "safe_message": "Task run was not found.",
+      "affected_resource": "TASK_RUN",
+      "operation": "READ",
+      "recovery_action": "Refresh run history.",
+      "current_source_mapping": "back/services/executionService.ts:185 / runObservability.ts:187"
+    },
+    {
+      "code": "TRIGGER_NOT_FOUND",
+      "http_status": 404,
+      "retryable": false,
+      "safe_message": "Trigger was not found.",
+      "affected_resource": "TASK_TRIGGER",
+      "operation": "READ",
+      "recovery_action": "Refresh Task trigger list.",
+      "current_source_mapping": "back/services/taskTrigger.ts:115"
+    },
+    {
+      "code": "TRIGGER_VERSION_CONFLICT",
+      "http_status": 409,
+      "retryable": false,
+      "safe_message": "Trigger definition changed.",
+      "affected_resource": "TASK_TRIGGER",
+      "operation": "COMPARE_AND_SWAP",
+      "recovery_action": "Reload the trigger before changing it.",
+      "current_source_mapping": "back/services/taskTrigger.ts:118"
+    },
+    {
+      "code": "ENV_PROFILE_SAVE_CONFLICT",
+      "http_status": 409,
+      "retryable": false,
+      "safe_message": "Environment profile could not be saved.",
+      "affected_resource": "ENVIRONMENT_PROFILE",
+      "operation": "SAVE",
+      "recovery_action": "Choose a unique profile name and inspect current owner/version.",
+      "current_source_mapping": "back/services/repositoryEnvProfile.ts:66"
+    },
+    {
+      "code": "CONFIG_BINDING_NOT_FOUND",
+      "http_status": 404,
+      "retryable": false,
+      "safe_message": "Config binding was not found.",
+      "affected_resource": "CONFIG_BINDING",
+      "operation": "READ",
+      "recovery_action": "Refresh binding list.",
+      "current_source_mapping": "back/services/taskConfig.ts:97"
+    },
+    {
+      "code": "UNSUPPORTED_DATABASE_SCHEMA",
+      "http_status": 503,
+      "retryable": false,
+      "safe_message": "Existing database schema is not supported.",
+      "affected_resource": "DATABASE",
+      "operation": "BOOTSTRAP",
+      "recovery_action": "Stop without deleting or migrating the data root; use an explicitly supported fresh root.",
+      "current_source_mapping": "existing back/shared/operationalSchema.ts UnsupportedDatabaseSchemaError"
+    },
+    {
+      "code": "DATABASE_SCHEMA_CORRUPTED",
+      "http_status": 503,
+      "retryable": false,
+      "safe_message": "The v2 database schema is inconsistent.",
+      "affected_resource": "DATABASE",
+      "operation": "BOOTSTRAP",
+      "recovery_action": "Fail closed, preserve the database and inspect safe signature/FK diagnostics.",
+      "current_source_mapping": "NEW v2 signature/corruption classification"
+    },
+    {
+      "code": "BACKUP_BUSY",
+      "http_status": 409,
+      "retryable": true,
+      "safe_message": "Backup cannot obtain a consistent idle boundary yet.",
+      "affected_resource": "BACKUP",
+      "operation": "SNAPSHOT",
+      "recovery_action": "Wait for active owners or complete recovery; do not kill them or discard queued history.",
+      "current_source_mapping": "existing BackupCoordinator.create idle gate"
+    },
+    {
+      "code": "TASK_DELETED",
+      "http_status": 404,
+      "retryable": false,
+      "safe_message": "The target Task no longer exists.",
+      "affected_resource": "WORKSPACE_UPDATE_OUTBOX",
+      "operation": "DISPATCH",
+      "recovery_action": "Persist per-target dispatch summary and skip; do not recreate a deleted Task.",
+      "current_source_mapping": "NEW durable dispatch_summary result, not a script failure"
+    },
+    {
+      "code": "TRIGGER_DELETED",
+      "http_status": 404,
+      "retryable": false,
+      "safe_message": "The target Trigger no longer exists.",
+      "affected_resource": "WORKSPACE_UPDATE_OUTBOX",
+      "operation": "DISPATCH",
+      "recovery_action": "Persist per-target dispatch summary and skip; do not recreate or rerun a deleted trigger.",
+      "current_source_mapping": "NEW durable dispatch_summary result, not a script failure"
+    },
+    {
+      "code": "API_ROUTE_NOT_FOUND",
+      "http_status": 404,
+      "retryable": false,
+      "safe_message": "API route was not found.",
+      "affected_resource": "API_ROUTE",
+      "operation": "ROUTE",
+      "recovery_action": "Use the documented fresh-v2 API; unknown /api routes return JSON before the SPA fallback.",
+      "current_source_mapping": "NEW safe /api fallback contract; not an old API compatibility route"
+    }
+  ]
+}

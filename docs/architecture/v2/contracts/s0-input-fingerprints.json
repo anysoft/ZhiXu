@@ -1,0 +1,29 @@
+{
+  "head": "d527a46095e85b7fc61c83544cd847a6e3f237db",
+  "tracked_tree_sha256": "5b71cf4871a12117af7642412e10cbb356404868c2cd3c5506bb029b3725d616",
+  "tracked_file_count": 3407,
+  "gitignore_sha256": "78f778aa7cc3494334676046b883b672c9e98f3fb28adfd3868b9aa99aef4893",
+  "assessment_reports": {
+    "docs/architecture/v2/REVIEW_VALIDATION.md": "da25f9e4603ea11c0412ec97cb098cabcc9f33a52723498190f2cd0848f80859",
+    "docs/architecture/v2/FRONTEND_INFORMATION_ARCHITECTURE.md": "46bc89e602406f8ecb5b105acac299c101bf1dba51038c1c18d5d83156b1a982",
+    "docs/architecture/v2/ENTITY_MAPPING.md": "55154d07b8c65f24e7cc1ab02706372d26a0825d100c4fb6278cb36f1edcf819",
+    "docs/architecture/v2/EXECUTION_AND_BACKUP.md": "1b018a7903bfcb7f7089503949c9e8e192fd746b79c5d53302745aedc340cc6a",
+    "docs/architecture/v2/ARCHITECTURE_V2_IMPACT_MATRIX.md": "5d3d77116bd5c5ee941153fda35139c948a1f625fa774b6e8ccf87f276b25ac6",
+    "docs/architecture/v2/ASSESSMENT_REPORT.md": "e6c5569e8933ca053ec20588d794b7e6a004138c1936eb12ccceaf90f5d73ca0",
+    "docs/architecture/v2/API_SERVICE_MAPPING.md": "4a7d4338168c05be98f3eec509b79b61e7bd51146b3e4d0797a355944f1b65e0",
+    "docs/architecture/v2/CURRENT_ARCHITECTURE.md": "1160ea0e7ac792a155de44a461bbc32e72120555a9aabc51435dd811955d80c1",
+    "docs/architecture/v2/OPEN_DECISIONS.md": "a79742b5602cf35376f1da4cae7ab659e5747118987505efbfd6f6a327c303c5",
+    "docs/architecture/v2/IMPACT_MATRIX.md": "53185a8a2916fc35a5e547ece3bbb5af072deeaa753f03bd4da6d7899d77c1d8",
+    "docs/architecture/v2/FILE_IMPACT_INVENTORY.md": "3b8366e22d3246bfdca98fafd71210fa2b655382e8e3ce0e4e3ecd36cdc6cd31",
+    "docs/architecture/v2/IMPLEMENTATION_ROADMAP.md": "cb9b7fb3ee7a5f68a92335b1cb3f090bb735deb9e2f3c4c3040a29280e8651a9",
+    "docs/architecture/v2/TARGET_ARCHITECTURE.md": "c30d367a31e11f0a231ea439f563c26ae261959f7bf048e65730007408c21650",
+    "docs/architecture/v2/SUBSCRIPTION_SYNC_DESIGN.md": "ff2ce6a076a07b4fee24ab49269fc02db0167bbc51cc3bb16e0012de266ff034",
+    "docs/architecture/v2/SECURITY_AND_LIFECYCLE.md": "b68eb4b59d50364c3f619683da62c112ea952d09cf35c32959d151787d3e544b"
+  },
+  "authorized_prior_report_updates": [
+    "docs/architecture/v2/TARGET_ARCHITECTURE.md",
+    "docs/architecture/v2/OPEN_DECISIONS.md",
+    "docs/architecture/v2/IMPLEMENTATION_ROADMAP.md"
+  ],
+  "initial_working_tree": "pre-existing .gitignore modification adds docs/architecture/v2/ ignore; preserve"
+}

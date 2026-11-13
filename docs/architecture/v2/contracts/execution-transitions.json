@@ -1,0 +1,81 @@
+{
+  "contract": "zhixu-v2-s0-execution-1",
+  "approval_status": "TECHNICAL_CONTRACT_READY_FOR_APPROVAL",
+  "implementation_status": "NOT_RUN",
+  "queue_storage": "TaskRuns",
+  "same_workspace_parallel": false,
+  "wait_modes": ["WAIT", "SKIP", "FAIL_FAST"],
+  "queue_reasons": [
+    "NONE",
+    "TASK_CONCURRENCY",
+    "WORKSPACE_LEASE",
+    "PLATFORM_QUIESCING",
+    "RUNTIME_CAPACITY"
+  ],
+  "task_concurrency": ["FORBID", "QUEUE", "ALLOW"],
+  "transitions": {
+    "QUEUED": ["RESOLVING", "CANCELLED", "SKIPPED"],
+    "RESOLVING": [
+      "RUNNING",
+      "QUEUED",
+      "FAILED",
+      "CANCELLED",
+      "INTERRUPTED",
+      "RECOVERY_REQUIRED",
+      "SKIPPED"
+    ],
+    "RUNNING": [
+      "SUCCESS",
+      "FAILED",
+      "TIMEOUT",
+      "CANCELLED",
+      "INTERRUPTED",
+      "RECOVERY_REQUIRED"
+    ],
+    "RECOVERY_REQUIRED": ["INTERRUPTED"],
+    "SUCCESS": [],
+    "FAILED": [],
+    "TIMEOUT": [],
+    "CANCELLED": [],
+    "INTERRUPTED": [],
+    "SKIPPED": []
+  },
+  "terminal_states": [
+    "SUCCESS",
+    "FAILED",
+    "TIMEOUT",
+    "CANCELLED",
+    "INTERRUPTED",
+    "SKIPPED"
+  ],
+  "skip_rules": {
+    "same_task_forbid": "TASK_CONCURRENCY_FORBID",
+    "source_or_effective_resource_changed": "SOURCE_SUPERSEDED",
+    "wait_deadline_expired": "WORKSPACE_WAIT_TIMEOUT",
+    "automatic_event_queue_overflow": "EXECUTION_QUEUE_FULL",
+    "resource_busy_with_skip_or_fail_fast": "WORKSPACE_BUSY"
+  },
+  "candidate_defaults": {
+    "capacity_validation": "DEFERRED_TO_S1",
+    "run_queue_wait_timeout_ms": 900000,
+    "run_queue_max_per_task": 32,
+    "run_queue_max_per_workspace": 128,
+    "run_queue_max_global": 1024,
+    "max_active_executions": 8,
+    "queue_backoff_initial_ms": 250,
+    "queue_backoff_max_ms": 5000,
+    "queue_backoff_max_jitter_ratio": 0.1
+  },
+  "invariants": [
+    "WAIT is represented by QUEUED plus queue_reason, never another durable queue.",
+    "Admission snapshot is immutable; source_snapshot is assigned once after lease-protected validation.",
+    "A QUEUED row holds no active_workspace_id, persistent owner token, or long-lived OS lease.",
+    "Deadlines are absolute UTC and are not extended by restart, backup, or lease retry.",
+    "Task policy and Cron misfire are evaluated independently from Workspace resource waiting.",
+    "SOURCE_SUPERSEDED produces SKIPPED with zero script attempts and no automatic latest-source retry.",
+    "Unknown source ownership or incomplete cleanup requires RECOVERY_REQUIRED, never READY by empty-root reconstruction.",
+    "Terminal execution clears active_workspace_id but preserves workspace_id and source history.",
+    "All execution, editor, Git, Config, Node, recovery, and backup consumers use the same Workspace identity and lock inode.",
+    "No production behavior has been dynamically qualified by this design artifact."
+  ]
+}

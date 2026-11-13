@@ -1,0 +1,1999 @@
+{
+  "scope": "NON_RUNTIME_S0_CANDIDATE_ONLY",
+  "status": "DYNAMICALLY_VERIFIED",
+  "database": ":memory:",
+  "sqlite_version": "3.53.4",
+  "schema_identity": "zhixu.workspace.v2.s0.1",
+  "signature_algorithm": "sha256(sorted sqlite_schema objects type/name/table/tokenized SQL; JSON UTF-8 no whitespace; excludes sqlite_* and sql NULL)",
+  "schema_signature": "f466bedcecdad199bfb3ca501800f7fac026300d5fc2ad91ea77038cc782fe4c",
+  "ddl_sha256": "ffa7b469ff5844fab2fc49b6046447b542f0cf6fc2a7a6dc50246ae47b501655",
+  "tables": [
+    "Apps",
+    "Auths",
+    "ConfigAssetRevisions",
+    "ConfigAssets",
+    "CronTriggers",
+    "Dependences",
+    "EnvironmentProfiles",
+    "Envs",
+    "GitCredentials",
+    "GitUpdateTriggers",
+    "GitWorkspaces",
+    "GlobalEnvironmentRevision",
+    "NodeEnvironmentBuilds",
+    "NodeEnvironmentRevisions",
+    "NodeEnvironments",
+    "NodePackageManagerToolchains",
+    "NotificationChannels",
+    "NotificationDeliveries",
+    "NotificationOutbox",
+    "PlatformMetadata",
+    "PythonEnvironmentBuilds",
+    "PythonEnvironmentRevisions",
+    "PythonEnvironments",
+    "Repositories",
+    "RunningInstances",
+    "RuntimeInstallations",
+    "RuntimeOperations",
+    "RuntimeProviders",
+    "SchedulerProjections",
+    "TaskConfigBindings",
+    "TaskEnvVariables",
+    "TaskExecutionSettings",
+    "TaskHealthStates",
+    "TaskHooks",
+    "TaskNotificationChannelBindings",
+    "TaskNotificationPolicies",
+    "TaskRunAttempts",
+    "TaskRunEvents",
+    "TaskRuns",
+    "TaskRuntimeBindings",
+    "TaskSources",
+    "TaskStats",
+    "TaskTriggers",
+    "TaskViews",
+    "Tasks",
+    "TriggerEvents",
+    "WebhookTriggers",
+    "WorkspaceConfigBindings",
+    "WorkspaceDiscoveryPolicies",
+    "WorkspaceDiscoverySuppressions",
+    "WorkspaceOperations",
+    "WorkspacePreservationHolds",
+    "WorkspaceProfileVariables",
+    "WorkspaceRuntimeDefaults",
+    "WorkspaceSyncPolicies",
+    "WorkspaceSyncRuns",
+    "WorkspaceUpdateOutbox",
+    "Workspaces"
+  ],
+  "table_count": 58,
+  "foreign_key_count": 94,
+  "foreign_keys": [
+    {
+      "table": "ConfigAssetRevisions",
+      "columns": ["asset_id"],
+      "parent": "ConfigAssets",
+      "parent_columns": ["id"],
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "ConfigAssets",
+      "columns": ["current_revision_id"],
+      "parent": "ConfigAssetRevisions",
+      "parent_columns": ["id"],
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "CronTriggers",
+      "columns": ["trigger_id"],
+      "parent": "TaskTriggers",
+      "parent_columns": ["id"],
+      "on_delete": "CASCADE"
+    },
+    {
+      "table": "EnvironmentProfiles",
+      "columns": ["workspace_id"],
+      "parent": "Workspaces",
+      "parent_columns": ["id"],
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "GitUpdateTriggers",
+      "columns": ["trigger_id"],
+      "parent": "TaskTriggers",
+      "parent_columns": ["id"],
+      "on_delete": "CASCADE"
+    },
+    {
+      "table": "GitWorkspaces",
+      "columns": ["workspace_id", "workspace_type"],
+      "parent": "Workspaces",
+      "parent_columns": ["id", "type"],
+      "on_delete": "CASCADE"
+    },
+    {
+      "table": "GitWorkspaces",
+      "columns": ["baseline_sync_run_id"],
+      "parent": "WorkspaceSyncRuns",
+      "parent_columns": ["id"],
+      "on_delete": "SET NULL"
+    },
+    {
+      "table": "GitWorkspaces",
+      "columns": ["repository_id"],
+      "parent": "Repositories",
+      "parent_columns": ["id"],
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "GitWorkspaces",
+      "columns": ["workspace_id"],
+      "parent": "Workspaces",
+      "parent_columns": ["id"],
+      "on_delete": "CASCADE"
+    },
+    {
+      "table": "NodeEnvironmentBuilds",
+      "columns": [
+        "environment_id",
+        "revision_id",
+        "runtime_id",
+        "toolchain_id"
+      ],
+      "parent": "NodeEnvironmentRevisions",
+      "parent_columns": ["environment_id", "id", "runtime_id", "toolchain_id"],
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "NodeEnvironmentBuilds",
+      "columns": ["toolchain_id"],
+      "parent": "NodePackageManagerToolchains",
+      "parent_columns": ["id"],
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "NodeEnvironmentBuilds",
+      "columns": ["runtime_id"],
+      "parent": "RuntimeInstallations",
+      "parent_columns": ["id"],
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "NodeEnvironmentBuilds",
+      "columns": ["environment_id"],
+      "parent": "NodeEnvironments",
+      "parent_columns": ["id"],
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "NodeEnvironmentRevisions",
+      "columns": ["toolchain_id", "runtime_id"],
+      "parent": "NodePackageManagerToolchains",
+      "parent_columns": ["id", "runtime_id"],
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "NodeEnvironmentRevisions",
+      "columns": ["toolchain_id"],
+      "parent": "NodePackageManagerToolchains",
+      "parent_columns": ["id"],
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "NodeEnvironmentRevisions",
+      "columns": ["runtime_id"],
+      "parent": "RuntimeInstallations",
+      "parent_columns": ["id"],
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "NodeEnvironmentRevisions",
+      "columns": ["environment_id"],
+      "parent": "NodeEnvironments",
+      "parent_columns": ["id"],
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "NodeEnvironments",
+      "columns": ["id", "current_build_id"],
+      "parent": "NodeEnvironmentBuilds",
+      "parent_columns": ["environment_id", "id"],
+      "on_delete": "NO ACTION"
+    },
+    {
+      "table": "NodeEnvironments",
+      "columns": ["id", "current_revision_id"],
+      "parent": "NodeEnvironmentRevisions",
+      "parent_columns": ["environment_id", "id"],
+      "on_delete": "NO ACTION"
+    },
+    {
+      "table": "NodeEnvironments",
+      "columns": ["toolchain_id", "runtime_id"],
+      "parent": "NodePackageManagerToolchains",
+      "parent_columns": ["id", "runtime_id"],
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "NodeEnvironments",
+      "columns": ["toolchain_id"],
+      "parent": "NodePackageManagerToolchains",
+      "parent_columns": ["id"],
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "NodeEnvironments",
+      "columns": ["runtime_id"],
+      "parent": "RuntimeInstallations",
+      "parent_columns": ["id"],
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "NodePackageManagerToolchains",
+      "columns": ["runtime_id"],
+      "parent": "RuntimeInstallations",
+      "parent_columns": ["id"],
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "NotificationDeliveries",
+      "columns": ["outbox_id"],
+      "parent": "NotificationOutbox",
+      "parent_columns": ["id"],
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "NotificationOutbox",
+      "columns": ["channel_id"],
+      "parent": "NotificationChannels",
+      "parent_columns": ["id"],
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "NotificationOutbox",
+      "columns": ["task_run_id"],
+      "parent": "TaskRuns",
+      "parent_columns": ["id"],
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "NotificationOutbox",
+      "columns": ["task_id"],
+      "parent": "Tasks",
+      "parent_columns": ["id"],
+      "on_delete": "SET NULL"
+    },
+    {
+      "table": "PythonEnvironmentBuilds",
+      "columns": ["environment_id", "revision_id", "runtime_id"],
+      "parent": "PythonEnvironmentRevisions",
+      "parent_columns": ["environment_id", "id", "runtime_id"],
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "PythonEnvironmentBuilds",
+      "columns": ["runtime_id"],
+      "parent": "RuntimeInstallations",
+      "parent_columns": ["id"],
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "PythonEnvironmentBuilds",
+      "columns": ["environment_id"],
+      "parent": "PythonEnvironments",
+      "parent_columns": ["id"],
+      "on_delete": "CASCADE"
+    },
+    {
+      "table": "PythonEnvironmentRevisions",
+      "columns": ["runtime_id"],
+      "parent": "RuntimeInstallations",
+      "parent_columns": ["id"],
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "PythonEnvironmentRevisions",
+      "columns": ["environment_id"],
+      "parent": "PythonEnvironments",
+      "parent_columns": ["id"],
+      "on_delete": "CASCADE"
+    },
+    {
+      "table": "PythonEnvironments",
+      "columns": ["id", "current_build_id"],
+      "parent": "PythonEnvironmentBuilds",
+      "parent_columns": ["environment_id", "id"],
+      "on_delete": "NO ACTION"
+    },
+    {
+      "table": "PythonEnvironments",
+      "columns": ["id", "current_revision_id"],
+      "parent": "PythonEnvironmentRevisions",
+      "parent_columns": ["environment_id", "id"],
+      "on_delete": "NO ACTION"
+    },
+    {
+      "table": "PythonEnvironments",
+      "columns": ["runtime_id"],
+      "parent": "RuntimeInstallations",
+      "parent_columns": ["id"],
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "Repositories",
+      "columns": ["default_credential_id"],
+      "parent": "GitCredentials",
+      "parent_columns": ["id"],
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "RuntimeInstallations",
+      "columns": ["provider_id"],
+      "parent": "RuntimeProviders",
+      "parent_columns": ["id"],
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "RuntimeOperations",
+      "columns": ["runtime_id"],
+      "parent": "RuntimeInstallations",
+      "parent_columns": ["id"],
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "RuntimeOperations",
+      "columns": ["provider_id"],
+      "parent": "RuntimeProviders",
+      "parent_columns": ["id"],
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "SchedulerProjections",
+      "columns": ["env_profile_id"],
+      "parent": "EnvironmentProfiles",
+      "parent_columns": ["id"],
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "SchedulerProjections",
+      "columns": ["id"],
+      "parent": "Tasks",
+      "parent_columns": ["id"],
+      "on_delete": "CASCADE"
+    },
+    {
+      "table": "TaskConfigBindings",
+      "columns": ["asset_id", "revision_id"],
+      "parent": "ConfigAssetRevisions",
+      "parent_columns": ["asset_id", "id"],
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "TaskConfigBindings",
+      "columns": ["asset_id"],
+      "parent": "ConfigAssets",
+      "parent_columns": ["id"],
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "TaskConfigBindings",
+      "columns": ["task_id"],
+      "parent": "Tasks",
+      "parent_columns": ["id"],
+      "on_delete": "CASCADE"
+    },
+    {
+      "table": "TaskEnvVariables",
+      "columns": ["task_id"],
+      "parent": "Tasks",
+      "parent_columns": ["id"],
+      "on_delete": "CASCADE"
+    },
+    {
+      "table": "TaskExecutionSettings",
+      "columns": ["task_id"],
+      "parent": "Tasks",
+      "parent_columns": ["id"],
+      "on_delete": "CASCADE"
+    },
+    {
+      "table": "TaskHealthStates",
+      "columns": ["last_run_id"],
+      "parent": "TaskRuns",
+      "parent_columns": ["id"],
+      "on_delete": "SET NULL"
+    },
+    {
+      "table": "TaskHealthStates",
+      "columns": ["task_id"],
+      "parent": "Tasks",
+      "parent_columns": ["id"],
+      "on_delete": "CASCADE"
+    },
+    {
+      "table": "TaskHooks",
+      "columns": ["task_id"],
+      "parent": "Tasks",
+      "parent_columns": ["id"],
+      "on_delete": "CASCADE"
+    },
+    {
+      "table": "TaskNotificationChannelBindings",
+      "columns": ["channel_id"],
+      "parent": "NotificationChannels",
+      "parent_columns": ["id"],
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "TaskNotificationChannelBindings",
+      "columns": ["task_id"],
+      "parent": "Tasks",
+      "parent_columns": ["id"],
+      "on_delete": "CASCADE"
+    },
+    {
+      "table": "TaskNotificationPolicies",
+      "columns": ["task_id"],
+      "parent": "Tasks",
+      "parent_columns": ["id"],
+      "on_delete": "CASCADE"
+    },
+    {
+      "table": "TaskRunAttempts",
+      "columns": ["task_run_id"],
+      "parent": "TaskRuns",
+      "parent_columns": ["id"],
+      "on_delete": "CASCADE"
+    },
+    {
+      "table": "TaskRunEvents",
+      "columns": ["task_run_id"],
+      "parent": "TaskRuns",
+      "parent_columns": ["id"],
+      "on_delete": "CASCADE"
+    },
+    {
+      "table": "TaskRuns",
+      "columns": ["event_id"],
+      "parent": "TriggerEvents",
+      "parent_columns": ["id"],
+      "on_delete": "SET NULL"
+    },
+    {
+      "table": "TaskRuns",
+      "columns": ["trigger_id"],
+      "parent": "TaskTriggers",
+      "parent_columns": ["id"],
+      "on_delete": "SET NULL"
+    },
+    {
+      "table": "TaskRuns",
+      "columns": ["active_workspace_id"],
+      "parent": "Workspaces",
+      "parent_columns": ["id"],
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "TaskRuns",
+      "columns": ["workspace_id"],
+      "parent": "Workspaces",
+      "parent_columns": ["id"],
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "TaskRuns",
+      "columns": ["task_id"],
+      "parent": "Tasks",
+      "parent_columns": ["id"],
+      "on_delete": "SET NULL"
+    },
+    {
+      "table": "TaskRuntimeBindings",
+      "columns": ["node_environment_id"],
+      "parent": "NodeEnvironments",
+      "parent_columns": ["id"],
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "TaskRuntimeBindings",
+      "columns": ["python_environment_id"],
+      "parent": "PythonEnvironments",
+      "parent_columns": ["id"],
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "TaskRuntimeBindings",
+      "columns": ["task_id"],
+      "parent": "Tasks",
+      "parent_columns": ["id"],
+      "on_delete": "CASCADE"
+    },
+    {
+      "table": "TaskSources",
+      "columns": ["task_id", "workspace_id"],
+      "parent": "Tasks",
+      "parent_columns": ["id", "workspace_id"],
+      "on_delete": "CASCADE"
+    },
+    {
+      "table": "TaskSources",
+      "columns": ["workspace_id"],
+      "parent": "Workspaces",
+      "parent_columns": ["id"],
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "TaskSources",
+      "columns": ["task_id"],
+      "parent": "Tasks",
+      "parent_columns": ["id"],
+      "on_delete": "CASCADE"
+    },
+    {
+      "table": "TaskTriggers",
+      "columns": ["task_id"],
+      "parent": "Tasks",
+      "parent_columns": ["id"],
+      "on_delete": "CASCADE"
+    },
+    {
+      "table": "Tasks",
+      "columns": ["id", "workspace_id"],
+      "parent": "TaskSources",
+      "parent_columns": ["task_id", "workspace_id"],
+      "on_delete": "NO ACTION"
+    },
+    {
+      "table": "Tasks",
+      "columns": ["workspace_id", "env_profile_id"],
+      "parent": "EnvironmentProfiles",
+      "parent_columns": ["workspace_id", "id"],
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "Tasks",
+      "columns": ["discovered_workspace_id"],
+      "parent": "Workspaces",
+      "parent_columns": ["id"],
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "Tasks",
+      "columns": ["workspace_id"],
+      "parent": "Workspaces",
+      "parent_columns": ["id"],
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "TriggerEvents",
+      "columns": ["task_run_id"],
+      "parent": "TaskRuns",
+      "parent_columns": ["id"],
+      "on_delete": "SET NULL"
+    },
+    {
+      "table": "TriggerEvents",
+      "columns": ["workspace_update_id"],
+      "parent": "WorkspaceUpdateOutbox",
+      "parent_columns": ["id"],
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "TriggerEvents",
+      "columns": ["workspace_id"],
+      "parent": "Workspaces",
+      "parent_columns": ["id"],
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "TriggerEvents",
+      "columns": ["task_id"],
+      "parent": "Tasks",
+      "parent_columns": ["id"],
+      "on_delete": "SET NULL"
+    },
+    {
+      "table": "TriggerEvents",
+      "columns": ["trigger_id"],
+      "parent": "TaskTriggers",
+      "parent_columns": ["id"],
+      "on_delete": "SET NULL"
+    },
+    {
+      "table": "WebhookTriggers",
+      "columns": ["trigger_id"],
+      "parent": "TaskTriggers",
+      "parent_columns": ["id"],
+      "on_delete": "CASCADE"
+    },
+    {
+      "table": "WorkspaceConfigBindings",
+      "columns": ["asset_id", "revision_id"],
+      "parent": "ConfigAssetRevisions",
+      "parent_columns": ["asset_id", "id"],
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "WorkspaceConfigBindings",
+      "columns": ["asset_id"],
+      "parent": "ConfigAssets",
+      "parent_columns": ["id"],
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "WorkspaceConfigBindings",
+      "columns": ["workspace_id"],
+      "parent": "Workspaces",
+      "parent_columns": ["id"],
+      "on_delete": "CASCADE"
+    },
+    {
+      "table": "WorkspaceDiscoveryPolicies",
+      "columns": ["workspace_id"],
+      "parent": "GitWorkspaces",
+      "parent_columns": ["workspace_id"],
+      "on_delete": "CASCADE"
+    },
+    {
+      "table": "WorkspaceDiscoverySuppressions",
+      "columns": ["workspace_id"],
+      "parent": "GitWorkspaces",
+      "parent_columns": ["workspace_id"],
+      "on_delete": "CASCADE"
+    },
+    {
+      "table": "WorkspaceOperations",
+      "columns": ["workspace_id"],
+      "parent": "Workspaces",
+      "parent_columns": ["id"],
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "WorkspacePreservationHolds",
+      "columns": ["workspace_id"],
+      "parent": "Workspaces",
+      "parent_columns": ["id"],
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "WorkspaceProfileVariables",
+      "columns": ["profile_id"],
+      "parent": "EnvironmentProfiles",
+      "parent_columns": ["id"],
+      "on_delete": "CASCADE"
+    },
+    {
+      "table": "WorkspaceRuntimeDefaults",
+      "columns": ["node_environment_id"],
+      "parent": "NodeEnvironments",
+      "parent_columns": ["id"],
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "WorkspaceRuntimeDefaults",
+      "columns": ["python_environment_id"],
+      "parent": "PythonEnvironments",
+      "parent_columns": ["id"],
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "WorkspaceRuntimeDefaults",
+      "columns": ["workspace_id"],
+      "parent": "Workspaces",
+      "parent_columns": ["id"],
+      "on_delete": "CASCADE"
+    },
+    {
+      "table": "WorkspaceSyncPolicies",
+      "columns": ["workspace_id"],
+      "parent": "GitWorkspaces",
+      "parent_columns": ["workspace_id"],
+      "on_delete": "CASCADE"
+    },
+    {
+      "table": "WorkspaceSyncRuns",
+      "columns": ["update_outbox_id", "workspace_id"],
+      "parent": "WorkspaceUpdateOutbox",
+      "parent_columns": ["id", "workspace_id"],
+      "on_delete": "NO ACTION"
+    },
+    {
+      "table": "WorkspaceSyncRuns",
+      "columns": ["workspace_id"],
+      "parent": "Workspaces",
+      "parent_columns": ["id"],
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "WorkspaceUpdateOutbox",
+      "columns": ["workspace_id", "baseline_required"],
+      "parent": "GitWorkspaces",
+      "parent_columns": ["workspace_id", "baseline_established"],
+      "on_delete": "NO ACTION"
+    },
+    {
+      "table": "WorkspaceUpdateOutbox",
+      "columns": ["sync_run_id", "workspace_id"],
+      "parent": "WorkspaceSyncRuns",
+      "parent_columns": ["id", "workspace_id"],
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "WorkspaceUpdateOutbox",
+      "columns": ["workspace_id"],
+      "parent": "Workspaces",
+      "parent_columns": ["id"],
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "Workspaces",
+      "columns": ["id", "default_env_profile_id"],
+      "parent": "EnvironmentProfiles",
+      "parent_columns": ["workspace_id", "id"],
+      "on_delete": "RESTRICT"
+    }
+  ],
+  "index_count_including_autoindexes": 91,
+  "indexes": [
+    {
+      "table": "Apps",
+      "name": "sqlite_autoindex_Apps_1",
+      "unique": true,
+      "origin": "u",
+      "partial": false,
+      "columns": ["name"]
+    },
+    {
+      "table": "ConfigAssetRevisions",
+      "name": "config_asset_revisions_asset_id_revision_number",
+      "unique": true,
+      "origin": "c",
+      "partial": false,
+      "columns": ["asset_id", "revision_number"]
+    },
+    {
+      "table": "ConfigAssetRevisions",
+      "name": "sqlite_autoindex_ConfigAssetRevisions_2",
+      "unique": true,
+      "origin": "u",
+      "partial": false,
+      "columns": ["asset_id", "id"]
+    },
+    {
+      "table": "ConfigAssetRevisions",
+      "name": "sqlite_autoindex_ConfigAssetRevisions_1",
+      "unique": true,
+      "origin": "u",
+      "partial": false,
+      "columns": ["storage_key"]
+    },
+    {
+      "table": "ConfigAssets",
+      "name": "sqlite_autoindex_ConfigAssets_1",
+      "unique": true,
+      "origin": "u",
+      "partial": false,
+      "columns": ["name"]
+    },
+    {
+      "table": "CronTriggers",
+      "name": "cron_triggers_next_fire_at_trigger_id",
+      "unique": false,
+      "origin": "c",
+      "partial": false,
+      "columns": ["next_fire_at", "trigger_id"]
+    },
+    {
+      "table": "EnvironmentProfiles",
+      "name": "sqlite_autoindex_EnvironmentProfiles_2",
+      "unique": true,
+      "origin": "u",
+      "partial": false,
+      "columns": ["workspace_id", "id"]
+    },
+    {
+      "table": "EnvironmentProfiles",
+      "name": "sqlite_autoindex_EnvironmentProfiles_1",
+      "unique": true,
+      "origin": "u",
+      "partial": false,
+      "columns": ["workspace_id", "name"]
+    },
+    {
+      "table": "Envs",
+      "name": "sqlite_autoindex_Envs_1",
+      "unique": true,
+      "origin": "u",
+      "partial": false,
+      "columns": ["name"]
+    },
+    {
+      "table": "GitCredentials",
+      "name": "sqlite_autoindex_GitCredentials_1",
+      "unique": true,
+      "origin": "u",
+      "partial": false,
+      "columns": ["name"]
+    },
+    {
+      "table": "GitWorkspaces",
+      "name": "git_workspaces_repository_ref",
+      "unique": false,
+      "origin": "c",
+      "partial": false,
+      "columns": ["repository_id", "ref_type", "ref_name"]
+    },
+    {
+      "table": "GitWorkspaces",
+      "name": "sqlite_autoindex_GitWorkspaces_2",
+      "unique": true,
+      "origin": "u",
+      "partial": false,
+      "columns": ["workspace_id", "baseline_established"]
+    },
+    {
+      "table": "GitWorkspaces",
+      "name": "sqlite_autoindex_GitWorkspaces_1",
+      "unique": true,
+      "origin": "u",
+      "partial": false,
+      "columns": ["private_branch"]
+    },
+    {
+      "table": "NodeEnvironmentBuilds",
+      "name": "sqlite_autoindex_NodeEnvironmentBuilds_1",
+      "unique": true,
+      "origin": "u",
+      "partial": false,
+      "columns": ["environment_id", "id"]
+    },
+    {
+      "table": "NodeEnvironmentRevisions",
+      "name": "sqlite_autoindex_NodeEnvironmentRevisions_2",
+      "unique": true,
+      "origin": "u",
+      "partial": false,
+      "columns": ["environment_id", "id", "runtime_id", "toolchain_id"]
+    },
+    {
+      "table": "NodeEnvironmentRevisions",
+      "name": "sqlite_autoindex_NodeEnvironmentRevisions_1",
+      "unique": true,
+      "origin": "u",
+      "partial": false,
+      "columns": ["environment_id", "id"]
+    },
+    {
+      "table": "NodeEnvironments",
+      "name": "sqlite_autoindex_NodeEnvironments_1",
+      "unique": true,
+      "origin": "u",
+      "partial": false,
+      "columns": ["name"]
+    },
+    {
+      "table": "NodePackageManagerToolchains",
+      "name": "sqlite_autoindex_NodePackageManagerToolchains_2",
+      "unique": true,
+      "origin": "u",
+      "partial": false,
+      "columns": ["id", "runtime_id"]
+    },
+    {
+      "table": "NodePackageManagerToolchains",
+      "name": "sqlite_autoindex_NodePackageManagerToolchains_1",
+      "unique": true,
+      "origin": "u",
+      "partial": false,
+      "columns": ["runtime_id", "manager_type", "version"]
+    },
+    {
+      "table": "NotificationDeliveries",
+      "name": "sqlite_autoindex_NotificationDeliveries_1",
+      "unique": true,
+      "origin": "u",
+      "partial": false,
+      "columns": ["outbox_id", "attempt"]
+    },
+    {
+      "table": "NotificationOutbox",
+      "name": "notification_outbox_run",
+      "unique": false,
+      "origin": "c",
+      "partial": false,
+      "columns": ["task_run_id", "id"]
+    },
+    {
+      "table": "NotificationOutbox",
+      "name": "notification_outbox_due",
+      "unique": false,
+      "origin": "c",
+      "partial": false,
+      "columns": ["status", "next_attempt_at", "id"]
+    },
+    {
+      "table": "NotificationOutbox",
+      "name": "sqlite_autoindex_NotificationOutbox_1",
+      "unique": true,
+      "origin": "u",
+      "partial": false,
+      "columns": ["dedupe_key"]
+    },
+    {
+      "table": "PlatformMetadata",
+      "name": "sqlite_autoindex_PlatformMetadata_1",
+      "unique": true,
+      "origin": "pk",
+      "partial": false,
+      "columns": ["schema_identity"]
+    },
+    {
+      "table": "PythonEnvironmentBuilds",
+      "name": "python_environment_builds_runtime",
+      "unique": false,
+      "origin": "c",
+      "partial": false,
+      "columns": ["runtime_id"]
+    },
+    {
+      "table": "PythonEnvironmentBuilds",
+      "name": "sqlite_autoindex_PythonEnvironmentBuilds_1",
+      "unique": true,
+      "origin": "u",
+      "partial": false,
+      "columns": ["environment_id", "id"]
+    },
+    {
+      "table": "PythonEnvironmentRevisions",
+      "name": "python_environment_revisions_runtime",
+      "unique": false,
+      "origin": "c",
+      "partial": false,
+      "columns": ["runtime_id"]
+    },
+    {
+      "table": "PythonEnvironmentRevisions",
+      "name": "sqlite_autoindex_PythonEnvironmentRevisions_2",
+      "unique": true,
+      "origin": "u",
+      "partial": false,
+      "columns": ["environment_id", "id", "runtime_id"]
+    },
+    {
+      "table": "PythonEnvironmentRevisions",
+      "name": "sqlite_autoindex_PythonEnvironmentRevisions_1",
+      "unique": true,
+      "origin": "u",
+      "partial": false,
+      "columns": ["environment_id", "id"]
+    },
+    {
+      "table": "PythonEnvironments",
+      "name": "sqlite_autoindex_PythonEnvironments_1",
+      "unique": true,
+      "origin": "u",
+      "partial": false,
+      "columns": ["name"]
+    },
+    {
+      "table": "Repositories",
+      "name": "sqlite_autoindex_Repositories_1",
+      "unique": true,
+      "origin": "u",
+      "partial": false,
+      "columns": ["normalized_url"]
+    },
+    {
+      "table": "RuntimeInstallations",
+      "name": "runtime_installations_provider_id_implementation_version",
+      "unique": true,
+      "origin": "c",
+      "partial": false,
+      "columns": ["provider_id", "implementation", "version"]
+    },
+    {
+      "table": "RuntimeOperations",
+      "name": "runtime_operations_provider_id_status",
+      "unique": false,
+      "origin": "c",
+      "partial": false,
+      "columns": ["provider_id", "status"]
+    },
+    {
+      "table": "RuntimeOperations",
+      "name": "sqlite_autoindex_RuntimeOperations_1",
+      "unique": true,
+      "origin": "u",
+      "partial": false,
+      "columns": ["log_identity"]
+    },
+    {
+      "table": "RuntimeProviders",
+      "name": "runtime_providers_language_provider_type",
+      "unique": true,
+      "origin": "c",
+      "partial": false,
+      "columns": ["language", "provider_type"]
+    },
+    {
+      "table": "SchedulerProjections",
+      "name": "sqlite_autoindex_SchedulerProjections_1",
+      "unique": true,
+      "origin": "u",
+      "partial": false,
+      "columns": ["sub_id", "discovery_key"]
+    },
+    {
+      "table": "TaskConfigBindings",
+      "name": "sqlite_autoindex_TaskConfigBindings_1",
+      "unique": true,
+      "origin": "u",
+      "partial": false,
+      "columns": ["task_id", "target_base", "target_path"]
+    },
+    {
+      "table": "TaskEnvVariables",
+      "name": "task_env_variables_task_id_name",
+      "unique": true,
+      "origin": "c",
+      "partial": false,
+      "columns": ["task_id", "name"]
+    },
+    {
+      "table": "TaskHooks",
+      "name": "task_hooks_task_id_phase_position",
+      "unique": true,
+      "origin": "c",
+      "partial": false,
+      "columns": ["task_id", "phase", "position"]
+    },
+    {
+      "table": "TaskNotificationChannelBindings",
+      "name": "sqlite_autoindex_TaskNotificationChannelBindings_1",
+      "unique": true,
+      "origin": "pk",
+      "partial": false,
+      "columns": ["task_id", "channel_id"]
+    },
+    {
+      "table": "TaskRunAttempts",
+      "name": "task_run_attempts_task_run_id_attempt_number",
+      "unique": true,
+      "origin": "c",
+      "partial": false,
+      "columns": ["task_run_id", "attempt_number"]
+    },
+    {
+      "table": "TaskRunEvents",
+      "name": "sqlite_autoindex_TaskRunEvents_1",
+      "unique": true,
+      "origin": "u",
+      "partial": false,
+      "columns": ["task_run_id", "sequence"]
+    },
+    {
+      "table": "TaskRuns",
+      "name": "task_runs_finished",
+      "unique": false,
+      "origin": "c",
+      "partial": false,
+      "columns": ["finished_at", "id"]
+    },
+    {
+      "table": "TaskRuns",
+      "name": "task_runs_trigger_submitted",
+      "unique": false,
+      "origin": "c",
+      "partial": false,
+      "columns": ["trigger_type", "submitted_at", "id"]
+    },
+    {
+      "table": "TaskRuns",
+      "name": "task_runs_task_finished",
+      "unique": false,
+      "origin": "c",
+      "partial": false,
+      "columns": ["task_id", "finished_at", "id"]
+    },
+    {
+      "table": "TaskRuns",
+      "name": "task_runs_status_finished",
+      "unique": false,
+      "origin": "c",
+      "partial": false,
+      "columns": ["status", "finished_at", "id"]
+    },
+    {
+      "table": "TaskRuns",
+      "name": "task_runs_workspace_active",
+      "unique": true,
+      "origin": "c",
+      "partial": true,
+      "columns": ["active_workspace_id"]
+    },
+    {
+      "table": "TaskRuns",
+      "name": "task_runs_queue_due",
+      "unique": false,
+      "origin": "c",
+      "partial": false,
+      "columns": ["status", "next_eligible_at", "submitted_at", "id"]
+    },
+    {
+      "table": "TaskRuns",
+      "name": "task_runs_workspace_queue",
+      "unique": false,
+      "origin": "c",
+      "partial": false,
+      "columns": ["workspace_id", "status", "submitted_at", "id"]
+    },
+    {
+      "table": "TaskRuns",
+      "name": "task_runs_task_id_status_id",
+      "unique": false,
+      "origin": "c",
+      "partial": false,
+      "columns": ["task_id", "status", "id"]
+    },
+    {
+      "table": "TaskRuns",
+      "name": "task_runs_status_id",
+      "unique": false,
+      "origin": "c",
+      "partial": false,
+      "columns": ["status", "id"]
+    },
+    {
+      "table": "TaskRuns",
+      "name": "sqlite_autoindex_TaskRuns_2",
+      "unique": true,
+      "origin": "u",
+      "partial": false,
+      "columns": ["log_identity"]
+    },
+    {
+      "table": "TaskRuns",
+      "name": "sqlite_autoindex_TaskRuns_1",
+      "unique": true,
+      "origin": "u",
+      "partial": false,
+      "columns": ["submission_key"]
+    },
+    {
+      "table": "TaskSources",
+      "name": "task_sources_workspace",
+      "unique": false,
+      "origin": "c",
+      "partial": false,
+      "columns": ["workspace_id"]
+    },
+    {
+      "table": "TaskSources",
+      "name": "sqlite_autoindex_TaskSources_1",
+      "unique": true,
+      "origin": "u",
+      "partial": false,
+      "columns": ["task_id", "workspace_id"]
+    },
+    {
+      "table": "TaskStats",
+      "name": "task_stats_ref_id_date",
+      "unique": true,
+      "origin": "c",
+      "partial": false,
+      "columns": ["ref_id", "date"]
+    },
+    {
+      "table": "TaskStats",
+      "name": "task_stats_date",
+      "unique": false,
+      "origin": "c",
+      "partial": false,
+      "columns": ["date"]
+    },
+    {
+      "table": "TaskTriggers",
+      "name": "task_triggers_task_id_type",
+      "unique": false,
+      "origin": "c",
+      "partial": false,
+      "columns": ["task_id", "type"]
+    },
+    {
+      "table": "TaskTriggers",
+      "name": "task_triggers_task_id_discovery_key",
+      "unique": true,
+      "origin": "c",
+      "partial": false,
+      "columns": ["task_id", "discovery_key"]
+    },
+    {
+      "table": "TaskViews",
+      "name": "sqlite_autoindex_TaskViews_1",
+      "unique": true,
+      "origin": "u",
+      "partial": false,
+      "columns": ["name"]
+    },
+    {
+      "table": "Tasks",
+      "name": "sqlite_autoindex_Tasks_2",
+      "unique": true,
+      "origin": "u",
+      "partial": false,
+      "columns": ["discovered_workspace_id", "discovery_key"]
+    },
+    {
+      "table": "Tasks",
+      "name": "sqlite_autoindex_Tasks_1",
+      "unique": true,
+      "origin": "u",
+      "partial": false,
+      "columns": ["id", "workspace_id"]
+    },
+    {
+      "table": "TriggerEvents",
+      "name": "trigger_events_task_id_id",
+      "unique": false,
+      "origin": "c",
+      "partial": false,
+      "columns": ["task_id", "id"]
+    },
+    {
+      "table": "TriggerEvents",
+      "name": "trigger_events_status_id",
+      "unique": false,
+      "origin": "c",
+      "partial": false,
+      "columns": ["status", "id"]
+    },
+    {
+      "table": "TriggerEvents",
+      "name": "sqlite_autoindex_TriggerEvents_2",
+      "unique": true,
+      "origin": "u",
+      "partial": false,
+      "columns": ["origin_trigger_id", "event_key"]
+    },
+    {
+      "table": "TriggerEvents",
+      "name": "sqlite_autoindex_TriggerEvents_1",
+      "unique": true,
+      "origin": "u",
+      "partial": false,
+      "columns": ["task_run_id"]
+    },
+    {
+      "table": "WebhookTriggers",
+      "name": "sqlite_autoindex_WebhookTriggers_1",
+      "unique": true,
+      "origin": "u",
+      "partial": false,
+      "columns": ["public_id"]
+    },
+    {
+      "table": "WorkspaceConfigBindings",
+      "name": "sqlite_autoindex_WorkspaceConfigBindings_1",
+      "unique": true,
+      "origin": "u",
+      "partial": false,
+      "columns": ["workspace_id", "target_base", "target_path"]
+    },
+    {
+      "table": "WorkspaceDiscoverySuppressions",
+      "name": "sqlite_autoindex_WorkspaceDiscoverySuppressions_1",
+      "unique": true,
+      "origin": "pk",
+      "partial": false,
+      "columns": ["workspace_id", "discovery_key"]
+    },
+    {
+      "table": "WorkspaceOperations",
+      "name": "workspace_operation_active",
+      "unique": true,
+      "origin": "c",
+      "partial": true,
+      "columns": ["workspace_id"]
+    },
+    {
+      "table": "WorkspaceOperations",
+      "name": "sqlite_autoindex_WorkspaceOperations_4",
+      "unique": true,
+      "origin": "u",
+      "partial": false,
+      "columns": ["request_key"]
+    },
+    {
+      "table": "WorkspaceOperations",
+      "name": "sqlite_autoindex_WorkspaceOperations_3",
+      "unique": true,
+      "origin": "u",
+      "partial": false,
+      "columns": ["workspace_id", "request_key"]
+    },
+    {
+      "table": "WorkspaceOperations",
+      "name": "sqlite_autoindex_WorkspaceOperations_2",
+      "unique": true,
+      "origin": "u",
+      "partial": false,
+      "columns": ["journal_key"]
+    },
+    {
+      "table": "WorkspaceOperations",
+      "name": "sqlite_autoindex_WorkspaceOperations_1",
+      "unique": true,
+      "origin": "pk",
+      "partial": false,
+      "columns": ["id"]
+    },
+    {
+      "table": "WorkspacePreservationHolds",
+      "name": "workspace_preservation_active",
+      "unique": false,
+      "origin": "c",
+      "partial": true,
+      "columns": [
+        "workspace_id",
+        "source_generation",
+        "content_revision",
+        "inventory_hash"
+      ]
+    },
+    {
+      "table": "WorkspacePreservationHolds",
+      "name": "sqlite_autoindex_WorkspacePreservationHolds_2",
+      "unique": true,
+      "origin": "u",
+      "partial": false,
+      "columns": ["id", "workspace_id"]
+    },
+    {
+      "table": "WorkspacePreservationHolds",
+      "name": "sqlite_autoindex_WorkspacePreservationHolds_1",
+      "unique": true,
+      "origin": "u",
+      "partial": false,
+      "columns": ["workspace_id", "snapshot_key"]
+    },
+    {
+      "table": "WorkspaceProfileVariables",
+      "name": "sqlite_autoindex_WorkspaceProfileVariables_1",
+      "unique": true,
+      "origin": "u",
+      "partial": false,
+      "columns": ["profile_id", "name"]
+    },
+    {
+      "table": "WorkspaceRuntimeDefaults",
+      "name": "sqlite_autoindex_WorkspaceRuntimeDefaults_1",
+      "unique": true,
+      "origin": "u",
+      "partial": false,
+      "columns": ["workspace_id", "kind"]
+    },
+    {
+      "table": "WorkspaceSyncRuns",
+      "name": "workspace_sync_initial_success",
+      "unique": true,
+      "origin": "c",
+      "partial": true,
+      "columns": ["workspace_id"]
+    },
+    {
+      "table": "WorkspaceSyncRuns",
+      "name": "workspace_sync_history",
+      "unique": false,
+      "origin": "c",
+      "partial": false,
+      "columns": ["workspace_id", "id"]
+    },
+    {
+      "table": "WorkspaceSyncRuns",
+      "name": "workspace_sync_active",
+      "unique": true,
+      "origin": "c",
+      "partial": true,
+      "columns": ["workspace_id"]
+    },
+    {
+      "table": "WorkspaceSyncRuns",
+      "name": "sqlite_autoindex_WorkspaceSyncRuns_3",
+      "unique": true,
+      "origin": "u",
+      "partial": false,
+      "columns": ["id", "workspace_id"]
+    },
+    {
+      "table": "WorkspaceSyncRuns",
+      "name": "sqlite_autoindex_WorkspaceSyncRuns_2",
+      "unique": true,
+      "origin": "u",
+      "partial": false,
+      "columns": ["workspace_id", "request_key"]
+    },
+    {
+      "table": "WorkspaceSyncRuns",
+      "name": "sqlite_autoindex_WorkspaceSyncRuns_1",
+      "unique": true,
+      "origin": "u",
+      "partial": false,
+      "columns": ["log_identity"]
+    },
+    {
+      "table": "WorkspaceUpdateOutbox",
+      "name": "workspace_update_outbox_due",
+      "unique": false,
+      "origin": "c",
+      "partial": false,
+      "columns": ["status", "next_attempt_at", "id"]
+    },
+    {
+      "table": "WorkspaceUpdateOutbox",
+      "name": "sqlite_autoindex_WorkspaceUpdateOutbox_3",
+      "unique": true,
+      "origin": "u",
+      "partial": false,
+      "columns": ["id", "workspace_id"]
+    },
+    {
+      "table": "WorkspaceUpdateOutbox",
+      "name": "sqlite_autoindex_WorkspaceUpdateOutbox_2",
+      "unique": true,
+      "origin": "u",
+      "partial": false,
+      "columns": ["sync_run_id"]
+    },
+    {
+      "table": "WorkspaceUpdateOutbox",
+      "name": "sqlite_autoindex_WorkspaceUpdateOutbox_1",
+      "unique": true,
+      "origin": "u",
+      "partial": false,
+      "columns": ["workspace_id", "source_generation", "after_commit"]
+    },
+    {
+      "table": "Workspaces",
+      "name": "sqlite_autoindex_Workspaces_2",
+      "unique": true,
+      "origin": "u",
+      "partial": false,
+      "columns": ["id", "type"]
+    },
+    {
+      "table": "Workspaces",
+      "name": "sqlite_autoindex_Workspaces_1",
+      "unique": true,
+      "origin": "u",
+      "partial": false,
+      "columns": ["root_key"]
+    }
+  ],
+  "explicit_index_count": 35,
+  "sql_guard_count": 144,
+  "checks": [
+    {
+      "name": "LOCAL_without_Repository",
+      "expectation": "PASS",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "committed"
+    },
+    {
+      "name": "GIT_without_repository_rejected",
+      "expectation": "REJECT",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "NOT NULL constraint failed: GitWorkspaces.repository_id"
+    },
+    {
+      "name": "LOCAL_with_Git_extension_rejected",
+      "expectation": "REJECT",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "FOREIGN KEY constraint failed"
+    },
+    {
+      "name": "GIT_CREATING_missing_extension_not_READY",
+      "expectation": "REJECT",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "WORKSPACE_NOT_READY"
+    },
+    {
+      "name": "GIT_with_valid_extension_READY",
+      "expectation": "PASS",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "committed"
+    },
+    {
+      "name": "same_Repository_ref_different_Workspaces_allowed",
+      "expectation": "PASS",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "committed"
+    },
+    {
+      "name": "duplicate_private_branch_rejected",
+      "expectation": "REJECT",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "WORKSPACE_TYPE_INVALID"
+    },
+    {
+      "name": "invalid_Workspace_type_rejected",
+      "expectation": "REJECT",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "CHECK constraint failed: type IN ('LOCAL','GIT')"
+    },
+    {
+      "name": "initial_READY_bypass_rejected",
+      "expectation": "REJECT",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "WORKSPACE_NOT_READY"
+    },
+    {
+      "name": "invalid_lifecycle_rejected",
+      "expectation": "REJECT",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "WORKSPACE_NOT_READY"
+    },
+    {
+      "name": "READY_to_CREATING_rejected",
+      "expectation": "REJECT",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "WORKSPACE_NOT_READY"
+    },
+    {
+      "name": "Workspace_type_change_rejected",
+      "expectation": "REJECT",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "WORKSPACE_TYPE_INVALID"
+    },
+    {
+      "name": "Git_source_ref_change_rejected",
+      "expectation": "REJECT",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "WORKSPACE_TYPE_INVALID"
+    },
+    {
+      "name": "Tag_scheduled_policy_rejected",
+      "expectation": "REJECT",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "SYNC_POLICY_INVALID"
+    },
+    {
+      "name": "Tag_applied_commit_moving_rejected",
+      "expectation": "REJECT",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "GIT_REF_POLICY_INVALID"
+    },
+    {
+      "name": "Branch_interval_policy_allowed",
+      "expectation": "PASS",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "committed"
+    },
+    {
+      "name": "LOCAL_sync_policy_rejected",
+      "expectation": "REJECT",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "FOREIGN KEY constraint failed"
+    },
+    {
+      "name": "Task_without_Workspace_rejected",
+      "expectation": "REJECT",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "WORKSPACE_NOT_READY"
+    },
+    {
+      "name": "Task_without_Source_rejected_at_commit",
+      "expectation": "REJECT",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "FOREIGN KEY constraint failed"
+    },
+    {
+      "name": "Task_Source_same_transaction_allowed",
+      "expectation": "PASS",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "committed"
+    },
+    {
+      "name": "Task_Source_owner_mismatch_rejected_at_commit",
+      "expectation": "REJECT",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "FOREIGN KEY constraint failed"
+    },
+    {
+      "name": "cross_Workspace_Task_Profile_rejected",
+      "expectation": "REJECT",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "FOREIGN KEY constraint failed"
+    },
+    {
+      "name": "cross_Workspace_default_Profile_rejected_at_commit",
+      "expectation": "REJECT",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "FOREIGN KEY constraint failed"
+    },
+    {
+      "name": "same_Workspace_Profile_allowed",
+      "expectation": "PASS",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "committed"
+    },
+    {
+      "name": "manual_Task_invalid_discovery_owner_rejected",
+      "expectation": "REJECT",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "TASK_IDENTITY_IMMUTABLE"
+    },
+    {
+      "name": "discovered_Task_LOCAL_rejected",
+      "expectation": "REJECT",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "TASK_IDENTITY_INVALID"
+    },
+    {
+      "name": "discovered_Task_GIT_allowed",
+      "expectation": "PASS",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "committed"
+    },
+    {
+      "name": "ignored_discovery_entry_not_recreated",
+      "expectation": "REJECT",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "TASK_IDENTITY_INVALID"
+    },
+    {
+      "name": "retired_discovered_Task_cannot_remain_enabled",
+      "expectation": "REJECT",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "CHECK constraint failed: discovery_state<>'RETIRED' OR enabled=0"
+    },
+    {
+      "name": "path_traversal_relational_guard",
+      "expectation": "REJECT",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "CHECK constraint failed: length(relative_entrypoint)>0 AND substr(relative_entrypoint,1,1)<>'/' AND instr(relative_entrypoint,char(92))=0 AND relative_entrypoint NOT LIKE '../%' AND relative_entrypoint NOT LIKE '%/../%' AND relative_entrypoint NOT LIKE '%/..' AND relative_entrypoint<>'..'"
+    },
+    {
+      "name": "Workspace_DELETE_with_Task_rejected_state_unchanged",
+      "expectation": "REJECT",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "WORKSPACE_REFERENCED"
+    },
+    {
+      "name": "active_TaskRun_blocks_Task_delete",
+      "expectation": "REJECT",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "TASK_ACTIVE_RUN"
+    },
+    {
+      "name": "two_QUEUED_TaskRuns_same_Workspace_allowed",
+      "expectation": "PASS",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "committed"
+    },
+    {
+      "name": "two_active_TaskRuns_same_Workspace_rejected",
+      "expectation": "REJECT",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "UNIQUE constraint failed: TaskRuns.active_workspace_id"
+    },
+    {
+      "name": "different_Workspace_active_execution_allowed",
+      "expectation": "PASS",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "committed"
+    },
+    {
+      "name": "queued_cancel_preserves_deadline",
+      "expectation": "PASS",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "committed"
+    },
+    {
+      "name": "TaskRun_expected_source_immutable",
+      "expectation": "REJECT",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "SOURCE_SUPERSEDED"
+    },
+    {
+      "name": "TaskRun_source_snapshot_write_once",
+      "expectation": "REJECT",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "SOURCE_SUPERSEDED"
+    },
+    {
+      "name": "TaskRun_terminal_cannot_requeue",
+      "expectation": "REJECT",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "TASK_RUN_STATUS_INVALID"
+    },
+    {
+      "name": "TaskRun_invalid_owner_rejected",
+      "expectation": "REJECT",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "TASK_IDENTITY_INVALID"
+    },
+    {
+      "name": "delete_Task_archive_reclaim_preserves_Run_history",
+      "expectation": "PASS",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "committed"
+    },
+    {
+      "name": "nonempty_LOCAL_reclaim_without_preservation_hold_rejected",
+      "expectation": "REJECT",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "WORKSPACE_REFERENCED"
+    },
+    {
+      "name": "historical_Run_blocks_identity_purge_but_not_reclaim",
+      "expectation": "REJECT",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "FOREIGN KEY constraint failed"
+    },
+    {
+      "name": "retention_expired_no_refs_allows_final_metadata_purge",
+      "expectation": "PASS",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "committed"
+    },
+    {
+      "name": "Sync_without_GIT_rejected",
+      "expectation": "REJECT",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "WORKSPACE_TYPE_INVALID"
+    },
+    {
+      "name": "single_active_SyncRun_per_Workspace",
+      "expectation": "REJECT",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "UNIQUE constraint failed: WorkspaceSyncRuns.workspace_id"
+    },
+    {
+      "name": "SUCCESS_without_outbox_cannot_commit",
+      "expectation": "REJECT",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "FOREIGN KEY constraint failed"
+    },
+    {
+      "name": "SUCCESS_and_outbox_same_transaction_commit",
+      "expectation": "PASS",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "committed"
+    },
+    {
+      "name": "outbox_without_SUCCESS_rejected",
+      "expectation": "REJECT",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "SYNC_RECOVERY_REQUIRED"
+    },
+    {
+      "name": "APPLIED_Discovery_failed_recovery_no_outbox",
+      "expectation": "PASS",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "committed"
+    },
+    {
+      "name": "APPLIED_failure_cannot_be_generic_FAILED",
+      "expectation": "REJECT",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "CHECK constraint failed: status NOT IN ('FAILED','CANCELLED','INTERRUPTED','BLOCKED') OR git_update_status<>'APPLIED'"
+    },
+    {
+      "name": "SUCCESS_commit_facts_immutable",
+      "expectation": "REJECT",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "SYNC_RECOVERY_REQUIRED"
+    },
+    {
+      "name": "outbox_trigger_plan_immutable",
+      "expectation": "REJECT",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "SYNC_RECOVERY_REQUIRED"
+    },
+    {
+      "name": "same_successful_commit_no_duplicate_outbox",
+      "expectation": "REJECT",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "UNIQUE constraint failed: WorkspaceUpdateOutbox.workspace_id, WorkspaceUpdateOutbox.source_generation, WorkspaceUpdateOutbox.after_commit"
+    },
+    {
+      "name": "outbox_dispatch_retry_same_identity",
+      "expectation": "PASS",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "committed"
+    },
+    {
+      "name": "Profile_variable_bumps_Profile_and_Workspace_versions",
+      "expectation": "PASS",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "committed"
+    },
+    {
+      "name": "Global_ENV_membership_monotonic_revision",
+      "expectation": "PASS",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "committed"
+    },
+    {
+      "name": "UNSET_profile_value_rejected",
+      "expectation": "REJECT",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "CHECK constraint failed: (operation='SET' AND value IS NOT NULL) OR (operation='UNSET' AND value IS NULL)"
+    },
+    {
+      "name": "Workspace_MASK_binding_rejected",
+      "expectation": "REJECT",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "CHECK constraint failed: operation='ATTACH'"
+    },
+    {
+      "name": "transaction_rollback_preserves_preexisting_rows",
+      "expectation": "PASS",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "committed"
+    },
+    {
+      "name": "queued_claim_after_lifecycle_admission_closed_rejected",
+      "expectation": "REJECT",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "WORKSPACE_NOT_READY"
+    },
+    {
+      "name": "live_TaskRun_cannot_rebind_Task_identity",
+      "expectation": "REJECT",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "TASK_IDENTITY_IMMUTABLE"
+    },
+    {
+      "name": "FORBID_same_Task_not_queued_twice",
+      "expectation": "REJECT",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "TASK_CONCURRENCY_FORBID"
+    },
+    {
+      "name": "SKIPPED_FORBID_audit_does_not_hold_lease",
+      "expectation": "PASS",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "committed"
+    },
+    {
+      "name": "queued_unresolved_source_cannot_be_written_early",
+      "expectation": "REJECT",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "SOURCE_SUPERSEDED"
+    },
+    {
+      "name": "initial_insert_cannot_forge_resolved_source_snapshot",
+      "expectation": "REJECT",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "SOURCE_SUPERSEDED"
+    },
+    {
+      "name": "resolved_source_snapshot_wrong_Git_commit_rejected",
+      "expectation": "REJECT",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "SOURCE_SUPERSEDED"
+    },
+    {
+      "name": "resolved_Git_source_snapshot_allowed",
+      "expectation": "PASS",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "committed"
+    },
+    {
+      "name": "CREATE_idempotency_same_key_different_Workspace_rejected",
+      "expectation": "REJECT",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "UNIQUE constraint failed: WorkspaceOperations.request_key"
+    },
+    {
+      "name": "first_same_commit_initial_SUCCESS_outbox_no_revision_increment",
+      "expectation": "PASS",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "committed"
+    },
+    {
+      "name": "initial_SUCCESS_outbox_without_marker_cannot_commit",
+      "expectation": "REJECT",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "FOREIGN KEY constraint failed"
+    },
+    {
+      "name": "second_same_commit_is_NO_CHANGE_no_duplicate_outbox",
+      "expectation": "PASS",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "committed"
+    },
+    {
+      "name": "false_initial_after_baseline_rejected",
+      "expectation": "REJECT",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "SYNC_POLICY_INVALID"
+    },
+    {
+      "name": "baseline_marker_cannot_reset",
+      "expectation": "REJECT",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "SYNC_RECOVERY_REQUIRED"
+    },
+    {
+      "name": "baseline_history_retention_does_not_repeat_initial_event",
+      "expectation": "PASS",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "committed"
+    },
+    {
+      "name": "TriggerEvent_RECEIVED_to_SUBMITTED_atomic_route_allowed",
+      "expectation": "PASS",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "committed"
+    },
+    {
+      "name": "TriggerEvent_terminal_FAILED_cannot_reprocess",
+      "expectation": "REJECT",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "TRIGGER_EVENT_INVALID"
+    },
+    {
+      "name": "GitUpdate_event_without_successful_update_rejected",
+      "expectation": "REJECT",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "SYNC_RECOVERY_REQUIRED"
+    },
+    {
+      "name": "branch_private_branch_NULL_rejected",
+      "expectation": "REJECT",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "CHECK constraint failed: (ref_type='branch' AND private_branch IS NOT NULL AND private_branch='ws-'||workspace_id) OR (ref_type IN ('tag','commit') AND private_branch IS NULL)"
+    },
+    {
+      "name": "SUCCESS_missing_factual_target_cannot_bypass_NULL_CHECK",
+      "expectation": "REJECT",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "CHECK constraint failed: status<>'SUCCESS' OR (actual_commit IS NOT NULL AND target_commit IS NOT NULL AND after_commit IS NOT NULL AND actual_commit=target_commit AND after_commit=actual_commit AND (git_update_status='APPLIED' OR (initial=1 AND git_update_status='UNCHANGED' AND before_commit=actual_commit)) AND discovery_status IN ('NOT_REQUESTED','SUCCESS') AND content_revision IS NOT NULL)"
+    },
+    {
+      "name": "retired_discovered_Task_cannot_run_even_source_returns",
+      "expectation": "REJECT",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "TASK_NOT_READY"
+    },
+    {
+      "name": "retired_discovered_Task_queued_claim_rejected",
+      "expectation": "REJECT",
+      "status": "DYNAMICALLY_VERIFIED",
+      "observed": "TASK_NOT_READY"
+    },
+    {
+      "name": "bootstrap_EMPTY_DATA_ROOT",
+      "expectation": "EMPTY_DATA_ROOT",
+      "observed": "EMPTY_DATA_ROOT",
+      "status": "DYNAMICALLY_VERIFIED"
+    },
+    {
+      "name": "bootstrap_SUPPORTED_FRESH_V2",
+      "expectation": "SUPPORTED_FRESH_V2",
+      "observed": "SUPPORTED_FRESH_V2",
+      "status": "DYNAMICALLY_VERIFIED"
+    },
+    {
+      "name": "bootstrap_UNSUPPORTED_EXISTING_SCHEMA",
+      "expectation": "UNSUPPORTED_EXISTING_SCHEMA",
+      "observed": "UNSUPPORTED_EXISTING_SCHEMA",
+      "status": "DYNAMICALLY_VERIFIED"
+    },
+    {
+      "name": "bootstrap_CORRUPTED_V2_SCHEMA",
+      "expectation": "CORRUPTED_V2_SCHEMA",
+      "observed": "CORRUPTED_V2_SCHEMA",
+      "status": "DYNAMICALLY_VERIFIED"
+    }
+  ],
+  "check_count": 86,
+  "production_schema_deployed": false,
+  "filesystem_reclamation_verified": false,
+  "backup_restore_verified": false,
+  "foreign_key_check": [],
+  "integrity_check": "ok"
+}

@@ -1,0 +1,9 @@
+{
+  "scope": "NON_RUNTIME_S0_DTO_EXAMPLES",
+  "status": "STATICALLY_VALIDATED",
+  "method": "TypeScript createProgram strict/noEmit types=[] ES2022 CommonJS Node10",
+  "files": ["execution.dto.ts", "api.dto.ts"],
+  "diagnostics": 0,
+  "emitted": false,
+  "production_build_test": "NOT_RUN"
+}
