@@ -46,7 +46,7 @@ export const notificationTransport = {
         signal: controller.signal,
         headersTimeout: 10000,
         bodyTimeout: 10000,
-        maxRedirections: 0,
+        // Undici 7 request() does not follow redirects without an explicit interceptor.
       });
       let length = 0;
       const chunks: Buffer[] = [];
