@@ -11,6 +11,11 @@ const {
   ManagedRuntimeAdapter,
 } = require('../../../back/services/taskExecutionV2/runtime');
 const resumeCase = process.env.ZHIXU_S4_RUNTIME_HTTP_RESUME_CASE;
+const {
+  runtimeArtifactOptions,
+  MANAGED_NODE_VERSION,
+  MANAGED_TSX_VERSION,
+} = require('../s5r-offline-options.cjs');
 
 test('S4 Runtime public projection omits private paths and credentials while retaining public catalog URLs', () => {
   const projected = publicRuntimeValue(
@@ -47,6 +52,7 @@ test(
       ...(resumeCase ? { existingRoot: resumeCase } : {}),
     });
     const app = await V2Application.launch({
+      runtimeArtifacts: runtimeArtifactOptions(),
       dataRoot: path.join(h.root, 'http-application-data'),
       initialize: !resumeCase,
       projectRoot: h.projectRoot,
@@ -194,7 +200,7 @@ test(
       await h.measure('authenticated_http_node_install_and_build', async () => {
         await operation('/runtime/node/catalog', { timeout_seconds: 180 });
         await operation('/runtime/node/installations', {
-          version: '24.21.0',
+          version: MANAGED_NODE_VERSION,
           timeout_seconds: 180,
         });
       });
@@ -225,7 +231,7 @@ test(
           install_scripts_policy: 'ALLOW',
           dependencies: [
             { name: 'is-number', specifier: '7.0.0', type: 'DEPENDENCY' },
-            { name: 'tsx', specifier: '4.20.6', type: 'DEPENDENCY' },
+            { name: 'tsx', specifier: MANAGED_TSX_VERSION, type: 'DEPENDENCY' },
           ],
         },
       );

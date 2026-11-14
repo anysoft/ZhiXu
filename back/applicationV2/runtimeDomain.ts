@@ -19,6 +19,11 @@ import {
   RuntimeDomainContext,
 } from '../services/runtimeDomainScope';
 import { fail } from '../services/workspaceV2/errors';
+import {
+  VerifiedRuntimeArtifactStore,
+  RuntimeArtifactOptions,
+} from '../services/runtimeArtifacts';
+import { bindRuntimeArtifacts } from '../services/runtimeArtifactScope';
 
 const TABLES: Record<string, string> = {
   RuntimeProviderModel: 'RuntimeProviders',
@@ -66,8 +71,12 @@ function defaultValue(raw: string | null, type: string): unknown {
 /** Real ORM mapping over the byte-verified frozen tables. Never calls sync/DDL. */
 export async function createRuntimeDomain(
   s: Pick<V2Services, 'store' | 'roots' | 'leases'>,
+  artifactOptions?: RuntimeArtifactOptions,
 ): Promise<CandidateRuntimeDomain> {
   await s.store.verifySchema();
+  const artifacts = artifactOptions
+    ? await VerifiedRuntimeArtifactStore.open(artifactOptions, s.store.dataRoot)
+    : undefined;
   const expected = await fs.lstat(s.store.databasePath);
   const file = s.store.databasePath;
   class CandidateDatabase extends sqlite3.Database {
@@ -114,7 +123,9 @@ export async function createRuntimeDomain(
     dialectOptions: { mode: sqlite3.OPEN_READWRITE },
     pool: { max: 1, min: 0 },
   });
+  let unbindArtifacts: (() => void) | undefined;
   try {
+    if (artifacts) unbindArtifacts = bindRuntimeArtifacts(s.store, artifacts);
     await database.authenticate();
     const models: Record<string, ModelStatic<Model>> = {};
     for (const [name, table] of Object.entries(TABLES)) {
@@ -178,6 +189,7 @@ export async function createRuntimeDomain(
       models,
       store: s.store,
       barrier: s.leases.barrier,
+      artifacts,
     };
     const operations = withRuntimeDomain(
       context,
@@ -222,12 +234,20 @@ export async function createRuntimeDomain(
         try {
           await withRuntimeDomain(context, () => operations.close());
         } finally {
-          await database.close();
+          try {
+            await database.close();
+          } finally {
+            unbindArtifacts?.();
+          }
         }
       },
     };
   } catch (error) {
-    await database.close();
+    try {
+      await database.close();
+    } finally {
+      unbindArtifacts?.();
+    }
     throw error;
   }
 }

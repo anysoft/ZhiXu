@@ -1,6 +1,9 @@
 *
 !package.json
 !pnpm-lock.yaml
+!pnpm-workspace.yaml
+!patches/
+!patches/**
 !.npmrc
 !LICENSE
 !version.yaml
@@ -25,3 +28,5 @@ src/.umi*/**
 !scripts/release/healthcheck.cjs
 !.umirc.ts
 !scripts/release/prune-fixtures.cjs
+!scripts/native/
+!scripts/native/**

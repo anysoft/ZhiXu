@@ -6,6 +6,7 @@ import { spawn } from 'child_process';
 import { GitCredential } from '../data/gitCredential';
 import { CredentialSecret } from './credentialSecret';
 import { normalizeRepositoryUrl } from '../shared/gitProvider';
+import { verifiedGitSshTools } from '../shared/nativeGitTools';
 import {
   GitResourceError,
   quoteGitShell,
@@ -17,9 +18,18 @@ export interface GitAccessContext {
   directory: string;
   secrets: string[];
   cleanup: () => Promise<void>;
+  /** Verified candidate executable; omitted by the existing v9 host-tool policy. */
+  sshKeygen?: string;
+  gitExecutable?: string;
 }
-@Service()
+// The existing v9 container resolves the unchanged default host-tool policy.
+@Service({ factory: () => new GitCredentialResolver() })
 export default class GitCredentialResolver {
+  constructor(private readonly tools: {
+    requireBundledSsh?: boolean;
+    /** Trusted composition only; never populated from HTTP or environment input. */
+    gitToolsRoot?: string;
+  } = {}) {}
   async resolve(
     credential: GitCredential | null,
     secret: CredentialSecret,
@@ -52,10 +62,17 @@ export default class GitCredentialResolver {
       });
       const auth = credential?.auth_type || 'anonymous';
       const isSsh = /^(ssh:\/\/|[^/]+@[^/]+:)/.test(remote);
+      const bundled = this.tools.requireBundledSsh
+        ? await verifiedGitSshTools(this.tools.gitToolsRoot)
+        : undefined;
       if ((auth === 'https_token' && isSsh) || (auth === 'ssh_key' && !isSsh))
         throw new GitResourceError(
           'Credential type does not match repository transport',
         );
+      if (bundled) {
+        env.GIT_EXEC_PATH = bundled.execPath;
+        env.PATH = bundled.binPath + ':/usr/bin:/bin';
+      }
       const dataFile = path.join(directory, 'secret.json');
       const askpass = path.join(directory, 'askpass');
       await fs.writeFile(
@@ -97,7 +114,12 @@ export default class GitCredentialResolver {
           });
           identity = ` -i ${quoteGitShell(key)}`;
         }
-        env.GIT_SSH_COMMAND = `ssh -F /dev/null -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes -o GlobalKnownHostsFile=/dev/null -o UserKnownHostsFile=${quoteGitShell(
+        if (bundled) {
+          for (const name of Object.keys(env))
+            if (name.startsWith('SSH_')) delete env[name];
+          env.SSH_SK_HELPER = bundled.skHelper;
+        }
+        env.GIT_SSH_COMMAND = `${bundled ? quoteGitShell(bundled.ssh) : 'ssh'} -F /dev/null -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes -o GlobalKnownHostsFile=/dev/null -o UserKnownHostsFile=${quoteGitShell(
           knownHosts,
         )} -o ConnectTimeout=15${identity}`;
         env.SSH_ASKPASS = askpass;
@@ -109,6 +131,7 @@ export default class GitCredentialResolver {
         env,
         directory,
         cleanup,
+        ...(bundled ? { sshKeygen: bundled.sshKeygen, gitExecutable: bundled.git } : {}),
         secrets: [secret.token, secret.private_key, secret.passphrase].filter(
           Boolean,
         ) as string[],

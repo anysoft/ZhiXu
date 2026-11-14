@@ -9,15 +9,16 @@ import { GitResourceError } from '../shared/gitSecurity';
 export async function inspectSshCredential(
   credential: GitCredential,
   secret: CredentialSecret,
+  resolver = new GitCredentialResolver(),
 ) {
-  const context = await new GitCredentialResolver().resolve(
+  const context = await resolver.resolve(
     { ...credential, status: 'enabled' },
     secret,
     'ssh://git@credential-validation.invalid/key',
   );
   try {
     const result = await runGitProcess(
-      'ssh-keygen',
+      context.sshKeygen || 'ssh-keygen',
       ['-y', '-f', path.join(context.directory, 'identity')],
       context,
       10000,

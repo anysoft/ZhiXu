@@ -3,12 +3,14 @@ import type { Sequelize, ModelStatic, Model, Transaction } from 'sequelize';
 import type { WorkspaceStore } from './workspaceV2/store';
 import type { PlatformBackupBarrier } from './backup/barrier';
 import { RuntimeError } from '../shared/runtime';
+import type { VerifiedRuntimeArtifactStore } from './runtimeArtifacts';
 
 export interface RuntimeDomainContext {
   sequelize: Sequelize;
   models: Record<string, ModelStatic<Model>>;
   store: WorkspaceStore;
   barrier: PlatformBackupBarrier;
+  artifacts?: VerifiedRuntimeArtifactStore;
 }
 const scope = new AsyncLocalStorage<RuntimeDomainContext>();
 export function withRuntimeDomain<T>(

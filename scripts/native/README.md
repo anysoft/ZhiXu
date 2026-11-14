@@ -1,0 +1,18 @@
+# Verified native components
+
+The fresh-v2 build accepts the maintained `@whyour/sqlite3@1.1.2` binding API only with the reviewed source-only patch. Its installer verifies the SQLite source archive using both pinned SHA-256 and the publisher SHA3-256, compiles N-API v6 from source, opens the actual binding, checks `sqlite_version()` and `sqlite_source_id()`, and records the loaded addon SHA. It never downloads the fork's old prebuilt SQLite 3.41.1 binary. `verify-sqlite.cjs` repeats these checks before v2 compilation. `ZHIXU_SQLITE_SOURCE_ARCHIVE` may name an already acquired archive; this is a build-only input and does not bypass digest verification. `ZHIXU_SQLITE_FORCE_REBUILD=1` forces a fresh build. Build temporary directories must not contain `=` because gyp-generated Makefile targets do not support that character.
+
+`build-git-tools.sh` builds client-only OpenSSH 10.6p2 and Git 2.50.2 (the official November security backport) with static OpenSSL 3.5.9 LTS and zlib 1.4. Git smart HTTPS uses the controlled curl 8.23.0 static helper with Mbed TLS 3.6.7 LTS, electing its explicit GPL-2.0-or-later option for the Git component. Git never links the separate SSH OpenSSL library. TLS still verifies against the platform CA bundle (`/etc/ssl/cert.pem` on Darwin, `/etc/ssl/certs/ca-certificates.crt` on Debian/Ubuntu). Versions, official HTTPS URLs and source digests are reviewed in `git-tools-sources.json`. This is a ZhiXu source build, not an upstream precompiled binary. Required tools are a C compiler and make (`build-essential` on Debian/Ubuntu), Perl, Python >=3.9, CA certificates, and `ldd` on Linux / `otool` on macOS. System OpenSSL/zlib development packages are not used. The build changes no host packages or host configuration, runs no server, and installs only into the explicitly selected new output. Its uniquely owned work root retains complete command/exit/build/linkage receipts for review. The Git build omits unused Perl/Tcl/Gettext and legacy WebDAV push helpers; smart HTTP(S), SSH and local Git transports remain built and must pass actual final-candidate tests.
+
+Example in a private build checkout, with canonical absolute paths and protected, caller-owned parent directories on one filesystem:
+
+```bash
+bash scripts/native/build-git-tools.sh \
+  --output /owned/candidate/bin/git-tools \
+  --source-cache /owned/native-sources \
+  --work-parent /owned/native-builds --jobs 2
+```
+
+Existing outputs fail closed and are never overwritten. Preseed the six exact source archives in the source cache for a network-free build. The ordinary v2 build invokes `prepare-git-tools.cjs`, which uses the checkout's ignored `release-tools/native-git` cache and verifies the complete bundle after backend compilation. Release packaging must copy all of `bin/git-tools` and cover all six regular executables, bounded internal Git builtin/helper symlinks , corresponding source archives/build recipe/license notices and `manifest.json` in its immutable artifact manifest. Native targets compile this bundle on their actual supported platform/libc; Docker-built addons or SSH clients cannot stand in for native Debian 11/glibc 2.31 outputs.
+
+The v2 credential resolver, workspace Git supervisor and storage verifier always select this bundle, including `GIT_EXEC_PATH` and the controlled PATH; it rejects missing, wrong-platform, symlinked, writable or digest-mismatched bytes. The optional tool-root constructor capability is for trusted composition and controlled source tests only; it is never an HTTP or runtime environment setting. Existing v9 consumers keep their prior default policy. A version/build receipt does not replace real credential, known-host, encrypted-key, fetch and push regression tests on the final artifact.

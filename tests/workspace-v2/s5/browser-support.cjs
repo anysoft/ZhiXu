@@ -9,6 +9,7 @@ const {
   assetManifest,
 } = require('./artifact-support.cjs');
 const { V2Application } = artifactModule('applicationV2/application');
+const { runtimeArtifactOptions } = require('../s5r-offline-options.cjs');
 async function withBrowserDeadline(promise, label, milliseconds = 30000) {
   let timer;
   try {
@@ -109,6 +110,7 @@ async function browserFixture(caseId, options = {}) {
     files: sealed.files,
   });
   const app = await V2Application.launch({
+    runtimeArtifacts: runtimeArtifactOptions(),
     artifactRoot: path.join(
       releaseRoot(),
       'static/build/applicationV2/contracts',

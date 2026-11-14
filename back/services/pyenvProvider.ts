@@ -12,6 +12,8 @@ import {
   PYENV_REVISION,
   PYENV_SOURCE,
 } from '../shared/runtime';
+import { VerifiedRuntimeArtifactStore } from './runtimeArtifacts';
+import { currentRuntimeDomain } from './runtimeDomainScope';
 
 export interface ProviderContext {
   id: number;
@@ -42,6 +44,10 @@ export function parsePythonCatalog(output: string) {
   });
 }
 const diagnostic =
+  'import json,sys,platform,ssl,_ssl,_hashlib,zlib,_sqlite3\n' +
+  'sqlite_source_id=_sqlite3.connect(":memory:").execute("SELECT sqlite_source_id()").fetchone()[0]\n' +
+  'print(json.dumps(dict(executable=sys.executable,version=list(sys.version_info[:3]),version_text=sys.version,prefix=sys.prefix,base_prefix=sys.base_prefix,implementation=platform.python_implementation(),machine=platform.machine(),system=platform.system(),openssl_version=ssl.OPENSSL_VERSION,zlib_version=zlib.ZLIB_RUNTIME_VERSION,ssl_module=_ssl.__file__,hashlib_module=_hashlib.__file__,zlib_module=zlib.__file__,sqlite_module=_sqlite3.__file__,default_verify_paths=ssl.get_default_verify_paths()._asdict(),sqlite_version=_sqlite3.sqlite_version,sqlite_source_id=sqlite_source_id)))';
+const legacyDiagnostic =
   'import json,sys,platform; print(json.dumps(dict(executable=sys.executable,version=list(sys.version_info[:3]),version_text=sys.version,prefix=sys.prefix,base_prefix=sys.base_prefix,implementation=platform.python_implementation(),machine=platform.machine(),system=platform.system())))';
 
 /** Trusted, pinned pyenv source; standalone python-build avoids host pyenv hooks/shims. */
@@ -73,14 +79,27 @@ export default class PyenvProvider {
     return code;
   }
   async setup(ctx: ProviderContext, repair = false) {
+    const artifacts = VerifiedRuntimeArtifactStore.current(this.paths.dataRoot);
+    if (!artifacts && currentRuntimeDomain())
+      throw new RuntimeError('RUNTIME_ARTIFACT_TRUST_CONFIGURATION_REQUIRED');
     await ctx.stage('FETCHING_PROVIDER');
     const stage = path.join(ctx.directory, 'provider-stage');
-    await fs.mkdir(stage, { mode: 0o700 });
+    if (artifacts) {
+      await artifacts.extract(
+        ctx,
+        artifacts.pythonProvider(this.revision),
+        stage,
+      );
+    } else {
+      await fs.mkdir(stage, { mode: 0o700 });
+    }
     const git = (args: string[]) =>
       ctx.command.run('git', args, stage, ctx.environment, true);
-    await git(['init', '--quiet']);
-    await git(['fetch', '--depth=1', PYENV_SOURCE, this.revision]);
-    await git(['checkout', '--quiet', '--detach', 'FETCH_HEAD']);
+    if (!artifacts) {
+      await git(['init', '--quiet']);
+      await git(['fetch', '--depth=1', PYENV_SOURCE, this.revision]);
+      await git(['checkout', '--quiet', '--detach', 'FETCH_HEAD']);
+    }
     if ((await git(['rev-parse', 'HEAD'])).trim() !== this.revision)
       throw new RuntimeError('RUNTIME_PROVIDER_INVALID');
     for (const relative of ['.git', 'libexec', 'plugins/python-build/bin']) {
@@ -186,34 +205,101 @@ export default class PyenvProvider {
       ctx.environment,
       true,
     );
-    return parsePythonCatalog(output);
+    const artifacts = VerifiedRuntimeArtifactStore.current(this.paths.dataRoot);
+    return parsePythonCatalog(output).filter(
+      (version) =>
+        !artifacts ||
+        artifacts.manifest.python.some(
+          (p) => p.version === version && p.provider_revision === revision,
+        ),
+    );
   }
   async install(
     ctx: ProviderContext,
     runtime: RuntimeInstallation,
     revision: string,
   ) {
+    const artifacts = VerifiedRuntimeArtifactStore.current(this.paths.dataRoot);
+    if (!artifacts && currentRuntimeDomain())
+      throw new RuntimeError('RUNTIME_ARTIFACT_TRUST_CONFIGURATION_REQUIRED');
     const code = await this.code(ctx, revision);
     const target = await this.paths.createInstallation(
       runtime.version,
       runtime.id,
       ctx.providerId,
     );
+    const environment = artifacts
+      ? await artifacts.preparePython(ctx, runtime.version, revision)
+      : ctx.environment;
     await ctx.stage('BUILDING');
     await ctx.command.run(
       path.join(code, 'plugins/python-build/bin/python-build'),
       ['-v', exactPythonVersion(runtime.version), target],
       ctx.directory,
-      ctx.environment,
+      environment,
     );
     await ctx.stage('VERIFYING');
-    return this.verify(ctx, runtime, true);
+    const metadata = await this.verify(ctx, runtime, true);
+    if (!artifacts) return metadata;
+    const profile = artifacts.manifest.python.find(
+      (p) => p.version === runtime.version && p.provider_revision === revision,
+    )!;
+    const verifiedInputs = {
+      schema: 1,
+      kind: 'PYTHON_RUNTIME',
+      manifest_sha256: artifacts.manifestSha256,
+      trust_anchor_sha256: artifacts.trustAnchorSha256,
+      provider_artifact_id: artifacts.pythonProvider(revision),
+      definition_artifact_id: profile.definition,
+      source_artifact_ids: artifacts
+        .pythonSources(runtime.version, revision)
+        .map((s) => s.artifact),
+      ca_bundle_artifact_id: profile.ca_bundle,
+      executable_sha256: metadata.executable_sha256,
+      ssl_module_sha256: metadata.ssl_module_sha256,
+      hashlib_module_sha256: metadata.hashlib_module_sha256,
+      zlib_module_sha256: metadata.zlib_module_sha256,
+      openssl_version: metadata.openssl_version,
+      zlib_version: metadata.zlib_version,
+      ca_bundle_sha256: artifacts.artifact(profile.ca_bundle).sha256,
+      sqlite_artifact_id: profile.sqlite,
+      sqlite_module_sha256: metadata.sqlite_module_sha256,
+      sqlite_version: metadata.sqlite_version,
+      sqlite_source_id: metadata.sqlite_source_id,
+      pip_artifact_id: metadata.pip_artifact_id,
+      pip_wheel_sha256: metadata.pip_wheel_sha256,
+      pip_init_sha256: metadata.pip_init_sha256,
+      pip_vendor_manifest_sha256: metadata.pip_vendor_manifest_sha256,
+      pip_version: metadata.pip_version,
+    };
+    const marker = await this.paths.ownership(runtime.id);
+    await this.paths.privateWrite(
+      marker,
+      JSON.stringify({
+        ...(await this.paths.readJson(marker)),
+        verified_inputs: verifiedInputs,
+      }),
+    );
+    return {
+      ...metadata,
+      ...(artifacts
+        ? {
+            verified_provider: artifacts.provenance(
+              artifacts.pythonProvider(revision),
+            ),
+            verified_sources: artifacts
+              .pythonSources(runtime.version, revision)
+              .map((s) => artifacts.provenance(s.artifact)),
+            verified_inputs: verifiedInputs,
+          }
+        : {}),
+    };
   }
   async verify(
     ctx: ProviderContext,
     runtime: RuntimeInstallation,
     newInstallation = false,
-  ) {
+  ): Promise<Record<string, unknown> & { executable_sha256: string }> {
     const { root, executable } = await this.paths.executable(
       runtime.version,
       runtime.id,
@@ -243,7 +329,14 @@ export default class PyenvProvider {
       metadata = JSON.parse(
         await ctx.command.run(
           executable,
-          ['-I', '-S', '-c', diagnostic],
+          [
+            '-I',
+            '-S',
+            '-c',
+            VerifiedRuntimeArtifactStore.current(this.paths.dataRoot)
+              ? diagnostic
+              : legacyDiagnostic,
+          ],
           ctx.directory,
           ctx.environment,
           true,
@@ -268,6 +361,91 @@ export default class PyenvProvider {
       (await fs.realpath(metadata.base_prefix)) !== root
     )
       throw new RuntimeError('RUNTIME_VERIFY_FAILED');
+    const artifacts = VerifiedRuntimeArtifactStore.current(this.paths.dataRoot);
+    const facts: Record<string, unknown> = {};
+    if (artifacts) {
+      Object.assign(
+        facts,
+        await artifacts.verifyPythonPip(ctx, executable, runtime.version),
+      );
+      const profiles = artifacts.manifest.python.filter(
+        (p) =>
+          p.version === runtime.version &&
+          p.provider_revision === this.revision,
+      );
+      const profile = profiles.length === 1 ? profiles[0] : undefined;
+      if (
+        !profile ||
+        String(metadata.openssl_version).match(
+          /^OpenSSL (\d+\.\d+\.\d+)(?:\s|$)/,
+        )?.[1] !== artifacts.artifact(profile.openssl).version ||
+        metadata.zlib_version !== artifacts.artifact(profile.zlib).version ||
+        metadata.sqlite_version !==
+          artifacts.artifact(profile.sqlite).version ||
+        metadata.sqlite_source_id !==
+          artifacts.artifact(profile.sqlite).provenance?.sqlite_source_id
+      )
+        throw new RuntimeError('RUNTIME_CRYPTO_VERIFY_FAILED');
+      const linked: Record<string, string[]> = {};
+      for (const name of ['ssl', 'hashlib', 'zlib', 'sqlite']) {
+        const module = await fs.realpath(metadata[name + '_module']);
+        if (!module.startsWith(root + path.sep))
+          throw new RuntimeError('RUNTIME_VERIFY_FAILED');
+        const relative = path.relative(root, module).split(path.sep).join('/');
+        await this.paths.directory(
+          path
+            .relative(await this.paths.root(), path.dirname(module))
+            .split(path.sep)
+            .join('/'),
+        );
+        const digest = await artifacts.digestFile(module);
+        facts[name + '_module_relative'] = relative;
+        facts[name + '_module_sha256'] = digest.sha256;
+        const output = await ctx.command.run(
+          process.platform === 'darwin' ? '/usr/bin/otool' : '/usr/bin/ldd',
+          process.platform === 'darwin' ? ['-L', module] : [module],
+          ctx.directory,
+          ctx.environment,
+          true,
+        );
+        const lines = output
+          .split(/\r?\n/)
+          .slice(process.platform === 'darwin' ? 1 : 0);
+        linked[name] = [
+          ...new Set(
+            lines
+              .map((line) => line.trim().split(/\s+/)[0])
+              .filter(Boolean)
+              .map((file) => path.basename(file)),
+          ),
+        ].sort();
+        if (
+          !linked[name].length ||
+          linked[name].some((file) =>
+            /^lib(?:ssl|crypto|sqlite3)(?:[.-]|$)|^libz(?:[.-]|$)/i.test(file),
+          )
+        )
+          throw new RuntimeError('RUNTIME_CRYPTO_VERIFY_FAILED');
+      }
+      const cert = await fs.realpath(metadata.default_verify_paths.cafile);
+      if (!cert.startsWith(root + path.sep))
+        throw new RuntimeError('RUNTIME_CRYPTO_VERIFY_FAILED');
+      const digest = await artifacts.digestFile(cert);
+      if (digest.sha256 !== artifacts.artifact(profile.ca_bundle).sha256)
+        throw new RuntimeError('RUNTIME_CRYPTO_VERIFY_FAILED');
+      Object.assign(facts, {
+        openssl_version: metadata.openssl_version,
+        zlib_version: metadata.zlib_version,
+        default_certfile_relative: path
+          .relative(root, cert)
+          .split(path.sep)
+          .join('/'),
+        linked_library_names: linked,
+        python_sqlite_version: metadata.sqlite_version,
+        sqlite_version: metadata.sqlite_version,
+        sqlite_source_id: metadata.sqlite_source_id,
+      });
+    }
     return {
       disk_usage_bytes: await this.paths.diskUsage(root),
       version_text: metadata.version_text,
@@ -276,6 +454,7 @@ export default class PyenvProvider {
       platform: metadata.system,
       architecture: metadata.machine,
       executable_sha256: checksum,
+      ...facts,
     };
   }
   async uninstall(ctx: ProviderContext, runtime: RuntimeInstallation) {

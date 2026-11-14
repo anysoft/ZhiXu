@@ -1,0 +1,43 @@
+{
+  "format": 1,
+  "publisher": "ZhiXu controlled source build",
+  "openssh": {
+    "version": "10.6p2",
+    "url": "https://cdn.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-10.6p2.tar.gz",
+    "sha256": "9ae44872090cf2f06b3cf9ff147e7f16f309671340763ed2f99248398ae29d5b",
+    "signatureKeyFingerprint": "7168B983815A5EEF59A4ADFD2A3F414E736060BA"
+  },
+  "openssl": {
+    "version": "3.5.9",
+    "url": "https://github.com/openssl/openssl/releases/download/openssl-3.5.9/openssl-3.5.9.tar.gz",
+    "sha256": "603f5602e2eef00d77fbd429d34dcd5822bb301757a1bc9cdb24c670f1eb859a",
+    "checksumUrl": "https://github.com/openssl/openssl/releases/download/openssl-3.5.9/openssl-3.5.9.tar.gz.sha256"
+  },
+  "zlib": {
+    "version": "1.4",
+    "url": "https://zlib.net/zlib-1.4.tar.gz",
+    "sha256": "02dd159783677a749c04adbdd02b55b8a2bcc7e054f51b76b549199a916ad584",
+    "checksumUrl": "https://zlib.net/"
+  },
+  "git": {
+    "version": "2.50.2",
+    "url": "https://www.kernel.org/pub/software/scm/git/git-2.50.2.tar.xz",
+    "sha256": "b9d6be0e286803466f998ced664566de3368534eca7eda6d5d9358e40f55c151",
+    "checksumUrl": "https://www.kernel.org/pub/software/scm/git/sha256sums.asc",
+    "securityReleaseSource": "https://github.blog/open-source/git/git-security-vulnerabilities-announced-7/"
+  },
+  "curl": {
+    "version": "8.23.0",
+    "url": "https://curl.se/download/curl-8.23.0.tar.xz",
+    "sha256": "8dadd7d2536a314f982ad05a651b713f426bf7d02cc2c76cffb9796f2218e6c5",
+    "publisherDigestSource": "https://api.github.com/repos/curl/curl/releases/tags/curl-8_23_0"
+  },
+  "mbedtls": {
+    "version": "3.6.7",
+    "url": "https://github.com/Mbed-TLS/mbedtls/releases/download/mbedtls-3.6.7/mbedtls-3.6.7.tar.bz2",
+    "sha256": "a7e8bcbec0e6f761b4af24f25677626b35f762f68eef79c08677a363212d11f6",
+    "publisherDigestSource": "https://api.github.com/repos/Mbed-TLS/mbedtls/releases/tags/mbedtls-3.6.7",
+    "selectedLicense": "GPL-2.0-or-later",
+    "licenseSource": "https://raw.githubusercontent.com/Mbed-TLS/mbedtls/mbedtls-3.6.7/LICENSE"
+  }
+}

@@ -79,7 +79,7 @@ for (const scenario of scenarios)
           .click();
         f.adoptSession((await (await login).json()).data);
         await page.waitForURL('**/dashboard');
-      let childPid, releaseTask;
+        let childPid, releaseTask;
         if (
           [
             'LOG_POLLING',
@@ -88,9 +88,13 @@ for (const scenario of scenarios)
             'RESTORE_PENDING',
           ].includes(scenario)
         ) {
-        releaseTask = path.join(f.h.root, 'release-task');
-        const quoted = "'" + releaseTask.replace(/'/g, "'\\''") + "'";
-        run = await f.task('printf "S5R_BROWSER_CHILD=%s\\n" "$$"\nwhile [ ! -f ' + quoted + ' ]; do sleep 0.05; done\nprintf "S5R_BROWSER_SUCCESS\\n"\n');
+          releaseTask = path.join(f.h.root, 'release-task');
+          const quoted = "'" + releaseTask.replace(/'/g, "'\\''") + "'";
+          run = await f.task(
+            'printf "S5R_BROWSER_CHILD=%s\\n" "$$"\nwhile [ ! -f ' +
+              quoted +
+              ' ]; do sleep 0.05; done\nprintf "S5R_BROWSER_SUCCESS\\n"\n',
+          );
           await f.running(run.run_id);
           const log = await until(
             () => f.request('GET', `/task-runs/${run.run_id}/log`),
@@ -132,7 +136,10 @@ for (const scenario of scenarios)
               new URL(response.url()).pathname ===
               `/api/task-runs/${run.run_id}/log`,
           );
-          await page.goto(f.origin + '/runs/' + run.run_id);
+          // SPA navigation preserves the product's memory-only authenticated
+          // session; a new document deliberately requires another login.
+          await page.locator('.ant-menu').getByText('Runs', { exact: true }).click();
+          await page.locator(`a[href="/runs/${run.run_id}"]`).click();
           assert.equal((await observed).status(), 200);
           await page.getByTestId('run-log').waitFor();
         }
@@ -146,7 +153,10 @@ for (const scenario of scenarios)
           assert.ok(['QUEUED', 'RUNNING'].includes(status.body.data.status));
         }
         if (scenario === 'RESTORE_PENDING') {
-        await fs.writeFile(releaseTask, 'complete before the snapshot\n', { mode: 0o600, flag: 'wx' });
+          await fs.writeFile(releaseTask, 'complete before the snapshot\n', {
+            mode: 0o600,
+            flag: 'wx',
+          });
           assert.equal(
             (await f.terminal(run.run_id)).body.data.status,
             'SUCCESS',
@@ -187,16 +197,31 @@ for (const scenario of scenarios)
           context = undefined;
           closedBeforeSignal = true;
         }
-      if (run && scenario !== 'RESTORE_PENDING')
-        assert.equal((await f.request('GET', `/task-runs/${run.run_id}`)).body.data.status, 'RUNNING');
-      const stopping = f.shutdown();
-      if (releaseTask && scenario !== 'RESTORE_PENDING') {
-        // Release this specific child's natural-completion gate after SIGTERM.
-        // The owned control file is outside user source and Runtime domains.
-        await new Promise((resolve) => setTimeout(resolve, 100));
-        await fs.writeFile(releaseTask, 'natural completion during graceful stop\n', { mode: 0o600, flag: 'wx' });
-      }
-      const lifetime = await stopping;
+        if (run && scenario !== 'RESTORE_PENDING')
+          assert.equal(
+            (await f.request('GET', `/task-runs/${run.run_id}`)).body.data
+              .status,
+            'RUNNING',
+          );
+        assert.equal(browser.isConnected(), true);
+        const contextAliveAtSignal = !page.isClosed();
+        assert.equal(
+          contextAliveAtSignal,
+          scenario !== 'CONTEXT_ALREADY_CLOSED',
+        );
+        const stopping = f.shutdown();
+        if (releaseTask && scenario !== 'RESTORE_PENDING') {
+          // Release this specific child's natural-completion gate after SIGTERM.
+          // The owned control file is outside user source and Runtime domains.
+          await new Promise((resolve) => setTimeout(resolve, 100));
+          await fs.writeFile(
+            releaseTask,
+            'natural completion during graceful stop\n',
+            { mode: 0o600, flag: 'wx' },
+          );
+        }
+        const lifetime = await stopping;
+        assert.equal(browser.isConnected(), true);
         assert.equal(closedBeforeSignal, scenario === 'CONTEXT_ALREADY_CLOSED');
         if (scenario === 'AUTHENTICATED_UPLOAD') {
           const admission = lifetime.events.find(
@@ -247,6 +272,9 @@ for (const scenario of scenarios)
           application_pid: oldPid,
           independent_restart_pid: next.pid,
           browser_context_closed_before_sigterm: closedBeforeSignal,
+          browser_context_alive_at_sigterm: contextAliveAtSignal,
+          browser_process_connected_after_application_exit:
+            browser.isConnected(),
           mocked_business_http: false,
           shutdown_duration_ms: lifetime.shutdown_duration_ms,
           shutdown_events: lifetime.events,

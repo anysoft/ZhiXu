@@ -1,0 +1,13 @@
+{
+  "fork": "@whyour/sqlite3@1.1.2",
+  "coreVersion": "3.54.1",
+  "sourceId": "2026-10-16 14:45:20 555e07ef33f69a0957d24d8e555b702464a131d6f1607f4c3c1e4551e8e6ca76",
+  "sourceUrl": "https://sqlite.org/2026/sqlite-autoconf-3540100.tar.gz",
+  "sourceSha256": "926ef8d3eab93fbf6e06011901273eec076b25594a4e1cdadd50c987f4f6d64e",
+  "sourceSha3_256": "b6ced585c750916b1052667239a12c25a7ff34e7f06e1e6e01ecb0427657d9c4",
+  "publisher": "SQLite project",
+  "publisherChecksumSource": "https://sqlite.org/download.html",
+  "signatureStatus": "SIGNATURE_NOT_AVAILABLE",
+  "napiTarget": 6,
+  "upstreamPrebuiltAllowed": false
+}

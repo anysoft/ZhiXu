@@ -3,6 +3,8 @@ import { DesiredPackage, ResolvedPackage } from '../data/pythonEnvironment';
 import { RuntimeError } from '../shared/runtime';
 import { ProviderContext } from './pyenvProvider';
 import PythonEnvironmentPathResolver from './pythonEnvironmentPaths';
+import { VerifiedRuntimeArtifactStore } from './runtimeArtifacts';
+import { currentRuntimeDomain } from './runtimeDomainScope';
 /** An index is a server-owned policy. HTTP loopback is only available via constructor injection in tests. */
 export default class PipPackageManager {
   constructor(
@@ -15,6 +17,11 @@ export default class PipPackageManager {
     args: string[],
     capture = false,
   ) {
+    if (
+      currentRuntimeDomain() &&
+      !VerifiedRuntimeArtifactStore.current(this.paths.runtime.dataRoot)
+    )
+      throw new RuntimeError('RUNTIME_ARTIFACT_TRUST_CONFIGURATION_REQUIRED');
     const environment = {
       ...ctx.environment,
       PIP_CONFIG_FILE: '/dev/null',
@@ -23,6 +30,10 @@ export default class PipPackageManager {
       PIP_REQUIRE_VIRTUALENV: 'true',
       PIP_CACHE_DIR: await this.paths.cache(),
       PYTHONDONTWRITEBYTECODE: '1',
+      ...(VerifiedRuntimeArtifactStore.current(this.paths.runtime.dataRoot)
+        ?.options.mode === 'OFFLINE_VERIFIED'
+        ? { PIP_NO_INDEX: '1' }
+        : {}),
     };
     return ctx.command.run(
       python,
@@ -47,6 +58,14 @@ export default class PipPackageManager {
     python: string,
     dependencies: DesiredPackage[],
   ) {
+    const artifacts = VerifiedRuntimeArtifactStore.current(
+      this.paths.runtime.dataRoot,
+    );
+    if (currentRuntimeDomain() && !artifacts)
+      throw new RuntimeError('RUNTIME_ARTIFACT_TRUST_CONFIGURATION_REQUIRED');
+    if (dependencies.length && artifacts?.options.mode === 'OFFLINE_VERIFIED')
+      throw new RuntimeError('RUNTIME_ARTIFACT_CLOSURE_UNAVAILABLE');
+    if (artifacts) await artifacts.verifyPythonPip(ctx, python);
     if (!dependencies.length) return;
     try {
       await this.run(ctx, python, [
@@ -71,6 +90,10 @@ export default class PipPackageManager {
     python: string,
     dependencies: DesiredPackage[],
   ) {
+    const artifacts = VerifiedRuntimeArtifactStore.current(
+      this.paths.runtime.dataRoot,
+    );
+    if (artifacts) await artifacts.verifyPythonPip(ctx, python);
     const list = JSON.parse(
       await this.run(ctx, python, ['list', '--format=json'], true),
     );

@@ -1,6 +1,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 import { createHash } from 'crypto';
+import { isDeepStrictEqual } from 'util';
 import type { ExecutionContext } from '../../shared/execution';
 import type { RuntimeInstallation, RuntimeProvider } from '../../data/runtime';
 import type {
@@ -19,6 +20,9 @@ import { RuntimeLease } from '../runtimeProcess';
 import { openRegular } from '../backup/files';
 import { WorkspaceStore } from '../workspaceV2/store';
 import { fail, positiveId } from '../workspaceV2/errors';
+import { VerifiedRuntimeArtifactStore } from '../runtimeArtifacts';
+import { runtimeArtifactsFor } from '../runtimeArtifactScope';
+import { runtimeTreeDigest } from '../runtimeTreeWitness';
 
 export interface PhysicalRuntimeSelection {
   kind: 'PYTHON' | 'NODE' | 'SHELL';
@@ -63,10 +67,523 @@ export class ManagedRuntimeAdapter {
   readonly paths: RuntimePathResolver;
   readonly python: PythonEnvironmentPathResolver;
   readonly node: NodePathResolver;
-  constructor(readonly store: WorkspaceStore) {
+  constructor(
+    readonly store: WorkspaceStore,
+    private readonly approvedArtifacts?: VerifiedRuntimeArtifactStore,
+  ) {
     this.paths = new RuntimePathResolver(store.dataRoot);
     this.python = new PythonEnvironmentPathResolver(this.paths);
     this.node = new NodePathResolver(store.dataRoot);
+  }
+
+  private artifactPolicy() {
+    // Services are constructed before the Runtime domain is opened. Resolve
+    // immutable boot configuration lazily for this exact database owner.
+    const bound = runtimeArtifactsFor(this.store);
+    if (bound && this.approvedArtifacts && bound !== this.approvedArtifacts)
+      fail('RUNTIME_NOT_READY');
+    const artifacts = this.approvedArtifacts ?? bound;
+    if (
+      !(artifacts instanceof VerifiedRuntimeArtifactStore) ||
+      !Object.isFrozen(artifacts) ||
+      artifacts.dataRoot !== this.store.dataRoot
+    )
+      fail('RUNTIME_NOT_READY');
+    return artifacts;
+  }
+
+  private approvedProvenance(
+    artifacts: VerifiedRuntimeArtifactStore,
+    value: unknown,
+    id: string,
+  ) {
+    const proof = metadata(value),
+      approved = artifacts.artifact(id);
+    if (
+      proof.manifest_sha256 !== artifacts.manifestSha256 ||
+      proof.trust_anchor_sha256 !== artifacts.trustAnchorSha256 ||
+      proof.trust_method !== 'INDEPENDENT_PREAPPROVED_MANIFEST_SHA256' ||
+      !['ONLINE_VERIFIED', 'OFFLINE_VERIFIED'].includes(String(proof.mode)) ||
+      typeof proof.verified_at !== 'string' ||
+      !Number.isFinite(Date.parse(proof.verified_at))
+    )
+      fail('RUNTIME_NOT_READY');
+    for (const [key, expected] of Object.entries(approved))
+      if (!isDeepStrictEqual(proof[key], expected)) fail('RUNTIME_NOT_READY');
+    return approved;
+  }
+
+  private async verifiedInputs(
+    file: string,
+    expected: Record<string, unknown>,
+  ) {
+    const handle = await openRegular(file, false);
+    try {
+      const before = await handle.stat();
+      if (
+        before.nlink !== 1 ||
+        before.size > 1024 * 1024 ||
+        before.mode & 0o077 ||
+        (process.getuid && before.uid !== process.getuid())
+      )
+        fail('RUNTIME_NOT_READY');
+      const owner = metadata(JSON.parse(await handle.readFile('utf8')));
+      const after = await handle.stat(),
+        named = await fs.lstat(file);
+      for (const current of [after, named])
+        if (
+          !current.isFile() ||
+          current.isSymbolicLink() ||
+          current.nlink !== 1 ||
+          current.dev !== before.dev ||
+          current.ino !== before.ino ||
+          current.size !== before.size ||
+          current.mtimeMs !== before.mtimeMs ||
+          current.ctimeMs !== before.ctimeMs
+        )
+          fail('RUNTIME_NOT_READY');
+      if (!isDeepStrictEqual(owner.verified_inputs, expected))
+        fail('RUNTIME_NOT_READY');
+    } finally {
+      await handle.close();
+    }
+  }
+
+  private async inspectNodeArtifacts(
+    runtime: JsonRow<RuntimeInstallation> & {
+      metadata: Record<string, unknown>;
+    },
+    tool: JsonRow<NodePackageManagerToolchain> & {
+      metadata: Record<string, unknown>;
+    },
+    build: NodeEnvironmentBuild,
+    runtimeRoot: string,
+    buildRoot: string,
+    language?: string,
+  ) {
+    const artifacts = this.artifactPolicy();
+    const approved = artifacts.nodeDistribution(runtime.version);
+    const archive = this.approvedProvenance(
+      artifacts,
+      runtime.metadata.verified_artifact,
+      approved.archive,
+    );
+    const npm = this.approvedProvenance(
+      artifacts,
+      runtime.metadata.verified_npm,
+      approved.npm,
+    );
+    const nodeProof = metadata(archive.provenance),
+      npmProof = metadata(npm.provenance);
+    if (
+      npm.npm_name !== 'npm' ||
+      runtime.metadata.npm_version !== npm.npm_version ||
+      npmProof.cli_relative_path !== 'bin/npm-cli.js'
+    )
+      fail('RUNTIME_NOT_READY');
+    for (const checksum of [
+      nodeProof.executable_sha256,
+      npmProof.cli_sha256,
+      npmProof.tree_sha256,
+    ])
+      if (typeof checksum !== 'string' || !/^[a-f0-9]{64}$/.test(checksum))
+        fail('RUNTIME_NOT_READY');
+    if (
+      runtime.metadata.executable_sha256 !== nodeProof.executable_sha256 ||
+      runtime.metadata.npm_cli_sha256 !== npmProof.cli_sha256
+    )
+      fail('RUNTIME_NOT_READY');
+    const npmRoot = path.join(runtimeRoot, 'lib/node_modules/npm');
+    const npmManifest = JSON.parse(
+      await this.node.text(runtimeRoot, 'lib/node_modules/npm/package.json'),
+    );
+    const npmTree = await runtimeTreeDigest(npmRoot);
+    if (
+      npmManifest.name !== 'npm' ||
+      npmManifest.version !== npm.npm_version ||
+      npmTree.sha256 !== npmProof.tree_sha256 ||
+      npmTree.entry_count !== npmProof.tree_entry_count
+    )
+      fail('RUNTIME_NOT_READY');
+    const runtimeInputs = {
+      schema: 1,
+      kind: 'NODE_RUNTIME',
+      manifest_sha256: artifacts.manifestSha256,
+      trust_anchor_sha256: artifacts.trustAnchorSha256,
+      archive_artifact_id: approved.archive,
+      npm_artifact_id: approved.npm,
+      executable_sha256: nodeProof.executable_sha256,
+      npm_cli_sha256: npmProof.cli_sha256,
+      npm_tree_sha256: npmProof.tree_sha256,
+    };
+    if (!isDeepStrictEqual(runtime.metadata.verified_inputs, runtimeInputs))
+      fail('RUNTIME_NOT_READY');
+    await this.verifiedInputs(
+      await this.node.marker('runtime', runtime.id),
+      runtimeInputs,
+    );
+
+    let closure: Awaited<
+      | ReturnType<VerifiedRuntimeArtifactStore['npmClosure']>
+      | ReturnType<VerifiedRuntimeArtifactStore['pnpmClosure']>
+    >;
+    if (tool.manager_type === 'NPM') {
+      if (
+        tool.version !== npm.npm_version ||
+        tool.metadata.cli_sha256 !== npmProof.cli_sha256
+      )
+        fail('RUNTIME_NOT_READY');
+      closure = await artifacts.npmClosure(
+        build.package_json,
+        runtime.version,
+        tool.version,
+      );
+    } else if (tool.manager_type === 'PNPM') {
+      if (artifacts.options.mode !== 'ONLINE_VERIFIED')
+        fail('RUNTIME_NOT_READY');
+      const approvedClosure = await artifacts.pnpmClosure(
+        build.package_json,
+        runtime.version,
+        tool.version,
+      );
+      const pnpm = this.approvedProvenance(
+        artifacts,
+        tool.metadata.verified_artifact,
+        approvedClosure.toolchain,
+      );
+      const proof = metadata(pnpm.provenance),
+        toolRoot = await this.node.assertOwned('toolchain', tool.id);
+      const packageRoot = await artifacts.packageRoot(toolRoot, 'pnpm');
+      const pkg = JSON.parse(await this.node.text(packageRoot, 'package.json'));
+      const tree = await runtimeTreeDigest(packageRoot);
+      if (
+        pnpm.npm_name !== 'pnpm' ||
+        pnpm.npm_version !== tool.version ||
+        proof.cli_relative_path !== 'bin/pnpm.cjs' ||
+        pkg.name !== 'pnpm' ||
+        pkg.version !== tool.version ||
+        tool.metadata.cli_sha256 !== proof.cli_sha256 ||
+        (await this.digest(
+          await this.node.file(packageRoot, 'bin/pnpm.cjs'),
+        )) !== proof.cli_sha256 ||
+        tree.sha256 !== proof.tree_sha256 ||
+        tree.entry_count !== proof.tree_entry_count
+      )
+        fail('RUNTIME_NOT_READY');
+      const toolInputs = {
+        schema: 1,
+        kind: 'NODE_TOOLCHAIN',
+        manifest_sha256: artifacts.manifestSha256,
+        trust_anchor_sha256: artifacts.trustAnchorSha256,
+        tool_artifact_id: pnpm.id,
+        cli_sha256: proof.cli_sha256,
+        tree_sha256: proof.tree_sha256,
+      };
+      if (!isDeepStrictEqual(tool.metadata.verified_inputs, toolInputs))
+        fail('RUNTIME_NOT_READY');
+      await this.verifiedInputs(
+        await this.node.marker('toolchain', tool.id),
+        toolInputs,
+      );
+      closure = approvedClosure;
+    } else fail('RUNTIME_NOT_READY');
+    const lock = artifacts.artifact(closure.lockfile);
+    if (build.lock_hash !== lock.sha256) fail('RUNTIME_NOT_READY');
+    const inputs: Record<string, unknown> = {
+      schema: 1,
+      kind: 'NODE_BUILD',
+      manifest_sha256: artifacts.manifestSha256,
+      trust_anchor_sha256: artifacts.trustAnchorSha256,
+      lock_artifact_id: closure.lockfile,
+      lock_artifact_sha256: lock.sha256,
+    };
+    const tsxArtifacts = closure.packages
+      .map((id) => artifacts.artifact(id))
+      .filter((a) => a.npm_name === 'tsx');
+    if (
+      tsxArtifacts.length > 1 ||
+      (language === 'TYPESCRIPT' && tsxArtifacts.length !== 1)
+    )
+      fail('RUNTIME_NOT_READY');
+    if (tsxArtifacts.length) {
+      const tsx = tsxArtifacts[0],
+        proof = metadata(tsx.provenance);
+      if (
+        typeof proof.cli_relative_path !== 'string' ||
+        !['dist/cli.mjs', './dist/cli.mjs'].includes(proof.cli_relative_path) ||
+        typeof proof.cli_sha256 !== 'string' ||
+        !/^[a-f0-9]{64}$/.test(proof.cli_sha256) ||
+        typeof proof.tree_sha256 !== 'string' ||
+        !/^[a-f0-9]{64}$/.test(proof.tree_sha256)
+      )
+        fail('RUNTIME_NOT_READY');
+      const tsxRoot = await artifacts.packageRoot(buildRoot, 'tsx'),
+        tree = await runtimeTreeDigest(tsxRoot);
+      const packageJson = JSON.parse(
+        await this.node.text(tsxRoot, 'package.json'),
+      );
+      const declaredCli =
+        typeof packageJson.bin === 'string'
+          ? packageJson.bin
+          : packageJson.bin?.tsx;
+      if (
+        packageJson.name !== 'tsx' ||
+        packageJson.version !== tsx.npm_version ||
+        declaredCli !== proof.cli_relative_path ||
+        tree.sha256 !== proof.tree_sha256 ||
+        tree.entry_count !== proof.tree_entry_count ||
+        (await this.digest(await this.node.file(tsxRoot, 'dist/cli.mjs'))) !==
+          proof.cli_sha256
+      )
+        fail('RUNTIME_NOT_READY');
+      Object.assign(inputs, {
+        tsx_artifact_id: tsx.id,
+        tsx_cli_relative_path: proof.cli_relative_path,
+        tsx_cli_sha256: proof.cli_sha256,
+        tsx_tree_sha256: proof.tree_sha256,
+      });
+    }
+    if (closure.esbuild) {
+      const esbuild = artifacts.artifact(closure.esbuild.artifact);
+      if (
+        esbuild.format !== 'binary' ||
+        esbuild.acquisition !== 'VERIFIED_REBUILD' ||
+        !esbuild.provenance ||
+        esbuild.version !== closure.esbuild.version ||
+        closure.esbuild.package_name !==
+          '@esbuild/' + process.platform + '-' + process.arch
+      )
+        fail('RUNTIME_NOT_READY');
+      const fromRoot = tsxArtifacts.length
+        ? await artifacts.packageRoot(buildRoot, 'tsx')
+        : buildRoot;
+      const esbuildRoot = await artifacts.packageRoot(
+        buildRoot,
+        'esbuild',
+        fromRoot,
+      );
+      const binaryRoot = await artifacts.packageRoot(
+        buildRoot,
+        closure.esbuild.package_name,
+        esbuildRoot,
+      );
+      for (const root of [binaryRoot, esbuildRoot])
+        await this.executable(
+          await this.node.file(root, 'bin/esbuild'),
+          esbuild.sha256,
+        );
+      Object.assign(inputs, {
+        esbuild_artifact_id: esbuild.id,
+        esbuild_sha256: esbuild.sha256,
+        esbuild_package: closure.esbuild.package_name,
+        esbuild_publisher: esbuild.publisher,
+        esbuild_build_provenance: esbuild.provenance,
+      });
+    }
+    if (!isDeepStrictEqual(build.metadata.verified_artifacts, inputs))
+      fail('RUNTIME_NOT_READY');
+    await this.verifiedInputs(
+      await this.node.marker('build', build.id),
+      inputs,
+    );
+  }
+
+  private async inspectPythonArtifacts(
+    runtime: JsonRow<RuntimeInstallation> & {
+      metadata: Record<string, unknown>;
+    },
+    provider: RuntimeProvider,
+    root: string,
+    venv: string,
+  ) {
+    const artifacts = this.artifactPolicy(),
+      revision = provider.provider_revision;
+    if (typeof revision !== 'string') fail('RUNTIME_NOT_READY');
+    const rows = artifacts.manifest.python.filter(
+      (p) => p.version === runtime.version && p.provider_revision === revision,
+    );
+    if (rows.length !== 1) fail('RUNTIME_NOT_READY');
+    const approved = rows[0] as (typeof rows)[number] & {
+      definition: string;
+      openssl: string;
+      zlib: string;
+      ca_bundle: string;
+      sqlite: string;
+      pip_wheel: string;
+    };
+    for (const id of [
+      approved.definition,
+      approved.openssl,
+      approved.zlib,
+      approved.ca_bundle,
+      approved.sqlite,
+      approved.pip_wheel,
+    ])
+      if (typeof id !== 'string') fail('RUNTIME_NOT_READY');
+    const providerArtifact = artifacts.pythonProvider(revision);
+    this.approvedProvenance(
+      artifacts,
+      runtime.metadata.verified_provider,
+      providerArtifact,
+    );
+    const sources = artifacts.pythonSources(runtime.version, revision);
+    const proofs = array<unknown>(runtime.metadata.verified_sources);
+    if (proofs.length !== sources.length) fail('RUNTIME_NOT_READY');
+    sources.forEach((source, i) =>
+      this.approvedProvenance(artifacts, proofs[i], source.artifact),
+    );
+    const inputs = metadata(runtime.metadata.verified_inputs);
+    const pip = artifacts.artifact(approved.pip_wheel),
+      pipProof = metadata(pip.provenance);
+    const expected: Record<string, unknown> = {
+      schema: 1,
+      kind: 'PYTHON_RUNTIME',
+      manifest_sha256: artifacts.manifestSha256,
+      trust_anchor_sha256: artifacts.trustAnchorSha256,
+      provider_artifact_id: providerArtifact,
+      definition_artifact_id: approved.definition,
+      source_artifact_ids: sources.map((s) => s.artifact),
+      ca_bundle_artifact_id: approved.ca_bundle,
+      sqlite_artifact_id: approved.sqlite,
+      pip_artifact_id: pip.id,
+      pip_wheel_sha256: pip.sha256,
+      pip_init_sha256: pipProof.pip_init_sha256,
+      pip_vendor_manifest_sha256: pipProof.pip_vendor_manifest_sha256,
+      pip_version: pip.version,
+      executable_sha256: runtime.metadata.executable_sha256,
+      ssl_module_sha256: inputs.ssl_module_sha256,
+      hashlib_module_sha256: inputs.hashlib_module_sha256,
+      zlib_module_sha256: inputs.zlib_module_sha256,
+      sqlite_module_sha256: inputs.sqlite_module_sha256,
+      sqlite_version: artifacts.artifact(approved.sqlite).version,
+      sqlite_source_id: metadata(artifacts.artifact(approved.sqlite).provenance)
+        .sqlite_source_id,
+      openssl_version: inputs.openssl_version,
+      zlib_version: inputs.zlib_version,
+      ca_bundle_sha256: artifacts.artifact(approved.ca_bundle).sha256,
+    };
+    if (!isDeepStrictEqual(inputs, expected)) fail('RUNTIME_NOT_READY');
+    const opensslVersion = String(inputs.openssl_version).match(
+      /^OpenSSL (\d+\.\d+\.\d+)(?:\s|$)/,
+    )?.[1];
+    const approvedOpenSslVersion = artifacts
+      .artifact(approved.openssl)
+      .version.match(/(?:^|[^0-9])(\d+\.\d+\.\d+)(?:$|[^0-9])/u)?.[1];
+    const approvedZlibVersion = artifacts
+      .artifact(approved.zlib)
+      .version.replace(/^zlib-/, '');
+    if (
+      !opensslVersion ||
+      opensslVersion !== approvedOpenSslVersion ||
+      inputs.zlib_version !== approvedZlibVersion ||
+      runtime.metadata.openssl_version !== inputs.openssl_version ||
+      runtime.metadata.zlib_version !== inputs.zlib_version ||
+      runtime.metadata.sqlite_version !== expected.sqlite_version ||
+      runtime.metadata.sqlite_source_id !== expected.sqlite_source_id ||
+      runtime.metadata.sqlite_module_sha256 !== inputs.sqlite_module_sha256 ||
+      typeof expected.sqlite_source_id !== 'string' ||
+      !expected.sqlite_source_id ||
+      runtime.metadata.pip_version !== pip.version
+    )
+      fail('RUNTIME_NOT_READY');
+    for (const checksum of [
+      pipProof.pip_init_sha256,
+      pipProof.pip_vendor_manifest_sha256,
+    ])
+      if (typeof checksum !== 'string' || !/^[a-f0-9]{64}$/.test(checksum))
+        fail('RUNTIME_NOT_READY');
+    const lib = 'lib/python' + runtime.version.split('.').slice(0, 2).join('.');
+    const pipInit = lib + '/site-packages/pip/__init__.py';
+    const pipVendor = lib + '/site-packages/pip/_vendor/vendor.txt';
+    const wheel = 'pip-wheels/' + pipProof.wheel_filename;
+    if (
+      typeof pipProof.wheel_filename !== 'string' ||
+      !/^[a-zA-Z0-9._-]+\.whl$/.test(pipProof.wheel_filename) ||
+      runtime.metadata.pip_init_relative !== pipInit ||
+      runtime.metadata.pip_vendor_manifest_relative !== pipVendor ||
+      runtime.metadata.pip_wheel_relative !== wheel
+    )
+      fail('RUNTIME_NOT_READY');
+    for (const [relative, checksum] of [
+      [pipInit, pipProof.pip_init_sha256],
+      [pipVendor, pipProof.pip_vendor_manifest_sha256],
+      [wheel, pip.sha256],
+    ] as const)
+      if (
+        (await this.digest(await this.node.file(root, relative))) !== checksum
+      )
+        fail('RUNTIME_NOT_READY');
+    // A repaired base Runtime must not bless an older READY venv's bundled pip.
+    for (const [relative, checksum] of [
+      [pipInit, pipProof.pip_init_sha256],
+      [pipVendor, pipProof.pip_vendor_manifest_sha256],
+    ] as const)
+      if (
+        (await this.digest(await this.node.file(venv, relative))) !== checksum
+      )
+        fail('RUNTIME_NOT_READY');
+    const bundled = path.join(root, lib, 'ensurepip/_bundled');
+    const oldWheels = await (async () => {
+      try {
+        await this.existing(
+          path.relative(this.store.dataRoot, bundled).split(path.sep).join('/'),
+        );
+        return await fs.readdir(bundled, { withFileTypes: true });
+      } catch (error) {
+        if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error;
+        return [];
+      }
+    })();
+    for (const entry of oldWheels)
+      if (
+        !entry.isFile() ||
+        entry.isSymbolicLink() ||
+        /\.whl$/i.test(entry.name)
+      )
+        fail('RUNTIME_NOT_READY');
+    const linked = metadata(runtime.metadata.linked_library_names);
+    for (const name of ['ssl', 'hashlib', 'zlib', 'sqlite']) {
+      const libraries = linked[name];
+      if (
+        !Array.isArray(libraries) ||
+        !libraries.length ||
+        libraries.some(
+          (library) =>
+            typeof library !== 'string' ||
+            path.basename(library) !== library ||
+            /[\\\0]/.test(library) ||
+            /^lib(?:ssl|crypto|sqlite3)(?:[.-]|$)|^libz(?:[.-]|$)/i.test(
+              library,
+            ),
+        )
+      )
+        fail('RUNTIME_NOT_READY');
+    }
+    for (const [field, checksum, prefix] of [
+      ['ssl_module_relative', 'ssl_module_sha256', '_ssl.'],
+      ['hashlib_module_relative', 'hashlib_module_sha256', '_hashlib.'],
+      ['zlib_module_relative', 'zlib_module_sha256', 'zlib.'],
+      ['sqlite_module_relative', 'sqlite_module_sha256', '_sqlite3.'],
+    ]) {
+      const relative = runtime.metadata[field],
+        digest = inputs[checksum];
+      if (
+        typeof relative !== 'string' ||
+        !path.posix.basename(relative).startsWith(prefix) ||
+        typeof digest !== 'string' ||
+        !/^[a-f0-9]{64}$/.test(digest) ||
+        (await this.digest(await this.node.file(root, relative))) !== digest
+      )
+        fail('RUNTIME_NOT_READY');
+    }
+    const certfile = runtime.metadata.default_certfile_relative;
+    if (
+      typeof certfile !== 'string' ||
+      (await this.digest(await this.node.file(root, certfile))) !==
+        expected.ca_bundle_sha256
+    )
+      fail('RUNTIME_NOT_READY');
+    await this.verifiedInputs(await this.paths.ownership(runtime.id), expected);
   }
 
   private async existing(relative: string) {
@@ -181,6 +698,12 @@ export class ManagedRuntimeAdapter {
       location.base.executable,
       runtime.metadata.executable_sha256,
     );
+    await this.inspectPythonArtifacts(
+      runtime,
+      provider,
+      location.base.root,
+      location.venv,
+    );
     return {
       kind: 'PYTHON',
       executable: location.executable,
@@ -263,6 +786,14 @@ export class ManagedRuntimeAdapter {
     );
     if ((await this.digest(cli)) !== tool.metadata.cli_sha256)
       fail('RUNTIME_NOT_READY');
+    await this.inspectNodeArtifacts(
+      runtime,
+      tool,
+      build,
+      runtimeRoot,
+      buildRoot,
+      language,
+    );
     const result: ManagedRuntimeSnapshot = {
       kind: 'NODE',
       executable,
@@ -322,6 +853,7 @@ export class ManagedRuntimeAdapter {
     }
     if (!environmentId) fail('CONFIGURATION_REQUIRED');
     try {
+      this.artifactPolicy();
       return kind === 'PYTHON'
         ? await this.inspectPython(environmentId)
         : await this.inspectNode(environmentId, language);

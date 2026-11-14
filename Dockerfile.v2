@@ -1,29 +1,53 @@
 # Explicit fresh-v2 candidate. The default Dockerfile remains the v9 image.
-# Both native-addon installation and compilation run for the target platform.
-FROM node:22.23.5-bookworm-slim@sha256:e9f565d32859f0cbfb52125eafe8be39390f24dac302dc3cdf566e8ba3ab21ee AS toolchain
+# Supported Node patch on Debian 13; no packages are mixed from testing/unstable.
+FROM node:22.23.5-trixie-slim@sha256:68c76cfad89921b927eae28ba21407475e29d0ce450afcdbe70c1532db042b64 AS toolchain
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential python3 git ca-certificates \
+    build-essential python3 perl git ca-certificates \
     && rm -rf /var/lib/apt/lists/*
-RUN npm install --global pnpm@8.3.1
+# Bootstrap bytes are fixed independently of the old npm bundled in Node's image.
+ADD --checksum=sha256:8ad8563b81e71b90ef405b140bccf3ba9b5e7884ab210bd49ee4e2f4bc6f61f5 https://registry.npmjs.org/npm/-/npm-11.21.2.tgz /tmp/zhixu-npm.tgz
+ADD --checksum=sha256:7e8a946108e7baab119e51d27c24d6178b46545422643dbc91e34e2f1ee32e0f https://registry.npmjs.org/pnpm/-/pnpm-10.34.9.tgz /tmp/zhixu-pnpm.tgz
+RUN rm -rf /usr/local/lib/node_modules/npm \
+    && mkdir -p /usr/local/lib/node_modules/npm /opt/zhixu-build-pnpm \
+    && tar -xzf /tmp/zhixu-npm.tgz --strip-components=1 -C /usr/local/lib/node_modules/npm \
+    && tar -xzf /tmp/zhixu-pnpm.tgz --strip-components=1 -C /opt/zhixu-build-pnpm \
+    && ln -s /opt/zhixu-build-pnpm/bin/pnpm.cjs /usr/local/bin/pnpm \
+    && rm -f /tmp/zhixu-npm.tgz /tmp/zhixu-pnpm.tgz \
+    && node /usr/local/lib/node_modules/npm/bin/npm-cli.js --version \
+    && pnpm --version
+ENV npm_config_nodedir=/usr/local
 WORKDIR /build
 
+FROM toolchain AS native-git
+COPY scripts/native /native/scripts/native
+RUN mkdir -p /native/bin /native/sources /native/work \
+    && bash /native/scripts/native/build-git-tools.sh \
+       --output /native/bin/git-tools --source-cache /native/sources \
+       --work-parent /native/work --jobs 2
+
 FROM toolchain AS dependencies
-COPY package.json pnpm-lock.yaml .npmrc ./
-RUN pnpm install --frozen-lockfile --ignore-scripts && pnpm rebuild
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
+COPY patches ./patches
+COPY scripts/native/verify-sqlite.cjs scripts/native/sqlite-core.json ./scripts/native/
+RUN pnpm install --frozen-lockfile
 
 FROM dependencies AS compile
 COPY . .
-RUN npm run build:v2
+COPY --from=native-git /native/bin/git-tools ./bin/git-tools
+RUN node scripts/build-v2.cjs
 
 FROM compile AS build
-# Keep the locked runtime graph, including target-native SQLite bindings.
+# Keep the exact runtime graph; fail closed if the source-built SQLite is absent.
 RUN npm_config_ignore_scripts=true pnpm prune --prod \
     && pnpm rebuild \
-    && node -e 'const sqlite3 = require("sqlite3"); const db = new sqlite3.Database(":memory:", error => { if (error) throw error; db.close(error => { if (error) throw error; }); });'
+    && node scripts/native/verify-sqlite.cjs
 
-FROM node:22.23.5-bookworm-slim@sha256:e9f565d32859f0cbfb52125eafe8be39390f24dac302dc3cdf566e8ba3ab21ee AS runtime
+FROM node:22.23.5-trixie-slim@sha256:68c76cfad89921b927eae28ba21407475e29d0ce450afcdbe70c1532db042b64 AS runtime
+# Compiler/headers are required by the retained online CPython source provider.
+# The host-distribution openssh-client is intentionally not installed: v2 uses
+# the verified candidate bundle including static, supported crypto dependencies.
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    tini bash coreutils util-linux git openssh-client openssl ca-certificates curl \
+    tini bash coreutils util-linux git openssl ca-certificates curl \
     tar gzip xz-utils tzdata python3 build-essential libssl-dev zlib1g-dev \
     libbz2-dev libreadline-dev libsqlite3-dev libffi-dev liblzma-dev libncurses-dev uuid-dev \
     && rm -rf /var/lib/apt/lists/* \
@@ -36,9 +60,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && chmod 0700 /data /data/home /backup /scratch /scratch/tmp
 WORKDIR /app
 COPY --from=build /build/node_modules ./node_modules
+COPY --from=build /build/bin/git-tools ./bin/git-tools
 COPY --from=build /build/static/build ./static/build
 COPY --from=build /build/static/dist-v2 ./static/dist-v2
-COPY --from=build /build/package.json /build/pnpm-lock.yaml /build/version.yaml /build/LICENSE ./
+COPY --from=build /build/package.json /build/pnpm-lock.yaml /build/pnpm-workspace.yaml /build/version.yaml /build/LICENSE ./
 COPY --from=build /build/shell/*.py ./shell/
 COPY --from=build /build/scripts/release-v2 ./scripts/release-v2
 COPY --from=build /build/scripts/release/entrypoint.cjs ./scripts/release/entrypoint.cjs
@@ -56,7 +81,6 @@ ENV NODE_ENV=production \
     HOME=/data/home TMPDIR=/scratch/tmp \
     ZHIXU_V2_DATA_ROOT=/data/state ZHIXU_V2_BACKUP_ROOT=/backup/state \
     LANG=C.UTF-8 LOG_LEVEL=info
-# Assets are root-owned and immutable to the service UID even without --read-only.
 RUN chmod -R a-w /app
 USER 10001:10001
 EXPOSE 5600

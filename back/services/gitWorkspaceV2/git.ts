@@ -8,6 +8,7 @@ import GitCredentialResolver, {
   GitAccessContext,
 } from '../gitCredentialResolver';
 import { normalizeRepositoryUrl } from '../../shared/gitProvider';
+import { verifiedGitSshTools } from '../../shared/nativeGitTools';
 import { WorkspaceGuard } from '../workspaceLocks';
 import { WorkspaceStore } from '../workspaceV2/store';
 import { WorkspaceRootResolver } from '../workspaceV2/roots';
@@ -126,6 +127,8 @@ export class WorkspaceGitAdapter {
     readonly roots: WorkspaceRootResolver,
     readonly options: {
       accessResolver?: WorkspaceGitAccessResolver;
+      /** Trusted composition only; never read from an HTTP DTO or environment. */
+      gitToolsRoot?: string;
       fault?: FaultHook;
     } = {},
   ) {
@@ -186,6 +189,7 @@ export class WorkspaceGitAdapter {
       ) => Promise<{ code: number; stdout: string; stderr: string }>,
     ) => Promise<T>,
   ) {
+    const tools = await verifiedGitSshTools(this.options.gitToolsRoot);
     for (const lease of leases) await lease.assertHeld();
     if (options.signal?.aborted) stop('SYNC_CANCELLED');
     const fds = [
@@ -266,7 +270,7 @@ export class WorkspaceGitAdapter {
                 ...args,
               ],
               cwd,
-              environment,
+              { ...environment, PATH: tools.binPath + ':/usr/bin:/bin', GIT_EXEC_PATH: tools.execPath },
               timeout,
               'git',
               4 * 1024 * 1024,
@@ -434,7 +438,10 @@ export class WorkspaceGitAdapter {
       }
     }
     try {
-      return await new GitCredentialResolver().resolve(
+      return await new GitCredentialResolver({
+        requireBundledSsh: true,
+        gitToolsRoot: this.options.gitToolsRoot,
+      }).resolve(
         credential,
         secret,
         repository.remote_url,
@@ -458,7 +465,7 @@ export class WorkspaceGitAdapter {
       // The existing resolver owns credential helpers. Unrelated host loaders,
       // proxy settings and executable search paths are not inherited by Git.
       for (const [key, value] of Object.entries(access.env))
-        if (/^(?:GIT_|SSH_ASKPASS|SSH_ASKPASS_REQUIRE|DISPLAY$)/.test(key))
+        if (/^(?:GIT_|SSH_ASKPASS|SSH_ASKPASS_REQUIRE|SSH_SK_HELPER|DISPLAY$)/.test(key))
           environment[key] = value;
       await this.supervised([repositoryLease], options, async (run) => {
         const operation = run(

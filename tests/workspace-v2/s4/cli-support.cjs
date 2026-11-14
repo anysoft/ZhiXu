@@ -1,5 +1,6 @@
 const path = require('node:path'),
   { spawn } = require('node:child_process');
+const { runtimeArtifactCliArguments } = require('../s5r-offline-options.cjs');
 async function startCli(h, dataRoot, initialize = false, extra = []) {
   const entry = path.join(h.projectRoot, 'static/build/appV2.js');
   const child = spawn(
@@ -11,6 +12,7 @@ async function startCli(h, dataRoot, initialize = false, extra = []) {
       '--port',
       '0',
       ...(initialize ? ['--initialize'] : []),
+      ...runtimeArtifactCliArguments(),
       ...extra,
     ],
     {

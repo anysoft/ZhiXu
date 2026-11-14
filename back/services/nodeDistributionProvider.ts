@@ -6,6 +6,9 @@ import { RuntimeError } from '../shared/runtime';
 import { NodeCatalogEntry } from '../shared/nodeEnvironment';
 import { ProviderContext } from './pyenvProvider';
 import NodePathResolver, { nodeFileHash } from './nodePaths';
+import { VerifiedRuntimeArtifactStore } from './runtimeArtifacts';
+import { runtimeTreeDigest } from './runtimeTreeWitness';
+import { currentRuntimeDomain } from './runtimeDomainScope';
 export function exactNodeVersion(value: unknown): string {
   if (
     typeof value !== 'string' ||
@@ -109,6 +112,8 @@ export default class NodeDistributionProvider {
   }
   async catalog(ctx: ProviderContext) {
     await ctx.stage('REFRESHING_CATALOG');
+    const artifacts = VerifiedRuntimeArtifactStore.current(this.paths.dataRoot);
+    if (artifacts) return artifacts.nodeCatalog();
     const file = path.join(ctx.directory, 'index.json');
     await this.download(
       ctx,
@@ -199,6 +204,13 @@ export default class NodeDistributionProvider {
     runtime: RuntimeInstallation,
     repair = false,
   ) {
+    const artifacts = VerifiedRuntimeArtifactStore.current(this.paths.dataRoot);
+    if (
+      !artifacts &&
+      currentRuntimeDomain() &&
+      this.source === 'https://nodejs.org/dist'
+    )
+      throw new RuntimeError('RUNTIME_ARTIFACT_TRUST_CONFIGURATION_REQUIRED');
     const version = exactNodeVersion(runtime.version),
       platform = nodePlatform(),
       prefix = `node-v${version}-${platform}`,
@@ -206,29 +218,42 @@ export default class NodeDistributionProvider {
     const archive = path.join(ctx.directory, 'node.tar.xz'),
       checksums = path.join(ctx.directory, 'SHASUMS256.txt'),
       staging = path.join(ctx.directory, 'distribution');
-    await ctx.stage('DOWNLOADING_CHECKSUM');
-    await this.download(
-      ctx,
-      `${this.source}/v${version}/SHASUMS256.txt`,
-      checksums,
-      1024 * 1024,
-    );
-    const matches = (await fs.readFile(checksums, 'utf8'))
-      .split(/\r?\n/)
-      .map((x) => x.match(/^([a-f0-9]{64})\s+\*?(.+)$/))
-      .filter((x) => x?.[2] === artifact);
-    if (matches.length !== 1)
-      throw new RuntimeError('NODE_RUNTIME_ARTIFACT_UNAVAILABLE');
-    await ctx.stage('DOWNLOADING_RUNTIME');
-    await this.download(
-      ctx,
-      `${this.source}/v${version}/${artifact}`,
-      archive,
-      256 * 1024 * 1024,
-    );
-    const checksum = await nodeFileHash(archive);
-    if (checksum !== matches[0]![1])
-      throw new RuntimeError('NODE_RUNTIME_CHECKSUM_MISMATCH');
+    const approved = artifacts?.nodeDistribution(version);
+    let checksum: string;
+    if (artifacts && approved) {
+      await ctx.stage('RESOLVING_VERIFIED_ARTIFACT');
+      await fs.copyFile(
+        await artifacts.resolve(approved.archive, ctx),
+        archive,
+      );
+      checksum = await nodeFileHash(archive);
+      if (checksum !== artifacts.artifact(approved.archive).sha256)
+        throw new RuntimeError('RUNTIME_ARTIFACT_CHECKSUM_MISMATCH');
+    } else {
+      await ctx.stage('DOWNLOADING_CHECKSUM');
+      await this.download(
+        ctx,
+        `${this.source}/v${version}/SHASUMS256.txt`,
+        checksums,
+        1024 * 1024,
+      );
+      const matches = (await fs.readFile(checksums, 'utf8'))
+        .split(/\r?\n/)
+        .map((x) => x.match(/^([a-f0-9]{64})\s+\*?(.+)$/))
+        .filter((x) => x?.[2] === artifact);
+      if (matches.length !== 1)
+        throw new RuntimeError('NODE_RUNTIME_ARTIFACT_UNAVAILABLE');
+      await ctx.stage('DOWNLOADING_RUNTIME');
+      await this.download(
+        ctx,
+        `${this.source}/v${version}/${artifact}`,
+        archive,
+        256 * 1024 * 1024,
+      );
+      checksum = await nodeFileHash(archive);
+      if (checksum !== matches[0]![1])
+        throw new RuntimeError('NODE_RUNTIME_CHECKSUM_MISMATCH');
+    }
     await ctx.stage('EXTRACTING_RUNTIME');
     try {
       await ctx.command.run(
@@ -252,8 +277,49 @@ export default class NodeDistributionProvider {
         throw new RuntimeError('NODE_ARCHIVE_INVALID');
       throw e;
     }
+    if (artifacts && approved) {
+      // A separately authenticated npm distribution replaces bundled npm before
+      // either its CLI or lifecycle scripts are allowed to execute.
+      const npmRoot = path.join(staging, 'lib/node_modules/npm');
+      const npmStage = path.join(ctx.directory, 'verified-npm');
+      await artifacts.extract(ctx, approved.npm, npmStage);
+      await fs.rm(npmRoot, { recursive: true });
+      await fs.rename(npmStage, npmRoot);
+    }
     await ctx.stage('VERIFYING_STAGING');
     const metadata = await this.verifyAt(ctx, runtime, staging, false);
+    if (
+      artifacts &&
+      approved &&
+      metadata.npm_version !== artifacts.artifact(approved.npm).version
+    )
+      throw new RuntimeError('NODE_NPM_INVALID');
+    let verifiedInputs: Record<string, unknown> | undefined;
+    if (artifacts && approved) {
+      const node = artifacts.artifact(approved.archive),
+        npm = artifacts.artifact(approved.npm);
+      const tree = await runtimeTreeDigest(
+        path.join(staging, 'lib/node_modules/npm'),
+      );
+      if (
+        node.provenance?.executable_sha256 !== metadata.executable_sha256 ||
+        npm.provenance?.cli_sha256 !== metadata.npm_cli_sha256 ||
+        npm.provenance?.tree_sha256 !== tree.sha256 ||
+        npm.provenance?.tree_entry_count !== tree.entry_count
+      )
+        throw new RuntimeError('RUNTIME_ARTIFACT_PROVENANCE_INVALID');
+      verifiedInputs = {
+        schema: 1,
+        kind: 'NODE_RUNTIME',
+        manifest_sha256: artifacts.manifestSha256,
+        trust_anchor_sha256: artifacts.trustAnchorSha256,
+        archive_artifact_id: approved.archive,
+        npm_artifact_id: approved.npm,
+        executable_sha256: metadata.executable_sha256,
+        npm_cli_sha256: metadata.npm_cli_sha256,
+        npm_tree_sha256: tree.sha256,
+      };
+    }
     const target = await this.paths.target('runtime', runtime.id);
     if (repair) {
       try {
@@ -282,6 +348,16 @@ export default class NodeDistributionProvider {
     await fs.rename(staging, target);
     await this.paths.own('runtime', runtime.id, target);
     await this.verify(ctx, { ...runtime, metadata });
+    if (verifiedInputs) {
+      const marker = await this.paths.marker('runtime', runtime.id);
+      await this.paths.privateWrite(
+        marker,
+        JSON.stringify({
+          ...(await this.paths.readJson(marker)),
+          verified_inputs: verifiedInputs,
+        }),
+      );
+    }
     return {
       ...metadata,
       artifact,
@@ -290,6 +366,13 @@ export default class NodeDistributionProvider {
       signature_verified: false,
       distribution_source: this.source,
       installed_at: new Date().toISOString(),
+      ...(artifacts && approved
+        ? {
+            verified_artifact: artifacts.provenance(approved.archive),
+            verified_npm: artifacts.provenance(approved.npm),
+          }
+        : {}),
+      ...(verifiedInputs ? { verified_inputs: verifiedInputs } : {}),
     };
   }
 }

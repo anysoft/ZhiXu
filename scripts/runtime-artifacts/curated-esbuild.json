@@ -1,0 +1,64 @@
+{
+  "schema": 1,
+  "publisher": "ZhiXu controlled source rebuild",
+  "version": "0.28.2",
+  "not_upstream_prebuilt_bytes": true,
+  "source_repository": "https://github.com/evanw/esbuild",
+  "source_commit": "609683d892977362a0f99026cb74b96263d728a9",
+  "source_archive_url": "https://codeload.github.com/evanw/esbuild/tar.gz/609683d892977362a0f99026cb74b96263d728a9",
+  "source_archive_sha256": "04cb2d38fb6af093577aa8bf174add7286099b65ef7854480cbbb8ff061cef1f",
+  "go_version": "go1.26.11",
+  "go_archive_url": "https://go.dev/dl/go1.26.11.darwin-arm64.tar.gz",
+  "go_archive_sha256": "e3a42e67a7a8acf450ebada2b074c7ca863000ca514907b7185b45e8f5cdff57",
+  "go_archive_publisher_checksum_url": "https://go.dev/dl/?mode=json",
+  "module_source": "Official Go proxy + sum.golang.org validation against unchanged upstream go.sum; then -mod=vendor with GOPROXY=off/GOSUMDB=off",
+  "module_checksum": "golang.org/x/sys@v0.0.0-20220715151400-c0bba94af5f8 h1:0A+M6Uqn+Eje4kHMK80dtF3JCXC4ykBgQG4Fe06QRhQ=",
+  "signature_status": "SIGNATURE_NOT_AVAILABLE",
+  "trust_basis": "Repository-reviewed pins from an independently controlled rebuild; never loaded from the imported artifact package",
+  "build_environment": {
+    "CGO_ENABLED": "0",
+    "module_mode": "vendor",
+    "GOPROXY": "off",
+    "GOSUMDB": "off"
+  },
+  "build_flags": [
+    "-p=2",
+    "-ldflags=-s -w -buildid=",
+    "-buildvcs=false",
+    "-trimpath"
+  ],
+  "targets": [
+    {
+      "os": "linux",
+      "architecture": "x64",
+      "goarch": "amd64",
+      "sha256": "14cb77b8d10f8ed26f007802932c531647feb005328912801cffe461f645f477",
+      "bytes": 11456638,
+      "build_receipt_sha256": "0507feb10eab28d885bcf8a75e408b3527cf1b223bfc6c22be83f5468e2b6e17"
+    },
+    {
+      "os": "linux",
+      "architecture": "arm64",
+      "goarch": "arm64",
+      "sha256": "95ab553d31ee3e8a283665fcad4e0bedbb085e31b6950e0a803ad0de96c4cac4",
+      "bytes": 10354814,
+      "build_receipt_sha256": "baed95ec3fe0aa3ded0528b21c3d1f98b5aad64354f4d779796f214e9f1379f8"
+    },
+    {
+      "os": "darwin",
+      "architecture": "arm64",
+      "goarch": "arm64",
+      "sha256": "73658be735a2b09bef9b92028e976b65ad6f6c6df478087c86102841c7ff13eb",
+      "bytes": 10624082,
+      "build_receipt_sha256": "dc691ab614e91d53e703436d3ba43e9b3dbeffd75ad7d0ea0146f69db10fbf1a"
+    },
+    {
+      "os": "darwin",
+      "architecture": "x64",
+      "goarch": "amd64",
+      "sha256": "fc75483c5b81d5f9a53d8eb30fe71c8e8b2db131c5da0a3cf18c9f0ff68858c4",
+      "bytes": 11688960,
+      "build_receipt_sha256": "dee0c409e522718749171f7669b40e0070302062dd0adff9435ced036cb7b1a2"
+    }
+  ]
+}

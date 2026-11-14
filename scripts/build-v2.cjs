@@ -12,7 +12,9 @@ function run(args, env = process.env) {
   if (r.error) throw r.error;
   if (r.status !== 0) process.exit(r.status ?? 1);
 }
+run([path.join(root, 'scripts/native/verify-sqlite.cjs')]);
 run([path.join(root, 'scripts/build-back.cjs')]);
+run([path.join(root, 'scripts/native/prepare-git-tools.cjs')]);
 const target = path.join(root, 'static/build/applicationV2/contracts');
 fs.mkdirSync(target, { recursive: true });
 const hashes = {};

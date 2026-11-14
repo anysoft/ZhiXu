@@ -191,16 +191,35 @@ async function productionCli(t, caseId) {
     );
     assert.equal(workspace.status, 202);
     const id = workspace.body.data.workspace.id;
-    assert.equal(
-      (
-        await request('POST', `/workspaces/${id}/files`, {
+    const provisionId = workspace.body.data.operation.id;
+    const provision = await until(
+      () => request('GET', `/workspaces/${id}/operations/${provisionId}`),
+      (row) => ['SUCCEEDED', 'FAILED', 'RECOVERY_REQUIRED'].includes(row.body.data?.status),
+    );
+    assert.equal(provision.body.data.status, 'SUCCEEDED');
+    await until(
+      () => request('GET', `/workspaces/${id}`),
+      (row) => row.body.data?.capabilities?.write_files === true,
+    );
+    const created = await until(
+      async () => {
+        const row = await request('POST', `/workspaces/${id}/files`, {
           path: 'main.sh',
           content: script,
           must_not_exist: true,
-        })
-      ).status,
-      200,
+        });
+        // Live UI capability probes may temporarily own a conflicting lease.
+        // Busy admission has no mutation; every other error fails immediately.
+        if (row.status !== 200) {
+          assert.equal(row.status, 409);
+          assert.equal(row.body.error_code, 'WORKSPACE_BUSY');
+        }
+        return row;
+      },
+      (row) => row.status === 200,
+      5000,
     );
+    assert.equal(created.status, 200);
     const definition = await request('POST', '/tasks', shellTask(id, name));
     assert.equal(definition.status, 200);
     const run = await request(

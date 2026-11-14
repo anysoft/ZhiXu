@@ -29,6 +29,34 @@ function releaseArguments(environment, args) {
     parsed.password
   )
     throw Error('V2_RELEASE_PUBLIC_ORIGIN_INVALID');
+  const artifactKeys = [
+    ['ZHIXU_V2_RUNTIME_ARTIFACT_MODE', '--runtime-artifact-mode'],
+    ['ZHIXU_V2_RUNTIME_ARTIFACT_STORE', '--runtime-artifact-store'],
+    [
+      'ZHIXU_V2_RUNTIME_ARTIFACT_TRUST_ANCHOR',
+      '--runtime-artifact-trust-anchor',
+    ],
+    ['ZHIXU_V2_RUNTIME_ARTIFACT_MANIFEST', '--runtime-artifact-manifest'],
+  ];
+  const artifactArguments = [];
+  if (artifactKeys.some(([key]) => environment[key] !== undefined)) {
+    const mode = environment.ZHIXU_V2_RUNTIME_ARTIFACT_MODE;
+    if (!['ONLINE_VERIFIED', 'OFFLINE_VERIFIED'].includes(mode))
+      throw Error('V2_RELEASE_RUNTIME_ARTIFACT_CONFIG_INVALID');
+    for (const [key, flag] of artifactKeys) {
+      const value = environment[key];
+      if (
+        typeof value !== 'string' ||
+        !value ||
+        (flag !== '--runtime-artifact-mode' &&
+          (!path.isAbsolute(value) ||
+            path.resolve(value) !== value ||
+            value === '/'))
+      )
+        throw Error('V2_RELEASE_RUNTIME_ARTIFACT_CONFIG_INVALID');
+      artifactArguments.push(flag, value);
+    }
+  }
   return [
     '--data-root',
     environment.ZHIXU_V2_DATA_ROOT,
@@ -42,6 +70,7 @@ function releaseArguments(environment, args) {
     '/app/static/dist-v2',
     '--public-origin',
     origin,
+    ...artifactArguments,
     ...args,
   ];
 }

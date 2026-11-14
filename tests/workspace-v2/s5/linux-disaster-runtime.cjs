@@ -1,5 +1,9 @@
 // Real compiled App Runtime domain; operation requests cross actual authenticated HTTP.
 const fs = require('node:fs/promises');
+const {
+  MANAGED_NODE_VERSION,
+  MANAGED_TSX_VERSION,
+} = require('../s5r-offline-options.cjs');
 async function requestRuntimeOperation(instance, type, input) {
   const timeout = { timeout_seconds: input.timeout_seconds ?? 1800 };
   if (type === 'PROVIDER_INSTALL')
@@ -108,12 +112,14 @@ async function provisionManagedRuntime(f, options = {}) {
   }
   if (options.node !== false) {
     await run('NODE_CATALOG_REFRESH');
-    await run('NODE_RUNTIME_INSTALL', { node: { version: '24.22.3' } });
+    await run('NODE_RUNTIME_INSTALL', {
+      node: { version: MANAGED_NODE_VERSION },
+    });
     const runtime = (await domain.node.runtimes()).find(
       (row) => row.language === 'NODE' && row.state === 'READY',
     );
     if (!runtime) throw Error('S2_REAL_MANAGED_NODE_REQUIRED');
-    if (runtime.version !== '24.22.3')
+    if (runtime.version !== MANAGED_NODE_VERSION)
       throw Error('S5_SAFE_MANAGED_NODE_VERSION_REQUIRED');
     await run('NODE_PACKAGE_MANAGER_INSTALL', {
       node: { runtime_id: runtime.id, manager_type: 'NPM' },
@@ -130,7 +136,7 @@ async function provisionManagedRuntime(f, options = {}) {
       toolchain_id: tool.id,
       dependencies: [
         { name: 'is-number', specifier: '7.0.0', type: 'DEPENDENCY' },
-        { name: 'tsx', specifier: '4.20.6', type: 'DEPENDENCY' },
+        { name: 'tsx', specifier: MANAGED_TSX_VERSION, type: 'DEPENDENCY' },
       ],
       install_scripts_policy: 'ALLOW',
     });

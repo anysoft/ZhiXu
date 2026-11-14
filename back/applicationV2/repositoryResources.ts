@@ -51,6 +51,8 @@ interface Secret {
   passphrase?: string;
 }
 export interface CandidateGitCapabilities {
+  /** Explicit trusted source-test capability; never an HTTP/environment option. */
+  gitToolsRoot?: string;
   /** Constructor-only fixture capability; HTTP input never selects a transport bypass. */
   normalizeRemote?: (remote: string) => Promise<RepositoryIdentity>;
   accessResolver?: (
@@ -60,10 +62,16 @@ export interface CandidateGitCapabilities {
 }
 /** Explicit candidate SQLite adapter around the existing credential and supervised Git algorithms. */
 export class CandidateGitResources {
+  private readonly credentialResolver: GitCredentialResolver;
   constructor(
     readonly s: V2Services,
     private readonly capabilities: CandidateGitCapabilities = {},
-  ) {}
+  ) {
+    this.credentialResolver = new GitCredentialResolver({
+      requireBundledSsh: true,
+      gitToolsRoot: capabilities.gitToolsRoot,
+    });
+  }
   async normalize(remote: string) {
     if (this.capabilities.normalizeRemote)
       return this.capabilities.normalizeRemote(remote);
@@ -211,6 +219,7 @@ export class CandidateGitResources {
             status,
           },
           secret,
+          this.credentialResolver,
         );
       } catch {
         fail('INVALID_REQUEST', 400);
@@ -398,7 +407,7 @@ export class CandidateGitResources {
       return access;
     }
     try {
-      return await new GitCredentialResolver().resolve(
+      return await this.credentialResolver.resolve(
         credential,
         credential ? this.secret(credential) : {},
         row.remote_url,
@@ -423,7 +432,7 @@ export class CandidateGitResources {
       GIT_ATTR_NOSYSTEM: '1',
     };
     for (const [key, value] of Object.entries(access.env))
-      if (/^(?:GIT_|SSH_ASKPASS|SSH_ASKPASS_REQUIRE|DISPLAY$)/.test(key))
+      if (/^(?:GIT_|SSH_ASKPASS|SSH_ASKPASS_REQUIRE|SSH_SK_HELPER|DISPLAY$)/.test(key))
         env[key] = value;
     if (identity)
       Object.assign(env, {
@@ -479,7 +488,7 @@ export class CandidateGitResources {
     const credential = await this.credential(id);
     return this.s.leases.barrier.mutation(async () => {
       let success = false;
-      const access = await new GitCredentialResolver()
+      const access = await this.credentialResolver
         .resolve(credential, this.secret(credential), remote)
         .catch(() => fail('GIT_CREDENTIAL_INVALID', 403));
       try {

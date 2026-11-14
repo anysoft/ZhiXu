@@ -3,6 +3,7 @@ const path = require('node:path');
 const { randomBytes, createHash } = require('node:crypto');
 const { createS4Fixture } = require('./fixture.cjs');
 const { V2Application } = require('../../../back/applicationV2/application');
+const { runtimeArtifactOptions } = require('../s5r-offline-options.cjs');
 function browserLibrary() {
   for (const id of [
     process.env.ZHIXU_S4_PLAYWRIGHT,
@@ -72,6 +73,7 @@ async function browserFixture(caseId, options = {}) {
     files: manifest,
   });
   const app = await V2Application.launch({
+    runtimeArtifacts: runtimeArtifactOptions(),
     dataRoot: instance.dataRoot,
     backupRoot: instance.backupRoot,
     initialize: true,

@@ -6,6 +6,7 @@ const {
 } = require('./artifact-support.cjs');
 // Private, retained S1.B qualification domains. No default app data or user roots.
 const fs = require('node:fs/promises');
+const { runtimeArtifactOptions } = require('../s5r-offline-options.cjs');
 const path = require('node:path');
 const os = require('node:os');
 const crypto = require('node:crypto');
@@ -415,6 +416,7 @@ async function createS1BFixture(
         async launchApplication(initialize) {
           const { V2Application } = artifactModule('applicationV2/application');
           instance.app = await V2Application.launch({
+            runtimeArtifacts: runtimeArtifactOptions(),
             dataRoot,
             backupRoot: instance.backupRoot,
             projectRoot,

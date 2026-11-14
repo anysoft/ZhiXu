@@ -5,6 +5,7 @@ const path = require('node:path');
 const os = require('node:os');
 const crypto = require('node:crypto');
 const { spawn, execFileSync } = require('node:child_process');
+const { runtimeArtifactCliArguments } = require('../s5r-offline-options.cjs');
 const sha256 = (bytes) =>
   crypto.createHash('sha256').update(bytes).digest('hex');
 let initialIdentity;
@@ -296,6 +297,7 @@ async function startArtifactCli(
       '--port',
       '0',
       ...(initialize ? ['--initialize'] : []),
+      ...runtimeArtifactCliArguments(),
       ...extra,
     ],
     {

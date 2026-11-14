@@ -44,7 +44,7 @@ docker compose up -d --wait
 ```bash
 git clone https://github.com/anysoft/ZhiXu.git
 cd ZhiXu
-npm install -g pnpm@8.3.1
+npm install -g pnpm@10.34.9
 pnpm install
 pnpm start
 ```

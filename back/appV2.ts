@@ -4,6 +4,7 @@ import path from 'path';
 import { randomBytes } from 'crypto';
 import { assertV2BackendNode } from './applicationV2/backendNode';
 import type { V2ShutdownEvent } from './applicationV2/httpLifetime';
+import type { RuntimeArtifactOptions } from './services/runtimeArtifacts';
 function projectDirectory() {
   let current = __dirname;
   for (;;) {
@@ -31,6 +32,10 @@ function argumentsV2(args: string[]) {
         '--public-origin',
         '--port',
         '--frontend-root',
+        '--runtime-artifact-mode',
+        '--runtime-artifact-store',
+        '--runtime-artifact-trust-anchor',
+        '--runtime-artifact-manifest',
       ].includes(key) ||
       result[key] !== undefined
     )
@@ -45,6 +50,21 @@ function argumentsV2(args: string[]) {
   }
   if (typeof result['--data-root'] !== 'string')
     throw new Error('EXPLICIT_DATA_ROOT_REQUIRED');
+  const artifactArgs = [
+    '--runtime-artifact-mode',
+    '--runtime-artifact-store',
+    '--runtime-artifact-trust-anchor',
+    '--runtime-artifact-manifest',
+  ];
+  if (artifactArgs.some((key) => result[key] !== undefined)) {
+    if (
+      artifactArgs.some((key) => typeof result[key] !== 'string') ||
+      !['ONLINE_VERIFIED', 'OFFLINE_VERIFIED'].includes(
+        result['--runtime-artifact-mode'] as string,
+      )
+    )
+      throw new Error('STARTUP_ARGUMENT_INVALID');
+  }
   return result;
 }
 async function main() {
@@ -89,6 +109,16 @@ async function main() {
       : undefined,
     legacyDataRoots: originalLegacyRoot ? [originalLegacyRoot] : [],
     onShutdownEvent: diagnostics ? reportShutdown : undefined,
+    runtimeArtifacts: args['--runtime-artifact-mode']
+      ? {
+          mode: args[
+            '--runtime-artifact-mode'
+          ] as RuntimeArtifactOptions['mode'],
+          storeRoot: args['--runtime-artifact-store'] as string,
+          trustAnchorPath: args['--runtime-artifact-trust-anchor'] as string,
+          manifestPath: args['--runtime-artifact-manifest'] as string,
+        }
+      : undefined,
   };
   let stop!: () => void;
   const stopped = new Promise<void>((r) => {

@@ -6,6 +6,11 @@ const { Sequelize } = require('sequelize');
 const { randomUUID } = require('node:crypto');
 const load = require('../../test/helpers/load-security-module.cjs');
 const { createFixture, projectRoot } = require('./fixture.cjs');
+const {
+  runtimeArtifactOptions,
+  MANAGED_NODE_VERSION,
+  MANAGED_TSX_VERSION,
+} = require('./s5r-offline-options.cjs');
 
 async function attachRuntimeDomain(f) {
   // Resource requests use optimistic SQL checks plus writes. Acquire the SQLite
@@ -58,19 +63,86 @@ async function attachRuntimeDomain(f) {
   const python = new (module('back/services/pythonEnvironment.ts').default)(
     operations,
   );
+  const artifactOptions = runtimeArtifactOptions();
+  let context, unbind;
+  const scoped = (action) =>
+    context
+      ? module('back/services/runtimeDomainScope.ts').withRuntimeDomain(
+          context,
+          action,
+        )
+      : action();
+  if (artifactOptions) {
+    // The normal module instances are shared with the real Task adapter's
+    // per-WorkspaceStore policy. The original loader still maps actual Runtime
+    // models to this real SQLite database; no Provider/build/SQLite is mocked.
+    const {
+      VerifiedRuntimeArtifactStore,
+    } = require('../../back/services/runtimeArtifacts');
+    const {
+      bindRuntimeArtifacts,
+    } = require('../../back/services/runtimeArtifactScope');
+    const artifacts = await VerifiedRuntimeArtifactStore.open(
+      artifactOptions,
+      f.dataRoot,
+    );
+    context = {
+      sequelize: db,
+      models,
+      store: f.store,
+      barrier: f.barrier,
+      artifacts,
+    };
+    unbind = bindRuntimeArtifacts(f.store, artifacts);
+  }
+  const node = context
+    ? new Proxy(operations.node, {
+        get(target, key) {
+          const member = Reflect.get(target, key, target);
+          return typeof member === 'function'
+            ? (...args) => scoped(() => member.apply(target, args))
+            : member;
+        },
+      })
+    : operations.node;
+  const publicOperations = context
+    ? new Proxy(operations, {
+        get(target, key) {
+          if (key === 'node') return node;
+          const member = Reflect.get(target, key, target);
+          return typeof member === 'function'
+            ? (...args) => scoped(() => member.apply(target, args))
+            : member;
+        },
+      })
+    : operations;
+  const publicPython = context
+    ? new Proxy(python, {
+        get(target, key) {
+          const member = Reflect.get(target, key, target);
+          return typeof member === 'function'
+            ? (...args) => scoped(() => member.apply(target, args))
+            : member;
+        },
+      })
+    : python;
   let closed = false;
   return {
     db,
-    operations,
-    python,
-    node: operations.node,
+    operations: publicOperations,
+    python: publicPython,
+    node,
     models,
     module,
     async close() {
       if (closed) return;
       closed = true;
-      await operations.close();
-      await db.close();
+      try {
+        await scoped(() => operations.close());
+      } finally {
+        unbind?.();
+        await db.close();
+      }
     },
   };
 }
@@ -123,7 +195,9 @@ async function provisionManagedRuntime(f, options = {}) {
   }
   if (options.node !== false) {
     await run('NODE_CATALOG_REFRESH');
-    await run('NODE_RUNTIME_INSTALL', { node: { version: '24.21.0' } });
+    await run('NODE_RUNTIME_INSTALL', {
+      node: { version: MANAGED_NODE_VERSION },
+    });
     const runtime = (await domain.node.runtimes()).find(
       (row) => row.language === 'NODE' && row.state === 'READY',
     );
@@ -143,7 +217,7 @@ async function provisionManagedRuntime(f, options = {}) {
       toolchain_id: tool.id,
       dependencies: [
         { name: 'is-number', specifier: '7.0.0', type: 'DEPENDENCY' },
-        { name: 'tsx', specifier: '4.20.6', type: 'DEPENDENCY' },
+        { name: 'tsx', specifier: MANAGED_TSX_VERSION, type: 'DEPENDENCY' },
       ],
       install_scripts_policy: 'ALLOW',
     });

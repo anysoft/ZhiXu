@@ -1,0 +1,52 @@
+{
+  "schema": 1,
+  "publisher": "ZhiXu reviewed python-build definition composition",
+  "python_version": "3.13.15",
+  "pyenv_release": "v2.8.5",
+  "pyenv_revision": "c293de3650a2d08ea36c5f6f0d55c5a3841b0c72",
+  "definition_file": "python-3.13.15.definition",
+  "definition_sha256": "7513b380621f73e5817cb2e6d51b34328bc7a9e50643a21b2f4d1d6e8a1f1632",
+  "openssl": {
+    "version": "3.5.9",
+    "source_url": "https://github.com/openssl/openssl/releases/download/openssl-3.5.9/openssl-3.5.9.tar.gz",
+    "sha256": "603f5602e2eef00d77fbd429d34dcd5822bb301757a1bc9cdb24c670f1eb859a",
+    "publisher": "OpenSSL Project",
+    "support_branch": "3.5 LTS",
+    "publisher_checksum_url": "https://github.com/openssl/openssl/releases/download/openssl-3.5.9/openssl-3.5.9.tar.gz.sha256"
+  },
+  "zlib": {
+    "version": "1.4",
+    "source_url": "https://zlib.net/zlib-1.4.tar.gz",
+    "sha256": "02dd159783677a749c04adbdd02b55b8a2bcc7e054f51b76b549199a916ad584",
+    "publisher": "zlib project"
+  },
+  "ca_bundle": {
+    "version": "2026-11-05",
+    "source_url": "https://curl.se/ca/cacert-2026-11-05.pem",
+    "sha256": "427c064216761a1e72a8b30f0d954d08cb6e4435a82091fb865afd20c8497285",
+    "publisher": "curl project conversion of Mozilla CA store",
+    "publisher_checksum_url": "https://curl.se/ca/cacert-2026-11-05.pem.sha256",
+    "license": "MPL-2.0",
+    "trust_scope": "Mozilla CA PEM conversion; browser-specific name constraints are not represented"
+  },
+  "sqlite": {
+    "version": "3.54.1",
+    "source_url": "https://sqlite.org/2026/sqlite-autoconf-3540100.tar.gz",
+    "sha256": "926ef8d3eab93fbf6e06011901273eec076b25594a4e1cdadd50c987f4f6d64e",
+    "publisher": "SQLite project / Hwaci",
+    "sqlite_source_id": "2026-10-16 14:45:20 555e07ef33f69a0957d24d8e555b702464a131d6f1607f4c3c1e4551e8e6ca76",
+    "signature_status": "SIGNATURE_NOT_AVAILABLE",
+    "publisher_checksum_algorithm": "SHA3-256",
+    "publisher_checksum": "b6ced585c750916b1052667239a12c25a7ff34e7f06e1e6e01ecb0427657d9c4",
+    "publisher_checksum_url": "https://sqlite.org/download.html"
+  },
+  "pip": {
+    "version": "26.3",
+    "wheel_filename": "pip-26.3-py3-none-any.whl",
+    "source_url": "https://files.pythonhosted.org/packages/07/25/ee8c38ae72d66b844ce8eb9711ba905dba21ca1a8a0c960057c41cd23337/pip-26.3-py3-none-any.whl",
+    "sha256": "f3b60b20ffaadd4415ed7957212a38ac63fa4c5fa375bd0f4a797777940fad13",
+    "publisher": "Python Packaging Authority / pip project",
+    "metadata_url": "https://pypi.org/pypi/pip/26.3/json",
+    "signature_status": "SIGNATURE_NOT_VERIFIED"
+  }
+}

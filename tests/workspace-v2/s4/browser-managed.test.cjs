@@ -1,13 +1,16 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { browserFixture } = require('./browser-support.cjs');
+const { MANAGED_NODE_VERSION } = require('../s5r-offline-options.cjs');
 async function choose(page, container, label, value) {
   await container
     .getByLabel(label, { exact: true })
     .locator('xpath=ancestor::div[contains(@class,"ant-select-selector")]')
     .click();
   if (label === 'Runtime version')
-    await container.getByLabel(label, { exact: true }).fill('24.21.0');
+    await container
+      .getByLabel(label, { exact: true })
+      .fill(MANAGED_NODE_VERSION);
   await page
     .locator('.ant-select-dropdown:visible')
     .getByText(value, { exact: typeof value === 'string' })
@@ -89,7 +92,7 @@ test(
         '/api/runtime/node/installations',
       );
       const runtime = (await f.app.runtime.node.runtimes()).find(
-        (r) => r.version === '24.21.0',
+        (r) => r.version === MANAGED_NODE_VERSION,
       );
       assert.ok(runtime);
       assert.equal(runtime.state, 'READY');
@@ -99,7 +102,12 @@ test(
         .click();
       await page.getByRole('button', { name: 'Install', exact: true }).click();
       dialog = page.getByRole('dialog');
-      await choose(page, dialog, 'Runtime', `24.21.0 · #${runtime.id}`);
+      await choose(
+        page,
+        dialog,
+        'Runtime',
+        `${MANAGED_NODE_VERSION} · #${runtime.id}`,
+      );
       await choose(page, dialog, 'Package manager', 'npm');
       await operationClick(
         () => dialog.getByRole('button', { name: /Save$/ }).click(),
@@ -118,7 +126,12 @@ test(
         .click();
       dialog = page.getByRole('dialog');
       await dialog.getByLabel('Name', { exact: true }).fill('Browser Node');
-      await choose(page, dialog, 'Runtime', `24.21.0 · #${runtime.id}`);
+      await choose(
+        page,
+        dialog,
+        'Runtime',
+        `${MANAGED_NODE_VERSION} · #${runtime.id}`,
+      );
       await choose(
         page,
         dialog,

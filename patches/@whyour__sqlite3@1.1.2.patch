@@ -1,0 +1,260 @@
+diff --git a/package.json b/package.json
+index dcd023da..f8520ca8 100644
+--- a/package.json
++++ b/package.json
+@@ -18,7 +18,7 @@
+     ]
+   },
+   "contributors": [
+-    "Konstantin Käfer <mail@kkaefer.com>",
++    "Konstantin K\u00e4fer <mail@kkaefer.com>",
+     "Dane Springmeyer <dane@mapbox.com>",
+     "Will White <will@mapbox.com>",
+     "Orlando Vazquez <ovazquez@gmail.com>",
+@@ -28,7 +28,7 @@
+     "Ryan Dahl <ry@tinyclouds.org>",
+     "Tom MacWright <tom@mapbox.com>",
+     "Carter Thaxton <carter.thaxton@gmail.com>",
+-    "Audrius Kažukauskas <audrius@neutrino.lt>",
++    "Audrius Ka\u017eukauskas <audrius@neutrino.lt>",
+     "Johannes Schauer <josch@pyneo.org>",
+     "Nathan Rajlich <nathan@tootallnate.net>",
+     "AJ ONeal <coolaj86@gmail.com>",
+@@ -70,7 +70,7 @@
+   "scripts": {
+     "build": "node-pre-gyp build",
+     "build:debug": "node-pre-gyp build --debug",
+-    "install": "node-pre-gyp install --fallback-to-build",
++    "install": "node deps/install-secure.cjs",
+     "pretest": "node test/support/createdb.js",
+     "test": "mocha -R spec --timeout 480000",
+     "pack": "node-pre-gyp package",
+diff --git a/deps/common-sqlite.gypi b/deps/common-sqlite.gypi
+index 9d70d3b9..d5d1e8b0 100644
+--- a/deps/common-sqlite.gypi
++++ b/deps/common-sqlite.gypi
+@@ -1,6 +1,6 @@
+ {
+   'variables': {
+-      'sqlite_version%':'3410100',
++      'sqlite_version%':'3540100',
+       "toolset%":'',
+   },
+   'target_defaults': {
+diff --git a/deps/extract.js b/deps/extract.js
+index c25f483c..78877d9b 100644
+--- a/deps/extract.js
++++ b/deps/extract.js
+@@ -32,6 +32,13 @@ tar.extract({
+     sync: true,
+     file: tarball,
+     cwd: dirname,
++    // Extract only build inputs: VERSION shadows the C++ <version> header
++    // on case-insensitive filesystems. All source bytes remain hash-pinned.
++    filter: (name, entry) => entry.type === "File" && [
++        "sqlite-autoconf-3540100/sqlite3.c",
++        "sqlite-autoconf-3540100/sqlite3.h",
++        "sqlite-autoconf-3540100/sqlite3ext.h",
++    ].includes(name),
+ });
+ 
+ // Keep the bundled tarball pristine and patch the generated amalgamation.
+diff --git a/deps/install-secure.cjs b/deps/install-secure.cjs
+new file mode 100644
+index 00000000..37307c92
+--- /dev/null
++++ b/deps/install-secure.cjs
+@@ -0,0 +1,193 @@
++'use strict';
++// ZhiXu source-only build recipe. The fork's JS/C++ binding API is unchanged.
++const fs = require('node:fs/promises');
++const constants = require('node:fs').constants;
++const path = require('node:path');
++const https = require('node:https');
++const crypto = require('node:crypto');
++const { spawn } = require('node:child_process');
++const ROOT = path.resolve(__dirname, '..');
++const VERSION = '3.54.1';
++const SOURCE_ID = '2026-10-16 14:45:20 555e07ef33f69a0957d24d8e555b702464a131d6f1607f4c3c1e4551e8e6ca76';
++const URL = 'https://sqlite.org/2026/sqlite-autoconf-3540100.tar.gz';
++const SOURCE_SHA256 = '926ef8d3eab93fbf6e06011901273eec076b25594a4e1cdadd50c987f4f6d64e';
++const SOURCE_SHA3 = 'b6ced585c750916b1052667239a12c25a7ff34e7f06e1e6e01ecb0427657d9c4';
++const MAX_BYTES = 8 * 1024 * 1024;
++const digest = (data, algorithm = 'sha256') => crypto.createHash(algorithm).update(data).digest('hex');
++const fail = (code) => { throw Object.assign(new Error(code), { code }); };
++let child;
++let receivedSignal;
++function stopChild(current, signal) {
++  if (!current?.pid) return;
++  try { process.kill(process.platform === 'win32' ? current.pid : -current.pid, signal); } catch {}
++}
++for (const signal of ['SIGINT', 'SIGTERM']) process.on(signal, () => {
++  receivedSignal = signal;
++  stopChild(child, signal);
++  const force = setTimeout(() => stopChild(child, 'SIGKILL'), 2000);
++  force.unref();
++});
++function run(args, options = {}) {
++  if (receivedSignal) fail('SQLITE_BUILD_INTERRUPTED');
++  return new Promise((resolve, reject) => {
++    const current = spawn(process.execPath, args, { cwd: options.cwd || ROOT, env: options.env || process.env, detached: process.platform !== 'win32', stdio: options.capture ? ['ignore', 'pipe', 'inherit'] : ['ignore', 'inherit', 'inherit'] });
++    child = current;
++    let force;
++    let timedOut = false;
++    const deadline = setTimeout(() => {
++      timedOut = true;
++      stopChild(current, 'SIGTERM');
++      force = setTimeout(() => stopChild(current, 'SIGKILL'), 2000);
++      force.unref();
++    }, options.capture ? 30000 : 600000);
++    const chunks = [];
++    if (options.capture) current.stdout.on('data', (b) => chunks.push(b));
++    current.once('error', (error) => { clearTimeout(deadline); clearTimeout(force); child = undefined; reject(error); });
++    current.once('close', (code, signal) => {
++      child = undefined;
++      clearTimeout(deadline);
++      clearTimeout(force);
++      if (timedOut || code !== 0 || signal || receivedSignal) reject(Object.assign(new Error('SQLITE_NATIVE_BUILD_FAILED'), { code: 'SQLITE_NATIVE_BUILD_FAILED' }));
++      else resolve(Buffer.concat(chunks));
++    });
++  });
++}
++async function regularBytes(file) {
++  const fd = await fs.open(file, constants.O_RDONLY | constants.O_NOFOLLOW);
++  try {
++    const st = await fd.stat();
++    if (!st.isFile() || st.nlink !== 1 || st.size > MAX_BYTES) fail('SQLITE_SOURCE_NOT_REGULAR');
++    const data = await fd.readFile();
++    const after = await fd.stat();
++    if (st.dev !== after.dev || st.ino !== after.ino || st.size !== after.size || st.mtimeMs !== after.mtimeMs || data.length !== st.size) fail('SQLITE_SOURCE_CHANGED');
++    return data;
++  } finally { await fd.close(); }
++}
++function verifyArchive(data) {
++  if (digest(data) !== SOURCE_SHA256 || digest(data, 'sha3-256') !== SOURCE_SHA3) fail('SQLITE_SOURCE_DIGEST_MISMATCH');
++}
++function acquire(url, redirects = 0) {
++  if (redirects > 3) return Promise.reject(Object.assign(new Error('SQLITE_SOURCE_REDIRECT_LIMIT'), { code: 'SQLITE_SOURCE_REDIRECT_LIMIT' }));
++  const target = new global.URL(url);
++  if (target.protocol !== 'https:' || !['sqlite.org', 'www.sqlite.org'].includes(target.hostname) || target.pathname !== '/2026/sqlite-autoconf-3540100.tar.gz') return Promise.reject(Object.assign(new Error('SQLITE_SOURCE_ORIGIN_REJECTED'), { code: 'SQLITE_SOURCE_ORIGIN_REJECTED' }));
++  return new Promise((resolve, reject) => {
++    const req = https.get(target, { timeout: 30000 }, (res) => {
++      if ([301, 302, 307, 308].includes(res.statusCode)) {
++        res.resume();
++        acquire(new global.URL(res.headers.location, target).href, redirects + 1).then(resolve, reject);
++        return;
++      }
++      if (res.statusCode !== 200) { res.resume(); reject(Object.assign(new Error('SQLITE_SOURCE_DOWNLOAD_FAILED'), { code: 'SQLITE_SOURCE_DOWNLOAD_FAILED' })); return; }
++      let size = 0;
++      const parts = [];
++      res.on('data', (b) => {
++        size += b.length;
++        if (size > MAX_BYTES) req.destroy(Object.assign(new Error('SQLITE_SOURCE_LIMIT'), { code: 'SQLITE_SOURCE_LIMIT' }));
++        else parts.push(b);
++      });
++      res.once('error', reject);
++      res.once('end', () => {
++        const expected = Number(res.headers['content-length']);
++        if (!size || (Number.isFinite(expected) && expected !== size)) reject(Object.assign(new Error('SQLITE_SOURCE_TRUNCATED'), { code: 'SQLITE_SOURCE_TRUNCATED' }));
++        else resolve(Buffer.concat(parts));
++      });
++    });
++    req.once('timeout', () => req.destroy(Object.assign(new Error('SQLITE_SOURCE_TIMEOUT'), { code: 'SQLITE_SOURCE_TIMEOUT' })));
++    req.once('error', reject);
++  });
++}
++const probeCode = String.raw`
++const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
++const root=process.argv[1],sqlite=require(path.join(root,'lib/sqlite3'));
++const file=require('@mapbox/node-pre-gyp').find(path.join(root,'package.json'));
++const db=new sqlite.Database(':memory:',error=>{if(error)throw error;db.get('SELECT sqlite_version() AS version, sqlite_source_id() AS source_id',(error,row)=>{if(error)throw error;db.close(error=>{if(error)throw error;process.stdout.write(JSON.stringify({...row,native_sha256:crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex'),relative_native_file:path.relative(root,file),node:process.versions.node,napi:process.versions.napi,platform:process.platform,architecture:process.arch}));});});});
++`;
++async function probe(root) {
++  const found = JSON.parse((await run(['-e', probeCode, root], { cwd: root, capture: true })).toString());
++  if (found.version !== VERSION || found.source_id !== SOURCE_ID || found.platform !== process.platform || found.architecture !== process.arch || !/^lib[\\/]binding[\\/]napi-v6-[A-Za-z0-9_-]+[\\/]node_sqlite3\.node$/.test(found.relative_native_file)) fail('SQLITE_NATIVE_IDENTITY_MISMATCH');
++  return found;
++}
++async function targetDirectory(relative) {
++  const parts = relative.split(path.sep);
++  if (parts.length !== 4 || parts[0] !== 'lib' || parts[1] !== 'binding' || parts[3] !== 'node_sqlite3.node') fail('SQLITE_NATIVE_PATH_REJECTED');
++  let current = ROOT;
++  for (const part of parts.slice(0, -1)) {
++    current = path.join(current, part);
++    await fs.mkdir(current, { mode: 0o755 }).catch((error) => { if (error.code !== 'EEXIST') throw error; });
++    const st = await fs.lstat(current);
++    if (!st.isDirectory() || st.isSymbolicLink()) fail('SQLITE_NATIVE_PATH_REJECTED');
++  }
++  return path.join(ROOT, relative);
++}
++async function main() {
++  process.umask(0o077);
++  if (process.env.NODE_TLS_REJECT_UNAUTHORIZED === '0') fail('SQLITE_TLS_BYPASS_REJECTED');
++  if (await fs.realpath(ROOT) !== ROOT) fail('SQLITE_PACKAGE_PATH_REJECTED');
++  const token = crypto.randomUUID();
++  const lockFile = path.join(ROOT, '.zhixu-sqlite-build.lock');
++  const lock = await fs.open(lockFile, constants.O_CREAT | constants.O_EXCL | constants.O_WRONLY | constants.O_NOFOLLOW, 0o600);
++  const lockIdentity = await lock.stat();
++  let stage;
++  try {
++    await lock.writeFile(token);
++    const helperHash = digest(await fs.readFile(__filename));
++    const receiptFile = path.join(ROOT, 'zhixu-sqlite-build.json');
++    if (process.env.ZHIXU_SQLITE_FORCE_REBUILD !== '1') {
++      const previous = await fs.readFile(receiptFile, 'utf8').then(JSON.parse).catch(() => null);
++      if (previous && previous.recipe_sha256 === helperHash && previous.source_archive_sha256 === SOURCE_SHA256 && previous.platform === process.platform && previous.architecture === process.arch) {
++        const actual = await probe(ROOT).catch(() => null);
++        if (actual?.native_sha256 === previous.native_sha256) { process.stdout.write('ZhiXu verified SQLite native build unchanged\n'); return; }
++      }
++    }
++    const archive = path.join(ROOT, 'deps/sqlite-autoconf-3540100.tar.gz');
++    let source;
++    const provided = process.env.ZHIXU_SQLITE_SOURCE_ARCHIVE;
++    if (provided) {
++      if (!path.isAbsolute(provided)) fail('SQLITE_SOURCE_PATH_REJECTED');
++      source = await regularBytes(provided);
++    } else source = await regularBytes(archive).catch((error) => { if (error.code === 'ENOENT') return null; throw error; });
++    source ??= await acquire(URL);
++    verifyArchive(source);
++    const archiveTemp = archive + '.' + token + '.tmp';
++    try { await fs.writeFile(archiveTemp, source, { mode: 0o644, flag: 'wx' }); await fs.rename(archiveTemp, archive); }
++    finally { await fs.rm(archiveTemp, { force: true }); }
++    // pnpm patch identities contain '='; gyp's Makefile generator misparses
++    // targets below that path. Compile in an owned external temporary root.
++    const temporaryRoot = await fs.realpath(require('node:os').tmpdir());
++    if (/[=\r\n]/.test(temporaryRoot)) fail('SQLITE_BUILD_TEMP_PATH_REJECTED');
++    stage = await fs.mkdtemp(path.join(temporaryRoot, 'zhixu-sqlite-stage-'));
++    await fs.mkdir(path.join(stage, 'node_modules'), { mode: 0o755 });
++    for (const name of ['@mapbox/node-pre-gyp', 'node-addon-api', 'node-gyp', 'tar']) {
++      const target = path.join(stage, 'node_modules', name);
++      await fs.mkdir(path.dirname(target), { recursive: true, mode: 0o755 });
++      await fs.symlink(path.dirname(require.resolve(name + '/package.json')), target, process.platform === 'win32' ? 'junction' : 'dir');
++    }
++    for (const name of ['package.json', 'binding.gyp']) await fs.copyFile(path.join(ROOT, name), path.join(stage, name));
++    for (const name of ['src', 'deps', 'lib']) await fs.cp(path.join(ROOT, name), path.join(stage, name), { recursive: true, filter: (file) => file !== path.join(ROOT, 'lib/binding') });
++    const env = { ...process.env, npm_config_node_gyp: require.resolve('node-gyp/bin/node-gyp.js') };
++    for (const name of ['CFLAGS', 'CXXFLAGS']) env[name] = [env[name] || '', '-ffile-prefix-map=' + stage + '=/usr/src/zhixu-sqlite'].join(' ').trim();
++    await run([require.resolve('@mapbox/node-pre-gyp/bin/node-pre-gyp'), 'rebuild', '--build-from-source', '--napi_build_version=6'], { cwd: stage, env });
++    const actual = await probe(stage);
++    const target = await targetDirectory(actual.relative_native_file);
++    const pending = target + '.' + token + '.tmp';
++    try { await fs.copyFile(path.join(stage, actual.relative_native_file), pending, constants.COPYFILE_EXCL); await fs.chmod(pending, 0o755); await fs.rename(pending, target); }
++    finally { await fs.rm(pending, { force: true }); }
++    const installed = await probe(ROOT);
++    if (installed.native_sha256 !== actual.native_sha256) fail('SQLITE_NATIVE_ACTIVATION_MISMATCH');
++    const receipt = { ...installed, recipe_sha256: helperHash, source_url: URL, source_archive_sha256: SOURCE_SHA256, source_archive_sha3_256: SOURCE_SHA3, fork_package: '@whyour/sqlite3@1.1.2', upstream_prebuilt_used: false, napi_target: 6 };
++    const pendingReceipt = receiptFile + '.' + token + '.tmp';
++    try { await fs.writeFile(pendingReceipt, JSON.stringify(receipt, null, 2) + '\n', { mode: 0o644, flag: 'wx' }); await fs.rename(pendingReceipt, receiptFile); }
++    finally { await fs.rm(pendingReceipt, { force: true }); }
++    process.stdout.write('ZhiXu verified SQLite ' + VERSION + ' native source build ready\n');
++  } finally {
++    try { if (stage) await fs.rm(stage, { recursive: true, force: true }); }
++    finally {
++      try { await lock.close(); }
++      finally {
++        const current = await fs.lstat(lockFile).catch(error => { if (error.code === 'ENOENT') return null; throw error; });
++        if (current?.dev === lockIdentity.dev && current?.ino === lockIdentity.ino) await fs.unlink(lockFile);
++      }
++    }
++  }
++}
++main().catch((error) => { process.stderr.write('ZhiXu SQLite build rejected: ' + (error.code || 'SQLITE_BUILD_FAILED') + '\n'); process.exitCode = 1; });

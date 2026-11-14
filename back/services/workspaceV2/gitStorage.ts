@@ -6,6 +6,7 @@ import config from '../../config';
 import { RepositoryPathResolver } from '../../shared/workspacePaths';
 import { WorkspaceGuard } from '../workspaceLocks';
 import { inheritedLeaseFds } from '../backup/inheritedLeases';
+import { verifiedGitSshTools } from '../../shared/nativeGitTools';
 import { openRegular, syncDirectory, writeAll } from '../backup/files';
 import { randomUUID } from 'crypto';
 import { fail, positiveId } from './errors';
@@ -91,6 +92,7 @@ async function withGit<T>(
     ) => Promise<{ code: number; stdout: string }>,
   ) => Promise<T>,
 ): Promise<T> {
+  const tools = await verifiedGitSshTools();
   const fds = [...new Set([...leaseFds, ...inheritedLeaseFds()])];
   const guard = new WorkspaceGuard(
     spawn(
@@ -130,7 +132,8 @@ async function withGit<T>(
         ],
         at,
         {
-          PATH: '/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin',
+          PATH: tools.binPath + ':/usr/bin:/bin',
+          GIT_EXEC_PATH: tools.execPath,
           GIT_CONFIG_NOSYSTEM: '1',
           GIT_CONFIG_GLOBAL: '/dev/null',
           GIT_TERMINAL_PROMPT: '0',

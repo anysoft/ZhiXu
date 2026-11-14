@@ -2,6 +2,9 @@
 *
 !package.json
 !pnpm-lock.yaml
+!pnpm-workspace.yaml
+!patches/
+!patches/**
 !.npmrc
 !LICENSE
 !version.yaml
@@ -38,3 +41,7 @@ src/.umi*/**
 !tests/**
 !test/
 !test/**
+!scripts/native/
+!scripts/native/**
+!scripts/runtime-artifacts/
+!scripts/runtime-artifacts/**

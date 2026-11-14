@@ -46,6 +46,7 @@ import type { ApiCall, ApiHandler, ApiRoute, RouteMap } from './types';
 import type { WorkspaceGitAdapter } from '../services/gitWorkspaceV2/git';
 import { normalizeV2PublicOrigin } from './publicOrigin';
 import { V2HttpLifetime, V2ShutdownEvent } from './httpLifetime';
+import type { RuntimeArtifactOptions } from '../services/runtimeArtifacts';
 
 export interface V2ApplicationOptions extends V2BootOptions {
   publicOrigin?: string;
@@ -54,6 +55,7 @@ export interface V2ApplicationOptions extends V2BootOptions {
   extraRoutes?: (s: V2Container) => RouteMap;
   onRestartRequested?: () => void;
   onShutdownEvent?: (event: V2ShutdownEvent) => void;
+  runtimeArtifacts?: RuntimeArtifactOptions;
 }
 const MUTATING = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
 function preciseKey(key: string) {
@@ -188,6 +190,15 @@ export class V2Application {
     this.phases.push('BACKUP_ADMISSION_RECOVERY');
     this.runtime = await createRuntimeDomain(
       this.services,
+      this.options.runtimeArtifacts
+        ? {
+            ...this.options.runtimeArtifacts,
+            excludedRoots: [
+              ...(this.options.runtimeArtifacts.excludedRoots ?? []),
+              this.services.backup.paths.root,
+            ],
+          }
+        : undefined,
     );
     this.triggers = new CandidateTaskTriggers(this.services);
     this.notifications = createNotificationDomain(this.services);

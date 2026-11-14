@@ -6,6 +6,11 @@ const { createS1BFixture } = require('../s1b/fixture.cjs');
 const { openOwnedRuntimeInstance } = require('./runtime-test-resume.cjs');
 const resumeCase = process.env.ZHIXU_S4_RUNTIME_DOMAIN_RESUME_CASE;
 const {
+  runtimeArtifactOptions,
+  MANAGED_NODE_VERSION,
+  MANAGED_TSX_VERSION,
+} = require('../s5r-offline-options.cjs');
+const {
   createRuntimeDomain,
 } = require('../../../back/applicationV2/runtimeDomain');
 const { runtimeApiRoutes } = require('../../../back/applicationV2/runtimeApi');
@@ -54,8 +59,8 @@ test('S4 production Runtime scope binds real independent databases, all SQLite t
     }),
     a = await scenario.createInstance('A'),
     b = await scenario.createInstance('B');
-  const da = a.track(await createRuntimeDomain(a)),
-    db = b.track(await createRuntimeDomain(b));
+  const da = a.track(await createRuntimeDomain(a, runtimeArtifactOptions())),
+    db = b.track(await createRuntimeDomain(b, runtimeArtifactOptions()));
   const [pa, pb] = await Promise.all([
     da.operations.getProvider(),
     db.operations.getProvider(),
@@ -101,7 +106,7 @@ test('S4 production Runtime scope binds real independent databases, all SQLite t
   );
   await assert.rejects(
     runtimeCall(routes)('POST /runtime/node/installations', {
-      body: { version: '24.21.0', unexpected: 'reject' },
+      body: { version: MANAGED_NODE_VERSION, unexpected: 'reject' },
     }),
   );
   await a.store.verifySchema();
@@ -128,7 +133,7 @@ test(
       a = resumeCase
         ? await openOwnedRuntimeInstance(scenario)
         : await scenario.createInstance('A'),
-      domain = a.track(await createRuntimeDomain(a)),
+      domain = a.track(await createRuntimeDomain(a, runtimeArtifactOptions())),
       routes = runtimeApiRoutes(a, domain),
       call = runtimeCall(routes),
       history = [];
@@ -220,7 +225,7 @@ test(
         body: { timeout_seconds: 1800 },
       });
       await operation('POST /runtime/node/installations', {
-        body: { version: '24.21.0', timeout_seconds: 1800 },
+        body: { version: MANAGED_NODE_VERSION, timeout_seconds: 1800 },
       });
       nodeRuntime = (await call('GET /runtime/node/installations')).data.find(
         (row) => row.state === 'READY',
@@ -249,7 +254,11 @@ test(
             toolchain_id: tool.id,
             dependencies: [
               { name: 'is-number', specifier: '7.0.0', type: 'DEPENDENCY' },
-              { name: 'tsx', specifier: '4.20.6', type: 'DEPENDENCY' },
+              {
+                name: 'tsx',
+                specifier: MANAGED_TSX_VERSION,
+                type: 'DEPENDENCY',
+              },
             ],
             production_only: false,
             install_scripts_policy: 'ALLOW',
