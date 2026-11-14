@@ -26,6 +26,7 @@ function argumentsV2(args: string[]) {
         '--backup-root',
         '--initialize',
         '--host',
+        '--public-origin',
         '--port',
         '--frontend-root',
       ].includes(key) ||
@@ -65,6 +66,7 @@ async function main() {
     backupRoot: args['--backup-root'] as string | undefined,
     initialize: args['--initialize'] === true,
     host: args['--host'] as string | undefined,
+    publicOrigin: args['--public-origin'] as string | undefined,
     port,
     frontendRoot: args['--frontend-root'] as string | undefined,
     projectRoot,

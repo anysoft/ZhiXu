@@ -1,0 +1,51 @@
+# Local candidate example; use a new project and dedicated named volumes.
+# Required: ZHIXU_V2_IMAGE=<locally-built candidate tag or digest>
+# Required: ZHIXU_V2_PUBLIC_ORIGIN=http://127.0.0.1:5600
+# First initialization is explicit:
+#   docker compose -f compose.v2.example.yaml run --rm --service-ports platform-v2 --initialize
+# After stopping that process:
+#   docker compose -f compose.v2.example.yaml up -d --pull never
+services:
+  platform-v2:
+    image: ${ZHIXU_V2_IMAGE:?Set the locally built candidate image or immutable digest}
+    pull_policy: never
+    user: '10001:10001'
+    restart: unless-stopped
+    ports:
+      - '127.0.0.1:${ZHIXU_V2_PORT:-5600}:5600'
+    environment:
+      ZHIXU_V2_PUBLIC_ORIGIN: ${ZHIXU_V2_PUBLIC_ORIGIN:?Set the exact browser origin including its published port}
+      ZHIXU_V2_DATA_ROOT: /data/state
+      ZHIXU_V2_BACKUP_ROOT: /backup/state
+      HOME: /data/home
+      TMPDIR: /scratch/tmp
+    volumes:
+      - v2-data:/data
+      - v2-backup:/backup
+      # SQLite preflight requires physical temporary capacity plus 2 GiB free.
+      # A small /tmp tmpfs cannot satisfy that gate.
+      - v2-scratch:/scratch
+    read_only: true
+    tmpfs:
+      - /tmp:rw,nosuid,nodev,exec,size=64m,mode=1777
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    cpus: '2.0'
+    mem_limit: 4g
+    pids_limit: 256
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 4096
+    stop_grace_period: 30s
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: '3'
+volumes:
+  v2-data:
+  v2-backup:
+  v2-scratch:

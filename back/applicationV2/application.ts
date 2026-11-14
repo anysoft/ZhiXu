@@ -44,8 +44,10 @@ import { withInheritedLease } from '../services/backup/inheritedLeases';
 import { fail } from '../services/workspaceV2/errors';
 import type { ApiCall, ApiHandler, ApiRoute, RouteMap } from './types';
 import type { WorkspaceGitAdapter } from '../services/gitWorkspaceV2/git';
+import { normalizeV2PublicOrigin } from './publicOrigin';
 
 export interface V2ApplicationOptions extends V2BootOptions {
+  publicOrigin?: string;
   git?: ConstructorParameters<typeof WorkspaceGitAdapter>[2];
   createGitResources?: (s: V2Container) => CandidateGitResources;
   extraRoutes?: (s: V2Container) => RouteMap;
@@ -103,6 +105,15 @@ export class V2Application {
     });
   }
   static async launch(options: V2ApplicationOptions): Promise<V2Application> {
+    options = {
+      ...options,
+      publicOrigin: normalizeV2PublicOrigin(options.publicOrigin),
+    };
+    if (
+      !options.publicOrigin &&
+      ['0.0.0.0', '::', '[::]'].includes(options.host ?? '')
+    )
+      throw new Error('STARTUP_PUBLIC_ORIGIN_REQUIRED');
     const instance = new V2Application(options);
     return new Promise((resolve, reject) => {
       void (async () => {
@@ -232,7 +243,11 @@ export class V2Application {
     const address = this.server!.address();
     if (!address || typeof address === 'string')
       throw new Error('HTTP_LISTEN_FAILED');
-    this.origin = `http://${this.options.host ?? '127.0.0.1'}:${address.port}`;
+    const host = this.options.host ?? '127.0.0.1';
+    const authority =
+      host.includes(':') && !host.startsWith('[') ? `[${host}]` : host;
+    this.origin =
+      this.options.publicOrigin ?? `http://${authority}:${address.port}`;
     if (this.ready) {
       this.phases.push('RECOVERY_COMPLETE');
       this.state = 'READY';

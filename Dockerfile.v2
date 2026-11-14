@@ -1,0 +1,61 @@
+# Explicit fresh-v2 candidate. The default Dockerfile remains the v9 image.
+# Both native-addon installation and compilation run for the target platform.
+FROM node:22.23.2-bookworm-slim@sha256:48e4b67d85f87bd551df43704e24d252f56cc5f8e9718841aace50f19948f0f9 AS toolchain
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential python3 git ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+RUN npm install --global pnpm@8.3.1
+WORKDIR /build
+
+FROM toolchain AS dependencies
+COPY package.json pnpm-lock.yaml .npmrc ./
+RUN pnpm install --frozen-lockfile --ignore-scripts && pnpm rebuild
+
+FROM dependencies AS compile
+COPY . .
+RUN npm run build:v2
+
+FROM compile AS build
+# Keep the locked runtime graph, including target-native SQLite bindings.
+RUN npm_config_ignore_scripts=true pnpm prune --prod
+
+FROM node:22.23.2-bookworm-slim@sha256:48e4b67d85f87bd551df43704e24d252f56cc5f8e9718841aace50f19948f0f9 AS runtime
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    tini bash coreutils util-linux git openssh-client openssl ca-certificates curl \
+    tar gzip xz-utils tzdata python3 build-essential libssl-dev zlib1g-dev \
+    libbz2-dev libreadline-dev libsqlite3-dev libffi-dev liblzma-dev libncurses-dev uuid-dev \
+    && rm -rf /var/lib/apt/lists/* \
+    && groupadd --gid 10001 zhixu && useradd --uid 10001 --gid 10001 \
+       --home-dir /data/home --no-create-home zhixu \
+    && mkdir -p /app /data/home /backup /scratch/tmp \
+    && chown -R 10001:10001 /data /backup /scratch \
+    && chmod 0700 /data /data/home /backup /scratch /scratch/tmp
+WORKDIR /app
+COPY --from=build /build/node_modules ./node_modules
+COPY --from=build /build/static/build ./static/build
+COPY --from=build /build/static/dist-v2 ./static/dist-v2
+COPY --from=build /build/package.json /build/pnpm-lock.yaml /build/version.yaml /build/LICENSE ./
+COPY --from=build /build/shell/*.py ./shell/
+COPY --from=build /build/scripts/release-v2 ./scripts/release-v2
+COPY --from=build /build/scripts/start-v2.cjs ./scripts/start-v2.cjs
+ARG SOURCE_COMMIT
+ARG SOURCE_TREE
+LABEL org.opencontainers.image.title="ZhiXu fresh-v2 candidate" \
+      org.opencontainers.image.description="Explicit fresh-v2 script automation application; qualification candidate only" \
+      org.opencontainers.image.revision=$SOURCE_COMMIT \
+      org.zhixu.source-tree=$SOURCE_TREE \
+      org.opencontainers.image.source="https://github.com/anysoft/ZhiXu" \
+      org.opencontainers.image.licenses="Apache-2.0" \
+      org.zhixu.application-mode="v2"
+ENV NODE_ENV=production \
+    HOME=/data/home TMPDIR=/scratch/tmp \
+    ZHIXU_V2_DATA_ROOT=/data/state ZHIXU_V2_BACKUP_ROOT=/backup/state \
+    LANG=C.UTF-8 LOG_LEVEL=info
+# Assets are root-owned and immutable to the service UID even without --read-only.
+RUN chmod -R a-w /app
+USER 10001:10001
+EXPOSE 5600
+STOPSIGNAL SIGTERM
+HEALTHCHECK --interval=10s --timeout=5s --start-period=90s --retries=6 \
+    CMD ["node", "scripts/release-v2/healthcheck.cjs"]
+ENTRYPOINT ["/usr/bin/tini", "--", "node", "scripts/release-v2/entrypoint.cjs"]
