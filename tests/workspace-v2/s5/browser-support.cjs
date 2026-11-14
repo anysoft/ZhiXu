@@ -28,6 +28,43 @@ async function withBrowserDeadline(promise, label, milliseconds = 30000) {
     clearTimeout(timer);
   }
 }
+async function waitForDialogOpening(dialog) {
+  await dialog.waitFor({ state: 'visible', timeout: 10000 });
+  return withBrowserDeadline(
+    dialog.evaluate(async (element) => {
+      const nextFrame = () =>
+        new Promise((resolve) => requestAnimationFrame(resolve));
+      await nextFrame();
+      await nextFrame();
+      const deadline = performance.now() + 10000;
+      for (;;) {
+        if (!element.isConnected)
+          throw Error('S5_DIALOG_DETACHED_DURING_OPENING');
+        const moving = element
+          .getAnimations()
+          .some(
+            (animation) =>
+              animation.playState === 'running' || animation.pending,
+          );
+        const opening = [...element.classList].some((name) =>
+          /(?:^|-)zoom-(?:appear|enter)(?:-|$)/.test(name),
+        );
+        const transform = getComputedStyle(element).transform;
+        if (
+          !moving &&
+          !opening &&
+          (transform === 'none' || transform === 'matrix(1, 0, 0, 1, 0, 0)')
+        )
+          return;
+        if (performance.now() > deadline)
+          throw Error('S5_DIALOG_OPENING_DEADLINE');
+        await nextFrame();
+      }
+    }),
+    'DIALOG_OPENING',
+    10000,
+  );
+}
 function browserLibrary() {
   for (const id of [
     process.env.ZHIXU_S5_PLAYWRIGHT,
@@ -226,4 +263,4 @@ async function browserFixture(caseId, options = {}) {
     },
   };
 }
-module.exports = { browserFixture, browserLibrary };
+module.exports = { browserFixture, browserLibrary, waitForDialogOpening };

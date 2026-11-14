@@ -5,7 +5,10 @@ const test = require('node:test'),
   path = require('node:path'),
   fs = require('node:fs/promises');
 const { randomUUID, createHash } = require('node:crypto');
-const { browserFixture } = require('./browser-support.cjs');
+const {
+  browserFixture,
+  waitForDialogOpening,
+} = require('./browser-support.cjs');
 const { WorkspaceLifecycleService } = artifactModule(
   'services/workspaceV2/lifecycle',
 );
@@ -386,6 +389,7 @@ test(
       await owned.row
         .getByRole('button', { name: 'Recover', exact: true })
         .click();
+      await waitForDialogOpening(page.getByRole('dialog'));
       await page
         .getByRole('dialog')
         .getByRole('button', { name: /Save$/ })
@@ -415,6 +419,7 @@ test(
       await unknown.row
         .getByRole('button', { name: 'Recover', exact: true })
         .click();
+      await waitForDialogOpening(page.getByRole('dialog'));
       await page
         .getByRole('dialog')
         .getByRole('button', { name: /Save$/ })

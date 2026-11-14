@@ -1,7 +1,10 @@
 // S5 reruns preserved UI/domain assertions against an explicit compiled release candidate.
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { browserFixture } = require('./browser-support.cjs');
+const {
+  browserFixture,
+  waitForDialogOpening,
+} = require('./browser-support.cjs');
 
 test(
   'S5 real browser: exact Task argument rows preserve empty strings, whitespace and embedded newlines across unrelated edits and execution',
@@ -75,6 +78,7 @@ test(
         );
         await page.getByRole('button', { name: 'Edit', exact: true }).click();
         dialog = page.getByRole('dialog');
+        await waitForDialogOpening(dialog);
         await dialog.getByRole('tab', { name: 'Runtime', exact: true }).click();
         if (stage === 'ONE_EMPTY_ARGUMENT') {
           await dialog
