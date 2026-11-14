@@ -19,7 +19,8 @@ const language = load('back/shared/i18n.ts', mocks);
 mocks['../shared/i18n'] = language;
 const { setLang, tf } = language;
 const NotificationService = load('back/services/notify.ts', mocks).default;
-const nodemailer = require('nodemailer');
+const nodemailerModule = require('nodemailer');
+const nodemailer = nodemailerModule.default || nodemailerModule;
 test('branded notification templates preserve payload structure and user content in both languages', async () => {
   let sent, mail;
   const service = new NotificationService({
