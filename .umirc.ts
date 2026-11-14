@@ -23,7 +23,7 @@ export default defineConfig({
     baseNavigator: false,
   },
   outputPath: frontendOutput,
-  ...(v2Frontend ? { routes: v2Routes } : {}),
+  ...(v2Frontend ? { routes: v2Routes, conventionLayout: false } : {}),
   fastRefresh: true,
   favicons: ['/favicon.svg'],
   publicPath: v2Frontend

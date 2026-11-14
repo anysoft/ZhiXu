@@ -486,7 +486,6 @@ export class WorkspaceBackupService {
       manifest.total_bytes > this.limits.backupSnapshotBytes
     )
       fail('BACKUP_SOURCE_INCOMPLETE');
-    await validateDatabase(path.join(root, 'data/db/database.sqlite'));
     const modes = new Map<string, number>();
     for await (const entry of inventoryLines(
       path.join(root, 'inventory.ndjson'),
@@ -498,6 +497,7 @@ export class WorkspaceBackupService {
       { readOnly: true },
     );
     try {
+      await validateDatabase(path.join(root, 'data/db/database.sqlite'));
       await this.domain.collect(store, 'snapshot', manifest.workspaces, modes);
     } finally {
       await store.close();

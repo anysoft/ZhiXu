@@ -99,16 +99,17 @@ test(
           expected_hash: file.body.data.hash,
         },
       );
-      assert.ok(saved.body.data.hash);
+      assert.ok(saved.body.data.entry.hash);
       file = await measure(
         'file_read',
         'GET',
         `/workspaces/${workspaceId}/files?path=main.sh`,
       );
+      assert.equal(saved.body.data.entry.hash, file.body.data.hash);
       await measure(
         'file_tree',
         'GET',
-        `/workspaces/${workspaceId}/files/tree`,
+        `/workspaces/${workspaceId}/tree`,
       );
       await measure(
         'file_search',
@@ -154,7 +155,7 @@ test(
       '/backups',
       {},
       undefined,
-      202,
+      200,
     );
     const operationId = backup.body.data.id;
     const operation = await until(

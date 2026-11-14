@@ -275,22 +275,10 @@ export class WorkspaceStore {
   }
 
   async verifySchema() {
-    const metadata = await this.all<{
-      schema_identity: string;
-      schema_version: number;
-      schema_signature: string;
-      model_contract: string;
-    }>('SELECT * FROM PlatformMetadata').catch(() =>
-      fail('UNSUPPORTED_DATABASE_SCHEMA', 503),
-    );
-    if (
-      metadata.length !== 1 ||
-      metadata[0].schema_identity !== WORKSPACE_SCHEMA_IDENTITY ||
-      metadata[0].schema_version !== 1
-    )
-      fail('UNSUPPORTED_DATABASE_SCHEMA', 503);
     const objects = await this.all<SchemaObject>(
       "SELECT type,name,tbl_name,sql FROM sqlite_schema WHERE name NOT LIKE 'sqlite_%' AND sql IS NOT NULL ORDER BY type,name",
+    ).catch(() =>
+      fail('UNSUPPORTED_DATABASE_SCHEMA', 503),
     );
     const tokens =
       /'(?:''|[^'])*'|"(?:""|[^"])*"|`(?:``|[^`])*`|\[[^\]]*\]|[^\s'"`\[]+/g;
@@ -306,6 +294,31 @@ export class WorkspaceStore {
         ),
       )
       .digest('hex');
+    // Qualify the catalog before preparing a query against an input-owned name.
+    // In particular, PlatformMetadata must never resolve to an untrusted VIEW.
+    const metadataObject = objects.find((row) => row.name === 'PlatformMetadata');
+    if (
+      metadataObject?.type !== 'table' ||
+      metadataObject.tbl_name !== 'PlatformMetadata' ||
+      !/\bschema_identity\b/.test(metadataObject.sql)
+    )
+      fail('UNSUPPORTED_DATABASE_SCHEMA', 503);
+    if (signature !== WORKSPACE_SCHEMA_SIGNATURE)
+      fail('DATABASE_SCHEMA_CORRUPTED', 503);
+    const metadata = await this.all<{
+      schema_identity: string;
+      schema_version: number;
+      schema_signature: string;
+      model_contract: string;
+    }>('SELECT * FROM PlatformMetadata').catch(() =>
+      fail('UNSUPPORTED_DATABASE_SCHEMA', 503),
+    );
+    if (
+      metadata.length !== 1 ||
+      metadata[0].schema_identity !== WORKSPACE_SCHEMA_IDENTITY ||
+      metadata[0].schema_version !== 1
+    )
+      fail('UNSUPPORTED_DATABASE_SCHEMA', 503);
     const integrity = await this.all<{ integrity_check: string }>(
       'PRAGMA integrity_check',
     );
@@ -313,7 +326,6 @@ export class WorkspaceStore {
     if (
       metadata[0].schema_signature !== WORKSPACE_SCHEMA_SIGNATURE ||
       metadata[0].model_contract !== 'S0-2026-11-13' ||
-      signature !== WORKSPACE_SCHEMA_SIGNATURE ||
       foreignKeys.length ||
       integrity.length !== 1 ||
       integrity[0].integrity_check !== 'ok'

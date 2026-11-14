@@ -2,7 +2,7 @@
   "name": "@anysoft/zhixu",
   "packageManager": "pnpm@8.3.1",
   "version": "1.0.0-rc.6",
-  "description": "ZhiXu \u2014 Git-native automation and task execution platform",
+  "description": "ZhiXu — Git-native automation and task execution platform",
   "repository": {
     "type": "git",
     "url": "https://github.com/anysoft/ZhiXu.git"
@@ -97,7 +97,25 @@
       "compression@1": "1.8.2",
       "lodash@4": "4.18.1",
       "sequelize@6": "6.37.8",
-      "dva-immer@1.0.2>immer": "9.0.21"
+      "dva-immer@1.0.2>immer": "9.0.21",
+      "@remix-run/router@>=1.0.0 <2.0.0": "1.23.4",
+      "axios@>=0.0.0 <1.0.0": "0.35.0",
+      "axios@>=1.0.0 <2.0.0": "1.21.1",
+      "browserslist@>=4.0.0 <5.0.0": "4.28.9",
+      "decode-uri-component@>=0.0.0 <1.0.0": "0.5.1",
+      "fast-uri@>=3.0.0 <4.0.0": "3.1.9",
+      "flatted@>=3.0.0 <4.0.0": "3.4.4",
+      "js-cookie@>=3.0.0 <4.0.0": "3.0.8",
+      "lodash-es@>=4.0.0 <5.0.0": "4.18.1",
+      "minimatch@>=3.0.0 <4.0.0": "3.1.5",
+      "nanoid@>=3.0.0 <4.0.0": "3.3.20",
+      "path-to-regexp@>=1.0.0 <2.0.0": "1.9.0",
+      "path-to-regexp@>=8.0.0 <9.0.0": "8.4.2",
+      "postcss@>=8.0.0 <9.0.0": "8.5.33",
+      "rollup@>=3.0.0 <4.0.0": "3.30.0",
+      "source-map-js@>=1.0.0 <2.0.0": "1.2.2",
+      "svgo@>=2.0.0 <3.0.0": "2.8.4",
+      "urllib@>=2.0.0 <3.0.0": "2.44.1"
     }
   },
   "dependencies": {

@@ -91,7 +91,7 @@ test('S5 actual compiled v9 release entry and direct app reject full genuine v2,
     for (const suffix of ['-wal', '-shm']) assert.ok((await fs.stat(path.join(instance.dataRoot, 'db/database.sqlite' + suffix))).size > 0);
     for (const direct of [false, true]) observations.push({ fixture: 'full-v2-wal-shm', ...await rejectUnchanged(t, instance, direct) });
   } finally { await store.close(); }
-  for (const kind of ['unknown', 'frozen-v8', 'corrupt']) {
+  for (const kind of ['unknown', 'metadata-view', 'frozen-v8', 'corrupt']) {
     const other = await h.createInstance(kind);
     await fs.mkdir(path.join(other.dataRoot, 'db'), { recursive: true, mode: 0o700 });
     const database = path.join(other.dataRoot, 'db/database.sqlite');
@@ -100,6 +100,8 @@ test('S5 actual compiled v9 release entry and direct app reject full genuine v2,
       const connection = await new Promise((resolve, reject) => { const db = new sqlite3.Database(database, error => error ? reject(error) : resolve(db)); });
       try {
         let sql = "CREATE TABLE unique_user_data(value TEXT);INSERT INTO unique_user_data VALUES ('s5-owned-keep');";
+        if (kind === 'metadata-view')
+          sql += "CREATE VIEW PlatformMetadata AS SELECT 9 AS platform_schema_version, 'ordinary-owned-fixture' AS model_signature, 'ordinary-owned-fixture' AS schema_signature;";
         if (kind === 'frozen-v8') {
           const frozen = artifactModule('schema/platformV8').default;
           assert.equal(frozen.metadata.platform_schema_version, 8);
@@ -147,5 +149,22 @@ test('S5 actual compiled v9 release entry still serves a fresh v9 database and r
   try { metadata = await new Promise((resolve, reject) => db.all('SELECT platform_schema_version FROM PlatformMetadata', (error, rows) => error ? reject(error) : resolve(rows))); }
   finally { await new Promise(resolve => db.close(resolve)); }
   assert.deepEqual(metadata, [{ platform_schema_version: 9 }]);
-  await h.record('S5-V9-ACTUAL-ENTRY-POSITIVE', { status: 'PASS', actual_release_entry: true, actual_compiled_app: true, actual_fresh_start_and_v9_restart: true, platform_schema_version: 9, mocks: false, results });
+  // An input database cannot authorize an extra object by recomputing its own
+  // metadata hash. Only a private copy of this test's stopped genuine v9 is changed.
+  const other = await h.createInstance('noncanonical-v9-catalog');
+  await fs.cp(instance.dataRoot, other.dataRoot, { recursive: true });
+  const altered = await new Promise((resolve, reject) => {
+    const connection = new sqlite3.Database(path.join(other.dataRoot, 'db/database.sqlite'), sqlite3.OPEN_READWRITE, error => error ? reject(error) : resolve(connection));
+  });
+  try {
+    await new Promise((resolve, reject) => altered.exec("CREATE VIEW OrdinaryExtraView AS SELECT 'owned-noncanonical-catalog' AS value", error => error ? reject(error) : resolve()));
+    const objects = await new Promise((resolve, reject) => altered.all("SELECT name,sql FROM sqlite_master WHERE name NOT LIKE 'sqlite_%' ORDER BY type,name", (error, rows) => error ? reject(error) : resolve(rows)));
+    const { schemaSignature } = artifactModule('shared/operationalSchema');
+    await new Promise((resolve, reject) => altered.run('UPDATE PlatformMetadata SET schema_signature=?', [schemaSignature(objects)], error => error ? reject(error) : resolve()));
+  } finally {
+    await new Promise((resolve, reject) => altered.close(error => error ? reject(error) : resolve()));
+  }
+  const noncanonicalRejections = [];
+  for (const direct of [false, true]) noncanonicalRejections.push(await rejectUnchanged(t, other, direct));
+  await h.record('S5-V9-ACTUAL-ENTRY-POSITIVE', { status: 'PASS', actual_release_entry: true, actual_compiled_app: true, actual_fresh_start_and_v9_restart: true, platform_schema_version: 9, mocks: false, results, self_recomputed_noncanonical_catalog_rejected: true, noncanonical_rejections: noncanonicalRejections });
 });
