@@ -168,7 +168,7 @@ def build(args, context, name, git_input):
                  'native_git_tools': git_input}
     result = {**context, 'source_archive_sha256': sha256(args.source_archive),
               'os': platform.system(), 'architecture': platform.machine(),
-              'kernel': platform.release(), 'build_name': name,
+              'kernel': platform.release(), 'build_name': target.name,
               'source_root': str(source), 'release_root': str(release),
               'independent_source_export': True, 'production_mode': True,
               'inherited_developer_node_modules': False,
@@ -184,7 +184,7 @@ def build(args, context, name, git_input):
     result['artifact_sha256'] = hashlib.sha256(json.dumps(
         identity, sort_keys=True, separators=(',', ':')).encode()).hexdigest()
     (target / 'candidate.json').write_text(json.dumps(result, indent=2) + '\n')
-    print(json.dumps({'build': name, 'status': 'BUILT',
+    print(json.dumps({'build': target.name, 'status': 'BUILT',
                       'artifact_sha256': result['artifact_sha256']}), flush=True)
     return result
 
