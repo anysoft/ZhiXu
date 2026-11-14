@@ -7,6 +7,10 @@ const { V2Application } = artifactModule('applicationV2/application');
   const instanceRoot = process.argv[2];
   await assertOwnedInstance(instanceRoot);
   const app = await V2Application.launch({
+    artifactRoot: path.join(
+      releaseRoot(),
+      'static/build/applicationV2/contracts',
+    ),
     dataRoot: path.join(instanceRoot, 'data'),
     backupRoot: path.join(instanceRoot, 'backups'),
     initialize: false,

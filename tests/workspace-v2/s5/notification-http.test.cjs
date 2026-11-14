@@ -37,6 +37,10 @@ async function setup(t) {
   t.after(() => new Promise((resolve) => receiver.close(resolve)));
   const url = `http://127.0.0.1:${receiver.address().port}/owned-notification`;
   const app = await V2Application.launch({
+    artifactRoot: path.join(
+      releaseRoot(),
+      'static/build/applicationV2/contracts',
+    ),
     dataRoot: instance.dataRoot,
     backupRoot: instance.backupRoot,
     initialize: true,

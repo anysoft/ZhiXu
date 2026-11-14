@@ -13,6 +13,10 @@ test(
   async (t) => {
     const h = await createS5Fixture(t, { caseId: 'S5-RESOURCE-HTTP-004' });
     const app = await V2Application.launch({
+      artifactRoot: path.join(
+        releaseRoot(),
+        'static/build/applicationV2/contracts',
+      ),
       dataRoot: path.join(h.root, 'resource-http-data'),
       initialize: true,
       projectRoot: h.projectRoot,

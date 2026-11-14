@@ -39,6 +39,10 @@ test('S5 explicit public authority works on a wildcard listener and rejects spoo
         dataRoot: root,
         initialize: true,
         projectRoot: h.projectRoot,
+        artifactRoot: path.join(
+          h.projectRoot,
+          'static/build/applicationV2/contracts',
+        ),
         publicOrigin,
       }),
       /STARTUP_PUBLIC_ORIGIN_INVALID/,
@@ -53,6 +57,10 @@ test('S5 explicit public authority works on a wildcard listener and rejects spoo
     V2Application.launch({
       dataRoot: path.join(h.root, 'missing-authority'),
       projectRoot: h.projectRoot,
+      artifactRoot: path.join(
+        h.projectRoot,
+        'static/build/applicationV2/contracts',
+      ),
       initialize: true,
       host: '0.0.0.0',
     }),
@@ -62,6 +70,10 @@ test('S5 explicit public authority works on a wildcard listener and rejects spoo
   const app = await V2Application.launch({
     dataRoot: path.join(h.root, 'actual-data'),
     projectRoot: h.projectRoot,
+    artifactRoot: path.join(
+      h.projectRoot,
+      'static/build/applicationV2/contracts',
+    ),
     initialize: true,
     background: false,
     port: 0,

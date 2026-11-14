@@ -72,6 +72,10 @@ async function browserFixture(caseId, options = {}) {
     files: sealed.files,
   });
   const app = await V2Application.launch({
+    artifactRoot: path.join(
+      releaseRoot(),
+      'static/build/applicationV2/contracts',
+    ),
     dataRoot: instance.dataRoot,
     backupRoot: instance.backupRoot,
     initialize: true,

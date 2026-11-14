@@ -7,6 +7,10 @@ const { V2Application } = artifactModule('applicationV2/application');
 async function httpFixture(t, caseId, options = {}) {
   const h = await createS5Fixture(t, { caseId });
   const app = await V2Application.launch({
+    artifactRoot: path.join(
+      releaseRoot(),
+      'static/build/applicationV2/contracts',
+    ),
     dataRoot: path.join(h.root, 'http-data'),
     initialize: true,
     projectRoot: h.projectRoot,
