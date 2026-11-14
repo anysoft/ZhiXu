@@ -89,6 +89,7 @@ export class TaskExecutionService {
   private cursor = 0;
   private ticking = false;
   private closed = false;
+  private closing?: Promise<void>;
   private timer?: NodeJS.Timeout;
   constructor(
     readonly store: WorkspaceStore,
@@ -97,6 +98,8 @@ export class TaskExecutionService {
     readonly options: {
       limits?: Partial<ExecutionLimits>;
       fault?: FaultHook;
+      /** Drain actual owners before coordinated shutdown; never a Task timeout. */
+      shutdownGraceMs?: number;
     } = {},
   ) {
     if (store.dataRoot !== roots.dataRoot || store.dataRoot !== leases.dataRoot)
@@ -104,6 +107,13 @@ export class TaskExecutionService {
     this.paths = new WorkspaceExecutionPaths(store.dataRoot);
     this.resolver = new WorkspaceExecutionResolver(store, roots, leases);
     this.limits = { ...DEFAULTS, ...options.limits };
+    if (
+      options.shutdownGraceMs !== undefined &&
+      (!Number.isSafeInteger(options.shutdownGraceMs) ||
+        options.shutdownGraceMs < 0 ||
+        options.shutdownGraceMs > 30000)
+    )
+      fail('INVALID_REQUEST', 400);
     for (const key of Object.keys(DEFAULTS) as (keyof ExecutionLimits)[])
       if (
         !Number.isSafeInteger(this.limits[key]) ||
@@ -452,20 +462,36 @@ export class TaskExecutionService {
     }, true);
   }
   start() {
-    if (this.timer) return;
+    if (this.timer || this.closing) return;
     this.closed = false;
     this.timer = setInterval(() => {
       void this.tick().catch(() => undefined);
     }, 100);
     this.timer.unref();
   }
-  async close() {
+  close(): Promise<void> {
+    if (this.closing) return this.closing;
     this.closed = true;
     if (this.timer) clearInterval(this.timer);
     this.timer = undefined;
-    while (this.ticking) await new Promise((resolve) => setTimeout(resolve, 5));
-    for (const value of this.active.values()) value.runner.cancel();
-    await Promise.all([...this.active.values()].map((v) => v.done));
+    this.closing = (async () => {
+      // This deadline closes the natural-completion window, not ownership.
+      // Child supervision, Config restoration and FD release must still finish.
+      const deadline = setTimeout(() => {
+        for (const value of this.active.values())
+          value.runner.interruptForShutdown();
+      }, this.options.shutdownGraceMs ?? 5000);
+      try {
+        while (this.ticking)
+          await new Promise((resolve) => setTimeout(resolve, 5));
+        await Promise.all([...this.active.values()].map((v) => v.done));
+      } finally {
+        clearTimeout(deadline);
+      }
+    })().finally(() => {
+      this.closing = undefined;
+    });
+    return this.closing;
   }
   async wait(id: number, timeoutMs = 60000) {
     const deadline = Date.now() + timeoutMs;
@@ -542,6 +568,7 @@ export class TaskExecutionService {
     return this.store.transaction(async (tx) => {
       const current = await this.get(row.id);
       if (
+        this.closed ||
         current.status !== 'QUEUED' ||
         current.cancel_requested ||
         current.queue_deadline_at <= this.now()
@@ -574,6 +601,7 @@ export class TaskExecutionService {
         );
         return false;
       }
+      if (this.closed) return false;
       const update = await tx.run(
         "UPDATE TaskRuns SET status='RESOLVING',owner_token=? WHERE id=? AND status='QUEUED' AND cancel_requested=0",
         [token, row.id],
@@ -685,15 +713,17 @@ export class TaskExecutionService {
                   run_id: row.id,
                   workspace_id: row.workspace_id,
                 });
-                if ((await this.get(row.id)).cancel_requested) {
+                const current = await this.get(row.id);
+                if (current.cancel_requested || runner.isInterrupted) {
+                  const cancelled = !!current.cancel_requested;
                   await this.terminal(
                     row,
                     token,
                     terminalExecutionResult(
                       row.id,
-                      'CANCELLED',
-                      'CANCELLED',
-                      'RESOLVE',
+                      cancelled ? 'CANCELLED' : 'INTERRUPTED',
+                      cancelled ? 'CANCELLED' : 'EXECUTION_INTERRUPTED',
+                      cancelled ? 'RESOLVE' : 'SHUTDOWN',
                     ),
                   );
                   return;
@@ -766,6 +796,22 @@ export class TaskExecutionService {
                   return;
                 }
                 try {
+                  if (runner.isInterrupted) {
+                    const cancelled =
+                      runner.isCancelled ||
+                      !!(await this.get(row.id)).cancel_requested;
+                    await this.terminal(
+                      row,
+                      token,
+                      terminalExecutionResult(
+                        row.id,
+                        cancelled ? 'CANCELLED' : 'INTERRUPTED',
+                        cancelled ? 'CANCELLED' : 'EXECUTION_INTERRUPTED',
+                        cancelled ? 'RESOLVE' : 'SHUTDOWN',
+                      ),
+                    );
+                    return;
+                  }
                   const snapshot = {
                     task_id: resolved.context.identity.taskId,
                     task_definition_version:
@@ -863,6 +909,20 @@ export class TaskExecutionService {
                       attempt <= resolved.context.settings.max_attempts;
                       attempt++
                     ) {
+                      if (runner.isInterrupted) {
+                        const current = await this.get(row.id);
+                        const cancelled =
+                          runner.isCancelled || !!current.cancel_requested;
+                        result = terminalExecutionResult(
+                          row.id,
+                          cancelled ? 'CANCELLED' : 'INTERRUPTED',
+                          cancelled ? 'CANCELLED' : 'EXECUTION_INTERRUPTED',
+                          cancelled ? 'RETRY' : 'SHUTDOWN',
+                          current.started_at,
+                          attempt - 1,
+                        );
+                        break;
+                      }
                       const now = this.now();
                       await this.store.transaction(async (tx) => {
                         await tx.run(
@@ -928,6 +988,17 @@ export class TaskExecutionService {
                           'CANCELLED',
                           'CANCELLED',
                           'RETRY',
+                          result.startedAt,
+                          attempt,
+                        );
+                        break;
+                      }
+                      if (runner.isInterrupted) {
+                        result = terminalExecutionResult(
+                          row.id,
+                          'INTERRUPTED',
+                          'EXECUTION_INTERRUPTED',
+                          'SHUTDOWN',
                           result.startedAt,
                           attempt,
                         );

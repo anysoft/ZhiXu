@@ -63,6 +63,7 @@ export class WorkspaceAttemptRunner {
   readonly materialization: WorkspaceMaterialization;
   private lifecycle?: TaskHookLifecycle;
   private cancelled = false;
+  private interrupted = false;
   private wake?: () => void;
   constructor(
     readonly store: WorkspaceStore,
@@ -80,8 +81,17 @@ export class WorkspaceAttemptRunner {
   get isCancelled() {
     return this.cancelled;
   }
+  /** Application shutdown is not durable USER_CANCEL intent. */
+  interruptForShutdown() {
+    this.interrupted = true;
+    this.lifecycle?.cancel();
+    this.wake?.();
+  }
+  get isInterrupted() {
+    return this.interrupted;
+  }
   async backoff(seconds: number) {
-    if (this.cancelled) return;
+    if (this.cancelled || this.interrupted) return;
     await new Promise<void>((resolve) => {
       const finish = () => {
         clearTimeout(timer);
@@ -95,6 +105,7 @@ export class WorkspaceAttemptRunner {
   retry(result: ExecutionResult, context: WorkspaceExecutionContext) {
     return (
       !this.cancelled &&
+      !this.interrupted &&
       result.attempt < context.settings.max_attempts &&
       result.cleanupResult === 'SUCCESS' &&
       (result.status === 'TIMEOUT' ||
@@ -193,7 +204,7 @@ export class WorkspaceAttemptRunner {
       const executor = new WorkspaceHookExecutor(fds, context.runtime),
         runner = new RunnerV2(executor);
       this.lifecycle = new TaskHookLifecycle(executor);
-      if (this.cancelled) this.lifecycle.cancel();
+      if (this.cancelled || this.interrupted) this.lifecycle.cancel();
       await redactor.write(`[ATTEMPT ${attempt}]\n`);
       const execution = await this.lifecycle.run(
         {
@@ -261,25 +272,46 @@ export class WorkspaceAttemptRunner {
         (item) => item !== result.primaryError,
       );
       result.hookResults = execution.hookResults;
-      result.exitCode =
-        execution.main?.exitCode ?? execution.main?.code ?? null;
+      // The supervisor's transport code (for example 143) is not a child exit.
+      result.exitCode = execution.main?.exitCode ?? null;
       result.signal = execution.main?.signal ?? null;
       result.cancelled =
-        this.cancelled || result.primaryError?.code === 'CANCELLED';
+        this.cancelled ||
+        (!this.interrupted && result.primaryError?.code === 'CANCELLED');
+      // The supervisor records which deadline actually initiated termination.
+      // A Task timeout already reaping its child stays TIMEOUT if shutdown
+      // arrives later; the lifecycle's transport cancellation cannot erase it.
+      if (
+        this.interrupted &&
+        !this.cancelled &&
+        execution.main?.reason === 'TIMEOUT'
+      )
+        result.primaryError = { phase: 'MAIN', code: 'TIMEOUT' };
+      const shutdownInterrupted =
+        this.interrupted &&
+        (!result.primaryError || result.primaryError.code === 'CANCELLED');
       result.timedOut = result.primaryError?.code === 'TIMEOUT';
       result.status = result.cancelled
         ? 'CANCELLED'
+        : shutdownInterrupted
+        ? 'INTERRUPTED'
         : result.timedOut
         ? 'TIMEOUT'
         : result.primaryError
         ? 'FAILED'
         : 'SUCCESS';
+      if (result.status === 'INTERRUPTED')
+        result.primaryError = {
+          phase: 'SHUTDOWN',
+          code: 'EXECUTION_INTERRUPTED',
+        };
     } catch (error) {
       result.primaryError = {
         phase: 'PREPARE',
         code: safeExecutionError(error),
       };
       result.cancelled = this.cancelled;
+      // An independent preparation failure is not relabelled as shutdown.
       result.status = this.cancelled ? 'CANCELLED' : 'FAILED';
       if (materializationStarted) {
         try {

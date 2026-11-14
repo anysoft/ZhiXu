@@ -45,6 +45,7 @@ import { fail } from '../services/workspaceV2/errors';
 import type { ApiCall, ApiHandler, ApiRoute, RouteMap } from './types';
 import type { WorkspaceGitAdapter } from '../services/gitWorkspaceV2/git';
 import { normalizeV2PublicOrigin } from './publicOrigin';
+import { V2HttpLifetime, V2ShutdownEvent } from './httpLifetime';
 
 export interface V2ApplicationOptions extends V2BootOptions {
   publicOrigin?: string;
@@ -52,6 +53,7 @@ export interface V2ApplicationOptions extends V2BootOptions {
   createGitResources?: (s: V2Container) => CandidateGitResources;
   extraRoutes?: (s: V2Container) => RouteMap;
   onRestartRequested?: () => void;
+  onShutdownEvent?: (event: V2ShutdownEvent) => void;
 }
 const MUTATING = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
 function preciseKey(key: string) {
@@ -93,7 +95,9 @@ export class V2Application {
   private resolveLifetime!: () => void;
   private backupApi?: ReturnType<typeof registerBackupApi>;
   private admission?: Awaited<ReturnType<typeof qualifyLocalStorage>>;
+  private readonly httpLifetime: V2HttpLifetime;
   constructor(readonly options: V2ApplicationOptions) {
+    this.httpLifetime = new V2HttpLifetime(options.onShutdownEvent);
     this.closedPromise = new Promise((r) => {
       this.stopped = r;
     });
@@ -182,7 +186,9 @@ export class V2Application {
     });
     await this.services.leases.barrier.recoverAbandonedSnapshot();
     this.phases.push('BACKUP_ADMISSION_RECOVERY');
-    this.runtime = await createRuntimeDomain(this.services);
+    this.runtime = await createRuntimeDomain(
+      this.services,
+    );
     this.triggers = new CandidateTaskTriggers(this.services);
     this.notifications = createNotificationDomain(this.services);
     await new BackupOperations(this.services.backup.paths).recover();
@@ -233,6 +239,7 @@ export class V2Application {
     await this.wireHttp();
     await new Promise<void>((resolve, reject) => {
       this.server = http.createServer({ maxHeaderSize: 16384 }, this.app);
+      this.httpLifetime.attach(this.server);
       this.server.once('error', reject);
       this.server.listen(
         this.options.port ?? 0,
@@ -270,6 +277,7 @@ export class V2Application {
     if (this.routesWired) return;
     this.routesWired = true;
     const app = this.app;
+    app.use(this.httpLifetime.admission);
     app.disable('x-powered-by');
     app.set('case sensitive routing', true);
     app.set('strict routing', true);
@@ -292,7 +300,7 @@ export class V2Application {
     });
     app.post(
       '/hooks/:publicId',
-      async (req, res, next) => {
+      this.httpLifetime.handle(async (req, res, next) => {
         try {
           if (Object.keys(req.query).length) fail('WEBHOOK_UNAUTHORIZED', 401);
           await this.triggers.authenticateWebhook(
@@ -304,9 +312,9 @@ export class V2Application {
         } catch (e) {
           next(e);
         }
-      },
+      }),
       express.json({ limit: '64kb', strict: true }),
-      async (req, res, next) => {
+      this.httpLifetime.handle(async (req, res, next) => {
         try {
           const data = await this.triggers.receiveWebhook(
             req.params.publicId,
@@ -317,118 +325,127 @@ export class V2Application {
         } catch (e) {
           next(e);
         }
-      },
+      }),
     );
-    app.use('/api', async (req, _res, next) => {
-      try {
-        const info = await this.auth.info();
-        if (
-          info?.info.blockedIps?.includes(
-            normalizeClientIp(req.ip || req.socket.remoteAddress),
+    app.use(
+      '/api',
+      this.httpLifetime.handle(async (req, _res, next) => {
+        try {
+          const info = await this.auth.info();
+          if (
+            info?.info.blockedIps?.includes(
+              normalizeClientIp(req.ip || req.socket.remoteAddress),
+            )
           )
-        )
-          fail('PANEL_SESSION_REQUIRED', 403);
-        next();
-      } catch (e) {
-        next(e);
-      }
-    });
+            fail('PANEL_SESSION_REQUIRED', 403);
+          next();
+        } catch (e) {
+          next(e);
+        }
+      }),
+    );
     app.get('/api/env.js', (_req, res) =>
       res.type('application/javascript').send('window.__ENV__QlBaseUrl="/";'),
     );
     app.get('/api/health', (_req, res) =>
-      res
-        .status(this.ready ? 200 : 503)
-        .json({
-          code: this.ready ? 200 : 503,
-          data: {
-            status: this.ready ? 'ok' : 'error',
-            services: { http: !!this.server, grpc: false },
-            metrics: {
-              uptime: Math.floor(process.uptime()),
-              memory: {
-                used: process.memoryUsage().heapUsed,
-                total: process.memoryUsage().heapTotal,
-              },
+      res.status(this.ready ? 200 : 503).json({
+        code: this.ready ? 200 : 503,
+        data: {
+          status: this.ready ? 'ok' : 'error',
+          services: { http: !!this.server, grpc: false },
+          metrics: {
+            uptime: Math.floor(process.uptime()),
+            memory: {
+              used: process.memoryUsage().heapUsed,
+              total: process.memoryUsage().heapTotal,
             },
-            mode: 'v2',
-            ready: this.ready,
-            state: this.state,
           },
-        }),
+          mode: 'v2',
+          ready: this.ready,
+          state: this.state,
+        },
+      }),
     );
-    app.get('/api/system', async (_req, res, next) => {
-      try {
-        const usage = await new WorkspacePreservationService(
-          this.services.backup,
-        ).usage();
-        res.json({
-          code: 200,
-          data: {
-            mode: 'v2',
-            initialized: await this.auth.initialized(),
-            ready: this.ready,
-            state: this.state,
-            local_write_admission: this.localWrites,
-            schema_identity: 'zhixu.workspace.v2.s0.1',
-            schema_version: 'S0-2026-11-13',
-            build_id: this.admission?.build_id ?? null,
-            version: '1.0.0-rc.6',
-            storage: {
-              ...usage,
-              status: this.localWrites ? 'READY' : 'RECOVERY_REQUIRED',
-              quota_bytes: this.services.backup.limits.backupRetainedBytes,
+    app.get(
+      '/api/system',
+      this.httpLifetime.handle(async (_req, res, next) => {
+        try {
+          const usage = await new WorkspacePreservationService(
+            this.services.backup,
+          ).usage();
+          res.json({
+            code: 200,
+            data: {
+              mode: 'v2',
+              initialized: await this.auth.initialized(),
+              ready: this.ready,
+              state: this.state,
+              local_write_admission: this.localWrites,
+              schema_identity: 'zhixu.workspace.v2.s0.1',
+              schema_version: 'S0-2026-11-13',
+              build_id: this.admission?.build_id ?? null,
+              version: '1.0.0-rc.6',
+              storage: {
+                ...usage,
+                status: this.localWrites ? 'READY' : 'RECOVERY_REQUIRED',
+                quota_bytes: this.services.backup.limits.backupRetainedBytes,
+              },
+              csrf_token: this.auth.setupCsrf(),
             },
-            csrf_token: this.auth.setupCsrf(),
-          },
-        });
-      } catch (e) {
-        next(e);
-      }
-    });
+          });
+        } catch (e) {
+          next(e);
+        }
+      }),
+    );
     app.use(
       ['/api/user/init', '/api/user/login', '/api/user/two-factor/login'],
       express.json({ limit: '16kb', strict: true }),
       rateLimit({ windowMs: 15 * 60 * 1000, max: 100 }),
     );
-    const initializeOwner = async (req: Request, res: Response, next: any) => {
-      try {
-        this.sameOrigin(req);
-        res.json({
-          code: 200,
-          data: await this.services.leases.barrier.mutation(() =>
-            this.auth.initialize(req.body, req.get('X-CSRF-Token')),
-          ),
-        });
-      } catch (e) {
-        next(e);
-      }
-    };
+    const initializeOwner = this.httpLifetime.handle(
+      async (req: Request, res: Response, next: any) => {
+        try {
+          this.sameOrigin(req);
+          res.json({
+            code: 200,
+            data: await this.services.leases.barrier.mutation(() =>
+              this.auth.initialize(req.body, req.get('X-CSRF-Token')),
+            ),
+          });
+        } catch (e) {
+          next(e);
+        }
+      },
+    );
     app.post('/api/user/init', initializeOwner);
     app.put('/api/user/init', initializeOwner);
-    app.post('/api/user/login', async (req, res, next) => {
-      try {
-        this.sameOrigin(req);
-        const data = await this.services.leases.barrier.mutation(() =>
-          this.auth.login(
-            req.body,
-            platform(req),
-            normalizeClientIp(req.ip || req.socket.remoteAddress),
-          ),
-        );
-        res.json(
-          'two_factor_required' in data
-            ? { code: 420, error_code: 'TWO_FACTOR_REQUIRED' }
-            : { code: 200, data },
-        );
-      } catch (e) {
-        next(e);
-      }
-    });
+    app.post(
+      '/api/user/login',
+      this.httpLifetime.handle(async (req, res, next) => {
+        try {
+          this.sameOrigin(req);
+          const data = await this.services.leases.barrier.mutation(() =>
+            this.auth.login(
+              req.body,
+              platform(req),
+              normalizeClientIp(req.ip || req.socket.remoteAddress),
+            ),
+          );
+          res.json(
+            'two_factor_required' in data
+              ? { code: 420, error_code: 'TWO_FACTOR_REQUIRED' }
+              : { code: 200, data },
+          );
+        } catch (e) {
+          next(e);
+        }
+      }),
+    );
     app.put(
       '/api/user/two-factor/login',
       rateLimit({ windowMs: 15 * 60 * 1000, max: 20 }),
-      async (req, res, next) => {
+      this.httpLifetime.handle(async (req, res, next) => {
         try {
           this.sameOrigin(req);
           res.json({
@@ -444,73 +461,91 @@ export class V2Application {
         } catch (e) {
           next(e);
         }
-      },
+      }),
     );
-    app.use('/api', async (req, res, next) => {
-      try {
-        const auth = await this.auth.principal(
-          req.headers.authorization,
-          platform(req),
-        );
-        (req as any).v2auth = auth;
-        if (MUTATING.has(req.method)) {
-          this.sameOrigin(req);
-          this.auth.verifyCsrf(auth.token, req.get('X-CSRF-Token'));
+    app.use(
+      '/api',
+      this.httpLifetime.handle(async (req, res, next) => {
+        try {
+          const auth = await this.auth.principal(
+            req.headers.authorization,
+            platform(req),
+          );
+          (req as any).v2auth = auth;
+          if (MUTATING.has(req.method)) {
+            this.sameOrigin(req);
+            this.auth.verifyCsrf(auth.token, req.get('X-CSRF-Token'));
+          }
+          next();
+        } catch (e) {
+          next(e);
         }
-        next();
-      } catch (e) {
-        next(e);
-      }
-    });
+      }),
+    );
     app.use('/api', express.json({ limit: '16mb', strict: true }));
-    app.get('/api/user', async (req, res, next) => {
-      try {
-        const { principal, token } = (req as any).v2auth;
-        res.json({
-          code: 200,
-          data: await this.auth.current(principal, token),
-        });
-      } catch (e) {
-        next(e);
-      }
-    });
-    app.post('/api/user/logout', async (req, res, next) => {
-      try {
-        await this.services.leases.barrier.mutation(() =>
-          this.auth.logout((req as any).v2auth.token),
-        );
-        res.json({ code: 200, data: null });
-      } catch (e) {
-        next(e);
-      }
-    });
-    await registerRetainedApi(app, this.services, this.auth);
-    this.backupApi = registerBackupApi(app, this.services, {
-      pauseProducers: async () => {
-        await this.services.pause();
-        await this.notifications.close();
-      },
-      resumeProducers: () => {
-        if (this.ready && this.options.background !== false) {
-          this.services.start();
-          this.notifications.start();
+    app.get(
+      '/api/user',
+      this.httpLifetime.handle(async (req, res, next) => {
+        try {
+          const { principal, token } = (req as any).v2auth;
+          res.json({
+            code: 200,
+            data: await this.auth.current(principal, token),
+          });
+        } catch (e) {
+          next(e);
         }
+      }),
+    );
+    app.post(
+      '/api/user/logout',
+      this.httpLifetime.handle(async (req, res, next) => {
+        try {
+          await this.services.leases.barrier.mutation(() =>
+            this.auth.logout((req as any).v2auth.token),
+          );
+          res.json({ code: 200, data: null });
+        } catch (e) {
+          next(e);
+        }
+      }),
+    );
+    await registerRetainedApi(app, this.services, this.auth, this.httpLifetime);
+    this.backupApi = registerBackupApi(
+      app,
+      this.services,
+      {
+        pauseProducers: async () => {
+          await this.services.pause();
+          await this.notifications.close();
+        },
+        resumeProducers: () => {
+          if (
+            this.ready &&
+            !this.closing &&
+            this.options.background !== false
+          ) {
+            this.services.start();
+            this.notifications.start();
+          }
+        },
+        requestRestart: async () => {
+          this.ready = false;
+          this.localWrites = false;
+          this.state = 'RESTORE_PENDING';
+          this.restartSignal();
+          this.options.onRestartRequested?.();
+        },
+        rebuildRuntime: () =>
+          this.runtime.run(() =>
+            new RestoreRebuildService(
+              this.services.backup.paths,
+              this.runtime.operations,
+            ).run(),
+          ),
       },
-      requestRestart: async () => {
-        this.ready = false;
-        this.localWrites = false;
-        this.state = 'RESTORE_PENDING';
-        this.restartSignal();
-        this.options.onRestartRequested?.();
-      },
-      rebuildRuntime: () =>
-        this.runtime.run(() =>
-          new RestoreRebuildService(
-            this.services.backup.paths,
-            this.runtime.operations,
-          ).run(),
-        ),
-    });
+      this.httpLifetime,
+    );
     for (const key of Object.keys(this.maps).sort(
       (a, b) => preciseKey(b) - preciseKey(a),
     )) {
@@ -521,73 +556,76 @@ export class V2Application {
       );
       (app as any)[method.toLowerCase()](
         '/api' + routePath,
-        async (req: Request, res: Response, next: any) => {
-          try {
-            const recoveryAction =
-              method === 'POST' &&
-              /^\/(?:workspaces\/:id\/(?:recover|git\/repair)|repositories\/:id\/(?:repair|initialize))$/.test(
-                routePath,
-              );
-            if (!this.ready && MUTATING.has(method) && !recoveryAction)
-              fail('WORKSPACE_RECOVERY_REQUIRED');
-            if (
-              !this.localWrites &&
-              MUTATING.has(method) &&
-              routePath.startsWith('/workspaces') &&
-              !recoveryAction
-            )
-              fail('WORKSPACE_RECOVERY_REQUIRED');
-            const entry = this.maps[key],
-              handle =
-                typeof entry === 'function'
-                  ? entry
-                  : (entry as ApiRoute).handle;
-            if (!handle) fail('WORKSPACE_OPERATION_FAILED');
-            const idempotencyKey = req.get('Idempotency-Key');
-            if (
-              frozen?.idempotency_key.startsWith('REQUIRED') &&
-              (!idempotencyKey ||
-                !/^\S[\x21-\x7e]{0,199}$/.test(idempotencyKey))
-            )
-              fail('IDEMPOTENCY_KEY_INVALID', 400);
-            let statusOverride: 200 | 202 | undefined;
-            const call: ApiCall = {
-              params: req.params,
-              query: req.query as Record<string, unknown>,
-              body: req.body ?? {},
-              idempotencyKey,
-              ifMatch: req.get('If-Match'),
-              setHeader: (name, value) => res.setHeader(name, value),
-              setStatus: (status) => {
-                statusOverride = status;
-              },
-              principal: (req as any).v2auth.principal,
-            };
-            const data = MUTATING.has(method)
-              ? await this.services.leases.barrier.mutation(() =>
-                  (handle as ApiHandler)(call),
-                )
-              : await (handle as ApiHandler)(call);
-            if (recoveryAction && !this.ready) {
-              const recovered = await this.services.recover();
-              if (recovered.ready) {
-                await qualifyLocalStorage(this.options);
-                this.localWrites = true;
-                this.ready = true;
-                this.state = 'READY';
-                if (this.options.background !== false) {
-                  this.services.start();
-                  this.runtime.startRecovery();
-                  this.notifications.start();
+        this.httpLifetime.handle(
+          async (req: Request, res: Response, next: any) => {
+            try {
+              const recoveryAction =
+                method === 'POST' &&
+                /^\/(?:workspaces\/:id\/(?:recover|git\/repair)|repositories\/:id\/(?:repair|initialize))$/.test(
+                  routePath,
+                );
+              if (!this.ready && MUTATING.has(method) && !recoveryAction)
+                fail('WORKSPACE_RECOVERY_REQUIRED');
+              if (
+                !this.localWrites &&
+                MUTATING.has(method) &&
+                routePath.startsWith('/workspaces') &&
+                !recoveryAction
+              )
+                fail('WORKSPACE_RECOVERY_REQUIRED');
+              const entry = this.maps[key],
+                handle =
+                  typeof entry === 'function'
+                    ? entry
+                    : (entry as ApiRoute).handle;
+              if (!handle) fail('WORKSPACE_OPERATION_FAILED');
+              const idempotencyKey = req.get('Idempotency-Key');
+              if (
+                frozen?.idempotency_key.startsWith('REQUIRED') &&
+                (!idempotencyKey ||
+                  !/^\S[\x21-\x7e]{0,199}$/.test(idempotencyKey))
+              )
+                fail('IDEMPOTENCY_KEY_INVALID', 400);
+              let statusOverride: 200 | 202 | undefined;
+              const call: ApiCall = {
+                params: req.params,
+                query: req.query as Record<string, unknown>,
+                body: req.body ?? {},
+                idempotencyKey,
+                ifMatch: req.get('If-Match'),
+                setHeader: (name, value) => res.setHeader(name, value),
+                setStatus: (status) => {
+                  statusOverride = status;
+                },
+                principal: (req as any).v2auth.principal,
+              };
+              const data = MUTATING.has(method)
+                ? await this.services.leases.barrier.mutation(() =>
+                    (handle as ApiHandler)(call),
+                  )
+                : await (handle as ApiHandler)(call);
+              if (recoveryAction && !this.ready && !this.closing) {
+                const recovered = await this.services.recover();
+                if (recovered.ready) {
+                  await qualifyLocalStorage(this.options);
+                  this.localWrites = true;
+                  this.ready = true;
+                  this.state = 'READY';
+                  if (this.options.background !== false) {
+                    this.services.start();
+                    this.runtime.startRecovery();
+                    this.notifications.start();
+                  }
                 }
               }
+              const status =
+                statusOverride ?? frozen?.success_http_status ?? 200;
+              res.status(status).json({ code: status, data: data ?? null });
+            } catch (e) {
+              next(e);
             }
-            const status = statusOverride ?? frozen?.success_http_status ?? 200;
-            res.status(status).json({ code: status, data: data ?? null });
-          } catch (e) {
-            next(e);
-          }
-        },
+          },
+        ),
       );
     }
     app.use('/api', (_req, res) =>
@@ -600,13 +638,16 @@ export class V2Application {
         'static/dist-v2',
       );
     app.use(express.static(frontend, { dotfiles: 'deny', fallthrough: true }));
-    app.get('*', async (_req, res, next) => {
-      try {
-        res.sendFile(path.join(frontend, 'index.html'));
-      } catch (e) {
-        next(e);
-      }
-    });
+    app.get(
+      '*',
+      this.httpLifetime.handle(async (_req, res, next) => {
+        try {
+          res.sendFile(path.join(frontend, 'index.html'));
+        } catch (e) {
+          next(e);
+        }
+      }),
+    );
     app.use((error: unknown, _req: Request, res: Response, _next: any) => {
       if (!res.headersSent) this.error.send(res, error);
     });
@@ -616,16 +657,31 @@ export class V2Application {
     this.closing = (async () => {
       this.ready = false;
       this.state = 'STOPPING';
+      const httpClosed = this.httpLifetime.close(this.server);
+      // Observe an early transport error while producers drain, then propagate it.
+      void httpClosed.catch(() => undefined);
+      this.httpLifetime.diagnostic('PRODUCERS_STOP_BEGIN');
       await this.services?.pause();
-      if (this.server)
-        await new Promise<void>((resolve) =>
-          this.server!.close(() => resolve()),
-        );
+      this.httpLifetime.diagnostic('PRODUCERS_STOPPED');
+      this.httpLifetime.diagnostic('SCHEDULER_OUTBOX_STOPPED');
+      await httpClosed;
+      await this.services?.syncScheduler.close();
+      await this.services?.sync.close();
+      this.httpLifetime.diagnostic('GIT_SYNC_STOPPED');
+      this.httpLifetime.diagnostic('TASK_RUNNER_STOP_BEGIN');
+      await this.services?.execution.close();
+      this.httpLifetime.diagnostic('TASK_RUNNER_STOPPED');
+      await this.backupApi?.operations.close();
+      this.httpLifetime.diagnostic('BACKUP_OPERATIONS_DRAINED');
       await this.notifications?.close();
+      this.httpLifetime.diagnostic('NOTIFICATIONS_STOPPED');
       await this.runtime?.close();
+      this.httpLifetime.diagnostic('RUNTIME_STOPPED');
       await this.services?.close();
+      this.httpLifetime.diagnostic('SQLITE_CLOSED');
       this.stopped();
       await this.lifetime;
+      this.httpLifetime.diagnostic('BACKEND_OWNER_RELEASED');
     })();
     return this.closing;
   }

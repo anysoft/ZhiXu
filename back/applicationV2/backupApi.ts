@@ -11,6 +11,7 @@ import { fail } from '../services/workspaceV2/errors';
 import type { WorkspaceBackupManifest } from '../services/workspaceV2/manifest';
 import type { V2Services } from './types';
 import * as v from './workspaceValidation';
+import type { V2HttpLifetime } from './httpLifetime';
 
 export interface BackupApiHooks {
   pauseProducers(): Promise<void>;
@@ -108,34 +109,36 @@ export function registerBackupApi(
   app: Express,
   s: V2Services,
   hooks: BackupApiHooks,
+  lifetime?: V2HttpLifetime,
 ) {
   const paths = s.backup.paths,
     operations = new BackupOperations(paths);
-  const handle =
-    (action: Action) =>
-    async (req: Request, res: Response, next: NextFunction) => {
-      try {
-        const data = await action(req, res);
-        if (!res.headersSent) res.json({ code: 200, data: data ?? null });
-      } catch (error: unknown) {
-        if (error instanceof BackupError)
-          next(
-            Object.assign(new Error(error.code), {
-              error_code: error.code,
-              status: 409,
-            }),
-          );
-        else if (error instanceof multer.MulterError)
-          next(
-            Object.assign(new Error('BACKUP_UPLOAD_INVALID'), {
-              error_code: 'BACKUP_UPLOAD_INVALID',
-              status: error.code === 'LIMIT_FILE_SIZE' ? 413 : 400,
-              details: { reason: error.code },
-            }),
-          );
-        else next(error);
-      }
-    };
+  const handle = (action: Action) =>
+    (lifetime?.handle ?? ((action) => action))(
+      async (req: Request, res: Response, next: NextFunction) => {
+        try {
+          const data = await action(req, res);
+          if (!res.headersSent) res.json({ code: 200, data: data ?? null });
+        } catch (error: unknown) {
+          if (error instanceof BackupError)
+            next(
+              Object.assign(new Error(error.code), {
+                error_code: error.code,
+                status: 409,
+              }),
+            );
+          else if (error instanceof multer.MulterError)
+            next(
+              Object.assign(new Error('BACKUP_UPLOAD_INVALID'), {
+                error_code: 'BACKUP_UPLOAD_INVALID',
+                status: error.code === 'LIMIT_FILE_SIZE' ? 413 : 400,
+                details: { reason: error.code },
+              }),
+            );
+          else next(error);
+        }
+      },
+    );
   const body = (
     req: Request,
     allowed: string[] = [],

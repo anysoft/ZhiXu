@@ -3,6 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import { randomBytes } from 'crypto';
 import { assertV2BackendNode } from './applicationV2/backendNode';
+import type { V2ShutdownEvent } from './applicationV2/httpLifetime';
 function projectDirectory() {
   let current = __dirname;
   for (;;) {
@@ -60,6 +61,20 @@ async function main() {
   if (!Number.isSafeInteger(port) || port < 0 || port > 65535)
     throw new Error('STARTUP_PORT_INVALID');
   const compiledContracts = path.join(__dirname, 'applicationV2/contracts');
+  const diagnostics = process.env.ZHIXU_V2_SHUTDOWN_DIAGNOSTICS === '1';
+  let shutdownStarted: bigint | undefined;
+  const reportShutdown = (
+    event: Pick<V2ShutdownEvent, 'event' | 'phase' | 'elapsed_ms'> &
+      Partial<V2ShutdownEvent>,
+  ) => {
+    shutdownStarted ??= process.hrtime.bigint();
+    process.stderr.write(
+      JSON.stringify({
+        ...event,
+        elapsed_ms: Number(process.hrtime.bigint() - shutdownStarted) / 1e6,
+      }) + '\n',
+    );
+  };
   const options = {
     dataRoot: args['--data-root'] as string,
     backupRoot: args['--backup-root'] as string | undefined,
@@ -73,13 +88,35 @@ async function main() {
       ? compiledContracts
       : undefined,
     legacyDataRoots: originalLegacyRoot ? [originalLegacyRoot] : [],
+    onShutdownEvent: diagnostics ? reportShutdown : undefined,
   };
   let stop!: () => void;
   const stopped = new Promise<void>((r) => {
     stop = r;
   });
-  process.once('SIGINT', () => stop());
-  process.once('SIGTERM', () => stop());
+  const stopFromSignal = (signal: 'SIGINT' | 'SIGTERM') => {
+    if (diagnostics)
+      reportShutdown({
+        event: 'V2_SHUTDOWN',
+        phase: signal + '_RECEIVED',
+        elapsed_ms: 0,
+      });
+    stop();
+  };
+  process.once('SIGINT', () => stopFromSignal('SIGINT'));
+  process.once('SIGTERM', () => stopFromSignal('SIGTERM'));
+  if (diagnostics)
+    process.once('beforeExit', () => {
+      process.stderr.write(
+        JSON.stringify({
+          event: 'V2_PROCESS_EXIT',
+          exit_code: process.exitCode ?? 0,
+          elapsed_ms: shutdownStarted
+            ? Number(process.hrtime.bigint() - shutdownStarted) / 1e6
+            : 0,
+        }) + '\n',
+      );
+    });
   await runV2Application(options, stopped, (current) => {
     const address = current.server!.address() as { port: number };
     process.stdout.write(

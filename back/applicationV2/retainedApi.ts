@@ -12,30 +12,33 @@ import * as v from './taskValidation';
 import { fail } from '../services/workspaceV2/errors';
 import { normalizeClientIp } from '../shared/clientIp';
 import { privateDirectory, syncDirectory } from '../services/backup/files';
+import type { V2HttpLifetime } from './httpLifetime';
 
 /** Retained account/settings endpoints use the candidate Auths table and owned files. */
 export async function registerRetainedApi(
   app: Express,
   s: V2Services,
   auth: V2PanelAuth,
+  lifetime?: V2HttpLifetime,
 ) {
   const body = (req: Request, keys: string[], required = keys) =>
     v.object(req.body ?? {}, keys, required);
-  const endpoint =
-    (
-      action: (req: Request, res: Response) => Promise<unknown>,
-      mutates = false,
-    ) =>
-    async (req: Request, res: Response, next: NextFunction) => {
-      try {
-        const result = mutates
-          ? await s.leases.barrier.mutation(() => action(req, res))
-          : await action(req, res);
-        if (!res.headersSent) res.json({ code: 200, data: result ?? null });
-      } catch (e) {
-        next(e);
-      }
-    };
+  const endpoint = (
+    action: (req: Request, res: Response) => Promise<unknown>,
+    mutates = false,
+  ) =>
+    (lifetime?.handle ?? ((action) => action))(
+      async (req: Request, res: Response, next: NextFunction) => {
+        try {
+          const result = mutates
+            ? await s.leases.barrier.mutation(() => action(req, res))
+            : await action(req, res);
+          if (!res.headersSent) res.json({ code: 200, data: result ?? null });
+        } catch (e) {
+          next(e);
+        }
+      },
+    );
   const readConfig = async () => {
     const rows = await s.store.all<any>(
       "SELECT id,info FROM Auths WHERE type='systemConfig'",

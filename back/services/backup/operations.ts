@@ -11,6 +11,9 @@ class OperationPaths extends RuntimePathResolver {
   }
 }
 export class BackupOperations {
+  private readonly pending = new Set<Promise<void>>();
+  private closing = false;
+  private readonly starting = new Set<Promise<void>>();
   constructor(readonly paths: BackupPaths) {}
   async exclusive<T>(action: () => Promise<T>) {
     await this.paths.initialize();
@@ -36,64 +39,87 @@ export class BackupOperations {
       processed_files: number;
     }) => Promise<unknown>,
   ) {
-    await this.paths.initialize();
-    let lease: RuntimeLease;
-    try {
-      lease = await RuntimeLease.acquire(
-        new OperationPaths(this.paths.control),
-        1,
-      );
-    } catch {
-      fail('BACKUP_OPERATION_BUSY');
-    }
-    const id = randomUUID(),
-      file = await this.paths.bucket('operations', id),
-      progress = { processed_bytes: 0, processed_files: 0 };
-    const state: any = {
-      id,
-      kind,
-      status: 'QUEUED',
-      phase: kind,
-      created_at: new Date().toISOString(),
-      ...progress,
-    };
-    try {
-      await privateJson(file, state);
-    } catch (e) {
-      await lease!.release();
-      throw e;
-    }
-    setImmediate(() => {
-      void (async () => {
-        let timer: NodeJS.Timeout | undefined;
-        let pending = Promise.resolve();
-        try {
-          state.status = 'RUNNING';
-          await privateJson(file, state);
-          timer = setInterval(() => {
-            const update = { ...state, ...progress };
-            pending = pending
-              .then(() => privateJson(file, update))
-              .catch(() => {});
-          }, 1000);
-          state.result = await action(progress);
-          state.status = 'SUCCESS';
-        } catch (e) {
-          state.status = 'FAILED';
-          const code = (e as any).code || (e as Error).message;
-          state.error_code = /^(?:BACKUP|RESTORE|PLATFORM)_[A-Z_]+$/.test(code)
-            ? code
-            : 'BACKUP_OPERATION_FAILED';
-        } finally {
-          if (timer) clearInterval(timer);
-          await pending;
-          Object.assign(state, progress);
-          state.finished_at = new Date().toISOString();
-          await privateJson(file, state).finally(() => lease!.release());
-        }
-      })().catch(() => {});
+    if (this.closing) fail('BACKUP_OPERATION_BUSY');
+    let admittedDone!: () => void;
+    const admitted = new Promise<void>((resolve) => {
+      admittedDone = resolve;
     });
-    return { id, status: 'QUEUED' };
+    this.starting.add(admitted);
+    try {
+      await this.paths.initialize();
+      let lease: RuntimeLease;
+      try {
+        lease = await RuntimeLease.acquire(
+          new OperationPaths(this.paths.control),
+          1,
+        );
+      } catch {
+        fail('BACKUP_OPERATION_BUSY');
+      }
+      const id = randomUUID(),
+        file = await this.paths.bucket('operations', id),
+        progress = { processed_bytes: 0, processed_files: 0 };
+      const state: any = {
+        id,
+        kind,
+        status: 'QUEUED',
+        phase: kind,
+        created_at: new Date().toISOString(),
+        ...progress,
+      };
+      try {
+        await privateJson(file, state);
+      } catch (e) {
+        await lease!.release();
+        throw e;
+      }
+      let settled!: () => void;
+      const pending = new Promise<void>((resolve) => {
+        settled = resolve;
+      });
+      this.pending.add(pending);
+      setImmediate(() => {
+        void (async () => {
+          let timer: NodeJS.Timeout | undefined;
+          let pending = Promise.resolve();
+          try {
+            state.status = 'RUNNING';
+            await privateJson(file, state);
+            timer = setInterval(() => {
+              const update = { ...state, ...progress };
+              pending = pending
+                .then(() => privateJson(file, update))
+                .catch(() => {});
+            }, 1000);
+            state.result = await action(progress);
+            state.status = 'SUCCESS';
+          } catch (e) {
+            state.status = 'FAILED';
+            const code = (e as any).code || (e as Error).message;
+            state.error_code = /^(?:BACKUP|RESTORE|PLATFORM)_[A-Z_]+$/.test(
+              code,
+            )
+              ? code
+              : 'BACKUP_OPERATION_FAILED';
+          } finally {
+            if (timer) clearInterval(timer);
+            await pending;
+            Object.assign(state, progress);
+            state.finished_at = new Date().toISOString();
+            await privateJson(file, state).finally(() => lease!.release());
+          }
+        })()
+          .catch(() => {})
+          .finally(() => {
+            this.pending.delete(pending);
+            settled();
+          });
+      });
+      return { id, status: 'QUEUED' };
+    } finally {
+      this.starting.delete(admitted);
+      admittedDone();
+    }
   }
   async get(id: string) {
     return readJson(
@@ -101,6 +127,12 @@ export class BackupOperations {
       undefined,
       true, // Progress updates atomically replace this operation's JSON file.
     );
+  }
+  /** Wait through the operation's terminal journal fsync and lease release. */
+  async close() {
+    this.closing = true;
+    while (this.starting.size) await Promise.all([...this.starting]);
+    while (this.pending.size) await Promise.all([...this.pending]);
   }
   async recover() {
     await this.exclusive(async () => {
