@@ -96,7 +96,7 @@ def s5_build_candidate(args, name, context):
     s5_run_command([args.node, args.pnpm, 'prune', '--prod'], source,
                    dict(environment, npm_config_ignore_scripts='true',
                         npm_config_store_dir=str(root / 'pnpm-store')), target / 'prune.log', journal)
-    s5_run_command([args.node, args.pnpm, 'rebuild', '--prod'], source,
+    s5_run_command([args.node, args.pnpm, 'rebuild'], source,
                    dict(environment, npm_config_store_dir=str(root / 'pnpm-store')),
                    target / 'rebuild-production.log', journal)
     driver_check = ('const s=require("sqlite3");const d=new s.Database(":memory:",e=>{'
