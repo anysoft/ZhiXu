@@ -23,6 +23,8 @@ src/.umi*/**
 !scripts/build-back.cjs
 !scripts/build-v2.cjs
 !scripts/start-v2.cjs
+!scripts/release/
+!scripts/release/entrypoint.cjs
 !scripts/release-v2/
 !scripts/release-v2/**
 !docs/

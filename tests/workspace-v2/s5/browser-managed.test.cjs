@@ -8,7 +8,7 @@ async function choose(page, container, label, value) {
     .locator('xpath=ancestor::div[contains(@class,"ant-select-selector")]')
     .click();
   if (label === 'Runtime version')
-    await container.getByLabel(label, { exact: true }).fill('24.21.0');
+    await container.getByLabel(label, { exact: true }).fill('24.22.3');
   await page
     .locator('.ant-select-dropdown:visible')
     .getByText(value, { exact: typeof value === 'string' })
@@ -84,13 +84,13 @@ test(
         .click();
       await page.getByRole('button', { name: 'Install', exact: true }).click();
       let dialog = page.getByRole('dialog');
-      await choose(page, dialog, 'Runtime version', /^24\.21\.0$/);
+      await choose(page, dialog, 'Runtime version', /^24\.22\.3$/);
       await operationClick(
         () => dialog.getByRole('button', { name: /Save$/ }).click(),
         '/api/runtime/node/installations',
       );
       const runtime = (await f.app.runtime.node.runtimes()).find(
-        (r) => r.version === '24.21.0',
+        (r) => r.version === '24.22.3',
       );
       assert.ok(runtime);
       assert.equal(runtime.state, 'READY');
@@ -100,7 +100,7 @@ test(
         .click();
       await page.getByRole('button', { name: 'Install', exact: true }).click();
       dialog = page.getByRole('dialog');
-      await choose(page, dialog, 'Runtime', `24.21.0 · #${runtime.id}`);
+      await choose(page, dialog, 'Runtime', `24.22.3 · #${runtime.id}`);
       await choose(page, dialog, 'Package manager', 'npm');
       await operationClick(
         () => dialog.getByRole('button', { name: /Save$/ }).click(),
@@ -119,7 +119,7 @@ test(
         .click();
       dialog = page.getByRole('dialog');
       await dialog.getByLabel('Name', { exact: true }).fill('Browser Node');
-      await choose(page, dialog, 'Runtime', `24.21.0 · #${runtime.id}`);
+      await choose(page, dialog, 'Runtime', `24.22.3 · #${runtime.id}`);
       await choose(
         page,
         dialog,
@@ -233,7 +233,7 @@ test(
         source.effective_resource_versions.node.runtime_id,
         runtime.id,
       );
-      assert.match(await f.app.services.execution.logs(runId), /v24\.21\.0/);
+      assert.match(await f.app.services.execution.logs(runId), /v24\.22\.3/);
       await page
         .getByRole('tab', { name: 'Historical source snapshot', exact: true })
         .click();

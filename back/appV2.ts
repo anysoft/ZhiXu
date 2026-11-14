@@ -2,6 +2,7 @@
 import fs from 'fs';
 import path from 'path';
 import { randomBytes } from 'crypto';
+import { assertV2BackendNode } from './applicationV2/backendNode';
 function projectDirectory() {
   let current = __dirname;
   for (;;) {
@@ -46,9 +47,7 @@ function argumentsV2(args: string[]) {
   return result;
 }
 async function main() {
-  const major = Number(process.versions.node.split('.')[0]);
-  if (![22, 24].includes(major))
-    throw new Error('BACKEND_NODE_22_OR_24_REQUIRED');
+  assertV2BackendNode(process.versions.node);
   const args = argumentsV2(process.argv.slice(2)),
     projectRoot = projectDirectory();
   const originalLegacyRoot = process.env.QL_DATA_DIR;

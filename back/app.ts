@@ -1,3 +1,6 @@
+import { assertV9StartupIdentity } from './shared/v9IdentityGuard';
+assertV9StartupIdentity(__dirname);
+
 import 'reflect-metadata';
 import { prepareOperationalDatabase } from './services/backup/bootstrap';
 import { setBackendLeaseFd } from './services/backup/inheritedLeases';

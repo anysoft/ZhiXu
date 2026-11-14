@@ -108,11 +108,13 @@ async function provisionManagedRuntime(f, options = {}) {
   }
   if (options.node !== false) {
     await run('NODE_CATALOG_REFRESH');
-    await run('NODE_RUNTIME_INSTALL', { node: { version: '24.21.0' } });
+    await run('NODE_RUNTIME_INSTALL', { node: { version: '24.22.3' } });
     const runtime = (await domain.node.runtimes()).find(
       (row) => row.language === 'NODE' && row.state === 'READY',
     );
     if (!runtime) throw Error('S2_REAL_MANAGED_NODE_REQUIRED');
+    if (runtime.version !== '24.22.3')
+      throw Error('S5_SAFE_MANAGED_NODE_VERSION_REQUIRED');
     await run('NODE_PACKAGE_MANAGER_INSTALL', {
       node: { runtime_id: runtime.id, manager_type: 'NPM' },
     });

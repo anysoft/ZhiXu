@@ -1,5 +1,6 @@
 'use strict';
 const fs = require('node:fs'), path = require('node:path'), crypto = require('node:crypto');
+const releaseRoot = path.resolve(__dirname, '../..');
 // Runs as the final service identity. Never chowns a mounted user directory.
 if (process.getuid?.() === 0) throw Error('NON_ROOT_REQUIRED');
 const data = process.env.DATA_DIR, backup = process.env.BACKUP_DIR;
@@ -9,6 +10,7 @@ for (const value of [data, backup, process.env.HOME]) {
   if (fs.realpathSync(parent) !== parent) throw Error('SYMLINK_PARENT_REJECTED');
   if (fs.existsSync(value) && fs.lstatSync(value).isSymbolicLink()) throw Error('SYMLINK_ROOT_REJECTED');
 }
+require(path.join(releaseRoot, 'static/build/shared/v9IdentityGuard.js')).assertV9DataIdentity(data);
 fs.mkdirSync(process.env.HOME, { recursive: true, mode: 0o700 });
 // Secret lies outside the atomically replaced live state root, on the persistent data volume.
 const secret = path.join(path.dirname(data), '.platform-jwt');
@@ -30,5 +32,5 @@ try {
   process.env.JWT_SECRET = value;
 } finally { fs.closeSync(fd); }
 process.env.QL_DATA_DIR = data;
-process.env.QL_DIR = '/app';
-require('/app/static/build/app.js');
+process.env.QL_DIR = releaseRoot;
+require(path.join(releaseRoot, 'static/build/app.js'));

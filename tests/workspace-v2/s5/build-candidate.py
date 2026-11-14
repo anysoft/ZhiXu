@@ -94,7 +94,17 @@ def s5_build_candidate(args, name, context):
     manifests = {'backend': s5_asset_manifest(source / 'static/build'),
                  'frontend': s5_asset_manifest(source / 'static/dist-v2')}
     s5_run_command([args.node, args.pnpm, 'prune', '--prod'], source,
-                   dict(environment, npm_config_ignore_scripts='true'), target / 'prune.log', journal)
+                   dict(environment, npm_config_ignore_scripts='true',
+                        npm_config_store_dir=str(root / 'pnpm-store')), target / 'prune.log', journal)
+    s5_run_command([args.node, args.pnpm, 'rebuild', '--prod'], source,
+                   dict(environment, npm_config_store_dir=str(root / 'pnpm-store')),
+                   target / 'rebuild-production.log', journal)
+    driver_check = ('const s=require("sqlite3");const d=new s.Database(":memory:",e=>{'
+                    'if(e)throw e;d.get("PRAGMA integrity_check",(e,r)=>{if(e)throw e;'
+                    'if(r.integrity_check!=="ok")throw Error("SQLITE_INTEGRITY_FAILED");'
+                    'd.close(e=>{if(e)throw e;process.stdout.write("SQLITE_NATIVE_READY\\n")})})});')
+    s5_run_command([args.node, '-e', driver_check], source, environment,
+                   target / 'native-driver-source.log', journal)
     if hashlib.sha256((source / 'pnpm-lock.yaml').read_bytes()).hexdigest() != locked:
         raise ValueError('S5_FROZEN_LOCKFILE_CHANGED')
     release = target / 'release'
@@ -109,11 +119,25 @@ def s5_build_candidate(args, name, context):
     for helper in (source / 'shell').glob('*.py'):
         shutil.copy2(helper, release / 'shell' / helper.name)
     shutil.copy2(source / 'scripts/start-v2.cjs', release / 'scripts/start-v2.cjs')
+    (release / 'scripts/release').mkdir()
+    shutil.copy2(source / 'scripts/release/entrypoint.cjs', release / 'scripts/release/entrypoint.cjs')
+    s5_run_command([args.node, '-e', driver_check], release, environment,
+                   target / 'native-driver-release.log', journal)
+    native_addons = [{'path': file.relative_to(release).as_posix(),
+                      'bytes': file.stat().st_size,
+                      'sha256': hashlib.sha256(file.read_bytes()).hexdigest()}
+                     for file in sorted((release / 'node_modules').rglob('*.node')) if file.is_file()]
+    if not native_addons:
+        raise ValueError('S5_TARGET_NATIVE_ADDON_MISSING')
     # Immutable artifact files have independent inodes, rather than PNPM store hardlinks.
     if (s5_asset_manifest(release / 'static/build') != manifests['backend'] or
             s5_asset_manifest(release / 'static/dist-v2') != manifests['frontend']):
         raise ValueError('S5_RELEASE_COPY_MISMATCH')
-    for artifact in [release / 'static/build', release / 'static/dist-v2']:
+    manifests['helpers'] = s5_asset_manifest(release / 'shell')
+    manifests['entrypoints'] = s5_asset_manifest(release / 'scripts')
+    root_files = {name: hashlib.sha256((release / name).read_bytes()).hexdigest()
+                  for name in ['package.json', 'pnpm-lock.yaml', 'version.yaml', 'LICENSE']}
+    for artifact in [release / 'static/build', release / 'static/dist-v2', release / 'shell', release / 'scripts']:
         for current, directories, names in os.walk(artifact):
             for name in names:
                 file = pathlib.Path(current) / name
@@ -128,15 +152,19 @@ def s5_build_candidate(args, name, context):
               'pnpm_version': context['pnpm_version'], 'os': platform.system(),
               'architecture': platform.machine(), 'kernel': platform.release(),
               'production_mode': True, 'independent_source_export': True,
+              'native_addons': native_addons, 'native_rebuilt_after_prune': True,
+              'root_files_sha256': root_files,
               'inherited_developer_node_modules': False, 'environment_user_secrets_inherited': False,
               'install': install, 'manifests': manifests, 'source_root': str(source),
               'release_root': str(release)}
     result['artifact_sha256'] = hashlib.sha256(json.dumps({
         'candidate_git_sha': args.commit, 'lockfile_sha256': locked,
-        'backend': manifests['backend']['sha256'], 'frontend': manifests['frontend']['sha256']},
+        'backend': manifests['backend']['sha256'], 'frontend': manifests['frontend']['sha256'],
+        'helpers': manifests['helpers']['sha256'], 'entrypoints': manifests['entrypoints']['sha256'],
+        'root_files_sha256': root_files, 'native_addons': native_addons},
         sort_keys=True, separators=(',', ':')).encode()).hexdigest()
     (target / 'candidate.json').write_text(json.dumps(result, indent=2) + '\n')
-    print(json.dumps({'build': name, 'status': 'BUILT', 'artifact_sha256': result['artifact_sha256']}), flush=True)
+    print(json.dumps({'build': target.name, 'status': 'BUILT', 'artifact_sha256': result['artifact_sha256']}), flush=True)
     return result
 
 
@@ -165,7 +193,8 @@ def s5_build_main():
                    node_version=subprocess.check_output([args.node, '--version'], text=True).strip(),
                    pnpm_version=subprocess.check_output([args.node, args.pnpm, '--version'], text=True).strip())
     results = [s5_build_candidate(args, name, context) for name in ['build-A', 'build-B']]
-    comparison = {key: results[0]['manifests'][key] == results[1]['manifests'][key] for key in ['backend', 'frontend']}
+    comparison = {key: results[0]['manifests'][key] == results[1]['manifests'][key]
+                  for key in ['backend', 'frontend', 'helpers', 'entrypoints']}
     (root / 'reproducibility.json').write_text(json.dumps({
         'candidate_git_sha': args.commit, 'comparison': comparison,
         'bit_for_bit_backend_frontend': all(comparison.values()),
