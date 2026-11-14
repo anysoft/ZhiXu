@@ -118,7 +118,7 @@ test(
       (await request('GET', `/task-runs/${runId}/attempts`)).body.data.length,
       1,
     );
-    const logs = await request('GET', `/task-runs/${runId}/logs`);
+    const logs = await request('GET', `/task-runs/${runId}/log`);
     assert.equal(logs.status, 200);
     assert.match(JSON.stringify(logs.body.data), /S5_COMPILED_REAL_CHILD/);
     const stopped = await cli.stop();
