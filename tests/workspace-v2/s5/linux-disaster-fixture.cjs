@@ -355,7 +355,10 @@ async function createS1BFixture(
             body: body === undefined ? undefined : JSON.stringify(body),
           });
           const payload = await response.json();
-          if (response.status >= 400 || payload.code !== 200) {
+          if (
+            ![200, 202].includes(response.status) ||
+            payload.code !== response.status
+          ) {
             const error = Error('S5_LINUX_APPLICATION_HTTP_REJECTED');
             error.error_code =
               typeof payload.error_code === 'string'
