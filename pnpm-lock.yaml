@@ -54,7 +54,7 @@ overrides:
 
 patchedDependencies:
   '@whyour/sqlite3@1.1.2':
-    hash: ae394b4930401aaafc31fa1b733b5349f251adcfbea531845c239f2ba6c1f25a
+    hash: 7aeb7e677786665d24aa68a3b3045a390a455244c4b83c0080188172de917d6e
     path: patches/@whyour__sqlite3@1.1.2.patch
 
 importers:
@@ -171,13 +171,13 @@ importers:
         version: 3.3.0
       sequelize:
         specifier: 6.37.8
-        version: 6.37.8(@whyour/sqlite3@1.1.2(patch_hash=ae394b4930401aaafc31fa1b733b5349f251adcfbea531845c239f2ba6c1f25a))
+        version: 6.37.8(@whyour/sqlite3@1.1.2(patch_hash=7aeb7e677786665d24aa68a3b3045a390a455244c4b83c0080188172de917d6e))
       sockjs:
         specifier: ^0.3.24
         version: 0.3.24
       sqlite3:
         specifier: npm:@whyour/sqlite3@1.1.2
-        version: '@whyour/sqlite3@1.1.2(patch_hash=ae394b4930401aaafc31fa1b733b5349f251adcfbea531845c239f2ba6c1f25a)'
+        version: '@whyour/sqlite3@1.1.2(patch_hash=7aeb7e677786665d24aa68a3b3045a390a455244c4b83c0080188172de917d6e)'
       toad-scheduler:
         specifier: ^3.0.1
         version: 3.0.1
@@ -10353,7 +10353,7 @@ snapshots:
 
   '@keyv/sqlite@4.0.1':
     dependencies:
-      sqlite3: '@whyour/sqlite3@1.1.2(patch_hash=ae394b4930401aaafc31fa1b733b5349f251adcfbea531845c239f2ba6c1f25a)'
+      sqlite3: '@whyour/sqlite3@1.1.2(patch_hash=7aeb7e677786665d24aa68a3b3045a390a455244c4b83c0080188172de917d6e)'
     transitivePeerDependencies:
       - encoding
       - supports-color
@@ -11816,7 +11816,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@whyour/sqlite3@1.1.2(patch_hash=ae394b4930401aaafc31fa1b733b5349f251adcfbea531845c239f2ba6c1f25a)':
+  '@whyour/sqlite3@1.1.2(patch_hash=7aeb7e677786665d24aa68a3b3045a390a455244c4b83c0080188172de917d6e)':
     dependencies:
       '@mapbox/node-pre-gyp': 1.0.11
       node-addon-api: 4.3.0
@@ -16648,7 +16648,7 @@ snapshots:
 
   sequelize-pool@7.1.0: {}
 
-  sequelize@6.37.8(@whyour/sqlite3@1.1.2(patch_hash=ae394b4930401aaafc31fa1b733b5349f251adcfbea531845c239f2ba6c1f25a)):
+  sequelize@6.37.8(@whyour/sqlite3@1.1.2(patch_hash=7aeb7e677786665d24aa68a3b3045a390a455244c4b83c0080188172de917d6e)):
     dependencies:
       '@types/debug': 4.1.12
       '@types/validator': 13.12.2
@@ -16662,7 +16662,7 @@ snapshots:
       retry-as-promised: 7.0.4
       semver: 7.7.4
       sequelize-pool: 7.1.0
-      sqlite3: '@whyour/sqlite3@1.1.2(patch_hash=ae394b4930401aaafc31fa1b733b5349f251adcfbea531845c239f2ba6c1f25a)'
+      sqlite3: '@whyour/sqlite3@1.1.2(patch_hash=7aeb7e677786665d24aa68a3b3045a390a455244c4b83c0080188172de917d6e)'
       toposort-class: 1.0.1
       uuid: 8.3.2
       validator: 13.15.35

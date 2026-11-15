@@ -15,6 +15,9 @@ ENV npm_config_nodedir=/usr/local
 WORKDIR /build
 
 FROM toolchain AS dependencies
+# pnpm root lifecycle TMPDIR contains patch_hash=; gyp needs a protected path without it.
+RUN mkdir -m 0700 /build/.sqlite-build-tmp
+ENV ZHIXU_SQLITE_BUILD_TMPDIR=/build/.sqlite-build-tmp
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
 COPY patches ./patches
 COPY scripts/native/verify-sqlite.cjs scripts/native/sqlite-core.json ./scripts/native/

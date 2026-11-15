@@ -61,10 +61,10 @@ index c25f483c..78877d9b 100644
  // Keep the bundled tarball pristine and patch the generated amalgamation.
 diff --git a/deps/install-secure.cjs b/deps/install-secure.cjs
 new file mode 100644
-index 00000000..37307c92
+index 00000000..3bbaa19b
 --- /dev/null
 +++ b/deps/install-secure.cjs
-@@ -0,0 +1,193 @@
+@@ -0,0 +1,211 @@
 +'use strict';
 +// ZhiXu source-only build recipe. The fork's JS/C++ binding API is unchanged.
 +const fs = require('node:fs/promises');
@@ -186,6 +186,25 @@ index 00000000..37307c92
 +  }
 +  return path.join(ROOT, relative);
 +}
++async function buildTemporaryRoot(provided = process.env.ZHIXU_SQLITE_BUILD_TMPDIR) {
++  let temporaryRoot;
++  if (provided !== undefined) {
++    if (typeof provided !== 'string' || !path.isAbsolute(provided) ||
++        path.resolve(provided) !== provided || /[=\r\n]/.test(provided))
++      fail('SQLITE_BUILD_TEMP_PATH_REJECTED');
++    const before = await fs.lstat(provided);
++    if (!before.isDirectory() || before.isSymbolicLink() ||
++        typeof process.getuid !== 'function' || before.uid !== process.getuid() ||
++        (before.mode & 0o022)) fail('SQLITE_BUILD_TEMP_PATH_REJECTED');
++    temporaryRoot = await fs.realpath(provided);
++    const after = await fs.lstat(provided);
++    if (temporaryRoot !== provided || before.dev !== after.dev ||
++        before.ino !== after.ino || before.ctimeMs !== after.ctimeMs)
++      fail('SQLITE_BUILD_TEMP_PATH_REJECTED');
++  } else temporaryRoot = await fs.realpath(require('node:os').tmpdir());
++  if (/[=\r\n]/.test(temporaryRoot)) fail('SQLITE_BUILD_TEMP_PATH_REJECTED');
++  return temporaryRoot;
++}
 +async function main() {
 +  process.umask(0o077);
 +  if (process.env.NODE_TLS_REJECT_UNAUTHORIZED === '0') fail('SQLITE_TLS_BYPASS_REJECTED');
@@ -220,8 +239,7 @@ index 00000000..37307c92
 +    finally { await fs.rm(archiveTemp, { force: true }); }
 +    // pnpm patch identities contain '='; gyp's Makefile generator misparses
 +    // targets below that path. Compile in an owned external temporary root.
-+    const temporaryRoot = await fs.realpath(require('node:os').tmpdir());
-+    if (/[=\r\n]/.test(temporaryRoot)) fail('SQLITE_BUILD_TEMP_PATH_REJECTED');
++    const temporaryRoot = await buildTemporaryRoot();
 +    stage = await fs.mkdtemp(path.join(temporaryRoot, 'zhixu-sqlite-stage-'));
 +    await fs.mkdir(path.join(stage, 'node_modules'), { mode: 0o755 });
 +    for (const name of ['@mapbox/node-pre-gyp', 'node-addon-api', 'node-gyp', 'tar']) {
