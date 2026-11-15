@@ -5,7 +5,7 @@
   "pyenv_release": "v2.8.5",
   "pyenv_revision": "c293de3650a2d08ea36c5f6f0d55c5a3841b0c72",
   "definition_file": "python-3.13.15.definition",
-  "definition_sha256": "7513b380621f73e5817cb2e6d51b34328bc7a9e50643a21b2f4d1d6e8a1f1632",
+  "definition_sha256": "f4dfbcbc096092222e6088c4fd291e4df1b3a2973dd5d3a7f33dcb3777a9eaf7",
   "openssl": {
     "version": "3.5.9",
     "source_url": "https://github.com/openssl/openssl/releases/download/openssl-3.5.9/openssl-3.5.9.tar.gz",

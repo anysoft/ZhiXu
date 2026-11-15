@@ -30,6 +30,13 @@ install_package "openssl-3.5.9" "https://github.com/openssl/openssl/releases/dow
 export CPPFLAGS="-I$OPENSSL_PREFIX_PATH/include $CPPFLAGS"
 export LDFLAGS="-L$OPENSSL_PREFIX_PATH/lib $LDFLAGS"
 export PKG_CONFIG_PATH="$OPENSSL_PREFIX_PATH/lib/pkgconfig:$PKG_CONFIG_PATH"
+# CPython's required-API probes place LIBS before the static OpenSSL archives.
+# Retain their system dependencies on GNU linkers without changing crypto input.
+case "$(uname -s)" in
+  Linux)
+    export LDFLAGS="$LDFLAGS -Wl,--push-state,--no-as-needed -lpthread -ldl -Wl,--pop-state"
+    ;;
+esac
 package_option python configure --with-openssl="$OPENSSL_PREFIX_PATH" --with-openssl-rpath=no
 mkdir -p "$OPENSSL_PREFIX_PATH/ssl"
 cp "$ZHIXU_RUNTIME_CA_BUNDLE" "$OPENSSL_PREFIX_PATH/ssl/cert.pem"

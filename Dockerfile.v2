@@ -68,6 +68,7 @@ COPY --from=build /build/static/build ./static/build
 COPY --from=build /build/static/dist-v2 ./static/dist-v2
 COPY --from=build /build/package.json /build/pnpm-lock.yaml /build/pnpm-workspace.yaml /build/version.yaml /build/LICENSE ./
 COPY --from=build /build/shell/*.py ./shell/
+COPY --from=build /build/scripts/native/verify-sqlite.cjs /build/scripts/native/sqlite-core.json ./scripts/native/
 COPY --from=build /build/scripts/release-v2 ./scripts/release-v2
 COPY --from=build /build/scripts/release/entrypoint.cjs ./scripts/release/entrypoint.cjs
 COPY --from=build /build/scripts/start-v2.cjs ./scripts/start-v2.cjs
@@ -84,8 +85,11 @@ ENV NODE_ENV=production \
     HOME=/data/home TMPDIR=/scratch/tmp \
     ZHIXU_V2_DATA_ROOT=/data/state ZHIXU_V2_BACKUP_ROOT=/backup/state \
     LANG=C.UTF-8 LOG_LEVEL=info
-RUN chmod -R a-w /app
+RUN chmod -R a+rX /app/bin/git-tools && chmod -R a-w /app
 USER 10001:10001
+# Actual final service UID must load and query the published target addon.
+RUN node scripts/native/verify-sqlite.cjs \
+    && node -e 'require("./static/build/shared/nativeGitTools").verifiedGitSshTools().then(() => { process.stdout.write("VERIFIED_GIT_TOOLS_SERVICE_UID_READY\n"); }).catch((error) => { process.stderr.write((error.code || "NATIVE_GIT_TOOL_REJECTED") + "\n"); process.exitCode = 1; })'
 EXPOSE 5600
 STOPSIGNAL SIGTERM
 HEALTHCHECK --interval=10s --timeout=5s --start-period=90s --retries=6 \

@@ -130,12 +130,38 @@ async function assertOwnedInstance(instanceRoot) {
     throw Error('S1B_INSTANCE_OUTSIDE_CURRENT_RUN');
   return m;
 }
-async function treeUsage(root) {
+// GNU make 4.4's jobserver FIFO is a transient build object, never a
+// Workspace asset. Only the S5 metrics caller opts in to stat/count it.
+async function measuredRuntimeJobserverFifo(root, file, initial) {
+  if (!initial.isFIFO() || typeof process.getuid !== 'function' ||
+      initial.uid !== process.getuid() || initial.nlink !== 1) return false;
+  const relative = path.relative(root, file);
+  if (!/^instance-[A-Za-z0-9_-]{1,80}\/data\/tmp\/runtime\/python\/operation-[1-9][0-9]*\/tmp\/GMfifo[0-9]+$/.test(relative.split(path.sep).join('/')))
+    return false;
+  const parts = relative.split(path.sep);
+  try { await assertOwnedInstance(path.join(root, parts[0])); }
+  catch { throw Error('S5_METRICS_RUNTIME_OWNER_REQUIRED'); }
+  let current = root;
+  for (const part of ['', ...parts.slice(0, -1)]) {
+    if (part) current = path.join(current, part);
+    const st = await fs.lstat(current);
+    if (!st.isDirectory() || st.isSymbolicLink() || st.uid !== process.getuid() ||
+        (st.mode & 0o022) || await fs.realpath(current) !== current)
+      return false;
+  }
+  const after = await fs.lstat(file);
+  return after.isFIFO() && after.dev === initial.dev && after.ino === initial.ino &&
+    after.uid === initial.uid && after.mode === initial.mode && after.nlink === 1;
+}
+async function treeUsage(root, { runtimeBuildMetrics = false } = {}) {
   let bytes = 0,
     files = 0,
-    directories = 0;
+    directories = 0,
+    allocatedBytes = 0,
+    temporaryFifos = 0;
   async function visit(p) {
     const st = await fs.lstat(p);
+    if (runtimeBuildMetrics) allocatedBytes += st.blocks * 512;
     if (st.isSymbolicLink()) {
       bytes += st.size;
       files++;
@@ -145,7 +171,16 @@ async function treeUsage(root) {
       directories++;
       for (const name of await fs.readdir(p)) await visit(path.join(p, name));
     } else {
-      if (!st.isFile()) throw Error('S1B_UNKNOWN_SPECIAL_FILE');
+      if (!st.isFile()) {
+        if (!runtimeBuildMetrics || !(await measuredRuntimeJobserverFifo(root, p, st)))
+          throw Error('S1B_UNKNOWN_SPECIAL_FILE');
+        // lstat only: never open the FIFO or follow it. Its allocation and
+        // object count still contribute to metrics and the byte budget.
+        bytes += Math.max(st.size, st.blocks * 512);
+        files++;
+        temporaryFifos++;
+        return;
+      }
       bytes += st.size;
       files++;
     }
@@ -155,7 +190,9 @@ async function treeUsage(root) {
   } catch (e) {
     if (e.code !== 'ENOENT') throw e;
   }
-  return { bytes, files, directories };
+  return runtimeBuildMetrics
+    ? { bytes, files, directories, allocated_bytes: allocatedBytes, temporary_fifo_count: temporaryFifos }
+    : { bytes, files, directories };
 }
 async function createS1BFixture(
   t,
@@ -243,20 +280,26 @@ async function createS1BFixture(
     },
     async measure(label, action) {
       const start = performance.now(),
-        before = await treeUsage(root),
+        before = await treeUsage(root, { runtimeBuildMetrics: true }),
         cpuBefore = process.cpuUsage(),
         fdBefore =
           process.platform === 'linux'
             ? (await fs.readdir('/proc/self/fd')).length
             : null;
-      let peak = before.bytes;
+      let peak = before.bytes,
+        peakAllocated = before.allocated_bytes,
+        peakFiles = before.files,
+        peakFifos = before.temporary_fifo_count;
       let sampling = false;
       const timer = setInterval(() => {
         if (sampling) return;
         sampling = true;
-        treeUsage(root)
+        treeUsage(root, { runtimeBuildMetrics: true })
           .then((x) => {
             peak = Math.max(peak, x.bytes);
+            peakAllocated = Math.max(peakAllocated, x.allocated_bytes);
+            peakFiles = Math.max(peakFiles, x.files);
+            peakFifos = Math.max(peakFifos, x.temporary_fifo_count);
           })
           .finally(() => {
             sampling = false;
@@ -265,14 +308,20 @@ async function createS1BFixture(
       timer.unref();
       try {
         const result = await action();
-        const after = await treeUsage(root);
+        const after = await treeUsage(root, { runtimeBuildMetrics: true });
         peak = Math.max(peak, after.bytes);
+        peakAllocated = Math.max(peakAllocated, after.allocated_bytes);
+        peakFiles = Math.max(peakFiles, after.files);
+        peakFifos = Math.max(peakFifos, after.temporary_fifo_count);
         await sandbox.record('metric-' + label, {
           status: 'PASS',
           duration_ms: performance.now() - start,
           before_disk: before,
           final_disk: after,
           sampled_peak_disk_bytes: peak,
+          sampled_peak_allocated_bytes: peakAllocated,
+          sampled_peak_file_count: peakFiles,
+          sampled_peak_temporary_fifo_count: peakFifos,
           sample_interval_ms: 250,
           process_peak_rss_bytes: process.resourceUsage().maxRSS * 1024,
           process_rss_bytes: process.memoryUsage().rss,

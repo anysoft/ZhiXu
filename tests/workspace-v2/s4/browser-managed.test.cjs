@@ -86,7 +86,7 @@ test(
         .click();
       await page.getByRole('button', { name: 'Install', exact: true }).click();
       let dialog = page.getByRole('dialog');
-      await choose(page, dialog, 'Runtime version', /^24\.21\.0$/);
+      await choose(page, dialog, 'Runtime version', MANAGED_NODE_VERSION);
       await operationClick(
         () => dialog.getByRole('button', { name: /Save$/ }).click(),
         '/api/runtime/node/installations',
@@ -245,7 +245,10 @@ test(
         source.effective_resource_versions.node.runtime_id,
         runtime.id,
       );
-      assert.match(await f.app.services.execution.logs(runId), /v24\.21\.0/);
+      assert.match(
+        await f.app.services.execution.logs(runId),
+        new RegExp('v' + MANAGED_NODE_VERSION.replaceAll('.', '\\.')),
+      );
       await page
         .getByRole('tab', { name: 'Historical source snapshot', exact: true })
         .click();

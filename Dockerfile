@@ -46,6 +46,7 @@ COPY --from=build /build/node_modules ./node_modules
 COPY --from=build /build/static ./static
 COPY --from=build /build/package.json /build/version.yaml /build/LICENSE ./
 COPY --from=build /build/shell/*.py ./shell/
+COPY --from=build /build/scripts/native/verify-sqlite.cjs /build/scripts/native/sqlite-core.json ./scripts/native/
 COPY --from=build /build/scripts/release/entrypoint.cjs /build/scripts/release/healthcheck.cjs ./scripts/release/
 ARG SOURCE_COMMIT
 ARG BUILD_CREATED
@@ -62,6 +63,8 @@ ENV NODE_ENV=production DATA_DIR=/data/state BACKUP_DIR=/backup HOME=/data/home 
     LANG=C.UTF-8 LOG_LEVEL=info
 RUN chmod 0700 /data /backup
 USER 10001:10001
+# Actual final service UID must load and query the published target addon.
+RUN node scripts/native/verify-sqlite.cjs
 EXPOSE 5700
 HEALTHCHECK --interval=10s --timeout=5s --start-period=60s --retries=6 CMD ["node", "scripts/release/healthcheck.cjs"]
 ENTRYPOINT ["/usr/bin/tini", "--", "node", "scripts/release/entrypoint.cjs"]

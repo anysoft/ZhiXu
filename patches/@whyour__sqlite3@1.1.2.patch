@@ -64,7 +64,7 @@ new file mode 100644
 index 00000000..3bbaa19b
 --- /dev/null
 +++ b/deps/install-secure.cjs
-@@ -0,0 +1,211 @@
+@@ -0,0 +1,222 @@
 +'use strict';
 +// ZhiXu source-only build recipe. The fork's JS/C++ binding API is unchanged.
 +const fs = require('node:fs/promises');
@@ -182,9 +182,22 @@ index 00000000..3bbaa19b
 +    current = path.join(current, part);
 +    await fs.mkdir(current, { mode: 0o755 }).catch((error) => { if (error.code !== 'EEXIST') throw error; });
 +    const st = await fs.lstat(current);
-+    if (!st.isDirectory() || st.isSymbolicLink()) fail('SQLITE_NATIVE_PATH_REJECTED');
++    if (!st.isDirectory() || st.isSymbolicLink() ||
++        typeof process.getuid !== 'function' || st.uid !== process.getuid())
++      fail('SQLITE_NATIVE_PATH_REJECTED');
++    // mkdir's requested mode is masked by the installer's strict umask. The
++    // published addon must remain traversable by the release service UID.
++    await fs.chmod(current, 0o755);
 +  }
 +  return path.join(ROOT, relative);
++}
++async function publishReceipt(receiptFile, receipt, token) {
++  const pendingReceipt = receiptFile + '.' + token + '.tmp';
++  try {
++    await fs.writeFile(pendingReceipt, JSON.stringify(receipt, null, 2) + '\n', { mode: 0o644, flag: 'wx' });
++    await fs.chmod(pendingReceipt, 0o644);
++    await fs.rename(pendingReceipt, receiptFile);
++  } finally { await fs.rm(pendingReceipt, { force: true }); }
 +}
 +async function buildTemporaryRoot(provided = process.env.ZHIXU_SQLITE_BUILD_TMPDIR) {
 +  let temporaryRoot;
@@ -260,9 +273,7 @@ index 00000000..3bbaa19b
 +    const installed = await probe(ROOT);
 +    if (installed.native_sha256 !== actual.native_sha256) fail('SQLITE_NATIVE_ACTIVATION_MISMATCH');
 +    const receipt = { ...installed, recipe_sha256: helperHash, source_url: URL, source_archive_sha256: SOURCE_SHA256, source_archive_sha3_256: SOURCE_SHA3, fork_package: '@whyour/sqlite3@1.1.2', upstream_prebuilt_used: false, napi_target: 6 };
-+    const pendingReceipt = receiptFile + '.' + token + '.tmp';
-+    try { await fs.writeFile(pendingReceipt, JSON.stringify(receipt, null, 2) + '\n', { mode: 0o644, flag: 'wx' }); await fs.rename(pendingReceipt, receiptFile); }
-+    finally { await fs.rm(pendingReceipt, { force: true }); }
++    await publishReceipt(receiptFile, receipt, token);
 +    process.stdout.write('ZhiXu verified SQLite ' + VERSION + ' native source build ready\n');
 +  } finally {
 +    try { if (stage) await fs.rm(stage, { recursive: true, force: true }); }

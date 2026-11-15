@@ -39,7 +39,8 @@ async function createOwnershipFixture(t) {
     execution: { concurrency: 'ALLOW', timeout_seconds: 40 },
   });
   const service = f.track(new TaskExecutionService(f.store, f.roots, f.leases));
-  const run = await service.submit(task.task.id);
+  const submissionKey = 'ownership-boundary-ticket';
+  const run = await service.submit(task.task.id, { submissionKey });
   let entered, release;
   const acquired = new Promise((resolve) => {
     entered = resolve;
@@ -67,13 +68,14 @@ async function createOwnershipFixture(t) {
     ...f,
     service,
     run,
+    submissionKey,
     workspace,
     release,
     ownerCalls: () => ownerCalls,
   };
 }
 
-test('S2 repeated dispatch preserves the real pending owner and close waits for its cancellation', async (t) => {
+test('S2 repeated dispatch preserves the real pending owner and close retains the original queued ticket without an Attempt', async (t) => {
   const f = await createOwnershipFixture(t);
   try {
     for (let i = 0; i < 3; i++) {
@@ -98,21 +100,28 @@ test('S2 repeated dispatch preserves the real pending owner and close waits for 
     );
     f.release();
     await closing;
-    const terminal = await f.service.get(f.run.id);
-    assert.equal(terminal.status, 'CANCELLED');
-    assert.equal(terminal.active_workspace_id, null);
-    assert.equal(terminal.owner_token, null);
+    const queued = await f.service.get(f.run.id);
+    assert.equal(queued.id, f.run.id);
+    assert.equal(queued.submission_key, f.submissionKey);
+    assert.equal(queued.status, 'QUEUED');
+    assert.equal(queued.cancel_requested, 0);
+    assert.equal(queued.attempt_count, 0);
+    assert.equal((await f.service.attempts(f.run.id)).length, 0);
+    assert.equal(queued.active_workspace_id, null);
+    assert.equal(queued.owner_token, null);
     assert.doesNotMatch(
       await f.service.logs(f.run.id),
       /REAL_OWNERSHIP_CHILD_STARTED/,
     );
     assert.equal((await f.leases.probeWorkspace(f.workspace.id)).busy, false);
+    const owner = await f.service.paths.owner(f.run.id);
+    await owner.release();
   } finally {
     f.release();
   }
 });
 
-test('S2 delayed real owner admits exactly one real child and close cancels and awaits cleanup', async (t) => {
+test('S2 delayed real owner admits exactly one real child and bounded close interrupts without user cancellation and awaits cleanup', async (t) => {
   const f = await createOwnershipFixture(t);
   try {
     for (let i = 0; i < 3; i++) {
@@ -132,17 +141,26 @@ test('S2 delayed real owner admits exactly one real child and close cancels and 
     assert.equal((await f.service.attempts(f.run.id)).length, 1);
     await f.service.close();
     const terminal = await f.service.get(f.run.id);
-    assert.equal(terminal.status, 'CANCELLED');
-    assert.equal(JSON.parse(terminal.result).cleanupResult, 'SUCCESS');
+    assert.equal(terminal.id, f.run.id);
+    assert.equal(terminal.submission_key, f.submissionKey);
+    assert.equal(terminal.status, 'INTERRUPTED');
+    assert.equal(terminal.error_code, 'EXECUTION_INTERRUPTED');
+    assert.equal(terminal.cancel_requested, 0);
+    const result = JSON.parse(terminal.result);
+    assert.equal(result.cancelled, false);
+    assert.equal(result.primaryError.phase, 'SHUTDOWN');
+    assert.equal(result.cleanupResult, 'SUCCESS');
     assert.equal(terminal.active_workspace_id, null);
     assert.equal(terminal.owner_token, null);
     const attempts = await f.service.attempts(f.run.id);
     assert.equal(attempts.length, 1);
-    assert.equal(attempts[0].status, 'CANCELLED');
+    assert.equal(attempts[0].status, 'INTERRUPTED');
     const logs = await f.service.logs(f.run.id);
     assert.equal(logs.match(/REAL_OWNERSHIP_CHILD_STARTED/g)?.length, 1);
     assert.doesNotMatch(logs, /UNEXPECTED_CHILD_FINISH/);
     assert.equal((await f.leases.probeWorkspace(f.workspace.id)).busy, false);
+    const owner = await f.service.paths.owner(f.run.id);
+    await owner.release();
   } finally {
     f.release();
   }
