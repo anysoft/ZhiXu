@@ -1,5 +1,5 @@
-version: 1.0.0-rc.6
+version: 2.0.0
 changeLogLink: https://github.com/anysoft/ZhiXu/releases
 publishTime: ""
 changeLog: |
-  ZhiXu 1.0 RC1: Git-native tasks, managed runtimes, isolated environments and portable recovery.
+  ZhiXu v2.0.0: Fresh-v2 LOCAL/GIT workspaces, unified task execution, verified managed runtimes and portable backup/restore. Automatic v9 migration is not supported.

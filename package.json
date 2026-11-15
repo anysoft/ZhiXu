@@ -1,7 +1,7 @@
 {
   "name": "@anysoft/zhixu",
   "packageManager": "pnpm@10.34.9",
-  "version": "1.0.0-rc.6",
+  "version": "2.0.0",
   "description": "ZhiXu \u2014 Git-native automation and task execution platform",
   "repository": {
     "type": "git",
