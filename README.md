@@ -21,7 +21,13 @@
 - 一致性备份、加密导出、恢复与灾难恢复基础
 - `linux/amd64` 与 `linux/arm64` 容器资格验证
 
-## Release Candidate
+## v2.0 架构发行准备：Fresh-v2 Only
+
+v2 使用统一的 LOCAL/GIT Workspace，按全新安装准备。请先读[发布准备与安装步骤](./docs/architecture/v2/V2_RELEASE_READINESS.md)及[发布范围决策](./docs/architecture/v2/V2_RELEASE_SCOPE_DECISION.md)。使用 `compose.v2.example.yaml`、独立的新项目/数据卷和5600端口；默认 Dockerfile/Compose 及下面的1.0说明不是 v9→v2 升级入口。
+
+已验收代码候选为 RC15。该封存候选内嵌版本仍为 `1.0.0-rc.6`，不代表已生成或发布 `v2.0.0` 包。v9 自动迁移和原地 Schema 升级均不支持，不能清空旧数据来“升级”。全量安全审计另行处理，已知风险保留；正式发布仍需人工批准。
+
+## 历史1.0 Release Candidate 说明
 
 当前版本为 `v1.0.0-rc.6` 候选源码。Qualified source `505c0bac` 已通过 [Container Qualification #6](https://github.com/anysoft/ZhiXu/actions/runs/36816777711)；品牌迁移后的提交仍需重新完成同一资格流程，之后才会创建 RC tag 和发布产物。
 

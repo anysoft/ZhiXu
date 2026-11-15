@@ -21,7 +21,13 @@
 - Consistent backups, encrypted exports, restore, and disaster recovery foundations
 - Qualified `linux/amd64` and `linux/arm64` containers
 
-## Release candidate
+## v2 architecture release preparation: fresh-v2 only
+
+v2 unifies LOCAL/GIT Workspaces and is prepared for fresh installation. Read the [release readiness and installation steps](./docs/architecture/v2/V2_RELEASE_READINESS.md) and [scope decision](./docs/architecture/v2/V2_RELEASE_SCOPE_DECISION.md). Use `compose.v2.example.yaml`, a new project with dedicated volumes, and port 5600. The default Dockerfile/Compose and the historical 1.0 instructions below are not a v9-to-v2 upgrade path.
+
+The qualified code candidate is RC15. Its sealed embedded version remains `1.0.0-rc.6`; no `v2.0.0` package or tag has been created or published. Automatic v9 migration and in-place schema upgrades are unsupported. Never clear existing data to upgrade. Full security auditing is deferred with known risks retained; publication requires separate human approval.
+
+## Historical 1.0 release candidate instructions
 
 The current source prepares `v1.0.0-rc.6`. Qualified source `505c0bac` passed [Container Qualification #6](https://github.com/anysoft/ZhiXu/actions/runs/36816777711). The branding commit must pass the same qualification before an RC tag or release is created.
 
@@ -44,7 +50,7 @@ See the [Docker deployment guide](./docs/deploy/docker.md) for details.
 ```bash
 git clone https://github.com/anysoft/ZhiXu.git
 cd ZhiXu
-npm install -g pnpm@8.3.1
+npm install -g pnpm@10.34.9
 pnpm install
 pnpm start
 ```

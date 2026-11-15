@@ -1,0 +1,291 @@
+{
+  "schema": "zhixu-v2-refactor-release-readiness/v1",
+  "checked_at_utc": "2026-11-15T14:25:45.783910+00:00",
+  "scope": "Refactor Release Acceptance; user-authorized scope alignment, not S5R full security clearance",
+  "scope_decision": {
+    "path": "docs/architecture/v2/V2_RELEASE_SCOPE_DECISION.md",
+    "sha256": "ca2deebe80ca32d340c735e13ec7e6a9cdf2d49e6d2996cb8d635a3d042141bb",
+    "authorization_request_sha256": "d1216dbdf79f0eaf2ba62f327a787203e42b78d9921203bed50608eaa1900757"
+  },
+  "candidate": {
+    "code_sha": "58cfda832bf556a96e0ebc1b0722116d9c20fd4e",
+    "code_tree": "70a730f0599b201158bf3115badcde5cec132f7f",
+    "entry_head": "ce58ea3d860399f2005e35c411296e27a7c5bc7a",
+    "branch": "codex/v2-s4-product-integration",
+    "entry_followup": "Metadata-only S5R report commit; not a recompiled candidate",
+    "embedded_package_version": "1.0.0-rc.6",
+    "embedded_version_yaml": "1.0.0-rc.6",
+    "release_label": "ZhiXu v2.0 architecture / RC15 fresh-v2 candidate",
+    "v2_0_0_artifact_or_tag_created": false,
+    "code_dependencies_images_or_build_inputs_changed": false,
+    "root_file_sha256": {
+      "package.json": "8ae5836633ea878aa48c6eb6d60f7d5426b75a33501972ef66234d43de85c7ff",
+      "version.yaml": "ce0db978d1470bb93a0fd3eaa78c57754734cc8f42865d133ea9b39c2222a42e",
+      "pnpm-lock.yaml": "17a644568dcee8c69305b286f739a58f51718849ef718f4c4f291c03a8b64aef",
+      "pnpm-workspace.yaml": "c9a952a50c7228b12d1133d0f6284d24fc653b51a8a9381f39050605e0b62bc8"
+    }
+  },
+  "existing_qualification_references": [
+    {
+      "path": "docs/architecture/v2/S5_RELEASE_QUALIFICATION_REPORT.md",
+      "sha256": "d1f33320e0d6effd8cc67ecc47215bca0e98db6e9ac5f126b96dbdcf4a58cfd8",
+      "classification": "REUSED_VERIFIED_EVIDENCE"
+    },
+    {
+      "path": "tests/workspace-v2/s5-validation-results.json",
+      "sha256": "f06d4b55d5d127baf79b47bdcb71b13b24d3b4121a40aef89fb51141ccc25a18",
+      "classification": "REUSED_VERIFIED_EVIDENCE"
+    },
+    {
+      "path": "docs/architecture/v2/S5R_REMEDIATION_REPORT.md",
+      "sha256": "537fcccd27d46e2438fad63623cffd02c8a65cab032645837cb5404b88553480",
+      "classification": "REUSED_VERIFIED_EVIDENCE"
+    },
+    {
+      "path": "tests/workspace-v2/s5r-validation-results.json",
+      "sha256": "bbe495b0be9a8d9cfd31d67fd8b7dab183e9d96e3d09e554ecafee4d0c027e9a",
+      "classification": "REUSED_VERIFIED_EVIDENCE"
+    }
+  ],
+  "reused_qualification": [
+    {
+      "item": "S0_DDL",
+      "status": "PASS",
+      "classification": "REUSED_VERIFIED_EVIDENCE",
+      "cases": 86
+    },
+    {
+      "item": "S1A",
+      "status": "PASS",
+      "classification": "REUSED_VERIFIED_EVIDENCE",
+      "cases": 68
+    },
+    {
+      "item": "S2",
+      "status": "PASS",
+      "classification": "REUSED_VERIFIED_EVIDENCE",
+      "cases": 112
+    },
+    {
+      "item": "S1B",
+      "status": "PASS",
+      "classification": "REUSED_VERIFIED_EVIDENCE",
+      "cases": 36
+    },
+    {
+      "item": "S3",
+      "status": "PASS",
+      "classification": "REUSED_VERIFIED_EVIDENCE",
+      "cases": 81
+    },
+    {
+      "item": "S4",
+      "status": "PASS",
+      "classification": "REUSED_VERIFIED_EVIDENCE",
+      "cases": 58
+    },
+    {
+      "item": "relevant_v9",
+      "status": "PASS",
+      "classification": "REUSED_VERIFIED_EVIDENCE",
+      "case_groups": [
+        210,
+        44
+      ]
+    },
+    {
+      "item": "Native_Linux_AMD64_ARM64",
+      "status": "PASS",
+      "classification": "REUSED_VERIFIED_EVIDENCE"
+    },
+    {
+      "item": "Docker_AMD64_ARM64",
+      "status": "PASS",
+      "classification": "REUSED_VERIFIED_EVIDENCE",
+      "basis": "Final RC15 each-architecture19+19+9+9,fullDR1 and actual nonroot/read-only entry/restart/shutdown PASS"
+    },
+    {
+      "item": "Managed_Runtime_offline_A_to_B_and_shutdown",
+      "status": "PASS",
+      "classification": "REUSED_VERIFIED_EVIDENCE"
+    }
+  ],
+  "actual_new_checks": {
+    "classification": "NEWLY_EXECUTED",
+    "git_relationship": "PASS: RC15 to entry HEAD changes only two S5R metadata files",
+    "protected_frozen_history_and_user_files_verified": 47,
+    "package_version_and_build_inputs": "PASS_UNCHANGED",
+    "actual_backend_frontend_manifests": {
+      "backend": {
+        "file_count": 634,
+        "sha256": "ee67403fd90d9dd4bf478f34c7eb8812e0b5c61b257edb0f3367b17bbbb77d48"
+      },
+      "frontend": {
+        "file_count": 227,
+        "sha256": "486b58c36a885146cbc164e3e0c919d58dd190a610a61c818f58d329a1ffd4a2"
+      }
+    },
+    "archive_transport_and_oci_config_identity": "PASS",
+    "doc_installation_scope_review": "PASS: fresh-v2 entry distinguished from historical v9/1.0 default deployment",
+    "private_check_receipt_sha256": "005b51898be264df5492012906fb45befabd38030aa4f967b080cbe2afe068b7"
+  },
+  "smoke_test": {
+    "classification": "REUSED_VERIFIED_EVIDENCE",
+    "status": "PASS",
+    "source": "tests/workspace-v2/s5/node-application.test.cjs",
+    "case_id": "S5-COMPILED-CLI",
+    "original_recorded_at": "2026-11-15T01:30:56.886Z",
+    "receipt_sha256": "831b6909c8df8aa3c515b303a6e0540ca4fa9ef064d4fbd0b5fe702cc8e9ac9d",
+    "whole_group_raw_sha256": "5235f6bcf3b2dbbc264db8e5f519a0a8ce6e8e50ed4d6cdae599f7d311ec473e",
+    "platform": "darwin/arm64",
+    "application_node": "22.23.5",
+    "controller_pids": [
+      19093,
+      19360
+    ],
+    "workspace_id": 1,
+    "task_id": 1,
+    "run_id": 1,
+    "attempt_count": 1,
+    "steps": [
+      "fresh_data_root",
+      "explicit_initialize",
+      "production_cli_start",
+      "administrator_init_and_login",
+      "create_local_workspace",
+      "create_main_sh",
+      "create_task",
+      "execute_success_and_inspect_log",
+      "graceful_stop_exit0",
+      "new_pid_restart",
+      "login_and_verify_task_run_attempt_persistence"
+    ]
+  },
+  "v9_data_root_rejection": {
+    "classification": "REUSED_VERIFIED_EVIDENCE",
+    "status": "PASS",
+    "receipt_sha256": "bd119cb172e652fa5a0befc3101cfdc187beef8797e47eaf8a8d3536c330a909",
+    "actual_v2_entry_exit_code": 1,
+    "paths_compared": 40,
+    "whole_domains_unchanged": true,
+    "inventory_sha256": "5443a08362717655e4215fc30a52d23c0e69ebea5d5f7fe5751260c5a55463de"
+  },
+  "artifact_verification": {
+    "classification": "NEWLY_EXECUTED",
+    "artifacts_regenerated": false,
+    "source_and_darwin_release": [
+      {
+        "artifact": "rc15-source",
+        "bytes": 111800320,
+        "sha256": "62f645a5f411715eaed90fe092f6e1ae7da6b65f19b8278a62728ab374e4df52",
+        "classification": "NEWLY_EXECUTED",
+        "status": "PASS",
+        "artifact_regenerated": false
+      },
+      {
+        "artifact": "darwin-arm64-release-A",
+        "bytes": 132451563,
+        "sha256": "9bc592ea5ce178856202c0dc868a357bd6f332b4ccf91bba6f9b31ebcd0c7b9a",
+        "classification": "NEWLY_EXECUTED",
+        "status": "PASS",
+        "artifact_regenerated": false
+      }
+    ],
+    "images": {
+      "amd64": {
+        "classification": "NEWLY_EXECUTED",
+        "status": "PASS",
+        "oci_manifest_digest": "sha256:12ec4578346c2874a83239e183ab7e7e507d42a4344a6d3145eed6759aeef679",
+        "config_digest": "sha256:694aac2803afff49f58e7b6e3a1d2168d4b033d9a223705ba0465a733e1d1a06",
+        "archive_sha256": "da525f416b5970a9bb427f8b21e27f257a16e79dd32faecb294c444c50e0a78f",
+        "archive_bytes": 498961408,
+        "candidate_revision": "58cfda832bf556a96e0ebc1b0722116d9c20fd4e",
+        "os": "linux",
+        "architecture": "amd64",
+        "user": "10001:10001",
+        "registry_published": false,
+        "layers": "REUSED_VERIFIED_EVIDENCE: unchanged complete archive SHA authenticates prior full-layer verification",
+        "docker_archive": {
+          "sha256": "e2ebb41f93f58be649f19698b6a79e2d429dcee30fc3cdd945377d11d4864dcf",
+          "bytes": 1223912448,
+          "format": "DOCKER_LOAD_ARCHIVE",
+          "config_matches_oci": true,
+          "classification": "NEWLY_EXECUTED",
+          "regenerated": false
+        }
+      },
+      "arm64": {
+        "classification": "NEWLY_EXECUTED",
+        "status": "PASS",
+        "oci_manifest_digest": "sha256:916d9d6f8cd615e85772b1cbdbad87c63086bbe7e133e2ac7f6f1964ff51ef38",
+        "config_digest": "sha256:25772d90674477261183f63728b906d0a8f18bc7c6d116a111f0368e2519ed35",
+        "archive_sha256": "c04d868d896e0967ef7a980fdcac4f3f29c6095732d1968a776e176bfa32c0a8",
+        "archive_bytes": 495192576,
+        "candidate_revision": "58cfda832bf556a96e0ebc1b0722116d9c20fd4e",
+        "os": "linux",
+        "architecture": "arm64",
+        "user": "10001:10001",
+        "registry_published": false,
+        "layers": "REUSED_VERIFIED_EVIDENCE: unchanged complete archive SHA authenticates prior full-layer verification",
+        "docker_archive": {
+          "sha256": "d98ffc47927917dee4b69ec91c0f8985f87d616365653fbfada5d05e81b2315b",
+          "bytes": 495194624,
+          "format": "DOCKER_LOAD_ARCHIVE",
+          "config_matches_oci": true,
+          "classification": "NEWLY_EXECUTED",
+          "regenerated": false
+        }
+      }
+    },
+    "registry_publication": "NOT_PERFORMED",
+    "bit_for_bit_all_dependency_reproducibility": "NOT_REQUIRED_BY_CURRENT_SCOPE"
+  },
+  "direct_severe_core_risk_floor": {
+    "assessment": "Existing final RC15 evidence reviewed; no recorded unremediated demonstrated core authorization/credential/data-loss/Git-or-Runtime-boundary defect",
+    "assessment_is_full_security_audit": false,
+    "new_security_research_or_scans": 0,
+    "confirmed_direct_core_severe_defect_would_block": true
+  },
+  "known_limitations": [
+    "Fresh-v2 Only; no automatic v9 migration or in-place schema upgrade; no clearing old data to upgrade",
+    "Offline Runtime requires separately trusted, protected artifacts and allowlist; offline PNPM and unsupported nonempty pip closures remain unsupported",
+    "User scripts run as the platform account with granted volumes/network/system tools; not an untrusted multi-tenant sandbox",
+    "Controlled internal Git does not fix system Git callable by trusted Shell Tasks",
+    "OS packages, build dependencies, SDK old npm and existing CVE findings remain documented security follow-up work",
+    "Exact tested Node22.23.5/24.22.3 and platform/libc/browser scope only; no arbitrary downgrade guarantee",
+    "Embedded SemVer1.0.0-rc.6 retained; changing public version or regenerating artifacts requires new identities and relevant checks before publication"
+  ],
+  "not_required_by_current_scope": {
+    "classification": "NOT_REQUIRED_BY_CURRENT_SCOPE",
+    "items": [
+      "Repeat full S0-S5 cross-platform matrix",
+      "Repeat eight-task A-to-B disaster recovery",
+      "Repeat84 browser shutdown cases",
+      "Rebuild all Managed Runtimes",
+      "Full CVE/SBOM reachability review and OS/SDK/transitive dependency remediation",
+      "Every dependency file bit-for-bit reproducibility"
+    ]
+  },
+  "historical_scope_results_preserved": {
+    "S5R_BLOCKERS_CLOSED": "NO",
+    "ZHI_XU_V2_S5_RELEASE_QUALIFICATION_PASS": "NO",
+    "READY_FOR_RELEASE_APPROVAL": "NO",
+    "reason": "Security findings retain unapproved residual risks or UNKNOWN_BLOCKED; exact final disposition attached separately"
+  },
+  "new_result": {
+    "ZHI_XU_V2_REFACTOR_ACCEPTANCE": "PASS",
+    "ZHI_XU_V2_FUNCTIONAL_RELEASE_READY": "YES",
+    "FULL_SECURITY_AUDIT": "DEFERRED",
+    "V9_AUTO_MIGRATION": "NOT_SUPPORTED",
+    "READY_FOR_RELEASE_APPROVAL": "YES",
+    "RELEASE_APPROVAL_GRANTED": "NO"
+  },
+  "execution_summary": {
+    "new_application_or_functional_test_runs": 0,
+    "new_security_scans": 0,
+    "new_builds": 0,
+    "new_containers_vms_or_remote_directories": 0,
+    "production_data_or_user_ssh_configuration_modified": false,
+    "merge_rebase_push_tag_release_publish_deploy_performed": false
+  }
+}

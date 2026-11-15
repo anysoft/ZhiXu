@@ -1,5 +1,7 @@
 # Release process
 
+> The pipeline below describes the historical 1.0/default-image release. Fresh-v2 preparation and its separate approval boundary are defined in [V2 release readiness](../architecture/v2/V2_RELEASE_READINESS.md). Do not use the default 1.0 image, existing v9 volumes, or a rebuild from this historical pipeline as an RC15 v2 artifact. This scope decision does not authorize publication.
+
 Phase16B stops at a local candidate commit until push/tag/publication are explicitly authorized. Qualification is not publication. Phase15's hosted run 35121041296 qualified fc6bab97d5abfd96f51a952ac04516e5bd6d85cb; it does not qualify new container code.
 
 ## Required repository configuration

@@ -1,5 +1,7 @@
 # Docker deployment — ZhiXu 1.0 RC
 
+> This guide describes the historical 1.0/v9 deployment path. Its existing-volume upgrade instructions do **not** apply to v9→v2. For fresh-v2 use the [v2 release readiness guide](../architecture/v2/V2_RELEASE_READINESS.md), `compose.v2.example.yaml`, and new dedicated data volumes. v2 never automatically migrates or takes over v9 data; do not clear a v9 volume to upgrade.
+
 ZhiXu 1.0 RC packages the Git-native scheduling platform as a non-root, read-only-root container for Linux AMD64 and ARM64. The previous platform source at `505c0bac15b18e403ae59fabb2841caa4f53f367` passed native hosted qualification on both architectures. The Phase 17 branding commit must pass the same workflow before `v1.0.0-rc.6` is tagged or published.
 
 No public RC image has been published yet. Use only the image digest and release assets recorded in a completed ZhiXu GitHub Release.
