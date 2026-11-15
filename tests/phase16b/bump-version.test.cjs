@@ -43,7 +43,7 @@ test('mid-transaction write failure restores bytes and modes, releases lock and 
   fs.chmodSync(path.join(root,'package.json'),0o640);
   const hook=path.join(root,'fail.cjs');
   fs.writeFileSync(hook,`const fs=require('node:fs/promises');const rename=fs.rename;let count=0;fs.rename=async(...args)=>{if(++count===3)throw Error('INJECTED_WRITE_FAILURE');return rename(...args);};`);
-  const result=run(['2.0.0'],{NODE_OPTIONS:'--require='+hook});
+  const result=run(['2.3.4'],{NODE_OPTIONS:'--require='+hook});
   assert.notEqual(result.status,0);assert.match(result.stderr,/INJECTED_WRITE_FAILURE/);
   for(const f of files)assert.equal(fs.readFileSync(path.join(root,f),'utf8'),before[f]);
   assert.equal(fs.statSync(path.join(root,'package.json')).mode&0o777,0o640);

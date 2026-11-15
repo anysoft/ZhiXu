@@ -1,15 +1,11 @@
-# Container security
+# Fresh-v2 container boundaries
 
-The build context is allowlisted: no .git, local .env, diagnostics or test fixtures. Each target compiles native addons itself. Production runs as UID/GID 10001, Tini forwards signals, the application root is read-only, and writes are confined to persistent data/backup and temporary paths. No Docker socket or host namespace access is granted.
+The default `Dockerfile` builds the fresh-v2 application. Its context is allowlisted and excludes local `.git`, `.env`, diagnostics and user state. Build inputs include required source, frozen contracts and test inputs; the runtime stage copies selected application artifacts. Native addons are built for the target architecture.
 
-The persistent JWT secret is generated at first startup outside the immutable image and live restore root, with exclusive creation, fsync and restrictive ownership/mode checks. Do not include volumes, task logs, encrypted backups or credentials in release artifacts. Secrets should never be build arguments.
+The default `compose.yaml` runs as UID/GID 10001 with a read-only application filesystem, dropped capabilities and `no-new-privileges`. Writable mounts are the dedicated `v2-data`, `v2-backup`, `v2-scratch` volumes and private tmpfs. `/data/state` and `/backup/state` are the v2 data and backup roots. No Docker socket or host namespace access is granted. Keep one active service per data volume and use a fresh project instead of adopting v9 volumes.
 
-OCI validation checks configuration identity and every layer, including deleted files, for source/state/private-key/JWT patterns. This pattern scan is bounded detection, not proof that arbitrary unknown secrets cannot exist. Context allowlisting supplies the primary isolation boundary. Retain docker history inspection as a separate gate.
+Task code executes with the platform identity. Restrict script administration to trusted users; this is not isolation against hostile task authors. Keep credentials, task logs, runtime trust material, encrypted exports and backup passphrases outside public release assets. Public origin must match the browser URL; remote access needs an authenticated TLS entry.
 
-The pinned scanner download is checksum verified. The vulnerability gate blocks fixable CRITICAL findings and malformed/empty scanner receipts. No blanket suppression is allowed. Fixing production dependency findings requires a focused change and rerun of the relevant qualification. Scanner database availability is a gate, not grounds to silently pass.
+The current release OCI audit verifies architecture, source/version and v2 entrypoint identity, service UID, blob digests, SBOM and provenance. Runtime smoke checks authentication, real Shell execution, persistence, shutdown and cleanup. Compose configuration is validated for both repository defaults and generated release assets. These checks are not a full secret, dependency or operating-system vulnerability audit.
 
-Task code is user-controlled and executes with the platform identity. This container is not a multi-tenant sandbox against hostile task authors. Restrict administration accordingly. Backup passphrases and portable exports must be stored separately.
-
-## Public self-test vectors
-
-Debian GnuTLS embeds nine public PEM known-answer keys from [upstream crypto-selftests-pk.c, tag 3.7.9](https://github.com/gnutls/gnutls/blob/3.7.9/lib/crypto-selftests-pk.c). The audit allows only their exact PEM SHA-256 values in the expected architecture-specific libgnutls shared-library path. It records every match. Unknown keys still fail; no library/directory-wide scan exclusion applies. Header strings without key material are not treated as private keys.
+Full CVE clearance and supply-chain review remain **DEFERRED** under the [accepted release scope](../architecture/v2/V2_RELEASE_SCOPE_DECISION.md). Historical Phase16B scanner gates, private-key pattern scans and public upstream self-test vector exceptions describe earlier qualification tooling; they are not claims that the fresh-v2 release passed those gates. Preserve the historical reports and resolve any confirmed direct severe defect before releasing the affected scope.

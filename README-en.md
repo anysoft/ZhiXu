@@ -21,48 +21,46 @@
 - Consistent backups, encrypted exports, restore, and disaster recovery foundations
 - Qualified `linux/amd64` and `linux/arm64` containers
 
-## v2 architecture release preparation: fresh-v2 only
+## v2.0.0 installation
 
-v2 unifies LOCAL/GIT Workspaces and is prepared for fresh installation. Read the [release readiness and installation steps](./docs/architecture/v2/V2_RELEASE_READINESS.md) and [scope decision](./docs/architecture/v2/V2_RELEASE_SCOPE_DECISION.md). Use `compose.v2.example.yaml`, a new project with dedicated volumes, and port 5600. The default `Dockerfile` builds v2. The old Compose configuration and the historical 1.0 instructions below are not a v9-to-v2 upgrade path.
+The default `Dockerfile` and `compose.yaml` run fresh-v2 with unified LOCAL/GIT Workspaces. Use a new project and dedicated volumes. Automatic v9 migration and in-place upgrades are unsupported; retain the original data.
 
-The qualified code candidate is RC15. Its sealed embedded version remains `1.0.0-rc.6`; no `v2.0.0` package or tag has been created or published. Automatic v9 migration and in-place schema upgrades are unsupported. Never clear existing data to upgrade. Full security auditing is deferred with known risks retained; publication requires separate human approval.
+Obtain image identity and assets from a completed, verified GitHub Release. Use a new deployment directory and retain any existing installation’s `.env`. In a repository checkout, prepare the service as follows. For release assets, copy `container.env.example` to `.env` instead:
 
-## Historical 1.0 release candidate instructions
-
-The current source prepares `v1.0.0-rc.6`. Qualified source `505c0bac` passed [Container Qualification #6](https://github.com/anysoft/ZhiXu/actions/runs/36816777711). The branding commit must pass the same qualification before an RC tag or release is created.
-
-Download `compose.yaml`, `.env.example`, `release-manifest.json`, and `SHA256SUMS` from the same verified GitHub Release. After checking the hashes:
-
-```bash
+```sh
 cp .env.example .env
-# Set DOCKERHUB_IMAGE and PLATFORM_VERSION from release-manifest.json
+# Set ZHIXU_V2_IMAGE from release-manifest.json; prefer image@sha256:digest.
+# Choose a new COMPOSE_PROJECT_NAME and the exact ZHIXU_V2_PUBLIC_ORIGIN.
 docker compose config --quiet
 docker compose pull
+docker compose run --rm --service-ports platform-v2 --initialize
+# After initialization and owner setup, stop with Ctrl+C and start normally:
 docker compose up -d --wait
 ```
 
-The service listens at <http://127.0.0.1:5700> by default. The persistent volume is mounted at `/data`, with `DATA_DIR=/data/state`; backups use `/backup`. The image runs as UID/GID `10001` with a read-only root filesystem and requires neither a Docker socket nor privileged mode.
+Open <http://127.0.0.1:5600>. The default configuration retains `v2-data`, `v2-backup` and `v2-scratch` volumes, with application data at `/data/state`, backups at `/backup/state` and temporary work at `/scratch/tmp`. The container runs as UID/GID `10001` with a read-only root filesystem. Keep the original project name and volumes when restarting an existing v2 installation, without reinitializing it.
 
-See the [Docker deployment guide](./docs/deploy/docker.md) for details.
+See the [Docker deployment guide](./docs/deploy/docker.md) for configuration, verified managed runtimes, backup and restore. The source version does not prove that an image has been published; use the actual release assets.
 
-## Development
+## Build from source
 
-```bash
+```sh
 git clone https://github.com/anysoft/ZhiXu.git
 cd ZhiXu
 npm install -g pnpm@10.34.9
-pnpm install
-pnpm start
+pnpm install --frozen-lockfile
+pnpm build:v2
 ```
 
-Open <http://127.0.0.1:5700>.
+Use the default `Dockerfile` for container builds and the Compose settings above for deployment.
 
-## Status
+## Release and qualification
 
-- Functional baseline: [Platform 1.0 freeze](./docs/architecture/21-platform-1.0-freeze.md)
-- Linux qualification: [Phase 15](./PHASE15_REPORT.md)
-- Container and release engineering: [Phase 16B](./PHASE16B_REPORT.md)
-- Branding and RC preparation: [Phase 17](./PHASE17_REPORT.md)
+- Current publication: [v2 release workflow](./docs/release/01-release-process.md)
+- Accepted scope: [v2 scope decision](./docs/architecture/v2/V2_RELEASE_SCOPE_DECISION.md)
+- Existing evidence and installation limits: [v2 release readiness](./docs/architecture/v2/V2_RELEASE_READINESS.md)
+
+Historical RC15 qualification identifies its sealed artifacts. Rebuilt images have a new commit and artifact identity. Full CVE and supply-chain audits remain deferred and are not claimed as passed.
 
 ## Name
 

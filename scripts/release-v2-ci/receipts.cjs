@@ -77,16 +77,11 @@ function assets(out = 'release-output', input = 'release-input') {
   assert.equal(smoke.commit, meta.sha);
   assert.equal(smoke.application_mode, 'v2');
   names.push('v2-smoke.json');
-  const compose = fs.readFileSync('compose.v2.example.yaml', 'utf8')
-    .replace('# Local candidate example; use a new project and dedicated named volumes.', '# Fresh-v2 release; use a new project and dedicated named volumes.')
-    .replace('ZHIXU_V2_IMAGE=<locally-built candidate tag or digest>', 'ZHIXU_V2_IMAGE=<published image@sha256:digest>')
-    .replaceAll('compose.v2.example.yaml', 'compose.yaml')
-    .replace('--pull never', '--pull missing')
-    .replace('Set the locally built candidate image or immutable digest', 'Set the published immutable image digest')
-    .replace('pull_policy: never', 'pull_policy: missing');
-  fs.writeFileSync(path.join(out, 'compose.yaml'), compose);
+  fs.copyFileSync('compose.yaml', path.join(out, 'compose.yaml'));
+  const environment = fs.readFileSync('docs/deploy/container.env.example', 'utf8');
+  assert.equal((environment.match(/^ZHIXU_V2_IMAGE=/gm) || []).length, 1, 'IMAGE_ENV_TEMPLATE_REQUIRED');
   fs.writeFileSync(path.join(out, 'container.env.example'),
-    `ZHIXU_V2_IMAGE=${meta.image}@${meta.digest}\nZHIXU_V2_PUBLIC_ORIGIN=http://127.0.0.1:5600\n`);
+    environment.replace(/^ZHIXU_V2_IMAGE=.*$/m, 'ZHIXU_V2_IMAGE=' + meta.image + '@' + meta.digest));
   write(path.join(out, 'release-manifest.json'), { version: meta.version, git_sha: meta.sha,
     application_mode: 'v2', installation: 'FRESH_ONLY', security_scan: 'DEFERRED',
     image: meta.image, manifest_digest: meta.digest, platforms: meta.platforms });

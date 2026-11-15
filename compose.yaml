@@ -1,24 +1,44 @@
+# Fresh-v2 only. Use a new project and dedicated named volumes.
+# Set ZHIXU_V2_IMAGE to the published immutable image digest.
+# Required: ZHIXU_V2_PUBLIC_ORIGIN=http://127.0.0.1:5600
+# First initialization is explicit:
+#   docker compose -f compose.yaml run --rm --service-ports platform-v2 --initialize
+# After stopping that process:
+#   docker compose -f compose.yaml up -d --pull missing
 services:
-  platform:
-    image: ${DOCKERHUB_IMAGE:?Set DOCKERHUB_IMAGE to the qualified image}:${PLATFORM_VERSION:-1.0.0-rc.6}
+  platform-v2:
+    image: ${ZHIXU_V2_IMAGE:?Set the qualified v2 image tag or immutable digest}
+    pull_policy: missing
+    user: '10001:10001'
     restart: unless-stopped
     ports:
-      - "127.0.0.1:${PLATFORM_PORT:-5700}:5700"
+      - '127.0.0.1:${ZHIXU_V2_PORT:-5600}:5600'
     environment:
-      DATA_DIR: /data/state
-      BACKUP_DIR: /backup
+      ZHIXU_V2_PUBLIC_ORIGIN: ${ZHIXU_V2_PUBLIC_ORIGIN:?Set the exact browser origin including its published port}
+      ZHIXU_V2_DATA_ROOT: /data/state
+      ZHIXU_V2_BACKUP_ROOT: /backup/state
       HOME: /data/home
+      TMPDIR: /scratch/tmp
     volumes:
-      - data:/data
-      - backup:/backup
+      - v2-data:/data
+      - v2-backup:/backup
+      # SQLite preflight requires physical temporary capacity plus 2 GiB free.
+      # A small /tmp tmpfs cannot satisfy that gate.
+      - v2-scratch:/scratch
     read_only: true
     tmpfs:
-      # Git credentials use executable, private GIT_ASKPASS helpers under /tmp.
-      - /tmp:rw,nosuid,nodev,exec,mode=1777
+      - /tmp:rw,nosuid,nodev,exec,size=64m,mode=1777
     cap_drop:
       - ALL
     security_opt:
       - no-new-privileges:true
+    cpus: '2.0'
+    mem_limit: 4g
+    pids_limit: 256
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 4096
     stop_grace_period: 30s
     logging:
       driver: json-file
@@ -26,5 +46,6 @@ services:
         max-size: 10m
         max-file: '3'
 volumes:
-  data:
-  backup:
+  v2-data:
+  v2-backup:
+  v2-scratch:

@@ -7,9 +7,8 @@ const {execFileSync} = require('node:child_process');
 const {randomUUID} = require('node:crypto');
 const yaml = require('js-yaml');
 const {metadata} = require('./metadata.cjs');
-const files = ['package.json', 'version.yaml', 'compose.yaml', 'docs/deploy/container.env.example',
-  'deploy/kubernetes/base/zhixu.yaml', 'deploy/kubernetes/overlays/example/kustomization.yaml',
-  'README.md', 'README-en.md', 'deploy/kubernetes/README.md', 'docs/deploy/docker.md'];
+const files = ['package.json', 'version.yaml', 'compose.yaml', '.env.example',
+  'docs/deploy/container.env.example', 'README.md', 'README-en.md', 'docs/deploy/docker.md'];
 const root = path.resolve(__dirname, '../..');
 
 function readSources(directory) {
@@ -23,13 +22,12 @@ function validateSources(sources, version) {
   metadata('v' + version, version, '0'.repeat(40));
   assert.equal(JSON.parse(sources['package.json']).version, version);
   assert.equal(yaml.load(sources['version.yaml']).version, version, 'VERSION_YAML_MISMATCH');
-  assert.ok(yaml.load(sources['compose.yaml']).services.platform.image.endsWith('${PLATFORM_VERSION:-' + version + '}'), 'COMPOSE_VERSION_MISMATCH');
-  assert.equal(sources['docs/deploy/container.env.example'].match(/^PLATFORM_VERSION=(.+)$/m)?.[1], version, 'ENV_VERSION_MISMATCH');
-  const workload = yaml.loadAll(sources['deploy/kubernetes/base/zhixu.yaml']).find(doc => doc?.kind === 'StatefulSet');
-  assert.equal(workload.spec.template.spec.containers.find(c => c.name === 'zhixu').image, 'anysoft/zhixu:' + version);
-  const overlay = yaml.load(sources['deploy/kubernetes/overlays/example/kustomization.yaml']);
-  assert.equal(overlay.images.find(i => i.name === 'anysoft/zhixu').newTag, version);
-  for (const file of files.slice(6)) assert.ok(sources[file].includes(version), `DOC_VERSION_MISMATCH:${file}`);
+  const service = yaml.load(sources['compose.yaml']).services['platform-v2'];
+  assert.match(service.image, /^\$\{ZHIXU_V2_IMAGE:\?[^}]+\}$/, 'COMPOSE_IMAGE_CONFIG_MISMATCH');
+  for (const file of ['.env.example', 'docs/deploy/container.env.example'])
+    assert.equal(sources[file].match(/^ZHIXU_V2_IMAGE=(.+)$/m)?.[1], 'anysoft/zhixu:' + version, `ENV_VERSION_MISMATCH:${file}`);
+  for (const file of ['README.md', 'README-en.md', 'docs/deploy/docker.md'])
+    assert.ok(sources[file].includes(version), `DOC_VERSION_MISMATCH:${file}`);
 }
 function planVersion(directory, version) {
   const before = readSources(directory), current = JSON.parse(before['package.json']).version;

@@ -21,48 +21,46 @@
 - 一致性备份、加密导出、恢复与灾难恢复基础
 - `linux/amd64` 与 `linux/arm64` 容器资格验证
 
-## v2.0 架构发行准备：Fresh-v2 Only
+## v2.0.0 安装
 
-v2 使用统一的 LOCAL/GIT Workspace，按全新安装准备。请先读[发布准备与安装步骤](./docs/architecture/v2/V2_RELEASE_READINESS.md)及[发布范围决策](./docs/architecture/v2/V2_RELEASE_SCOPE_DECISION.md)。使用 `compose.v2.example.yaml`、独立的新项目/数据卷和5600端口；默认 `Dockerfile` 构建 v2 镜像；旧版 Compose 及下面的1.0说明不是 v9→v2 升级入口。
+默认 `Dockerfile` 和 `compose.yaml` 均为 fresh-v2。v2 使用统一的 LOCAL/GIT Workspace，只支持全新安装，不自动迁移或接管 v9 数据。使用新项目和独立数据卷，保留旧数据。
 
-已验收代码候选为 RC15。该封存候选内嵌版本仍为 `1.0.0-rc.6`，不代表已生成或发布 `v2.0.0` 包。v9 自动迁移和原地 Schema 升级均不支持，不能清空旧数据来“升级”。全量安全审计另行处理，已知风险保留；正式发布仍需人工批准。
+从已完成且校验通过的 GitHub Release 获取镜像身份和发行附件。在新的部署目录操作，保留旧安装的 `.env`；仓库内可按以下步骤准备；从 Release 安装时，将其中的 `container.env.example` 复制为 `.env`：
 
-## 历史1.0 Release Candidate 说明
-
-当前版本为 `v1.0.0-rc.6` 候选源码。Qualified source `505c0bac` 已通过 [Container Qualification #6](https://github.com/anysoft/ZhiXu/actions/runs/36816777711)；品牌迁移后的提交仍需重新完成同一资格流程，之后才会创建 RC tag 和发布产物。
-
-从同一个已验证 GitHub Release 下载 `compose.yaml`、`.env.example`、`release-manifest.json` 和 `SHA256SUMS`。校验后运行：
-
-```bash
+```sh
 cp .env.example .env
-# 按 release-manifest.json 设置 DOCKERHUB_IMAGE 和 PLATFORM_VERSION
+# 按 release-manifest.json 设置 ZHIXU_V2_IMAGE，优先使用 image@sha256:digest。
+# 选择新的 COMPOSE_PROJECT_NAME，设置匹配访问地址的 ZHIXU_V2_PUBLIC_ORIGIN。
 docker compose config --quiet
 docker compose pull
+docker compose run --rm --service-ports platform-v2 --initialize
+# 完成首次初始化和管理员设置后 Ctrl+C 停止，再正常启动：
 docker compose up -d --wait
 ```
 
-默认访问地址为 <http://127.0.0.1:5700>。数据卷挂载到 `/data`，实际 `DATA_DIR=/data/state`；备份卷挂载到 `/backup`。镜像使用 UID/GID `10001`，只读根文件系统且不需要 Docker socket 或特权模式。
+默认访问地址为 <http://127.0.0.1:5600>。默认配置保留 `v2-data`、`v2-backup`、`v2-scratch` 三个卷；应用数据根为 `/data/state`，备份根为 `/backup/state`，临时目录为 `/scratch/tmp`。容器以 UID/GID `10001` 运行，使用只读根文件系统。重启已有 v2 安装时保持原项目名和卷，不再次初始化。
 
-完整说明见 [Docker 部署文档](./docs/deploy/docker.md)。
+配置、受管 Runtime、备份与恢复步骤见 [Docker 部署文档](./docs/deploy/docker.md)。版本号不表示镜像已经发布，具体产物以实际 Release 为准。
 
-## 本地开发
+## 源码构建
 
-```bash
+```sh
 git clone https://github.com/anysoft/ZhiXu.git
 cd ZhiXu
 npm install -g pnpm@10.34.9
-pnpm install
-pnpm start
+pnpm install --frozen-lockfile
+pnpm build:v2
 ```
 
-打开 <http://127.0.0.1:5700>。
+使用默认 `Dockerfile` 构建发行镜像，部署参数参照上述 Compose 配置。
 
-## 项目状态
+## 发布与验收
 
-- 功能架构基线：[Platform 1.0 freeze](./docs/architecture/21-platform-1.0-freeze.md)
-- Linux 资格：[Phase 15](./PHASE15_REPORT.md)
-- 容器与发布工程：[Phase 16B](./PHASE16B_REPORT.md)
-- 品牌迁移与 RC：[Phase 17](./PHASE17_REPORT.md)
+- 当前发布流程：[v2 release workflow](./docs/release/01-release-process.md)
+- 发布范围：[v2 scope decision](./docs/architecture/v2/V2_RELEASE_SCOPE_DECISION.md)
+- 已有验收记录与安装限制：[v2 release readiness](./docs/architecture/v2/V2_RELEASE_READINESS.md)
+
+RC15 历史资格对应其封存产物，重新构建的镜像具有新的提交和产物身份。完整 CVE 与供应链审计作为后续专项处理，不代表已通过。
 
 ## 名称
 

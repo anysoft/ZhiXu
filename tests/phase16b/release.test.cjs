@@ -15,7 +15,7 @@ test('image boundaries keep secret sources out and native compilation target-spe
  const docker=fs.readFileSync('Dockerfile','utf8'),ignore=fs.readFileSync('.dockerignore','utf8'),compose=fs.readFileSync('compose.yaml','utf8');
  assert.doesNotMatch(docker,/BUILDPLATFORM|\/ql\/data|task\.sh|otask\.sh|crond|pm2|ARG.*(?:SECRET|TOKEN|PASSWORD)|COPY.*\.env/);
  assert.match(docker,/USER 10001:10001/);assert.match(docker,/--frozen-lockfile/);assert.match(ignore,/^\*\n/);assert.doesNotMatch(ignore,/!\.env/);
- assert.match(compose,/DATA_DIR: \/data\/state/);assert.match(compose,/read_only: true/);assert.doesNotMatch(compose,/privileged:|docker\.sock|network_mode: host|pid: host/);
+ assert.match(compose,/ZHIXU_V2_DATA_ROOT: \/data\/state/);assert.match(compose,/read_only: true/);assert.doesNotMatch(compose,/privileged:|docker\.sock|network_mode: host|pid: host/);
 });
 
 test('container gate rejects empty scanner output even with passing other receipts',()=>{

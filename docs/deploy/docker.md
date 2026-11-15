@@ -1,55 +1,62 @@
-# Docker deployment — ZhiXu 1.0 RC
+# Docker deployment — ZhiXu v2.0.0
 
-> This guide describes the historical 1.0/v9 deployment path. Its existing-volume upgrade instructions do **not** apply to v9→v2. For fresh-v2 use the [v2 release readiness guide](../architecture/v2/V2_RELEASE_READINESS.md), `compose.v2.example.yaml`, and new dedicated data volumes. v2 never automatically migrates or takes over v9 data; do not clear a v9 volume to upgrade.
-
-ZhiXu 1.0 RC packages the Git-native scheduling platform as a non-root, read-only-root container for Linux AMD64 and ARM64. The previous platform source at `505c0bac15b18e403ae59fabb2841caa4f53f367` passed native hosted qualification on both architectures. The Phase 17 branding commit must pass the same workflow before `v1.0.0-rc.6` is tagged or published.
-
-No public RC image has been published yet. Use only the image digest and release assets recorded in a completed ZhiXu GitHub Release.
+The default `Dockerfile` and `compose.yaml` run fresh-v2 on Linux AMD64 and ARM64. Install into a new project with dedicated data, backup and scratch volumes. Existing v9 data cannot be upgraded in place, automatically migrated or cleared to make v2 start. Use only an image recorded in a completed, verified release; the source version alone does not prove publication.
 
 ## Start from a verified release
 
-Download `compose.yaml` and `container.env.example` from the same verified release. Check `SHA256SUMS`, copy `container.env.example` to `.env`, set `DOCKERHUB_IMAGE` from `release-manifest.json`, and select the exact `PLATFORM_VERSION`. Then run:
+Work in a new deployment directory and retain any existing installation’s `.env`. Download `compose.yaml`, `container.env.example`, `release-manifest.json` and `SHA256SUMS` from the same release. Verify the downloaded files with `sha256sum --check SHA256SUMS` (macOS: `shasum -a 256 --check SHA256SUMS`). Then:
 
 ```sh
+cp container.env.example .env
+# Set ZHIXU_V2_IMAGE to image@manifest_digest from release-manifest.json.
+# Choose a new COMPOSE_PROJECT_NAME and set the exact ZHIXU_V2_PUBLIC_ORIGIN.
 docker compose config --quiet
 docker compose pull
+docker compose run --rm --service-ports platform-v2 --initialize
+```
+
+For a repository checkout, copy the root `.env.example` instead. Keep `.env` private and use the same file and project name for all subsequent commands. The shipped release template pins its image by digest. `ZHIXU_V2_PORT` controls the host port; if it changes, also update `ZHIXU_V2_PUBLIC_ORIGIN` to match the exact browser origin.
+
+Open <http://127.0.0.1:5600>, create the first administrator and log in. After initialization and owner setup, stop the foreground service with Ctrl+C, then start normally without `--initialize`:
+
+```sh
 docker compose up -d --wait
 docker compose ps
 ```
 
-Open <http://127.0.0.1:5700> and create the first administrator. The port is loopback-only by default. Use an authenticated TLS reverse proxy for remote access. Internal gRPC stays inside the container and is not published.
+Initialization is explicit and only intended for a fresh data root. The entrypoint rejects unknown nonempty roots. The default port binds only to localhost; remote access needs a correctly configured public origin and authenticated TLS reverse proxy.
 
 ## Storage and identity
 
 | Path | Responsibility |
 |---|---|
 | `/app` | Immutable application and production dependencies |
-| `/data` | Persistent named volume owned by UID/GID 10001 |
-| `/data/state` | `DATA_DIR`: database, repositories, worktrees, managed runtimes and environments |
-| `/data/state.platform-control` | Restore staging, journals and recovery control |
-| `/data/home` | Controlled Git/runtime home |
-| `/data/.platform-jwt` | Persisted private JWT signing secret, mode 0600 |
-| `/backup` | Separate persistent `BACKUP_DIR` volume |
-| `/tmp` | Temporary writable, executable `tmpfs` removed with the container |
+| `/data` | Persistent `v2-data` volume owned by UID/GID 10001 |
+| `/data/state` | Fresh-v2 database, Workspaces, runtimes, environments and execution data |
+| `/data/state.platform-control` | Restore staging, journals and recovery control; keep it with the data volume |
+| `/data/home` | Private application home |
+| `/backup/state` | Backup domain inside the separate `v2-backup` volume mounted at `/backup` |
+| `/scratch/tmp` | Temporary work in `v2-scratch`; physical capacity plus at least 2 GiB free is required |
+| `/tmp` | Private writable, executable tmpfs removed with the container |
 
-Restore atomically renames the live data directory, so the volume mounts at `/data` while `DATA_DIR` is `/data/state`. Run one active instance per data volume. Never share a live SQLite directory between replicas.
+Restore renames the data root, so mount its parent `/data`, not `/data/state`. Run one active service per data volume. Retain the existing `v2-data`, `v2-backup`, `v2-scratch` volume keys and the existing project name when restarting an established v2 installation. These keys deliberately differ from the retired v9 `data` and `backup` keys. Switching Compose files does not authorize deleting old containers or volumes.
 
-Keep `exec` in the `/tmp` tmpfs mount options. Git authentication creates private, executable `GIT_ASKPASS` helpers there; `noexec` blocks HTTPS token authentication and SSH passphrase prompts even when public repository access succeeds. Retain `nosuid,nodev,mode=1777` and the non-root container identity.
+Named volumes inherit UID/GID 10001 ownership from the image. Prepare that ownership yourself for bind mounts; startup does not recursively change user data. Keep the service non-root, read-only root filesystem, dropped capabilities, `no-new-privileges` and private executable temporary mounts. A Docker socket, privileged mode and host networking are unnecessary.
 
-Named volumes inherit the image's non-root ownership. Prepare UID/GID 10001 access for administrator-provided bind mounts. Startup deliberately avoids recursively changing ownership of user data. The platform runs as `10001:10001`, drops all capabilities, enables `no-new-privileges`, and uses a read-only root filesystem. It does not require a Docker socket, privileged mode, host PID, or host networking.
+## Managed runtimes
 
-## Managed tasks
+The application Node runs the platform; Shell tasks work with the base Compose configuration. Managed Python/Node installation requires explicit verified artifact settings and mounts. Configure `ZHIXU_V2_RUNTIME_ARTIFACT_MODE`, `ZHIXU_V2_RUNTIME_ARTIFACT_STORE`, `ZHIXU_V2_RUNTIME_ARTIFACT_TRUST_ANCHOR` and `ZHIXU_V2_RUNTIME_ARTIFACT_MANIFEST` in a Compose override, with the protected trust anchor, correct platform package and private writable store. Adding these values only to `.env` does not inject them into the service.
 
-The application Node runtime runs the platform only. Tasks use explicitly installed Managed Runtimes and built Dependency Environments. Install a provider/runtime, create and build an environment, bind it to a Task, and verify readiness before execution. Host runtimes are deliberately fail-closed.
+See the [verified runtime installation guide](../architecture/v2/S5R_OFFLINE_RUNTIME_GUIDE.md) and [runtime configuration details](../architecture/v2/V2_RELEASE_READINESS.md#managed-runtime). Bind the installed runtime and built environment to the Task and check readiness before execution. Host runtimes do not substitute for verified managed runtimes.
 
-## Stop, upgrade and recover
+## Stop, backup and restore
 
-Use `docker compose stop` and allow the 30-second grace period before maintenance. Before an upgrade, create a platform backup and encrypted portable export, copy it outside the Docker host, and store its passphrase separately. A backup volume alone does not protect against host loss. Do not run `docker compose down --volumes` unless permanent data deletion is intended.
+Use `docker compose stop` and allow the 30-second grace period before maintenance. Create a full backup through the application, export it encrypted, verify it and copy it outside the Docker host; store the passphrase separately. The backup volume alone does not protect against host loss.
 
-For upgrades, stop the service, retain the backup/export, pull the exact qualified version, and start against the existing volumes. Arbitrary downgrade is not guaranteed; restore a verified compatible backup into a separate installation when rollback is required.
+Restore through the application's import, validation/preview and confirmation flow. Restart normally, verify recovery is complete, then rebuild the physical managed runtimes and environments before executing tasks. Keep the data root and its control domain together. Do not delete volumes or overwrite the only copy of source files to recover.
 
-Portable restore imports logical runtime/environment records but excludes physical runtime installations. After restore and restart, rebuild runtimes and environments before executing tasks.
+There is no v9-to-v2 upgrade path. Future v2 upgrades require an explicitly compatible schema and a verified backup. Arbitrary downgrade is not guaranteed; restore a compatible backup into a separate installation for rollback.
 
-## Verification and platforms
+## Release checks
 
-The supported RC matrix is native `linux/amd64` and `linux/arm64`. Each release SHA must pass the hosted Container Qualification workflow before multi-architecture publication. `HEALTHCHECK` calls `/api/health`; initial startup may take up to the configured health start period.
+The release workflow validates the repository's default Compose configuration and the exact Compose/environment assets attached to the release. Native AMD64/ARM64 image checks cover explicit initialization, the v2 system endpoint and frontend, owner login, real Shell execution and persisted state after restart. `HEALTHCHECK` reads `/api/system` and validates the fresh-v2 schema identity. Full CVE clearance remains deferred under the [accepted release scope](../architecture/v2/V2_RELEASE_SCOPE_DECISION.md).

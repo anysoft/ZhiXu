@@ -22,7 +22,7 @@ Each architecture must pass a fresh-v2 container smoke: explicit initialization,
 
 The publish job downloads both receipts and OCI archives from the same run and SHA. Existing receipt selection protects retries against expired or ambiguous artifacts. `skopeo --all --preserve-digests` promotes the qualified archives without rebuilding; registry verification checks platform/attestation digests and tag aliases. A final AMD64 smoke pulls the verified immutable multiarchitecture digest.
 
-GitHub Release assets contain fresh-v2 Compose/environment examples, source/image identity, per-architecture SBOM/provenance and gate receipts, the published-image smoke receipt, release notes and SHA256SUMS. The workflow downloads the published assets and verifies checksums after creation. New builds carry the new tagged SHA; historical RC15 evidence is not their artifact identity.
+GitHub Release assets contain the default fresh-v2 `compose.yaml` and its environment template, source/image identity, per-architecture SBOM/provenance and gate receipts, the published-image smoke receipt, release notes and SHA256SUMS. Qualification validates the default Compose configuration; publication validates the generated Compose/environment assets before creating the release. The workflow downloads the published assets and verifies checksums after creation. New builds carry the new tagged SHA; historical RC15 evidence is not their artifact identity.
 
 ## Triggering a release
 

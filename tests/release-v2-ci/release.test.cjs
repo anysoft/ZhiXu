@@ -69,7 +69,7 @@ test('assets describe fresh-only v2, include published smoke and checksum every 
   const notes = fs.readFileSync(out + '/release-notes.md', 'utf8');
   assert.match(notes, /Fresh-v2 installation only/); assert.match(notes, /deferred/);
   assert.doesNotMatch(notes, /Schema v9|Use ZhiXu Backup\/Export before upgrades/);
-  assert.match(fs.readFileSync(out + '/compose.yaml', 'utf8'), /ZHIXU_V2_DATA_ROOT/);
+  assert.equal(fs.readFileSync(out + '/compose.yaml', 'utf8'), fs.readFileSync('compose.yaml', 'utf8'));
   assert.match(fs.readFileSync(out + '/container.env.example', 'utf8'), new RegExp('anysoft/zhixu@' + digest));
   const checked = [];
   for (const line of fs.readFileSync(out + '/SHA256SUMS', 'utf8').trim().split('\n')) {

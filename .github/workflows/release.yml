@@ -97,6 +97,8 @@ jobs:
           node scripts/release-v2-ci/smoke.cjs
       - name: Create checksummed release assets
         run: node scripts/release-v2-ci/receipts.cjs assets
+      - name: Validate published Compose and environment assets
+        run: docker compose --env-file release-output/container.env.example -f release-output/compose.yaml config --quiet
       - name: Create GitHub Release
         run: |
           prerelease=()

@@ -54,14 +54,14 @@
 
 1. 从受控审核包取得本机架构的上述 **Docker格式归档**，校验Hash后 `docker load --input "$ZHIXU_V2_DOCKER_ARCHIVE"`。该变量指已取得的实际文件；OCI格式归档不要当作Docker格式文件混用。
 2. 在专属env文件中设置 `ZHIXU_V2_IMAGE` 为load输出的本地tag/ID、`ZHIXU_V2_PUBLIC_ORIGIN=http://127.0.0.1:5600`。使用从未承载旧数据的新Compose项目名；不复用v9的env、项目名、data卷或备份目标。
-3. 在仓库根目录使用[专用v2示例](../../../compose.v2.example.yaml)，例如：
+3. 在仓库根目录使用[默认 Compose 配置](../../../compose.yaml)，例如：
 
 ```sh
 # /path/to/v2.env与项目名由安装管理员选择；其中须配置上述两个变量。
-docker compose --env-file /path/to/v2.env -p zhixu-v2-fresh -f compose.v2.example.yaml config --quiet
-docker compose --env-file /path/to/v2.env -p zhixu-v2-fresh -f compose.v2.example.yaml run --rm --service-ports platform-v2 --initialize
+docker compose --env-file /path/to/v2.env -p zhixu-v2-fresh -f compose.yaml config --quiet
+docker compose --env-file /path/to/v2.env -p zhixu-v2-fresh -f compose.yaml run --rm --service-ports platform-v2 --initialize
 # 首次初始化正常就绪后Ctrl+C停止前台实例，再常规启动同一新项目：
-docker compose --env-file /path/to/v2.env -p zhixu-v2-fresh -f compose.v2.example.yaml up -d --pull never
+docker compose --env-file /path/to/v2.env -p zhixu-v2-fresh -f compose.yaml up -d --pull missing
 ```
 
 打开 <http://127.0.0.1:5600> 创建管理员并登录。容器为UID/GID10001、只读rootfs、drop ALL capabilities；只对可信管理员开放脚本管理入口。远程访问使用匹配public origin的认证/TLS入口。

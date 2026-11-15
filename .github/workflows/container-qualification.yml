@@ -38,6 +38,8 @@ jobs:
       - uses: docker/setup-buildx-action@v4
       - name: Install archive promotion tool
         run: sudo apt-get update && sudo apt-get install -y --no-install-recommends skopeo
+      - name: Validate default fresh-v2 Compose configuration
+        run: docker compose --env-file docs/deploy/container.env.example -f compose.yaml config --quiet
       - name: Validate release harness
         run: node --test tests/release-v2-ci/*.test.cjs
       - name: Build target-native OCI image with SBOM and provenance
