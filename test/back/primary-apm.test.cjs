@@ -1,3 +1,4 @@
+const path = require('node:path');
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const vm = require('node:vm');
@@ -12,7 +13,7 @@ test('container APM policy keeps worker isolation and can restore all inherited 
     const env={QL_CONTAINER:'true',QL_PRIMARY_APM:primary,QL_WORKER_APM:workers};
     const conf=config(env);env.pm_id='0';env.pmx=String(conf.pmx);
     const calls=[],module={exports:{}};
-    vm.runInNewContext(compiled,{module,exports:module.exports,process:{env},require(name){if(name==='cluster')return {fork(options){calls.push({...env,...options});return {id:1,process:{pid:123}}}};if(name==='express')return ()=>({use(){}});return {};}});
+    vm.runInNewContext(compiled,{module,exports:module.exports,__dirname:path.resolve("back"),__filename:path.resolve("back/app.js"),process:{env},require(name){if(name==='./shared/v9IdentityGuard')return {assertV9StartupIdentity(directory){assert.equal(directory,path.resolve("back"));}};if(name==='cluster')return {fork(options){calls.push({...env,...options});return {id:1,process:{pid:123}}}};if(name==='express')return ()=>({use(){}});return {};}});
     new module.exports().forkWorker('http');
     assert.equal(conf.pmx,primary==='true');
     assert.equal(calls[0].pmx,primary==='true'&&workers==='true'?'true':'false');

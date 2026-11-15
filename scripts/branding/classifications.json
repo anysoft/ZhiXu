@@ -27273,5 +27273,355 @@
     "classification": "TEST_FIXTURE_REVIEW",
     "action": "KEEP",
     "reason": "Credential browser acceptance harness uses the existing internal environment variables to isolate fresh fixture data, select the test browser runtime, and save sanitized evidence; no user-visible brand or compatibility behavior."
+  },
+  "eba47a45d9e1a7e9b7941ce29d00aa0a0d8237fd99b4da5a97cb8c95fb905fd2": {
+    "classification": "INTERNAL_IDENTITY_KEEP",
+    "action": "KEEP",
+    "reason": "CLI bootstrap retains legacy environment keys solely to isolate retained loaders from the v2 data root; not a displayed product name."
+  },
+  "091571412e1d0542b7489b112d100f9dc24dcb7a1c38d5b23fff1743ab9ffa88": {
+    "classification": "INTERNAL_IDENTITY_KEEP",
+    "action": "KEEP",
+    "reason": "CLI bootstrap retains legacy environment keys solely to isolate retained loaders from the v2 data root; not a displayed product name."
+  },
+  "b2ae668016050f037a32748084749f8ba5dfb6372e38fe0cc9f4b4c2f0eea569": {
+    "classification": "INTERNAL_IDENTITY_KEEP",
+    "action": "KEEP",
+    "reason": "CLI bootstrap retains legacy environment keys solely to isolate retained loaders from the v2 data root; not a displayed product name."
+  },
+  "c273cea5d52c691dc584dfc172387f0263f46121db4421a295f57436d63406d6": {
+    "classification": "INTERNAL_IDENTITY_KEEP",
+    "action": "KEEP",
+    "reason": "Rejects overlap with a legacy data root using its existing environment key; preserving data isolation."
+  },
+  "87789267c489de852a38f417e80fbce728264bd073e8a836ed201feba84a3cdf": {
+    "classification": "INTERNAL_IDENTITY_KEEP",
+    "action": "KEEP",
+    "reason": "Retained HTTP log pagination header name consumed as a wire protocol identifier; not UI branding."
+  },
+  "875e627cee31b2dbff9fdd44e6e03a4066fe9933eb3d7d5914ea5bc0a9b6c128": {
+    "classification": "INTERNAL_IDENTITY_KEEP",
+    "action": "KEEP",
+    "reason": "Retained HTTP log pagination header name consumed as a wire protocol identifier; not UI branding."
+  },
+  "b943d61feeacbfe72326e9136a897e579e4a8317748b82d5052508d2060c4e86": {
+    "classification": "INTERNAL_IDENTITY_KEEP",
+    "action": "KEEP",
+    "reason": "Existing v9 startup guard/probe environment keys identify the protected v9 root and isolated schema clone; do not rename these protection inputs."
+  },
+  "f2b745623ad859725ba333b5ecc3c236692fb9eab6b87505303083be967086e7": {
+    "classification": "INTERNAL_IDENTITY_KEEP",
+    "action": "KEEP",
+    "reason": "Existing v9 startup guard/probe environment keys identify the protected v9 root and isolated schema clone; do not rename these protection inputs."
+  },
+  "8fe2945cd4a1e69d554a30f13ea8d0a5e8984b7376642e64fe4dd16101638e72": {
+    "classification": "INTERNAL_IDENTITY_KEEP",
+    "action": "KEEP",
+    "reason": "Existing v9 startup guard/probe environment keys identify the protected v9 root and isolated schema clone; do not rename these protection inputs."
+  },
+  "354bc7619c60bec53038485365ac2b8137e1f9e12f90dbf52cc3795c74a1f167": {
+    "classification": "INTERNAL_IDENTITY_KEEP",
+    "action": "KEEP",
+    "reason": "Existing v9 startup guard/probe environment keys identify the protected v9 root and isolated schema clone; do not rename these protection inputs."
+  },
+  "2bda488a5badc82a0ca1726cfcab378f2bb9f7b2a862aa5aab95096e75849d4e": {
+    "classification": "INTERNAL_IDENTITY_KEEP",
+    "action": "KEEP",
+    "reason": "Existing v9 startup guard/probe environment keys identify the protected v9 root and isolated schema clone; do not rename these protection inputs."
+  },
+  "a6157079b8236a811f0719dfc9f06592e519790e8959b77a14b120692dfc03cd": {
+    "classification": "INTERNAL_IDENTITY_KEEP",
+    "action": "KEEP",
+    "reason": "Requires the probe process environment and working directory to match its private clone before schema access."
+  },
+  "4ac45fddf5526686b777b951a9f372e0dcd35dca07434e44dcc4d34c8a7067e8": {
+    "classification": "HISTORICAL_EVIDENCE_KEEP",
+    "action": "KEEP",
+    "reason": "Architecture assessment/contract reference in docs/architecture/v2/ASSESSMENT_REPORT.md records upstream lineage, retained identifiers or explicit rejection of legacy migration; not current product branding."
+  },
+  "75c499898a5fc622d92a83ac7b2d3060526ed6d8d4696342847e863e9e816e42": {
+    "classification": "HISTORICAL_EVIDENCE_KEEP",
+    "action": "KEEP",
+    "reason": "Architecture assessment/contract reference in docs/architecture/v2/CURRENT_ARCHITECTURE.md records upstream lineage, retained identifiers or explicit rejection of legacy migration; not current product branding."
+  },
+  "46f1dc2e1b593483b2aa70957407f355e9a0fd36aabf61a55d9ef11ab7779d03": {
+    "classification": "HISTORICAL_EVIDENCE_KEEP",
+    "action": "KEEP",
+    "reason": "Architecture assessment/contract reference in docs/architecture/v2/ENTITY_MAPPING.md records upstream lineage, retained identifiers or explicit rejection of legacy migration; not current product branding."
+  },
+  "e1270ba3fe292f5dceea1a19ab0098bb49435b785bfd7351a5bfbbd98009d8b5": {
+    "classification": "HISTORICAL_EVIDENCE_KEEP",
+    "action": "KEEP",
+    "reason": "Architecture assessment/contract reference in docs/architecture/v2/FILE_IMPACT_INVENTORY.md records upstream lineage, retained identifiers or explicit rejection of legacy migration; not current product branding."
+  },
+  "9e0cfdc9af29a208f19675d3451679de0038059d08d0559d9590a061ba8355f9": {
+    "classification": "HISTORICAL_EVIDENCE_KEEP",
+    "action": "KEEP",
+    "reason": "Architecture assessment/contract reference in docs/architecture/v2/FILE_IMPACT_INVENTORY.md records upstream lineage, retained identifiers or explicit rejection of legacy migration; not current product branding."
+  },
+  "aebdff63d16a69822a563bdbcd3676044a32725e0e012919849bb770b33b17a9": {
+    "classification": "HISTORICAL_EVIDENCE_KEEP",
+    "action": "KEEP",
+    "reason": "Architecture assessment/contract reference in docs/architecture/v2/FILE_IMPACT_INVENTORY.md records upstream lineage, retained identifiers or explicit rejection of legacy migration; not current product branding."
+  },
+  "44e16514c457ab8bc4f6566864fb5df4f0655b0507baf701a6472bf3e1f69d34": {
+    "classification": "HISTORICAL_EVIDENCE_KEEP",
+    "action": "KEEP",
+    "reason": "Architecture assessment/contract reference in docs/architecture/v2/FILE_IMPACT_INVENTORY.md records upstream lineage, retained identifiers or explicit rejection of legacy migration; not current product branding."
+  },
+  "9c334d0fa4c8a68ca315d129e2f8b76c5ef53c4b95d6a52745799855efd1ee25": {
+    "classification": "HISTORICAL_EVIDENCE_KEEP",
+    "action": "KEEP",
+    "reason": "Architecture assessment/contract reference in docs/architecture/v2/FILE_IMPACT_INVENTORY.md records upstream lineage, retained identifiers or explicit rejection of legacy migration; not current product branding."
+  },
+  "6352d01ea5b190b53454a9808431f5728adb22cafc47b251db5cb931c5c5f0ea": {
+    "classification": "HISTORICAL_EVIDENCE_KEEP",
+    "action": "KEEP",
+    "reason": "Architecture assessment/contract reference in docs/architecture/v2/FILE_IMPACT_INVENTORY.md records upstream lineage, retained identifiers or explicit rejection of legacy migration; not current product branding."
+  },
+  "0e1797adda6c7ff2a88e4908569c78c171b11fcfcae864b7cf06c302c50f49a6": {
+    "classification": "HISTORICAL_EVIDENCE_KEEP",
+    "action": "KEEP",
+    "reason": "Architecture assessment/contract reference in docs/architecture/v2/FILE_IMPACT_INVENTORY.md records upstream lineage, retained identifiers or explicit rejection of legacy migration; not current product branding."
+  },
+  "b65d8b3dc52cdf0f8dfdeb0f2498e7136a7e465907b5d6003011be2aa72fc7f5": {
+    "classification": "HISTORICAL_EVIDENCE_KEEP",
+    "action": "KEEP",
+    "reason": "Architecture assessment/contract reference in docs/architecture/v2/FILE_IMPACT_INVENTORY.md records upstream lineage, retained identifiers or explicit rejection of legacy migration; not current product branding."
+  },
+  "9dee1c16b56f6b0c412229fd66cf8960ccd461f4d1f70eecccc00ac20171f686": {
+    "classification": "HISTORICAL_EVIDENCE_KEEP",
+    "action": "KEEP",
+    "reason": "Architecture assessment/contract reference in docs/architecture/v2/FILE_IMPACT_INVENTORY.md records upstream lineage, retained identifiers or explicit rejection of legacy migration; not current product branding."
+  },
+  "9a00531a4a3955224cdc3c23fe78c9b4d98aa6aa19c087b9f46a844e3361fd55": {
+    "classification": "HISTORICAL_EVIDENCE_KEEP",
+    "action": "KEEP",
+    "reason": "Architecture assessment/contract reference in docs/architecture/v2/FILE_IMPACT_INVENTORY.md records upstream lineage, retained identifiers or explicit rejection of legacy migration; not current product branding."
+  },
+  "fda5dd151440bf8ef00c7360e41ad928a143305e3e01e4d38f14f01fb009715b": {
+    "classification": "HISTORICAL_EVIDENCE_KEEP",
+    "action": "KEEP",
+    "reason": "Architecture assessment/contract reference in docs/architecture/v2/FILE_IMPACT_INVENTORY.md records upstream lineage, retained identifiers or explicit rejection of legacy migration; not current product branding."
+  },
+  "c36f5eb0ca9780bef09de7eb204f628f63e7a15b5c2fbc7c30a8a61e8d4991ff": {
+    "classification": "HISTORICAL_EVIDENCE_KEEP",
+    "action": "KEEP",
+    "reason": "Architecture assessment/contract reference in docs/architecture/v2/FILE_IMPACT_INVENTORY.md records upstream lineage, retained identifiers or explicit rejection of legacy migration; not current product branding."
+  },
+  "df2e14f0fc3b9c84b734220b4f95f54e7649110f0892c97e8f35c36f125a0bff": {
+    "classification": "HISTORICAL_EVIDENCE_KEEP",
+    "action": "KEEP",
+    "reason": "Architecture assessment/contract reference in docs/architecture/v2/FILE_IMPACT_INVENTORY.md records upstream lineage, retained identifiers or explicit rejection of legacy migration; not current product branding."
+  },
+  "e72682335d18370d1fd01f08be5d69e4980fb506f7c602445c1aa6c8cabc355e": {
+    "classification": "HISTORICAL_EVIDENCE_KEEP",
+    "action": "KEEP",
+    "reason": "Architecture assessment/contract reference in docs/architecture/v2/FILE_IMPACT_INVENTORY.md records upstream lineage, retained identifiers or explicit rejection of legacy migration; not current product branding."
+  },
+  "431e18c5bbd5ed08f356bcbecea410fd590c175f4eb7d1cfcdbaacf1153df71a": {
+    "classification": "HISTORICAL_EVIDENCE_KEEP",
+    "action": "KEEP",
+    "reason": "Architecture assessment/contract reference in docs/architecture/v2/FILE_IMPACT_INVENTORY.md records upstream lineage, retained identifiers or explicit rejection of legacy migration; not current product branding."
+  },
+  "a362d383328367cc59d04d6d6243d3827e46ef1e4c100ab619eabb6c3e631500": {
+    "classification": "HISTORICAL_EVIDENCE_KEEP",
+    "action": "KEEP",
+    "reason": "Architecture assessment/contract reference in docs/architecture/v2/FILE_IMPACT_INVENTORY.md records upstream lineage, retained identifiers or explicit rejection of legacy migration; not current product branding."
+  },
+  "ba37725e4927dddcb2d8ab785c80cdeb804a4ffc9047419314332dff0ffeab7d": {
+    "classification": "HISTORICAL_EVIDENCE_KEEP",
+    "action": "KEEP",
+    "reason": "Architecture assessment/contract reference in docs/architecture/v2/FILE_IMPACT_INVENTORY.md records upstream lineage, retained identifiers or explicit rejection of legacy migration; not current product branding."
+  },
+  "efa5c041aa02e43dda1badfba691bbea345e8fdf36e09510f8eca9eeddcf8e2f": {
+    "classification": "HISTORICAL_EVIDENCE_KEEP",
+    "action": "KEEP",
+    "reason": "Architecture assessment/contract reference in docs/architecture/v2/FILE_IMPACT_INVENTORY.md records upstream lineage, retained identifiers or explicit rejection of legacy migration; not current product branding."
+  },
+  "f71c726a42c87b70a5711a11296da8592bacb21aade0f40d50fd0d76c28c5d15": {
+    "classification": "HISTORICAL_EVIDENCE_KEEP",
+    "action": "KEEP",
+    "reason": "Architecture assessment/contract reference in docs/architecture/v2/FILE_IMPACT_INVENTORY.md records upstream lineage, retained identifiers or explicit rejection of legacy migration; not current product branding."
+  },
+  "3d94e4583dfc279daaa76f8518a907320eeb5d75e34b32e1e66d2d44d1591f1c": {
+    "classification": "HISTORICAL_EVIDENCE_KEEP",
+    "action": "KEEP",
+    "reason": "Architecture assessment/contract reference in docs/architecture/v2/FILE_IMPACT_INVENTORY.md records upstream lineage, retained identifiers or explicit rejection of legacy migration; not current product branding."
+  },
+  "116c9cbf09a73dbfee65a715bc955722cb9ce11784b869766a923696471bd9ec": {
+    "classification": "HISTORICAL_EVIDENCE_KEEP",
+    "action": "KEEP",
+    "reason": "Architecture assessment/contract reference in docs/architecture/v2/FILE_IMPACT_INVENTORY.md records upstream lineage, retained identifiers or explicit rejection of legacy migration; not current product branding."
+  },
+  "cfba67f1c13d95ddc6e48db4995349fde74df6cb27cd1d34269dabdbdd89df22": {
+    "classification": "HISTORICAL_EVIDENCE_KEEP",
+    "action": "KEEP",
+    "reason": "Architecture assessment/contract reference in docs/architecture/v2/FILE_IMPACT_INVENTORY.md records upstream lineage, retained identifiers or explicit rejection of legacy migration; not current product branding."
+  },
+  "7ee69573aa392cb213d7684aa4b146b5f12e3ee7317151772c64c1c1f5da618d": {
+    "classification": "HISTORICAL_EVIDENCE_KEEP",
+    "action": "KEEP",
+    "reason": "Architecture assessment/contract reference in docs/architecture/v2/IMPLEMENTATION_ROADMAP.md records upstream lineage, retained identifiers or explicit rejection of legacy migration; not current product branding."
+  },
+  "ef67663e97fc2f50d702d5954eb48cd2404b2adf2a4f48b863b60ed6e1e0242d": {
+    "classification": "HISTORICAL_EVIDENCE_KEEP",
+    "action": "KEEP",
+    "reason": "Architecture assessment/contract reference in docs/architecture/v2/REVIEW_VALIDATION.md records upstream lineage, retained identifiers or explicit rejection of legacy migration; not current product branding."
+  },
+  "4220d871a97f619fd40a47b7953e2cbc98674172ac4145a9adb0bd7d05792cb0": {
+    "classification": "HISTORICAL_EVIDENCE_KEEP",
+    "action": "KEEP",
+    "reason": "Architecture assessment/contract reference in docs/architecture/v2/S0_TECHNICAL_CONTRACT.md records upstream lineage, retained identifiers or explicit rejection of legacy migration; not current product branding."
+  },
+  "0d9f14df87c5eb8e653d65705039860ec5141cf1e79efed99da7caa544f2eeda": {
+    "classification": "HISTORICAL_EVIDENCE_KEEP",
+    "action": "KEEP",
+    "reason": "Architecture assessment/contract reference in docs/architecture/v2/S4_IMPLEMENTATION_REPORT.md records upstream lineage, retained identifiers or explicit rejection of legacy migration; not current product branding."
+  },
+  "7a0d49444349d39059edadbe59b1b46469494ed0f3348bd900b15817e8956013": {
+    "classification": "HISTORICAL_EVIDENCE_KEEP",
+    "action": "KEEP",
+    "reason": "Architecture assessment/contract reference in docs/architecture/v2/SUBSCRIPTION_SYNC_DESIGN.md records upstream lineage, retained identifiers or explicit rejection of legacy migration; not current product branding."
+  },
+  "190af15236090c736802dae507a0b2eebd25332d3fa27c6eecbca5d2dcf2905b": {
+    "classification": "HISTORICAL_EVIDENCE_KEEP",
+    "action": "KEEP",
+    "reason": "Architecture assessment/contract reference in docs/architecture/v2/TARGET_ARCHITECTURE.md records upstream lineage, retained identifiers or explicit rejection of legacy migration; not current product branding."
+  },
+  "79fb71a6f873321f92c861b8f455f5c88b35a7011ca4ef5c064a06a7f81b630d": {
+    "classification": "INTERNAL_IDENTITY_KEEP",
+    "action": "KEEP",
+    "reason": "Retained loader project-root environment key; filesystem bootstrap identity, not product display."
+  },
+  "254d8ceb6495acfaed3dbc09cbcf3bb5be48de368c7d560f29661c8a833e55cd": {
+    "classification": "TEST_FIXTURE_REVIEW",
+    "action": "KEEP",
+    "reason": "Recorded isolated test environment/root/protocol assertion in tests/workspace-v2/run.cjs; retain exact legacy identifier to test rejection or isolation, not a product label."
+  },
+  "53d1bc0e2023e7e9194868098ef732d4c1139712fc6f7903d07cefecb2e5a560": {
+    "classification": "TEST_FIXTURE_REVIEW",
+    "action": "KEEP",
+    "reason": "Recorded isolated test environment/root/protocol assertion in tests/workspace-v2/run.cjs; retain exact legacy identifier to test rejection or isolation, not a product label."
+  },
+  "84dda67a6ca904e63a135be24f37c25fcfe2c196de87234d5b4d4f141adf44e1": {
+    "classification": "TEST_FIXTURE_REVIEW",
+    "action": "KEEP",
+    "reason": "Recorded isolated test environment/root/protocol assertion in tests/workspace-v2/s1b/full-disaster-worker.cjs; retain exact legacy identifier to test rejection or isolation, not a product label."
+  },
+  "e8b998b52569f6496c9c5c5e6a5d5be0e5e0a277aedfb57abd1d6c63278a082c": {
+    "classification": "TEST_FIXTURE_REVIEW",
+    "action": "KEEP",
+    "reason": "Recorded isolated test environment/root/protocol assertion in tests/workspace-v2/s1b/full-disaster-worker.cjs; retain exact legacy identifier to test rejection or isolation, not a product label."
+  },
+  "39f065e29107a0b189715dd96e20fc5ced0e0b12581b1a1e046d4e84eae0dd12": {
+    "classification": "TEST_FIXTURE_REVIEW",
+    "action": "KEEP",
+    "reason": "Recorded isolated test environment/root/protocol assertion in tests/workspace-v2/s1b/run.cjs; retain exact legacy identifier to test rejection or isolation, not a product label."
+  },
+  "b064fb876b574abb1b5c29298ed4ccf35f19057ff790c237d8626dd570900d9d": {
+    "classification": "TEST_FIXTURE_REVIEW",
+    "action": "KEEP",
+    "reason": "Recorded isolated test environment/root/protocol assertion in tests/workspace-v2/s1b/run.cjs; retain exact legacy identifier to test rejection or isolation, not a product label."
+  },
+  "5f570bd63043dbfe1217c7a69acb952de43a10c5f6920f9f5457082aa46c3c99": {
+    "classification": "TEST_FIXTURE_REVIEW",
+    "action": "KEEP",
+    "reason": "Recorded isolated test environment/root/protocol assertion in tests/workspace-v2/s2-runtime-fixture.cjs; retain exact legacy identifier to test rejection or isolation, not a product label."
+  },
+  "d64c67603e89ca3426e30f29e94f6ffca282184da14d951f0a27377c443e1cfd": {
+    "classification": "HISTORICAL_EVIDENCE_KEEP",
+    "action": "KEEP",
+    "reason": "Recorded isolated test environment/root/protocol assertion in tests/workspace-v2/s3-validation-results.json; retain exact legacy identifier to test rejection or isolation, not a product label."
+  },
+  "07b211ea687c32bb3309ad2192fa2763038c2576e62e4431c2200415ccb5b312": {
+    "classification": "HISTORICAL_EVIDENCE_KEEP",
+    "action": "KEEP",
+    "reason": "Recorded isolated test environment/root/protocol assertion in tests/workspace-v2/s3-validation-results.json; retain exact legacy identifier to test rejection or isolation, not a product label."
+  },
+  "7ef15869ba010a2163fe2535e53e8c482d1d68a44df529b104c3b081c48239d4": {
+    "classification": "HISTORICAL_EVIDENCE_KEEP",
+    "action": "KEEP",
+    "reason": "Recorded isolated test environment/root/protocol assertion in tests/workspace-v2/s4-validation-results.json; retain exact legacy identifier to test rejection or isolation, not a product label."
+  },
+  "de0932e9e53152c193b6344ba2c8b2862fa0322df90e66b944500b610c64a373": {
+    "classification": "HISTORICAL_EVIDENCE_KEEP",
+    "action": "KEEP",
+    "reason": "Recorded isolated test environment/root/protocol assertion in tests/workspace-v2/s4-validation-results.json; retain exact legacy identifier to test rejection or isolation, not a product label."
+  },
+  "860e64fdaf33c17fd73acd845afbd3788913078515eb928e78260e64cf52d81c": {
+    "classification": "TEST_FIXTURE_REVIEW",
+    "action": "KEEP",
+    "reason": "Recorded isolated test environment/root/protocol assertion in tests/workspace-v2/s4/architecture-boundaries.test.cjs; retain exact legacy identifier to test rejection or isolation, not a product label."
+  },
+  "5e8504edef1c25acfa0390718e4a532b4e98fd0360a731b08e24c80a9bb44a64": {
+    "classification": "TEST_FIXTURE_REVIEW",
+    "action": "KEEP",
+    "reason": "Recorded isolated test environment/root/protocol assertion in tests/workspace-v2/s4/cli-support.cjs; retain exact legacy identifier to test rejection or isolation, not a product label."
+  },
+  "7a1113deff6c560b8a5419c9668c8c23cc235f148a061e88d213077c420f33f4": {
+    "classification": "TEST_FIXTURE_REVIEW",
+    "action": "KEEP",
+    "reason": "Recorded isolated test environment/root/protocol assertion in tests/workspace-v2/s4/notification-pure.test.cjs; retain exact legacy identifier to test rejection or isolation, not a product label."
+  },
+  "826e6c0d79e1a9de76d9593242803dbfe31cce9c085cb4a25bd281dcef979039": {
+    "classification": "TEST_FIXTURE_REVIEW",
+    "action": "KEEP",
+    "reason": "Recorded isolated test environment/root/protocol assertion in tests/workspace-v2/s4/reverse-schema-identity-worker.cjs; retain exact legacy identifier to test rejection or isolation, not a product label."
+  },
+  "f951178dd1201813d0a9360c8130a181f36bced6db331fd360dbf283224b52c4": {
+    "classification": "TEST_FIXTURE_REVIEW",
+    "action": "KEEP",
+    "reason": "Recorded isolated test environment/root/protocol assertion in tests/workspace-v2/s4/reverse-schema-identity.test.cjs; retain exact legacy identifier to test rejection or isolation, not a product label."
+  },
+  "374f02152b8e7c5cb7c288d13d7a675e5562f393619e6e932615065034a63aab": {
+    "classification": "TEST_FIXTURE_REVIEW",
+    "action": "KEEP",
+    "reason": "Recorded isolated test environment/root/protocol assertion in tests/workspace-v2/s5/artifact-support.cjs; retain exact legacy identifier to test rejection or isolation, not a product label."
+  },
+  "d88fa52e4586877c69416879f8397051bf784f04066773aacf33f88eb1f50aed": {
+    "classification": "TEST_FIXTURE_REVIEW",
+    "action": "KEEP",
+    "reason": "Recorded isolated test environment/root/protocol assertion in tests/workspace-v2/s5/artifact-support.cjs; retain exact legacy identifier to test rejection or isolation, not a product label."
+  },
+  "a5de7f6218a09f6e77cf18dadd9007f5ffcda59697a390526c312bfe0ec2423d": {
+    "classification": "TEST_FIXTURE_REVIEW",
+    "action": "KEEP",
+    "reason": "Recorded isolated test environment/root/protocol assertion in tests/workspace-v2/s5/artifact-support.cjs; retain exact legacy identifier to test rejection or isolation, not a product label."
+  },
+  "ed29d85f7651e34af866cd0e25e0bf659f4129ea663c0adbcd8307b7a0c1675b": {
+    "classification": "TEST_FIXTURE_REVIEW",
+    "action": "KEEP",
+    "reason": "Recorded isolated test environment/root/protocol assertion in tests/workspace-v2/s5/linux-disaster-worker.cjs; retain exact legacy identifier to test rejection or isolation, not a product label."
+  },
+  "98dcbe2f536ca3d6f2c0fd364db1a4bc79f592ceb22e6d98955186cb36017ec2": {
+    "classification": "TEST_FIXTURE_REVIEW",
+    "action": "KEEP",
+    "reason": "Recorded isolated test environment/root/protocol assertion in tests/workspace-v2/s5/linux-disaster-worker.cjs; retain exact legacy identifier to test rejection or isolation, not a product label."
+  },
+  "933368b6578ecabd0b5b6c5c0722943f203eade048bb3139a79e9da56536bc2b": {
+    "classification": "TEST_FIXTURE_REVIEW",
+    "action": "KEEP",
+    "reason": "Recorded isolated test environment/root/protocol assertion in tests/workspace-v2/s5/v9-entry-identity.test.cjs; retain exact legacy identifier to test rejection or isolation, not a product label."
+  },
+  "ef891f610182af39608326acc776ddb8e7725c6eab8dd89045d8df01fa546b27": {
+    "classification": "TEST_FIXTURE_REVIEW",
+    "action": "KEEP",
+    "reason": "Recorded isolated test environment/root/protocol assertion in tests/workspace-v2/s5/v9-entry-identity.test.cjs; retain exact legacy identifier to test rejection or isolation, not a product label."
+  },
+  "5eb7335785f8e829ec1f54c2f45bd10ee72410a92b89c8dc9202be95b9b406a5": {
+    "classification": "TEST_FIXTURE_REVIEW",
+    "action": "KEEP",
+    "reason": "Recorded isolated test environment/root/protocol assertion in tests/workspace-v2/s5r/http-drain.test.cjs; retain exact legacy identifier to test rejection or isolation, not a product label."
+  },
+  "597ce79b48a94da8c61714f4726607cb0d2de91c0ab82038c0a1e199bd9e8241": {
+    "classification": "TEST_FIXTURE_REVIEW",
+    "action": "KEEP",
+    "reason": "Recorded isolated test environment/root/protocol assertion in tests/workspace-v2/s5r/http-drain.test.cjs; retain exact legacy identifier to test rejection or isolation, not a product label."
+  },
+  "0c9c5e3e88810bda79e7e9ee387e50f4708152681f808d216172cc746a775ab5": {
+    "classification": "TEST_FIXTURE_REVIEW",
+    "action": "KEEP",
+    "reason": "Recorded isolated test environment/root/protocol assertion in tests/workspace-v2/s5r/runtime-tree-loader.test.cjs; retain exact legacy identifier to test rejection or isolation, not a product label."
   }
 }

@@ -75,8 +75,23 @@ test('archived release recipe preserves same-run artifact provenance without act
   const dockerfile = fs.readFileSync('Dockerfile', 'utf8');
   assert.doesNotMatch(dockerfile, /git clone|git fetch|BUILDPLATFORM/);
   assert.match(dockerfile, /ARG SOURCE_COMMIT/);
-  assert.match(dockerfile, /node scripts\/release\/build-info\.cjs/);
-  assert.match(dockerfile, /COPY --from=build \/build\/static \.\/static/);
+  assert.match(dockerfile, /FROM dependencies AS compile[\s\S]*RUN node scripts\/build-v2\.cjs/);
+  assert.match(dockerfile, /FROM compile AS build/);
+  for (const artifact of ['build', 'dist-v2'])
+    assert.ok(dockerfile.includes(`COPY --from=build /build/static/${artifact} ./static/${artifact}`));
+  for (const argument of ['SOURCE_COMMIT', 'SOURCE_TREE', 'APP_VERSION'])
+    assert.ok(dockerfile.includes('ARG ' + argument));
+  for (const label of ['revision=$SOURCE_COMMIT', 'version=$APP_VERSION', 'source-tree=$SOURCE_TREE'])
+    assert.ok(dockerfile.includes(label));
+  const builder = fs.readFileSync('scripts/build-v2.cjs', 'utf8');
+  assert.match(builder, /scripts\/build-back\.cjs/);
+  assert.match(builder, /ZHIXU_FRONTEND_MODE: 'v2'/);
+  assert.match(dockerfile, /pnpm install --frozen-lockfile/);
+  assert.match(dockerfile, /pnpm rebuild[\s\S]*verify-sqlite\.cjs/);
+  assert.match(dockerfile, /COPY --from=build \/build\/scripts\/release-v2/);
+  const ciBuild = fs.readFileSync('scripts/release-v2-ci/build.cjs', 'utf8');
+  for (const argument of ['SOURCE_COMMIT=', 'SOURCE_TREE=', 'APP_VERSION='])
+    assert.ok(ciBuild.includes(argument));
 });
 
 test('complete artifact manifests reject changed, missing, extra files and untracked build inputs', (t) => {

@@ -1,3 +1,4 @@
+const path = require('node:path');
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -31,9 +32,12 @@ function create(env) {
   const module = { exports: {} };
   const sandbox = {
     module,
+    __dirname: path.resolve("back"),
+    __filename: path.resolve("back/app.js"),
     exports: module.exports,
     process: { env },
     require(name) {
+      if (name === './shared/v9IdentityGuard') return { assertV9StartupIdentity(directory) { assert.equal(directory, path.resolve('back')); } };
       if (name === 'cluster') return cluster;
       if (name === 'express') return () => ({ use() {} });
       return {};
