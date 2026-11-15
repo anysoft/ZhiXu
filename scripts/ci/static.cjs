@@ -10,12 +10,10 @@ function audit() {
   assert.deepEqual(workflow.permissions, { contents: 'read' });
   for (const trigger of [
     'workflow_dispatch',
-    'pull_request',
-    'push',
     'workflow_call',
   ])
     assert.ok(trigger in workflow.on);
-  assert.ok(!('pull_request_target' in workflow.on));
+  assert.deepEqual(Object.keys(workflow.on).sort(), ['workflow_call', 'workflow_dispatch']);
   assert.ok(
     !/secrets\.|contents:\s*write|packages:\s*write|id-token:\s*write|ubuntu-latest|docker\/|gh release/.test(
       text,

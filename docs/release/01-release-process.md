@@ -16,7 +16,7 @@ Missing configuration blocks publication. No PAT or production-host access is ne
 
 ## Qualification and publication
 
-`container-qualification.yml` runs on develop pushes/PRs, manual dispatch, and calls from the tag workflow. Native Ubuntu AMD64 and ARM64 runners use Node 22.23.5, validate the release helpers, then build a clean checkout with SBOM and provenance. The OCI audit checks v2 entrypoint/healthcheck, service UID, architecture, source/version labels and blob digests.
+`container-qualification.yml` runs on manual dispatch and calls from the tag workflow; branch pushes and pull requests do not trigger it. Native Ubuntu AMD64 and ARM64 runners use Node 22.23.5, validate the release helpers, then build a clean checkout with SBOM and provenance. The OCI audit checks v2 entrypoint/healthcheck, service UID, architecture, source/version labels and blob digests.
 
 Each architecture must pass a fresh-v2 container smoke: explicit initialization, health and frontend, owner authentication, LOCAL workspace, real Shell Task/Run/Attempt/log, graceful shutdown, independent restart and persistence, and retired subscription API. Every test uses dedicated random-labelled volumes and containers; cleanup failure blocks the gate. This is a focused release smoke, not a repeat of S5 qualification. Full CVE clearance and supply-chain review are **DEFERRED**, not PASS, under the accepted release scope.
 
@@ -26,6 +26,6 @@ GitHub Release assets contain the default fresh-v2 `compose.yaml` and its enviro
 
 ## Triggering a release
 
-Push the code and a matching version tag after configuring the settings above. A branch push alone does not create a GitHub Release; pushing `v2.0.0` triggers the release workflow. Local workflow edits and helper tests do not prove hosted image builds or registry publication succeeded.
+Push the code and a matching version tag after configuring the settings above. Branch pushes and pull requests do not automatically run Linux CI Foundation or Container Qualification. Run them manually when needed. A branch push alone does not create a GitHub Release; pushing `v2.0.0` triggers the release workflow. Local workflow edits and helper tests do not prove hosted image builds or registry publication succeeded.
 
 A partially failed publication is not PASS. Inspect tags, assets and receipts before retrying; qualification reruns never authorize replacing an existing release with different bytes. No local push, tag, deployment or publication is performed by the preparation task.
