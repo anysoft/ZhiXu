@@ -74,9 +74,11 @@ COPY --from=build /build/scripts/release/entrypoint.cjs ./scripts/release/entryp
 COPY --from=build /build/scripts/start-v2.cjs ./scripts/start-v2.cjs
 ARG SOURCE_COMMIT
 ARG SOURCE_TREE
-LABEL org.opencontainers.image.title="ZhiXu fresh-v2 candidate" \
-      org.opencontainers.image.description="Explicit fresh-v2 script automation application; qualification candidate only" \
+ARG APP_VERSION
+LABEL org.opencontainers.image.title="ZhiXu fresh-v2" \
+      org.opencontainers.image.description="Fresh-install Git-native script automation application" \
       org.opencontainers.image.revision=$SOURCE_COMMIT \
+      org.opencontainers.image.version=$APP_VERSION \
       org.zhixu.source-tree=$SOURCE_TREE \
       org.opencontainers.image.source="https://github.com/anysoft/ZhiXu" \
       org.opencontainers.image.licenses="Apache-2.0" \

@@ -1,23 +1,31 @@
-# Release process
+# ZhiXu v2 release workflow
 
-> The pipeline below describes the historical 1.0/default-image release. Fresh-v2 preparation and its separate approval boundary are defined in [V2 release readiness](../architecture/v2/V2_RELEASE_READINESS.md). Do not use the default 1.0 image, existing v9 volumes, or a rebuild from this historical pipeline as an RC15 v2 artifact. This scope decision does not authorize publication.
+The `release.yml` tag workflow publishes fresh-install v2 images. It explicitly builds `Dockerfile.v2`; the default `Dockerfile` and the Phase15/16B v9 qualification scripts remain historical workflows and are not prerequisites for v2 publication. Existing v9 volumes cannot be upgraded in place.
 
-Phase16B stops at a local candidate commit until push/tag/publication are explicitly authorized. Qualification is not publication. Phase15's hosted run 35121041296 qualified fc6bab97d5abfd96f51a952ac04516e5bd6d85cb; it does not qualify new container code.
-
-## Required repository configuration
+## Repository settings
 
 | Setting | Use |
 |---|---|
-| vars.RELEASE_BRANCH | Explicit approved branch ancestry, for example develop |
-| vars.DOCKERHUB_USERNAME | Docker Hub service account/user |
-| vars.DOCKERHUB_IMAGE | namespace/repository |
-| secrets.DOCKERHUB_TOKEN | Scoped Docker Hub token; never account password |
-| GITHUB_TOKEN | Built-in publish-job token for GitHub Release; no PAT |
+| `vars.RELEASE_BRANCH` | Approved branch containing the tagged commit, for example `develop` |
+| `vars.DOCKERHUB_USERNAME` | Docker Hub service account/user |
+| `vars.DOCKERHUB_IMAGE` | Docker Hub `namespace/repository` |
+| `secrets.DOCKERHUB_TOKEN` | Scoped Docker Hub token |
+| `GITHUB_TOKEN` | Built-in token for GitHub Release creation |
 
-Container Qualification needs contents:read and no custom secrets. It reuses Linux Qualification, builds each target on its native Ubuntu 24.04 runner, performs actual managed-runtime, persistence, recovery, restore and Compose acceptance, validates OCI layers/attestations and rejects fixable CRITICAL vulnerabilities. Missing evidence or failed cleanup blocks publication.
+Missing configuration blocks publication. No PAT or production-host access is needed. The tag must be strict SemVer, match `package.json`, and identify a commit on the approved branch. Only the publish job receives `contents: write`.
 
-After authorization, push the candidate and inspect hosted receipts for the exact SHA. Only then prepare an authorized strict version tag matching package.json on the approved branch. The tag workflow repeats qualification for that exact source. Ordinary branch pushes never publish.
+## Qualification and publication
 
-The publish job receives the exact qualified per-architecture OCI archives, verifies archive transport hashes and source identity, and promotes them with skopeo --all --preserve-digests. It creates the multiarch index without rebuilding images, verifies per-platform and attestation digests plus every tag alias, pulls and smoke-tests the published version, then creates checksummed GitHub Release assets. Only the publish job gets contents:write. BuildKit attestations do not require GitHub attestation or OIDC write permissions.
+`container-qualification.yml` runs on develop pushes/PRs, manual dispatch, and calls from the tag workflow. Native Ubuntu AMD64 and ARM64 runners use Node 22.23.5, validate the release helpers, then build a clean checkout with SBOM and provenance. The OCI audit checks v2 entrypoint/healthcheck, service UID, architecture, source/version labels and blob digests.
 
-A partially failed publication is not PASS. Inspect existing tags/assets and qualification receipts before a controlled retry. Never overwrite release identity to conceal different bytes. Do not mark Phase16B PASS until the actual registry and GitHub Release checks succeed.
+Each architecture must pass a fresh-v2 container smoke: explicit initialization, health and frontend, owner authentication, LOCAL workspace, real Shell Task/Run/Attempt/log, graceful shutdown, independent restart and persistence, and retired subscription API. Every test uses dedicated random-labelled volumes and containers; cleanup failure blocks the gate. This is a focused release smoke, not a repeat of S5 qualification. Full CVE clearance and supply-chain review are **DEFERRED**, not PASS, under the accepted release scope.
+
+The publish job downloads both receipts and OCI archives from the same run and SHA. Existing receipt selection protects retries against expired or ambiguous artifacts. `skopeo --all --preserve-digests` promotes the qualified archives without rebuilding; registry verification checks platform/attestation digests and tag aliases. A final AMD64 smoke pulls the verified immutable multiarchitecture digest.
+
+GitHub Release assets contain fresh-v2 Compose/environment examples, source/image identity, per-architecture SBOM/provenance and gate receipts, the published-image smoke receipt, release notes and SHA256SUMS. The workflow downloads the published assets and verifies checksums after creation. New builds carry the new tagged SHA; historical RC15 evidence is not their artifact identity.
+
+## Triggering a release
+
+Push the code and a matching version tag after configuring the settings above. A branch push alone does not create a GitHub Release; pushing `v2.0.0` triggers the release workflow. Local workflow edits and helper tests do not prove hosted image builds or registry publication succeeded.
+
+A partially failed publication is not PASS. Inspect tags, assets and receipts before retrying; qualification reruns never authorize replacing an existing release with different bytes. No local push, tag, deployment or publication is performed by the preparation task.

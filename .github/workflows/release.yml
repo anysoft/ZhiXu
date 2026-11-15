@@ -1,4 +1,4 @@
-name: Platform Release
+name: ZhiXu v2 Release
 on:
   push:
     tags: ['v*']
@@ -17,7 +17,7 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-node@v6
         with:
-          node-version: '22.23.2'
+          node-version: '22.23.5'
           package-manager-cache: false
       - name: Validate exact version and approved branch ancestry
         env:
@@ -47,7 +47,7 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-node@v6
         with:
-          node-version: '22.23.2'
+          node-version: '22.23.5'
           package-manager-cache: false
       - uses: docker/setup-buildx-action@v4
       - name: Select qualified image artifacts
@@ -91,13 +91,12 @@ jobs:
       - name: Pull published version and smoke test
         env:
           TEST_ARCH: amd64
-          SMOKE_ONLY: 'true'
         run: |
-          export TEST_IMAGE="$DOCKERHUB_IMAGE:${GITHUB_REF_NAME#v}"
+          export TEST_IMAGE="$(node -e 'const m=require("./release-output/published-manifest.json"); process.stdout.write(m.image+"@"+m.digest)')"
           docker pull "$TEST_IMAGE"
-          node scripts/release/container-acceptance.cjs
+          node scripts/release-v2-ci/smoke.cjs
       - name: Create checksummed release assets
-        run: node scripts/release/release-assets.cjs
+        run: node scripts/release-v2-ci/receipts.cjs assets
       - name: Create GitHub Release
         run: |
           prerelease=()

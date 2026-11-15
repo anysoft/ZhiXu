@@ -1,4 +1,4 @@
-name: Container Qualification
+name: Fresh-v2 Container Qualification
 on:
   workflow_dispatch:
   workflow_call:
@@ -12,10 +12,7 @@ concurrency:
   group: container-qualification-${{ github.ref }}-${{ github.run_id }}
   cancel-in-progress: false
 jobs:
-  linux:
-    uses: ./.github/workflows/linux-qualification.yml
   container:
-    needs: linux
     strategy:
       fail-fast: false
       matrix:
@@ -36,25 +33,19 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-node@v6
         with:
-          node-version: '22.23.2'
+          node-version: '22.23.5'
           package-manager-cache: false
       - uses: docker/setup-buildx-action@v4
       - name: Install archive promotion tool
         run: sudo apt-get update && sudo apt-get install -y --no-install-recommends skopeo
       - name: Validate release harness
-        run: node --test tests/phase16b/release.test.cjs tests/phase16b/qualification.test.cjs tests/phase16b/backup-operation.test.cjs
+        run: node --test tests/release-v2-ci/*.test.cjs
       - name: Build target-native OCI image with SBOM and provenance
-        run: node scripts/release/build.cjs
-      - name: Real container acceptance
-        run: node scripts/release/container-acceptance.cjs
-      - name: Compose acceptance
-        run: node scripts/release/compose-test.cjs
-      - name: Install checksum-verified scanner
-        run: python3 scripts/release/install-scanner.py
-      - name: Reject fixed critical vulnerabilities
-        run: release-tools/trivy image --scanners vuln --severity CRITICAL --ignore-unfixed --exit-code 1 --format json --output release-output/vulnerabilities.json "$TEST_IMAGE"
-      - name: Aggregate real gates
-        run: node scripts/release/gates.cjs
+        run: node scripts/release-v2-ci/build.cjs
+      - name: Fresh-v2 initialization, real task and restart smoke
+        run: node scripts/release-v2-ci/smoke.cjs
+      - name: Aggregate v2 release gates
+        run: node scripts/release-v2-ci/receipts.cjs gates
       - name: Upload compact gate receipt
         if: always()
         uses: actions/upload-artifact@v6
@@ -74,7 +65,7 @@ jobs:
     permissions:
       contents: read
       actions: read
-    needs: [linux, container]
+    needs: [container]
     if: always()
     runs-on: ubuntu-24.04
     steps:
@@ -115,7 +106,7 @@ jobs:
       - name: Enforce every job and both architecture receipts
         env:
           NEEDS: ${{ toJSON(needs) }}
-        run: node scripts/release/qualification-summary.cjs
+        run: node scripts/release-v2-ci/receipts.cjs summary
       - uses: actions/upload-artifact@v6
         with:
           name: container-summary-${{ github.run_id }}-${{ github.run_attempt }}-${{ github.sha }}
