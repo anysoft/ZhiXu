@@ -23,7 +23,7 @@
 
 ## v2.0 架构发行准备：Fresh-v2 Only
 
-v2 使用统一的 LOCAL/GIT Workspace，按全新安装准备。请先读[发布准备与安装步骤](./docs/architecture/v2/V2_RELEASE_READINESS.md)及[发布范围决策](./docs/architecture/v2/V2_RELEASE_SCOPE_DECISION.md)。使用 `compose.v2.example.yaml`、独立的新项目/数据卷和5600端口；默认 Dockerfile/Compose 及下面的1.0说明不是 v9→v2 升级入口。
+v2 使用统一的 LOCAL/GIT Workspace，按全新安装准备。请先读[发布准备与安装步骤](./docs/architecture/v2/V2_RELEASE_READINESS.md)及[发布范围决策](./docs/architecture/v2/V2_RELEASE_SCOPE_DECISION.md)。使用 `compose.v2.example.yaml`、独立的新项目/数据卷和5600端口；默认 `Dockerfile` 构建 v2 镜像；旧版 Compose 及下面的1.0说明不是 v9→v2 升级入口。
 
 已验收代码候选为 RC15。该封存候选内嵌版本仍为 `1.0.0-rc.6`，不代表已生成或发布 `v2.0.0` 包。v9 自动迁移和原地 Schema 升级均不支持，不能清空旧数据来“升级”。全量安全审计另行处理，已知风险保留；正式发布仍需人工批准。
 

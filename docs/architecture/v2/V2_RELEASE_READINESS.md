@@ -48,7 +48,7 @@
 | AMD64 Docker归档 | `e2ebb41f93f58be649f19698b6a79e2d429dcee30fc3cdd945377d11d4864dcf` |
 | ARM64 Docker归档 | `d98ffc47927917dee4b69ec91c0f8985f87d616365653fbfada5d05e81b2315b` |
 
-本地OCI digest不是已发布的registry地址；镜像缓存已按S5.R清场，审核包仍保留两种归档。不得用默认旧Dockerfile重新构建出的镜像冒充此候选。
+本地OCI digest不是已发布的registry地址；镜像缓存已按S5.R清场，审核包仍保留两种归档。当前默认 `Dockerfile` 构建 fresh-v2；重新构建产生的新镜像不得冒充上述 RC15 候选。
 
 ## Fresh-v2 Installation / Configuration
 

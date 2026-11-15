@@ -1,6 +1,6 @@
 # ZhiXu v2 release workflow
 
-The `release.yml` tag workflow publishes fresh-install v2 images. It explicitly builds `Dockerfile.v2`; the default `Dockerfile` and the Phase15/16B v9 qualification scripts remain historical workflows and are not prerequisites for v2 publication. Existing v9 volumes cannot be upgraded in place.
+The `release.yml` tag workflow publishes fresh-install v2 images. It builds the default `Dockerfile`, which contains the fresh-v2 image definition. The Phase15/16B v9 qualification scripts remain historical workflows and are not prerequisites for v2 publication. Existing v9 volumes cannot be upgraded in place.
 
 ## Repository settings
 

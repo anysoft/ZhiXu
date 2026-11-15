@@ -1,4 +1,5 @@
 *
+# Allowlist for the fresh-install v2 build context.
 !package.json
 !pnpm-lock.yaml
 !pnpm-workspace.yaml
@@ -8,6 +9,7 @@
 !LICENSE
 !version.yaml
 !tsconfig.json
+!.umirc.ts
 !config/
 !config/**
 !src/
@@ -22,11 +24,24 @@ src/.umi*/**
 !shell/*.py
 !scripts/
 !scripts/build-back.cjs
+!scripts/build-v2.cjs
+!scripts/start-v2.cjs
 !scripts/release/
-!scripts/release/build-info.cjs
 !scripts/release/entrypoint.cjs
-!scripts/release/healthcheck.cjs
-!.umirc.ts
-!scripts/release/prune-fixtures.cjs
+!scripts/release-v2/
+!scripts/release-v2/**
+!docs/
+!docs/architecture/
+!docs/architecture/v2/
+!docs/architecture/v2/contracts/
+!docs/architecture/v2/contracts/fresh-v2.sql
+!docs/architecture/v2/contracts/api-contracts.json
+!docs/architecture/v2/contracts/error-codes.json
+!tests/
+!tests/**
+!test/
+!test/**
 !scripts/native/
 !scripts/native/**
+!scripts/runtime-artifacts/
+!scripts/runtime-artifacts/**

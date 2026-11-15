@@ -15,7 +15,7 @@ const out = process.env.RELEASE_OUTPUT || 'release-output';
 fs.mkdirSync(out, { recursive: true });
 const tree = read('git', ['rev-parse', 'HEAD^{tree}']);
 fs.writeFileSync(out + '/source-state.json', JSON.stringify({ commit: sha, tree, worktree_dirty: false }));
-run('docker', ['buildx', 'build', '--file', 'Dockerfile.v2', '--platform', 'linux/' + arch,
+run('docker', ['buildx', 'build', '--file', 'Dockerfile', '--platform', 'linux/' + arch,
   '--build-arg', 'SOURCE_COMMIT=' + sha, '--build-arg', 'SOURCE_TREE=' + tree,
   '--build-arg', 'APP_VERSION=' + require('../../package.json').version,
   '--sbom=true', '--provenance=mode=max', '--metadata-file', out + '/build-metadata.json',

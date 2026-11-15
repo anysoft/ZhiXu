@@ -23,7 +23,7 @@
 
 ## v2 architecture release preparation: fresh-v2 only
 
-v2 unifies LOCAL/GIT Workspaces and is prepared for fresh installation. Read the [release readiness and installation steps](./docs/architecture/v2/V2_RELEASE_READINESS.md) and [scope decision](./docs/architecture/v2/V2_RELEASE_SCOPE_DECISION.md). Use `compose.v2.example.yaml`, a new project with dedicated volumes, and port 5600. The default Dockerfile/Compose and the historical 1.0 instructions below are not a v9-to-v2 upgrade path.
+v2 unifies LOCAL/GIT Workspaces and is prepared for fresh installation. Read the [release readiness and installation steps](./docs/architecture/v2/V2_RELEASE_READINESS.md) and [scope decision](./docs/architecture/v2/V2_RELEASE_SCOPE_DECISION.md). Use `compose.v2.example.yaml`, a new project with dedicated volumes, and port 5600. The default `Dockerfile` builds v2. The old Compose configuration and the historical 1.0 instructions below are not a v9-to-v2 upgrade path.
 
 The qualified code candidate is RC15. Its sealed embedded version remains `1.0.0-rc.6`; no `v2.0.0` package or tag has been created or published. Automatic v9 migration and in-place schema upgrades are unsupported. Never clear existing data to upgrade. Full security auditing is deferred with known risks retained; publication requires separate human approval.
 

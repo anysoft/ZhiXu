@@ -93,7 +93,7 @@ test('workflow builds v2 explicitly and publishes tested bytes after qualificati
   assert.match(release, /needs: \[policy, qualification\]/);
   assert.match(release, /scripts\/release\/publish.cjs/);
   assert.doesNotMatch(release, /release\/container-acceptance|release\/release-assets/);
-  assert.match(fs.readFileSync('scripts/release-v2-ci/build.cjs', 'utf8'), /'--file', 'Dockerfile.v2'/);
+  assert.match(fs.readFileSync('scripts/release-v2-ci/build.cjs', 'utf8'), /'--file', 'Dockerfile'/);
 });
 test('container worker authenticates, creates a real-task contract, polls and checks independent restart', async t => {
   let executions = 0, initialized = false;

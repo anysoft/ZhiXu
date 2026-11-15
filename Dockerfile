@@ -1,8 +1,10 @@
-# Native addons are installed in target-platform stages, never copied across architectures.
-FROM node:22.23.5-bookworm-slim@sha256:e9f565d32859f0cbfb52125eafe8be39390f24dac302dc3cdf566e8ba3ab21ee AS toolchain
+# Fresh-install v2 image; native addons are built for the target architecture.
+# Supported Node patch on Debian 13; no packages are mixed from testing/unstable.
+FROM node:22.23.5-trixie-slim@sha256:68c76cfad89921b927eae28ba21407475e29d0ce450afcdbe70c1532db042b64 AS toolchain
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential python3 git ca-certificates \
+    build-essential python3 perl git ca-certificates \
     && rm -rf /var/lib/apt/lists/*
+# Bootstrap bytes are fixed independently of the old npm bundled in Node's image.
 ADD --checksum=sha256:8ad8563b81e71b90ef405b140bccf3ba9b5e7884ab210bd49ee4e2f4bc6f61f5 https://registry.npmjs.org/npm/-/npm-11.21.2.tgz /tmp/zhixu-npm.tgz
 ADD --checksum=sha256:7e8a946108e7baab119e51d27c24d6178b46545422643dbc91e34e2f1ee32e0f https://registry.npmjs.org/pnpm/-/pnpm-10.34.9.tgz /tmp/zhixu-pnpm.tgz
 RUN rm -rf /usr/local/lib/node_modules/npm \
@@ -10,9 +12,18 @@ RUN rm -rf /usr/local/lib/node_modules/npm \
     && tar -xzf /tmp/zhixu-npm.tgz --strip-components=1 -C /usr/local/lib/node_modules/npm \
     && tar -xzf /tmp/zhixu-pnpm.tgz --strip-components=1 -C /opt/zhixu-build-pnpm \
     && ln -s /opt/zhixu-build-pnpm/bin/pnpm.cjs /usr/local/bin/pnpm \
-    && rm -f /tmp/zhixu-npm.tgz /tmp/zhixu-pnpm.tgz
+    && rm -f /tmp/zhixu-npm.tgz /tmp/zhixu-pnpm.tgz \
+    && node /usr/local/lib/node_modules/npm/bin/npm-cli.js --version \
+    && pnpm --version
 ENV npm_config_nodedir=/usr/local
 WORKDIR /build
+
+FROM toolchain AS native-git
+COPY scripts/native /native/scripts/native
+RUN mkdir -p /native/bin /native/sources /native/work \
+    && bash /native/scripts/native/build-git-tools.sh \
+       --output /native/bin/git-tools --source-cache /native/sources \
+       --work-parent /native/work --jobs 2
 
 FROM toolchain AS dependencies
 # pnpm root lifecycle TMPDIR contains patch_hash=; gyp needs a protected path without it.
@@ -23,48 +34,66 @@ COPY patches ./patches
 COPY scripts/native/verify-sqlite.cjs scripts/native/sqlite-core.json ./scripts/native/
 RUN pnpm install --frozen-lockfile
 
-FROM dependencies AS build
+FROM dependencies AS compile
 COPY . .
-ARG SOURCE_COMMIT
-ARG BUILD_CREATED
-RUN node scripts/build-back.cjs && node node_modules/@umijs/max/bin/max.js build \
-    && node scripts/release/build-info.cjs
-RUN npm_config_ignore_scripts=true pnpm prune --prod && node scripts/release/prune-fixtures.cjs
+COPY --from=native-git /native/bin/git-tools ./bin/git-tools
+RUN node scripts/build-v2.cjs
 
-FROM node:22.23.5-bookworm-slim@sha256:e9f565d32859f0cbfb52125eafe8be39390f24dac302dc3cdf566e8ba3ab21ee AS runtime
+FROM compile AS build
+# Keep the exact runtime graph; fail closed if the source-built SQLite is absent.
+RUN npm_config_ignore_scripts=true pnpm prune --prod \
+    && pnpm rebuild \
+    && node scripts/native/verify-sqlite.cjs
+
+FROM node:22.23.5-trixie-slim@sha256:68c76cfad89921b927eae28ba21407475e29d0ce450afcdbe70c1532db042b64 AS runtime
+# Compiler/headers are required by the retained online CPython source provider.
+# The host-distribution openssh-client is intentionally not installed: v2 uses
+# the verified candidate bundle including static, supported crypto dependencies.
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    tini bash coreutils util-linux git openssh-client openssl ca-certificates curl \
+    tini bash coreutils util-linux git openssl ca-certificates curl \
     tar gzip xz-utils tzdata python3 build-essential libssl-dev zlib1g-dev \
     libbz2-dev libreadline-dev libsqlite3-dev libffi-dev liblzma-dev libncurses-dev uuid-dev \
     && rm -rf /var/lib/apt/lists/* \
-    && groupadd --gid 10001 platform && useradd --uid 10001 --gid 10001 --home-dir /data/home --no-create-home platform \
-    && mkdir /app /data /backup && chown 10001:10001 /data /backup
-RUN rm -rf /usr/local/lib/node_modules/npm
-COPY --from=toolchain /usr/local/lib/node_modules/npm /usr/local/lib/node_modules/npm
+    && rm -rf /usr/local/lib/node_modules/npm \
+    && rm -f /usr/local/bin/npm /usr/local/bin/npx \
+    && groupadd --gid 10001 zhixu && useradd --uid 10001 --gid 10001 \
+       --home-dir /data/home --no-create-home zhixu \
+    && mkdir -p /app /data/home /backup /scratch/tmp \
+    && chown -R 10001:10001 /data /backup /scratch \
+    && chmod 0700 /data /data/home /backup /scratch /scratch/tmp
 WORKDIR /app
 COPY --from=build /build/node_modules ./node_modules
-COPY --from=build /build/static ./static
-COPY --from=build /build/package.json /build/version.yaml /build/LICENSE ./
+COPY --from=build /build/bin/git-tools ./bin/git-tools
+COPY --from=build /build/static/build ./static/build
+COPY --from=build /build/static/dist-v2 ./static/dist-v2
+COPY --from=build /build/package.json /build/pnpm-lock.yaml /build/pnpm-workspace.yaml /build/version.yaml /build/LICENSE ./
 COPY --from=build /build/shell/*.py ./shell/
 COPY --from=build /build/scripts/native/verify-sqlite.cjs /build/scripts/native/sqlite-core.json ./scripts/native/
-COPY --from=build /build/scripts/release/entrypoint.cjs /build/scripts/release/healthcheck.cjs ./scripts/release/
+COPY --from=build /build/scripts/release-v2 ./scripts/release-v2
+COPY --from=build /build/scripts/release/entrypoint.cjs ./scripts/release/entrypoint.cjs
+COPY --from=build /build/scripts/start-v2.cjs ./scripts/start-v2.cjs
 ARG SOURCE_COMMIT
-ARG BUILD_CREATED
+ARG SOURCE_TREE
 ARG APP_VERSION
 LABEL org.opencontainers.image.title="ZhiXu" \
-      org.opencontainers.image.description="Git-native script automation platform" \
-      org.opencontainers.image.version=$APP_VERSION \
+      org.opencontainers.image.description="Fresh-install Git-native script automation application" \
       org.opencontainers.image.revision=$SOURCE_COMMIT \
+      org.opencontainers.image.version=$APP_VERSION \
+      org.zhixu.source-tree=$SOURCE_TREE \
       org.opencontainers.image.source="https://github.com/anysoft/ZhiXu" \
-      org.opencontainers.image.created=$BUILD_CREATED \
-      org.opencontainers.image.licenses="Apache-2.0"
-ENV NODE_ENV=production DATA_DIR=/data/state BACKUP_DIR=/backup HOME=/data/home \
-    QL_DIR=/app BIND_HOST=0.0.0.0 BIND_HOST_GRPC=127.0.0.1 BACK_PORT=5700 GRPC_PORT=5500 \
+      org.opencontainers.image.licenses="Apache-2.0" \
+      org.zhixu.application-mode="v2"
+ENV NODE_ENV=production \
+    HOME=/data/home TMPDIR=/scratch/tmp \
+    ZHIXU_V2_DATA_ROOT=/data/state ZHIXU_V2_BACKUP_ROOT=/backup/state \
     LANG=C.UTF-8 LOG_LEVEL=info
-RUN chmod 0700 /data /backup
+RUN chmod -R a+rX /app/bin/git-tools && chmod -R a-w /app
 USER 10001:10001
 # Actual final service UID must load and query the published target addon.
-RUN node scripts/native/verify-sqlite.cjs
-EXPOSE 5700
-HEALTHCHECK --interval=10s --timeout=5s --start-period=60s --retries=6 CMD ["node", "scripts/release/healthcheck.cjs"]
-ENTRYPOINT ["/usr/bin/tini", "--", "node", "scripts/release/entrypoint.cjs"]
+RUN node scripts/native/verify-sqlite.cjs \
+    && node -e 'require("./static/build/shared/nativeGitTools").verifiedGitSshTools().then(() => { process.stdout.write("VERIFIED_GIT_TOOLS_SERVICE_UID_READY\n"); }).catch((error) => { process.stderr.write((error.code || "NATIVE_GIT_TOOL_REJECTED") + "\n"); process.exitCode = 1; })'
+EXPOSE 5600
+STOPSIGNAL SIGTERM
+HEALTHCHECK --interval=10s --timeout=5s --start-period=90s --retries=6 \
+    CMD ["node", "scripts/release-v2/healthcheck.cjs"]
+ENTRYPOINT ["/usr/bin/tini", "--", "node", "scripts/release-v2/entrypoint.cjs"]
