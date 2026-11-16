@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from '@umijs/max';
 import {
   Alert,
@@ -328,6 +328,9 @@ export default function RepositoriesPage() {
     action = useAction(),
     [editing, setEditing] = useState<any>(),
     [selected, setSelected] = useState<any>();
+  useEffect(() => {
+    if (editing) void credentials.reload();
+  }, [editing, credentials.reload]);
   return (
     <Page title={t('repositories')} subtitle={t('repositoryHelp')}>
       <Tabs
@@ -448,8 +451,10 @@ export default function RepositoriesPage() {
           >
             <Input />
           </Form.Item>
+          <ErrorPanel error={credentials.error} reload={() => void credentials.reload()} />
           <Form.Item name="default_credential_id" label={t('credential')}>
             <Select
+              loading={credentials.loading}
               allowClear
               placeholder={t('anonymous')}
               options={list(credentials.data).map((r: any) => ({
