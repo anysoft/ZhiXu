@@ -267,11 +267,13 @@ function Credentials() {
           <Form.Item name="status" label={t('status')}>
             <Select options={enumOptions(['enabled', 'disabled'])} />
           </Form.Item>
-          {editing.id && (
-            <Form.Item name="replace_secret" valuePropName="checked">
-              <Checkbox>{t('replaceSecret')}</Checkbox>
-            </Form.Item>
-          )}
+          <Form.Item
+            name="replace_secret"
+            valuePropName="checked"
+            hidden={!editing.id}
+          >
+            <Checkbox>{t('replaceSecret')}</Checkbox>
+          </Form.Item>
           <Form.Item noStyle shouldUpdate>
             {({ getFieldValue }) => (
               <>
