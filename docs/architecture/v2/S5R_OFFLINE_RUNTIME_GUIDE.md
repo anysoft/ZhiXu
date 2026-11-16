@@ -1,5 +1,7 @@
 # Verified offline Runtime provisioning
 
+This is an optional preapproved/offline mode. Default Compose deployments install managed runtimes online from official upstream sources and do not require this guide, a package or an external allowlist. Once this mode is explicitly configured, its strict manifest verification remains mandatory.
+
 Artifact acquisition and Managed Runtime installation are separate operations. An artifact package contains exact-byte manifests and source objects, not an installed Runtime, Environment Build or host npm cache. Existing Provider operations, leases, staging, verification and READY transitions still perform installation.
 
 ## Independent trust

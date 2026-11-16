@@ -13,7 +13,6 @@ import {
   PYENV_SOURCE,
 } from '../shared/runtime';
 import { VerifiedRuntimeArtifactStore } from './runtimeArtifacts';
-import { currentRuntimeDomain } from './runtimeDomainScope';
 
 export interface ProviderContext {
   id: number;
@@ -80,8 +79,6 @@ export default class PyenvProvider {
   }
   async setup(ctx: ProviderContext, repair = false) {
     const artifacts = VerifiedRuntimeArtifactStore.current(this.paths.dataRoot);
-    if (!artifacts && currentRuntimeDomain())
-      throw new RuntimeError('RUNTIME_ARTIFACT_TRUST_CONFIGURATION_REQUIRED');
     await ctx.stage('FETCHING_PROVIDER');
     const stage = path.join(ctx.directory, 'provider-stage');
     if (artifacts) {
@@ -220,8 +217,6 @@ export default class PyenvProvider {
     revision: string,
   ) {
     const artifacts = VerifiedRuntimeArtifactStore.current(this.paths.dataRoot);
-    if (!artifacts && currentRuntimeDomain())
-      throw new RuntimeError('RUNTIME_ARTIFACT_TRUST_CONFIGURATION_REQUIRED');
     const code = await this.code(ctx, revision);
     const target = await this.paths.createInstallation(
       runtime.version,

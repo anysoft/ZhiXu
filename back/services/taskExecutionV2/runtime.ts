@@ -83,6 +83,9 @@ export class ManagedRuntimeAdapter {
     if (bound && this.approvedArtifacts && bound !== this.approvedArtifacts)
       fail('RUNTIME_NOT_READY');
     const artifacts = this.approvedArtifacts ?? bound;
+    // No explicit policy means standard online installation, with managed path,
+    // ownership, executable and build checks still enforced below.
+    if (!artifacts) return undefined;
     if (
       !(artifacts instanceof VerifiedRuntimeArtifactStore) ||
       !Object.isFrozen(artifacts) ||
@@ -162,6 +165,7 @@ export class ManagedRuntimeAdapter {
     language?: string,
   ) {
     const artifacts = this.artifactPolicy();
+    if (!artifacts) return;
     const approved = artifacts.nodeDistribution(runtime.version);
     const archive = this.approvedProvenance(
       artifacts,
@@ -396,8 +400,9 @@ export class ManagedRuntimeAdapter {
     root: string,
     venv: string,
   ) {
-    const artifacts = this.artifactPolicy(),
-      revision = provider.provider_revision;
+    const artifacts = this.artifactPolicy();
+    if (!artifacts) return;
+    const revision = provider.provider_revision;
     if (typeof revision !== 'string') fail('RUNTIME_NOT_READY');
     const rows = artifacts.manifest.python.filter(
       (p) => p.version === runtime.version && p.provider_revision === revision,

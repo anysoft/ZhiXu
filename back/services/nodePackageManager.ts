@@ -14,7 +14,6 @@ import NodePathResolver, { nodeFileHash, nodeHash } from './nodePaths';
 import NodeDistributionProvider from './nodeDistributionProvider';
 import { VerifiedRuntimeArtifactStore } from './runtimeArtifacts';
 import { runtimeTreeDigest } from './runtimeTreeWitness';
-import { currentRuntimeDomain } from './runtimeDomainScope';
 export const NODE_REGISTRY = 'https://registry.npmjs.org/';
 const parseScript = `const fs=require('fs'),path=require('path');const root=process.argv[1],mode=process.argv[2],value=JSON.parse(process.argv[3]);const base=path.join(root,'lib/node_modules/npm/node_modules');const semver=require(path.join(base,'semver'));if(mode==='engine'){if(!semver.satisfies(value.version,value.engine))process.exit(42);console.log('true');}else{const validate=require(path.join(base,'validate-npm-package-name'));for(const d of value){if(!validate(d.name).validForNewPackages||!semver.validRange(d.specifier))process.exit(43);}console.log('true');}`;
 /** Exact managed CLI invocation; no shell activation or business packages in Runtime. */
@@ -49,8 +48,6 @@ export default class NodePackageManager {
     )
       throw new RuntimeError('NODE_RUNTIME_NOT_READY');
     const artifacts = VerifiedRuntimeArtifactStore.current(this.paths.dataRoot);
-    if (!artifacts && currentRuntimeDomain() && this.registry === NODE_REGISTRY)
-      throw new RuntimeError('RUNTIME_ARTIFACT_TRUST_CONFIGURATION_REQUIRED');
     if (artifacts) {
       const approved = artifacts.nodeDistribution(runtime.version);
       const nodeProof = artifacts.artifact(approved.archive).provenance;

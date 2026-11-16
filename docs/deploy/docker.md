@@ -45,7 +45,9 @@ Named volumes inherit UID/GID 10001 ownership from the image. Prepare that owner
 
 ## Managed runtimes
 
-The application Node runs the platform; Shell tasks work with the base Compose configuration. Managed Python/Node installation requires explicit verified artifact settings and mounts. Configure `ZHIXU_V2_RUNTIME_ARTIFACT_MODE`, `ZHIXU_V2_RUNTIME_ARTIFACT_STORE`, `ZHIXU_V2_RUNTIME_ARTIFACT_TRUST_ANCHOR` and `ZHIXU_V2_RUNTIME_ARTIFACT_MANIFEST` in a Compose override, with the protected trust anchor, correct platform package and private writable store. Adding these values only to `.env` does not inject them into the service.
+The application Node runs the platform; Shell tasks work with the base Compose configuration. Managed Python/Node installation works online by default without an external artifact manifest: pyenv is fetched from its official GitHub repository at the pinned revision, Python is built with python-build, Node distributions are checked against official SHA256 checksums, and packages use the standard PyPI/npm registries. The image already supplies compiler and development libraries through apt.
+
+For optional preapproved/offline artifact installation, use explicit artifact settings and mounts. Configure `ZHIXU_V2_RUNTIME_ARTIFACT_MODE`, `ZHIXU_V2_RUNTIME_ARTIFACT_STORE`, `ZHIXU_V2_RUNTIME_ARTIFACT_TRUST_ANCHOR` and `ZHIXU_V2_RUNTIME_ARTIFACT_MANIFEST` in a Compose override, with the protected trust anchor, correct platform package and private writable store. Adding these values only to `.env` does not inject them into the service.
 
 See the [verified runtime installation guide](../architecture/v2/S5R_OFFLINE_RUNTIME_GUIDE.md) and [runtime configuration details](../architecture/v2/V2_RELEASE_READINESS.md#managed-runtime). Bind the installed runtime and built environment to the Task and check readiness before execution. Host runtimes do not substitute for verified managed runtimes.
 

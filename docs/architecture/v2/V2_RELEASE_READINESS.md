@@ -77,7 +77,9 @@ docker compose --env-file /path/to/v2.env -p zhixu-v2-fresh -f compose.yaml up -
 
 ### Managed Runtime
 
-Compose基础示例可启动并执行Shell任务；安装受管语言前还须配置以下四项环境变量，并挂载正确平台的只读package/独立受保护allowlist及应用UID拥有的私有可写Store。它们不能位于Workspace、DataRoot或已安装Runtime内。
+Compose基础示例默认支持在线安装受管Python/Node：pyenv从官方GitHub固定提交获取，Python通过python-build下载校验并编译，Node按官方SHA256校验，依赖通过PyPI/npm安装。镜像通过apt提供编译工具和系统开发库，不要求额外批准清单。
+
+仅在选择预批准/离线制品模式时，配置以下四项环境变量，并挂载正确平台的只读package、独立受保护allowlist及应用UID拥有的私有可写Store。它们不能位于Workspace、DataRoot或已安装Runtime内。
 
 | 环境变量 | 内容 |
 |---|---|
@@ -88,7 +90,7 @@ Compose基础示例可启动并执行Shell任务；安装受管语言前还须�
 
 这四项须写入独立Compose override的service `environment`，输入/Store的mount也在该override配置；仅添加到 `--env-file` 不会自动透传进容器。后续命令同时指定基础Compose与该override。
 
-按照[Runtime导入与安装指南](S5R_OFFLINE_RUNTIME_GUIDE.md)执行编译后importer。容器默认入口仅接收 `--initialize`；导入时在相同Compose/override及卷配置下使用 `run --rm --no-deps --entrypoint node platform-v2 /app/scripts/release-v2/runtime-artifacts.cjs import`，并附指南列出的data/package/四Runtime参数。之后经正式Provider安装、Environment Build、Task绑定与readiness验证。无信任配置不承诺受管安装可用；不得用宿主Runtime替代。现有离线PNPM及未支持的非空pip依赖闭包明确不支持。
+按照[Runtime导入与安装指南](S5R_OFFLINE_RUNTIME_GUIDE.md)执行编译后importer。容器默认入口仅接收 `--initialize`；导入时在相同Compose/override及卷配置下使用 `run --rm --no-deps --entrypoint node platform-v2 /app/scripts/release-v2/runtime-artifacts.cjs import`，并附指南列出的data/package/四Runtime参数。之后经正式Provider安装、Environment Build、Task绑定与readiness验证。默认在线模式不执行此导入流程；显式配置制品模式后仍严格检查信任配置，不会静默退回普通在线安装。不得用宿主Runtime替代受管环境。现有离线PNPM及未支持的非空pip依赖闭包限制仅适用于制品模式，不限制默认在线pip/npm安装。
 
 ## Backup / Restore / Rollback
 

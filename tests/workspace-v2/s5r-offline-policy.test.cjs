@@ -65,7 +65,7 @@ for (const mode of ['ONLINE_VERIFIED', 'OFFLINE_VERIFIED'])
     },
   );
 
-test('S5R Node Provider policy unit refuses unconfigured v2 while preserving the outside-domain official HTTPS path', async (t) => {
+test('S5R Node Provider policy unit uses official HTTPS both inside and outside an unconfigured v2 domain', async (t) => {
   const f = await createOfflineFixture(t);
   const Paths = f.module('back/services/nodePaths.ts').default;
   const Provider = f.module(
@@ -100,41 +100,48 @@ test('S5R Node Provider policy unit refuses unconfigured v2 while preserving the
   );
   calls.length = 0;
   await f.scope.withRuntimeDomain({}, async () => {
-    await assert.rejects(provider.install(ctx, runtime), {
-      error_code: 'RUNTIME_ARTIFACT_TRUST_CONFIGURATION_REQUIRED',
-    });
+    await assert.rejects(
+      provider.install(ctx, runtime),
+      (error) => error === checkpoint,
+    );
   });
-  assert.equal(calls.length, 0);
+  assert.equal(calls.length, 1);
+  assert.ok(
+    calls[0][1].includes('https://nodejs.org/dist/v24.22.3/SHASUMS256.txt'),
+  );
 });
-test('S5R pip policy unit cannot execute an old READY interpreter in a v2 domain without independent trust', async (t) => {
+test('S5R pip policy unit uses standard pip in a v2 domain without an optional artifact policy', async (t) => {
   const f = await createOfflineFixture(t);
   const Paths = f.module('back/services/runtimePaths.ts').default;
   const EnvPaths = f.module('back/services/pythonEnvironmentPaths.ts').default;
   const Pip = f.module('back/services/pipPackageManager.ts').default;
   const pip = new Pip(new EnvPaths(new Paths(f.dataRoot)));
-  let commands = 0;
+  const calls = [];
   const ctx = {
     directory: f.root,
     environment: {},
     command: {
-      run: async () => {
-        commands++;
+      run: async (...args) => {
+        calls.push(args);
         return '';
       },
     },
   };
   await f.scope.withRuntimeDomain({}, async () => {
-    await assert.rejects(pip.run(ctx, '/old-ready/venv/bin/python', ['list']), {
-      error_code: 'RUNTIME_ARTIFACT_TRUST_CONFIGURATION_REQUIRED',
-    });
-    await assert.rejects(pip.install(ctx, '/old-ready/venv/bin/python', []), {
-      error_code: 'RUNTIME_ARTIFACT_TRUST_CONFIGURATION_REQUIRED',
-    });
+    await pip.run(ctx, '/unit-only/venv/bin/python', ['list']);
+    await pip.install(ctx, '/unit-only/venv/bin/python', []);
+    await pip.install(ctx, '/unit-only/venv/bin/python', [
+      { requirement: 'idna==3.11' },
+    ]);
   });
-  assert.equal(commands, 0);
+  assert.equal(calls.length, 2);
+  assert.ok(calls[1][1].includes('https://pypi.org/simple'));
+  assert.ok(calls[1][1].includes('idna==3.11'));
+  assert.equal(calls[1][3].PIP_NO_INDEX, undefined);
+  assert.equal(calls[1][3].PIP_CONFIG_FILE, '/dev/null');
 });
 
-test('S5R Python Provider policy unit refuses unconfigured v2 while preserving the outside-domain exact Git source pin', async (t) => {
+test('S5R Python Provider policy unit uses the exact official Git source pin by default in v2', async (t) => {
   const f = await createOfflineFixture(t);
   const Paths = f.module('back/services/runtimePaths.ts').default;
   const Provider = f.module('back/services/pyenvProvider.ts').default;
@@ -164,17 +171,27 @@ test('S5R Python Provider policy unit refuses unconfigured v2 while preserving t
   ]);
   calls.length = 0;
   await f.scope.withRuntimeDomain({}, async () => {
-    await assert.rejects(provider.setup(ctx), {
-      error_code: 'RUNTIME_ARTIFACT_TRUST_CONFIGURATION_REQUIRED',
-    });
+    ctx.directory = path.join(f.root, 'v2-context');
+    await fs.mkdir(ctx.directory, { mode: 0o700 });
+    await assert.rejects(provider.setup(ctx), (error) => error === checkpoint);
+    assert.deepEqual(calls[1][1], [
+      'fetch',
+      '--depth=1',
+      'https://github.com/pyenv/pyenv.git',
+      provider.revision,
+    ]);
+    // Check the unconfigured v2 install reaches its ordinary provider-code path.
+    provider.code = async () => {
+      throw checkpoint;
+    };
     await assert.rejects(
       provider.install(
         ctx,
         { version: '3.13.15', metadata: {} },
         provider.revision,
       ),
-      { error_code: 'RUNTIME_ARTIFACT_TRUST_CONFIGURATION_REQUIRED' },
+      (error) => error === checkpoint,
     );
   });
-  assert.equal(calls.length, 0);
+  assert.equal(calls.length, 2);
 });

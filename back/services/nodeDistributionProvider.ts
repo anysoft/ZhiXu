@@ -8,7 +8,6 @@ import { ProviderContext } from './pyenvProvider';
 import NodePathResolver, { nodeFileHash } from './nodePaths';
 import { VerifiedRuntimeArtifactStore } from './runtimeArtifacts';
 import { runtimeTreeDigest } from './runtimeTreeWitness';
-import { currentRuntimeDomain } from './runtimeDomainScope';
 export function exactNodeVersion(value: unknown): string {
   if (
     typeof value !== 'string' ||
@@ -205,12 +204,6 @@ export default class NodeDistributionProvider {
     repair = false,
   ) {
     const artifacts = VerifiedRuntimeArtifactStore.current(this.paths.dataRoot);
-    if (
-      !artifacts &&
-      currentRuntimeDomain() &&
-      this.source === 'https://nodejs.org/dist'
-    )
-      throw new RuntimeError('RUNTIME_ARTIFACT_TRUST_CONFIGURATION_REQUIRED');
     const version = exactNodeVersion(runtime.version),
       platform = nodePlatform(),
       prefix = `node-v${version}-${platform}`,

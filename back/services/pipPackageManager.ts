@@ -4,7 +4,6 @@ import { RuntimeError } from '../shared/runtime';
 import { ProviderContext } from './pyenvProvider';
 import PythonEnvironmentPathResolver from './pythonEnvironmentPaths';
 import { VerifiedRuntimeArtifactStore } from './runtimeArtifacts';
-import { currentRuntimeDomain } from './runtimeDomainScope';
 /** An index is a server-owned policy. HTTP loopback is only available via constructor injection in tests. */
 export default class PipPackageManager {
   constructor(
@@ -17,11 +16,6 @@ export default class PipPackageManager {
     args: string[],
     capture = false,
   ) {
-    if (
-      currentRuntimeDomain() &&
-      !VerifiedRuntimeArtifactStore.current(this.paths.runtime.dataRoot)
-    )
-      throw new RuntimeError('RUNTIME_ARTIFACT_TRUST_CONFIGURATION_REQUIRED');
     const environment = {
       ...ctx.environment,
       PIP_CONFIG_FILE: '/dev/null',
@@ -61,8 +55,6 @@ export default class PipPackageManager {
     const artifacts = VerifiedRuntimeArtifactStore.current(
       this.paths.runtime.dataRoot,
     );
-    if (currentRuntimeDomain() && !artifacts)
-      throw new RuntimeError('RUNTIME_ARTIFACT_TRUST_CONFIGURATION_REQUIRED');
     if (dependencies.length && artifacts?.options.mode === 'OFFLINE_VERIFIED')
       throw new RuntimeError('RUNTIME_ARTIFACT_CLOSURE_UNAVAILABLE');
     if (artifacts) await artifacts.verifyPythonPip(ctx, python);
