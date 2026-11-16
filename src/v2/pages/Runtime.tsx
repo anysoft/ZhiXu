@@ -389,14 +389,6 @@ function LanguageRuntime({
                 >
                   {t('newEnvironment')}
                 </Button>
-                <Button
-                  className="v2-section"
-                  onClick={() => setDialog('install')}
-                >
-                  {t('installLanguage', {
-                    language: kind === 'python' ? 'Python' : 'Node.js',
-                  })}
-                </Button>
                 <Table
                   rowKey="id"
                   dataSource={list(environments.data)}
