@@ -66,6 +66,7 @@ interface SpaceStats {
   bsize: number;
 }
 const RECOVERY_CONTEXT = Symbol('verified workspace restore context');
+const OFFLINE_CATALOG = Symbol('independent v2 backup catalog');
 
 /** Internal S1.A coordinator: real production backup primitives, explicit v2 domain only. */
 export class WorkspaceBackupService {
@@ -74,8 +75,9 @@ export class WorkspaceBackupService {
   readonly limits: WorkspaceLimits;
   readonly domain: WorkspaceBackupDomain;
   readonly fault: FaultHook;
+  private readonly sourceStore?: WorkspaceStore;
   constructor(
-    readonly store: WorkspaceStore,
+    store: WorkspaceStore | { token: typeof OFFLINE_CATALOG; dataRoot: string },
     readonly roots: WorkspaceRootResolver,
     readonly leases: WorkspaceLeaseService,
     backupRoot: string,
@@ -83,6 +85,9 @@ export class WorkspaceBackupService {
     recovery?: { token: typeof RECOVERY_CONTEXT; targetRoot: string },
   ) {
     if (recovery && recovery.token !== RECOVERY_CONTEXT)
+      fail('WORKSPACE_RECOVERY_REQUIRED');
+    if (store instanceof WorkspaceStore) this.sourceStore = store;
+    else if (store.token !== OFFLINE_CATALOG)
       fail('WORKSPACE_RECOVERY_REQUIRED');
     this.paths = new BackupPaths(
       recovery?.targetRoot || store.dataRoot,
@@ -97,6 +102,27 @@ export class WorkspaceBackupService {
     this.limits = workspaceLimits(options.limits);
     this.domain = new WorkspaceBackupDomain(this.limits);
     this.fault = options.fault || (async () => undefined);
+  }
+
+  /** Catalog/decryption/validation need the backup's database, not a live target database. */
+  static forOfflineCatalog(dataRoot: string, backupRoot: string) {
+    const roots = new WorkspaceRootResolver(dataRoot);
+    const leases = new WorkspaceLeaseService(
+      dataRoot,
+      new PlatformBackupBarrier(dataRoot + '.platform-control'),
+    );
+    return new WorkspaceBackupService(
+      { token: OFFLINE_CATALOG, dataRoot },
+      roots,
+      leases,
+      backupRoot,
+    );
+  }
+
+  /** Live-only operations fail closed when invoked on a catalog-only context. */
+  get store(): WorkspaceStore {
+    if (!this.sourceStore) fail('BACKUP_LIVE_STORE_REQUIRED');
+    return this.sourceStore;
   }
 
   static async forRestoreRecovery(

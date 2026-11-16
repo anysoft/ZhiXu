@@ -277,17 +277,30 @@ export async function recoverV2RestoreBeforeOpen(options: V2BootOptions) {
       throw new V2StartupError('RESTORE_PUBLISHED_ROOT_IDENTITY_MISMATCH');
   }
   if (journal) {
-    // Directory identity alone does not qualify an SQLite file. Validate every
-    // matching recovery source without letting SQLite open the original first.
+    // A completed restore uses only the published candidate. The quarantined
+    // original may be the corrupt database that made offline recovery necessary.
+    // Nonterminal recovery still validates every matching recovery source.
     const proofs = [];
-    for (const candidate of [
-      {
-        root: journal.target,
-        identities: [journal.old_identity, journal.candidate_identity],
-      },
-      { root: journal.old_root, identities: [journal.old_identity] },
-      { root: journal.candidate, identities: [journal.candidate_identity] },
-    ]) {
+    const candidates =
+      journal.stage === 'COMPLETE'
+        ? [
+            {
+              root: journal.target,
+              identities: [journal.candidate_identity],
+            },
+          ]
+        : [
+            {
+              root: journal.target,
+              identities: [journal.old_identity, journal.candidate_identity],
+            },
+            { root: journal.old_root, identities: [journal.old_identity] },
+            {
+              root: journal.candidate,
+              identities: [journal.candidate_identity],
+            },
+          ];
+    for (const candidate of candidates) {
       const actual = await fs
         .lstat(candidate.root)
         .catch((error: NodeJS.ErrnoException) => {

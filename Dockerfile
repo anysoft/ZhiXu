@@ -91,6 +91,7 @@ RUN chmod -R a+rX /app/bin/git-tools && chmod -R a-w /app
 USER 10001:10001
 # Actual final service UID must load and query the published target addon.
 RUN node scripts/native/verify-sqlite.cjs \
+    && node static/build/backupCliV2.js --help \
     && node -e 'require("./static/build/shared/nativeGitTools").verifiedGitSshTools().then(() => { process.stdout.write("VERIFIED_GIT_TOOLS_SERVICE_UID_READY\n"); }).catch((error) => { process.stderr.write((error.code || "NATIVE_GIT_TOOL_REJECTED") + "\n"); process.exitCode = 1; })'
 EXPOSE 5600
 STOPSIGNAL SIGTERM

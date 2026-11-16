@@ -57,6 +57,8 @@ Use `docker compose stop` and allow the 30-second grace period before maintenanc
 
 Restore through the application's import, validation/preview and confirmation flow. Restart normally, verify recovery is complete, then rebuild the physical managed runtimes and environments before executing tasks. Keep the data root and its control domain together. Do not delete volumes or overwrite the only copy of source files to recover.
 
+If SQLite is damaged or the Web service cannot start, use the image's independent [v2 backup CLI and disaster recovery procedure](disaster-recovery.md). It uses the same volumes and backup format without starting the Web service or opening the damaged database.
+
 There is no v9-to-v2 upgrade path. Future v2 upgrades require an explicitly compatible schema and a verified backup. Arbitrary downgrade is not guaranteed; restore a compatible backup into a separate installation for rollback.
 
 ## Logs and storage maintenance

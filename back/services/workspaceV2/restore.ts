@@ -320,6 +320,113 @@ export class WorkspaceRestoreService {
     return this.recover();
   }
 
+  /** Offline disaster entry: prove exclusive ownership, then validate the backup
+   * without opening the damaged target database. The ordinary journal/swap runs
+   * under the same backend FD for its complete lifetime. */
+  async restoreOffline(
+    snapshotId: string,
+    source: 'snapshots' | 'imports' = 'snapshots',
+  ) {
+    const lifetime = await acquireBackendLease(this.backup.paths);
+    try {
+      await this.backup.withCatalogLock(async () => {
+        const prior = await this.status();
+        if (
+          prior &&
+          !['COMPLETE', 'ROLLED_BACK', 'CANCELLED'].includes(prior.stage)
+        )
+          fail('RESTORE_PENDING', 503);
+        if (prior?.stage === 'ROLLED_BACK') {
+          // A deliberate retry may retire only this fully proven rollback's
+          // admission marker; both the original and failed candidate survive.
+          if (
+            !same(prior.old_identity, await identity(prior.target)) ||
+            !same(
+              prior.candidate_identity,
+              await identity(prior.failed_root),
+            ) ||
+            (await identity(prior.old_root)) ||
+            (await identity(prior.candidate))
+          )
+            fail('WORKSPACE_RECOVERY_REQUIRED');
+          await this.clearBarrier(prior);
+        }
+        await this.backup.barrier.recoverAbandonedSnapshot();
+        const outer = await this.backup.paths.bucket(source, snapshotId);
+        await this.backup.paths.assertOwned(outer, snapshotId);
+        const snapshot =
+          source === 'imports' ? path.join(outer, 'snapshot') : outer;
+        const manifest = await this.backup.validateRoot(snapshot);
+        await this.backup.reserve(
+          Math.ceil(manifest.total_bytes * 2.2),
+          this.backup.paths.control,
+        );
+        // A blank restore volume needs only a private directory, never a fake DB.
+        await privateDirectory(this.backup.paths.data, true);
+        const allowed = new Set([
+          'db',
+          'workspaces',
+          'git',
+          '.locks',
+          'tmp',
+          'runtime',
+          'config-assets',
+          'config',
+          'log',
+          'syslog',
+          'cache',
+          'upload',
+        ]);
+        if (
+          (await fs.readdir(this.backup.paths.data)).some(
+            (name) => !allowed.has(name),
+          )
+        )
+          fail('WORKSPACE_RECOVERY_REQUIRED');
+        const operation = randomUUID();
+        const j: Journal = {
+          version: 1,
+          operation_id: operation,
+          snapshot_id: backupId(snapshotId),
+          source,
+          manifest_hash: (await hashFile(path.join(snapshot, 'manifest.json')))
+            .sha256,
+          target: this.backup.paths.data,
+          candidate: path.join(
+            this.backup.paths.control,
+            'candidates',
+            operation,
+          ),
+          old_root: path.join(
+            this.backup.paths.control,
+            'quarantine',
+            operation,
+          ),
+          failed_root: path.join(
+            this.backup.paths.control,
+            'failed',
+            operation,
+          ),
+          stage: 'PENDING',
+          candidate_identity: null,
+          old_identity: await identity(this.backup.paths.data),
+        };
+        await this.write(j);
+        await privateJson(
+          path.join(this.backup.paths.control, 'barrier.json'),
+          {
+            version: 1,
+            id: operation,
+            phase: 'RESTORE_PENDING',
+          },
+        );
+      });
+      return await this.recoverOwned();
+    } finally {
+      await lifetime?.release();
+    }
+  }
+
   async cancelPending(operationId: string) {
     return this.backup.withCatalogLock(async () => {
       const journal = await this.status();
@@ -400,182 +507,187 @@ export class WorkspaceRestoreService {
   async recover(): Promise<WorkspaceStore> {
     const lifetime = await acquireBackendLease(this.backup.paths);
     try {
-      return await this.backup.withCatalogLock(async () => {
-        const j = await this.status();
-        if (!j) fail('WORKSPACE_RECOVERY_REQUIRED');
-        if (j.stage === 'COMPLETE') {
-          await this.clearBarrier(j);
-          return WorkspaceStore.open(
-            path.join(j.target, 'db/database.sqlite'),
-            j.target,
-          );
-        }
-        if (j.stage === 'CANCELLED') {
-          if (
-            !same(j.old_identity, await identity(j.target)) ||
-            (await identity(j.candidate))
-          )
-            fail('WORKSPACE_RECOVERY_REQUIRED');
-          await this.clearBarrier(j);
-          return WorkspaceStore.open(
-            path.join(j.target, 'db/database.sqlite'),
-            j.target,
-          );
-        }
-        if (j.stage === 'ROLLED_BACK') fail('WORKSPACE_RECOVERY_REQUIRED');
-        const source = await this.source(j);
-        await this.backup.materializePreservation(source.root, source.manifest);
-        for (const group of ['candidates', 'quarantine', 'failed'])
-          await privateDirectory(
-            path.join(this.backup.paths.control, group),
-            true,
-          );
-        // A crash may occur after either rollback rename, before its journal fsync.
-        if (j.stage === 'VALIDATING') {
-          const live = await identity(j.target),
-            failed = await identity(j.failed_root),
-            old = await identity(j.old_root);
-          if (
-            !live &&
-            same(failed, j.candidate_identity) &&
-            same(old, j.old_identity)
-          ) {
-            await fs.rename(j.old_root, j.target);
-            await syncDirectory(path.dirname(j.target));
-            j.stage = 'ROLLED_BACK';
-            await this.write(j);
-            fail('WORKSPACE_RECOVERY_REQUIRED');
-          }
-          if (
-            same(live, j.old_identity) &&
-            same(failed, j.candidate_identity) &&
-            !old
-          ) {
-            j.stage = 'ROLLED_BACK';
-            await this.write(j);
-            fail('WORKSPACE_RECOVERY_REQUIRED');
-          }
-        }
-        if (j.stage === 'PENDING' || j.stage === 'PREPARING') {
-          const present = await identity(j.candidate);
-          if (present) {
-            if (!same(present, j.candidate_identity))
-              fail('WORKSPACE_RECOVERY_REQUIRED');
-            await fs.rm(j.candidate, { recursive: true });
-          }
-          await fs.mkdir(j.candidate, { mode: 0o700 });
-          j.candidate_identity = await identity(j.candidate);
-          j.stage = 'PREPARING';
-          await this.write(j);
-          const copiedInventory = path.join(
-            this.backup.paths.control,
-            'candidate-copy-' + j.operation_id + '.ndjson',
-          );
-          await fs
-            .unlink(copiedInventory)
-            .catch((error: NodeJS.ErrnoException) => {
-              if (error.code !== 'ENOENT') throw error;
-            });
-          await copyInventory(
-            path.join(source.root, 'data'),
-            j.candidate,
-            copiedInventory,
-            () => false,
-            { processed_bytes: 0, processed_files: 0 },
-          );
-          for await (const entry of inventoryLines(
-            path.join(source.root, 'inventory.ndjson'),
-          )) {
-            if (entry.kind === 'file' || entry.kind === 'directory')
-              await fs.chmod(path.join(j.candidate, entry.path), entry.mode);
-          }
-          await this.fault('restore-after-copy', {
-            operation_id: j.operation_id,
-          });
-          await this.reconcile(j.candidate);
-          if (
-            !same(j.old_identity, await identity(j.target)) ||
-            j.old_identity?.dev !== j.candidate_identity?.dev
-          )
-            fail('WORKSPACE_RECOVERY_REQUIRED');
-          j.stage = 'PREPARED';
-          await this.write(j);
-          await this.fault('restore-after-candidate-validation', {
-            operation_id: j.operation_id,
-          });
-        }
-        if (j.stage === 'PREPARED') {
-          const live = await identity(j.target),
-            old = await identity(j.old_root);
-          if (same(live, j.old_identity) && !old) {
-            await fs.rename(j.target, j.old_root);
-            await syncDirectory(path.dirname(j.target));
-            await syncDirectory(path.dirname(j.old_root));
-          } else if (live || !same(old, j.old_identity))
-            fail('WORKSPACE_RECOVERY_REQUIRED');
-          await this.fault('restore-after-old-rename', {
-            operation_id: j.operation_id,
-          });
-          j.stage = 'OLD_ROOT_MOVED';
-          await this.write(j);
-        }
-        if (j.stage === 'OLD_ROOT_MOVED') {
-          const live = await identity(j.target),
-            candidate = await identity(j.candidate);
-          if (!live && same(candidate, j.candidate_identity)) {
-            await fs.rename(j.candidate, j.target);
-            await syncDirectory(path.dirname(j.target));
-          } else if (candidate || !same(live, j.candidate_identity))
-            fail('WORKSPACE_RECOVERY_REQUIRED');
-          await this.fault('restore-after-candidate-publish', {
-            operation_id: j.operation_id,
-          });
-          j.stage = 'CANDIDATE_PUBLISHED';
-          await this.write(j);
-        }
-        try {
-          if (!same(await identity(j.target), j.candidate_identity))
-            fail('WORKSPACE_RECOVERY_REQUIRED');
-          j.stage = 'VALIDATING';
-          await this.write(j);
-          await this.fault('restore-before-final-validation', {
-            operation_id: j.operation_id,
-          });
-          await this.reconcile(j.target);
-          await this.fault('restore-after-final-validation', {
-            operation_id: j.operation_id,
-          });
-          await this.fault('restore-before-complete', {
-            operation_id: j.operation_id,
-          });
-          j.stage = 'COMPLETE';
-          await this.write(j);
-          await this.clearBarrier(j);
-          return WorkspaceStore.open(
-            path.join(j.target, 'db/database.sqlite'),
-            j.target,
-          );
-        } catch (error) {
-          if (
-            same(await identity(j.target), j.candidate_identity) &&
-            same(await identity(j.old_root), j.old_identity)
-          ) {
-            await fs.rename(j.target, j.failed_root);
-            await syncDirectory(path.dirname(j.target));
-            await this.fault('restore-after-failed-rename', {
-              operation_id: j.operation_id,
-            });
-            await fs.rename(j.old_root, j.target);
-            await syncDirectory(path.dirname(j.target));
-            j.stage = 'ROLLED_BACK';
-            await this.write(j);
-          }
-          throw error;
-        }
-      });
+      return await this.recoverOwned();
     } finally {
       await lifetime?.release();
     }
+  }
+
+  /** Caller retains the real backend owner FD; online and offline entry share every stage. */
+  private async recoverOwned(): Promise<WorkspaceStore> {
+    return this.backup.withCatalogLock(async () => {
+      const j = await this.status();
+      if (!j) fail('WORKSPACE_RECOVERY_REQUIRED');
+      if (j.stage === 'COMPLETE') {
+        await this.clearBarrier(j);
+        return WorkspaceStore.open(
+          path.join(j.target, 'db/database.sqlite'),
+          j.target,
+        );
+      }
+      if (j.stage === 'CANCELLED') {
+        if (
+          !same(j.old_identity, await identity(j.target)) ||
+          (await identity(j.candidate))
+        )
+          fail('WORKSPACE_RECOVERY_REQUIRED');
+        await this.clearBarrier(j);
+        return WorkspaceStore.open(
+          path.join(j.target, 'db/database.sqlite'),
+          j.target,
+        );
+      }
+      if (j.stage === 'ROLLED_BACK') fail('WORKSPACE_RECOVERY_REQUIRED');
+      const source = await this.source(j);
+      await this.backup.materializePreservation(source.root, source.manifest);
+      for (const group of ['candidates', 'quarantine', 'failed'])
+        await privateDirectory(
+          path.join(this.backup.paths.control, group),
+          true,
+        );
+      // A crash may occur after either rollback rename, before its journal fsync.
+      if (j.stage === 'VALIDATING') {
+        const live = await identity(j.target),
+          failed = await identity(j.failed_root),
+          old = await identity(j.old_root);
+        if (
+          !live &&
+          same(failed, j.candidate_identity) &&
+          same(old, j.old_identity)
+        ) {
+          await fs.rename(j.old_root, j.target);
+          await syncDirectory(path.dirname(j.target));
+          j.stage = 'ROLLED_BACK';
+          await this.write(j);
+          fail('WORKSPACE_RECOVERY_REQUIRED');
+        }
+        if (
+          same(live, j.old_identity) &&
+          same(failed, j.candidate_identity) &&
+          !old
+        ) {
+          j.stage = 'ROLLED_BACK';
+          await this.write(j);
+          fail('WORKSPACE_RECOVERY_REQUIRED');
+        }
+      }
+      if (j.stage === 'PENDING' || j.stage === 'PREPARING') {
+        const present = await identity(j.candidate);
+        if (present) {
+          if (!same(present, j.candidate_identity))
+            fail('WORKSPACE_RECOVERY_REQUIRED');
+          await fs.rm(j.candidate, { recursive: true });
+        }
+        await fs.mkdir(j.candidate, { mode: 0o700 });
+        j.candidate_identity = await identity(j.candidate);
+        j.stage = 'PREPARING';
+        await this.write(j);
+        const copiedInventory = path.join(
+          this.backup.paths.control,
+          'candidate-copy-' + j.operation_id + '.ndjson',
+        );
+        await fs
+          .unlink(copiedInventory)
+          .catch((error: NodeJS.ErrnoException) => {
+            if (error.code !== 'ENOENT') throw error;
+          });
+        await copyInventory(
+          path.join(source.root, 'data'),
+          j.candidate,
+          copiedInventory,
+          () => false,
+          { processed_bytes: 0, processed_files: 0 },
+        );
+        for await (const entry of inventoryLines(
+          path.join(source.root, 'inventory.ndjson'),
+        )) {
+          if (entry.kind === 'file' || entry.kind === 'directory')
+            await fs.chmod(path.join(j.candidate, entry.path), entry.mode);
+        }
+        await this.fault('restore-after-copy', {
+          operation_id: j.operation_id,
+        });
+        await this.reconcile(j.candidate);
+        if (
+          !same(j.old_identity, await identity(j.target)) ||
+          j.old_identity?.dev !== j.candidate_identity?.dev
+        )
+          fail('WORKSPACE_RECOVERY_REQUIRED');
+        j.stage = 'PREPARED';
+        await this.write(j);
+        await this.fault('restore-after-candidate-validation', {
+          operation_id: j.operation_id,
+        });
+      }
+      if (j.stage === 'PREPARED') {
+        const live = await identity(j.target),
+          old = await identity(j.old_root);
+        if (same(live, j.old_identity) && !old) {
+          await fs.rename(j.target, j.old_root);
+          await syncDirectory(path.dirname(j.target));
+          await syncDirectory(path.dirname(j.old_root));
+        } else if (live || !same(old, j.old_identity))
+          fail('WORKSPACE_RECOVERY_REQUIRED');
+        await this.fault('restore-after-old-rename', {
+          operation_id: j.operation_id,
+        });
+        j.stage = 'OLD_ROOT_MOVED';
+        await this.write(j);
+      }
+      if (j.stage === 'OLD_ROOT_MOVED') {
+        const live = await identity(j.target),
+          candidate = await identity(j.candidate);
+        if (!live && same(candidate, j.candidate_identity)) {
+          await fs.rename(j.candidate, j.target);
+          await syncDirectory(path.dirname(j.target));
+        } else if (candidate || !same(live, j.candidate_identity))
+          fail('WORKSPACE_RECOVERY_REQUIRED');
+        await this.fault('restore-after-candidate-publish', {
+          operation_id: j.operation_id,
+        });
+        j.stage = 'CANDIDATE_PUBLISHED';
+        await this.write(j);
+      }
+      try {
+        if (!same(await identity(j.target), j.candidate_identity))
+          fail('WORKSPACE_RECOVERY_REQUIRED');
+        j.stage = 'VALIDATING';
+        await this.write(j);
+        await this.fault('restore-before-final-validation', {
+          operation_id: j.operation_id,
+        });
+        await this.reconcile(j.target);
+        await this.fault('restore-after-final-validation', {
+          operation_id: j.operation_id,
+        });
+        await this.fault('restore-before-complete', {
+          operation_id: j.operation_id,
+        });
+        j.stage = 'COMPLETE';
+        await this.write(j);
+        await this.clearBarrier(j);
+        return WorkspaceStore.open(
+          path.join(j.target, 'db/database.sqlite'),
+          j.target,
+        );
+      } catch (error) {
+        if (
+          same(await identity(j.target), j.candidate_identity) &&
+          same(await identity(j.old_root), j.old_identity)
+        ) {
+          await fs.rename(j.target, j.failed_root);
+          await syncDirectory(path.dirname(j.target));
+          await this.fault('restore-after-failed-rename', {
+            operation_id: j.operation_id,
+          });
+          await fs.rename(j.old_root, j.target);
+          await syncDirectory(path.dirname(j.target));
+          j.stage = 'ROLLED_BACK';
+          await this.write(j);
+        }
+        throw error;
+      }
+    });
   }
   private async clearBarrier(journal: Journal) {
     const state = await this.backup.barrier.state();
