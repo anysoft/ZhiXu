@@ -4,6 +4,7 @@ import { WorkspaceStore } from './store';
 import { fail } from './errors';
 import type { WorkspaceRow } from './types';
 import { sha256 } from '../backup/files';
+import { backupMode } from './manifest';
 
 export interface PreservationProof {
   snapshot_key: string;
@@ -28,6 +29,10 @@ export class WorkspacePreservationService {
     row: WorkspaceRow,
   ): Promise<PreservationProof> {
     const { manifest } = await this.backup.snapshot(snapshotId);
+    // Reclaim proofs must keep Git source independently recoverable when its
+    // remote disappears. Lightweight deltas cannot authorize removing that source.
+    if (row.type === 'GIT' && backupMode(manifest) === 'LIGHTWEIGHT')
+      fail('WORKSPACE_PRESERVATION_REQUIRED');
     const entry = manifest.workspaces.find(
       (item) => item.workspace_id === row.id,
     );

@@ -7,6 +7,8 @@ import { WorkspaceRootResolver } from '../workspaceV2/roots';
 import { WorkspaceLeaseService } from '../workspaceV2/lease';
 import type { FaultHook } from '../workspaceV2/types';
 import { backupFailure } from '../workspaceV2/manifest';
+import type { BackupMode } from '../workspaceV2/manifest';
+import type { WorkspaceGitAccessResolver } from '../gitWorkspaceV2/git';
 import { backupId, acquireBackendLease } from './paths';
 import { PlatformBackupBarrier } from './barrier';
 import { RuntimeRestoreReconciler } from './runtimeRestore';
@@ -17,6 +19,11 @@ export interface OfflineBackupOptions {
   backupRoot: string;
   projectRoot?: string;
   fault?: FaultHook;
+  /** Trusted restore composition only; never selected by CLI flags or HTTP. */
+  lightweightGit?: {
+    gitToolsRoot?: string;
+    accessResolver?: WorkspaceGitAccessResolver;
+  };
 }
 
 /** Independent v2 catalog and disaster recovery. Read commands never open DATA SQLite. */
@@ -31,6 +38,7 @@ export class OfflineBackupManager {
     );
     this.restore = new WorkspaceRestoreService(this.backup, {
       fault: options.fault,
+      lightweightGit: options.lightweightGit,
     });
   }
 
@@ -47,6 +55,11 @@ export class OfflineBackupManager {
             created_at: manifest.created_at,
             bytes: manifest.total_bytes,
             files: manifest.file_count,
+            backup_mode: manifest.backup_mode ?? 'FULL',
+            restore_requires_remote:
+              manifest.restore_requires_remote ??
+              manifest.backup_mode === 'LIGHTWEIGHT',
+            warnings: manifest.warnings ?? [],
             verified: true,
           });
         } catch (error) {
@@ -70,7 +83,16 @@ export class OfflineBackupManager {
   async info(id: string) {
     return this.backup.withCatalogLock(async () => {
       const snapshot = await this.backup.snapshot(backupId(id));
-      return { id, verified: true, manifest: snapshot.manifest };
+      return {
+        id,
+        verified: true,
+        backup_mode: snapshot.manifest.backup_mode ?? 'FULL',
+        restore_requires_remote:
+          snapshot.manifest.restore_requires_remote ??
+          snapshot.manifest.backup_mode === 'LIGHTWEIGHT',
+        warnings: snapshot.manifest.warnings ?? [],
+        manifest: snapshot.manifest,
+      };
     });
   }
 
@@ -80,6 +102,11 @@ export class OfflineBackupManager {
       return {
         id,
         verified: true,
+        backup_mode: snapshot.manifest.backup_mode ?? 'FULL',
+        restore_requires_remote:
+          snapshot.manifest.restore_requires_remote ??
+          snapshot.manifest.backup_mode === 'LIGHTWEIGHT',
+        warnings: snapshot.manifest.warnings ?? [],
         manifest_sha256: (
           await hashFile(path.join(snapshot.root, 'manifest.json'))
         ).sha256,
@@ -90,7 +117,9 @@ export class OfflineBackupManager {
     });
   }
 
-  async create() {
+  async create(mode: BackupMode = 'FULL') {
+    if (!['FULL', 'LIGHTWEIGHT'].includes(mode))
+      throw new BackupError('BACKUP_MODE_INVALID');
     const owner = await acquireBackendLease(this.backup.paths);
     try {
       await this.backup.barrier.recoverAbandonedSnapshot();
@@ -108,7 +137,7 @@ export class OfflineBackupManager {
           this.options.backupRoot,
           { fault: this.options.fault },
         );
-        return { id: await backup.create() };
+        return { id: await backup.create(600000, mode), backup_mode: mode };
       } finally {
         await store.close();
       }

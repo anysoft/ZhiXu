@@ -39,6 +39,21 @@ docker compose run --rm --no-deps --entrypoint node platform-v2 \
 
 This command requires a valid existing v2 installation. It cannot create a backup from a corrupt database. Export an encrypted Portable file through the existing application flow while the application is healthy and keep an external copy, with its passphrase stored separately.
 
+### Choose a backup mode
+
+`create` defaults to `FULL`, as does the Web backup page. You can select the mode explicitly:
+
+```sh
+docker compose run --rm --no-deps --entrypoint node platform-v2 \
+  /app/static/build/backupCliV2.js create --mode full
+docker compose run --rm --no-deps --entrypoint node platform-v2 \
+  /app/static/build/backupCliV2.js create --mode lightweight
+```
+
+`FULL` preserves the current complete local Git repositories and checked-out files, alongside the database, LOCAL Workspaces and business data. It can restore those saved bytes when the remote repository is unavailable. Remote-only objects and external LFS/submodule data that were never downloaded are not an offline guarantee; check the backup's warnings.
+
+`LIGHTWEIGHT` keeps the database, configuration and LOCAL Workspaces in full, and saves Git references, exact commit IDs and local deltas instead of complete Git repositories and checkouts. Git restoration needs the original remote repository, required base objects and working credentials/proxy. The candidate is rebuilt and checked before publication; if the remote is unavailable, keep the original data and use a `FULL` backup. Both modes use the same encrypted Portable format and restore commands below. `list`, `info` and `verify` report the mode and recovery dependencies.
+
 ## Restore a local snapshot
 
 ```sh
@@ -99,5 +114,7 @@ If recovery was interrupted, keep the service stopped and run `status` first. Wh
 docker compose run --rm --no-deps --entrypoint node platform-v2 \
   /app/static/build/backupCliV2.js restore --resume
 ```
+
+If LIGHTWEIGHT Git reconstruction fails because the remote or required base objects are unavailable, the existing Journal/candidate may remain at `PREPARING` while the original data stays unchanged. Restore remote access (including credentials/proxy), then use `restore --resume`. A pending Journal blocks selecting another backup on the same data root. To use a `FULL` backup instead, restore it to a separate fresh data root (`--data-root /absolute/new/root`) or a new data volume, retaining the original root and Journal; verify that recovery before changing the deployment to use it.
 
 Preserve the candidate, quarantine and failed directories; do not delete journals or guess which SQLite file to copy. If `status` reports a rejected journal, a busy owner, insufficient space or failed validation, resolve the reported issue before starting the service.

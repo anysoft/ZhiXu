@@ -9,7 +9,10 @@ import {
   WorkspaceBackupManifest,
   manifestValue,
   backupFailure,
+  backupMode,
+  BackupMode,
 } from './manifest';
+import { LightweightGitService } from './lightweightGit';
 import { WorkspaceLimits, workspaceLimits } from './limits';
 import { fail, errorCode } from './errors';
 import type { FaultHook } from './types';
@@ -235,7 +238,50 @@ export class WorkspaceBackupService {
       fail('DISK_BUDGET_EXCEEDED', 422);
   }
 
-  async create(timeoutMs = 600000) {
+  private async appendLightweightInventory(
+    data: string,
+    inventory: string,
+    progress: { processed_bytes: number; processed_files: number },
+  ) {
+    const seen = new Set<string>();
+    for await (const entry of inventoryLines(inventory)) seen.add(entry.path);
+    const output = await fs.open(inventory, 'a');
+    const add = async (name: string, directory: boolean) => {
+      if (seen.has(name)) return;
+      const file = path.join(data, name);
+      const entry = directory
+        ? { path: name, kind: 'directory', mode: 0o700, size: 0 }
+        : { path: name, kind: 'file', mode: 0o600, ...(await hashFile(file)) };
+      await writeAll(output, Buffer.from(JSON.stringify(entry) + '\n'));
+      seen.add(name);
+      progress.processed_files++;
+      progress.processed_bytes += entry.size;
+    };
+    const walk = async (name: string, depth: number): Promise<void> => {
+      if (depth > 128 || seen.size > 1000000)
+        fail('BACKUP_QUOTA_EXCEEDED', 422);
+      await privateDirectory(path.join(data, name));
+      await add(name, true);
+      for (const entry of await fs.readdir(path.join(data, name), {
+        withFileTypes: true,
+      })) {
+        const child = name + '/' + entry.name;
+        if (entry.isDirectory()) await walk(child, depth + 1);
+        else if (entry.isFile()) await add(child, false);
+        else fail('BACKUP_SOURCE_INCOMPLETE');
+      }
+    };
+    try {
+      await add('tmp', true);
+      await walk('tmp/backup-lightweight', 0);
+      await output.sync();
+    } finally {
+      await output.close();
+    }
+  }
+
+  async create(timeoutMs = 600000, mode: BackupMode = 'FULL') {
+    if (!['FULL', 'LIGHTWEIGHT'].includes(mode)) fail('INVALID_REQUEST', 400);
     if (this.store.dataRoot !== this.paths.data)
       fail('WORKSPACE_RECOVERY_REQUIRED');
     return this.withCatalogLock(() =>
@@ -243,6 +289,21 @@ export class WorkspaceBackupService {
         () => this.idle(),
         async () => {
           const workspaces = await this.domain.collect(this.store);
+          const lightweight = mode === 'LIGHTWEIGHT';
+          if (
+            lightweight &&
+            (await fs
+              .lstat(path.join(this.paths.data, 'tmp/backup-lightweight'))
+              .catch(() => null))
+          )
+            fail('BACKUP_SOURCE_INCOMPLETE');
+          const skip = (name: string) =>
+            excluded(name) ||
+            (lightweight &&
+              (name === 'git' ||
+                name.startsWith('git/') ||
+                name === 'workspaces/git' ||
+                name.startsWith('workspaces/git/')));
           const dependencies = [];
           for (const held of await this.store.all<{ snapshot_key: string }>(
             'SELECT DISTINCT snapshot_key FROM WorkspacePreservationHolds WHERE released_at IS NULL ORDER BY snapshot_key',
@@ -256,10 +317,17 @@ export class WorkspaceBackupService {
           }
           if (dependencies.length > 1024) fail('BACKUP_QUOTA_EXCEEDED', 422);
           const payloadEstimate =
-            (await this.measure(this.paths.data, (name) =>
-              EXCLUDED.some(
-                (prefix) => name === prefix || name.startsWith(prefix + '/'),
-              ),
+            (await this.measure(
+              this.paths.data,
+              (name) =>
+                (lightweight &&
+                  (name === 'git' ||
+                    name.startsWith('git/') ||
+                    name === 'workspaces/git' ||
+                    name.startsWith('workspaces/git/'))) ||
+                EXCLUDED.some(
+                  (prefix) => name === prefix || name.startsWith(prefix + '/'),
+                ),
             )) +
             dependencies.reduce((sum, dependency) => sum + dependency.bytes, 0);
           if (payloadEstimate > this.limits.backupSnapshotBytes)
@@ -278,9 +346,24 @@ export class WorkspaceBackupService {
               this.paths.data,
               data,
               path.join(allocated.root, 'inventory.ndjson'),
-              excluded,
+              skip,
               progress,
             );
+            const git = lightweight
+              ? new LightweightGitService(this.store)
+              : null;
+            const lightweightGit = git
+              ? await git.capture(
+                  path.join(data, 'tmp/backup-lightweight'),
+                  workspaces,
+                )
+              : undefined;
+            if (lightweightGit)
+              await this.appendLightweightInventory(
+                data,
+                path.join(allocated.root, 'inventory.ndjson'),
+                progress,
+              );
             await this.fault('backup-after-copy', { id: allocated.id });
             await fs
               .mkdir(path.join(data, 'db'), { mode: 0o700 })
@@ -351,7 +434,17 @@ export class WorkspaceBackupService {
             }
             const manifest: WorkspaceBackupManifest = {
               format_family: 'zhixu-workspace-backup',
-              format_version: 2,
+              format_version: lightweight ? 3 : 2,
+              backup_mode: mode,
+              restore_requires_remote: !!lightweightGit?.repositories.length,
+              warnings: lightweight
+                ? lightweightGit?.repositories.length
+                  ? ['LIGHTWEIGHT_REQUIRES_REMOTE_GIT_BASE']
+                  : []
+                : await new LightweightGitService(this.store).fullWarnings(
+                    workspaces,
+                  ),
+              ...(lightweightGit ? { lightweight_git: lightweightGit } : {}),
               backup_id: allocated.id,
               created_at: new Date().toISOString(),
               schema_identity: 'zhixu.workspace.v2.s0.1',
@@ -378,6 +471,12 @@ export class WorkspaceBackupService {
             };
             if (manifest.total_bytes > this.limits.backupSnapshotBytes)
               fail('BACKUP_QUOTA_EXCEEDED', 422);
+            if (
+              retained + manifest.total_bytes >
+              this.limits.backupRetainedBytes
+            )
+              fail('BACKUP_QUOTA_EXCEEDED', 422);
+            if (lightweight) await this.reserve(0);
             await privateJson(
               path.join(allocated.root, 'manifest.json'),
               manifest,
@@ -524,7 +623,38 @@ export class WorkspaceBackupService {
     );
     try {
       await validateDatabase(path.join(root, 'data/db/database.sqlite'));
-      await this.domain.collect(store, 'snapshot', manifest.workspaces, modes);
+      if (backupMode(manifest) === 'LIGHTWEIGHT') {
+        if (!manifest.lightweight_git) fail('BACKUP_SOURCE_INCOMPLETE');
+        if (
+          (await fs.lstat(path.join(root, 'data/git')).catch(() => null)) ||
+          (await fs
+            .lstat(path.join(root, 'data/workspaces/git'))
+            .catch(() => null))
+        )
+          fail('BACKUP_SOURCE_INCOMPLETE');
+        await new LightweightGitService(store).validate(
+          path.join(root, 'data/tmp/backup-lightweight'),
+          manifest.lightweight_git,
+          manifest.workspaces,
+        );
+        if (
+          manifest.restore_requires_remote !==
+          !!manifest.lightweight_git.repositories.length
+        )
+          fail('BACKUP_SOURCE_INCOMPLETE');
+        await this.domain.collect(
+          store,
+          'lightweight',
+          manifest.workspaces,
+          modes,
+        );
+      } else
+        await this.domain.collect(
+          store,
+          'snapshot',
+          manifest.workspaces,
+          modes,
+        );
     } finally {
       await store.close();
     }

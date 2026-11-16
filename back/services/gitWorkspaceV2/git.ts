@@ -179,6 +179,55 @@ export class WorkspaceGitAdapter {
     return this.supervised(leases, options, action);
   }
 
+  /** Trusted offline-candidate composition: the ordinary credential, proxy and
+   * supervised command boundary, before a repository asset has been rebuilt. */
+  async withRemoteCommands<T>(
+    repositoryId: number,
+    options: WorkspaceGitOptions,
+    action: (
+      run: (
+        args: string[],
+        cwd: string,
+        allowFailure?: boolean,
+      ) => Promise<{ code: number; stdout: string; stderr: string }>,
+      remote: string,
+    ) => Promise<T>,
+  ): Promise<T> {
+    positiveId(repositoryId);
+    const repository = (
+      await this.store.all<GitRepositoryRow>(
+        'SELECT * FROM Repositories WHERE id=?',
+        [repositoryId],
+      )
+    )[0];
+    if (!repository) stop('REPOSITORY_NOT_FOUND', 404);
+    const access = await applyGitProxy(
+      await this.access(repository),
+      this.store,
+      repositoryId,
+      options.workspaceId,
+    );
+    try {
+      const environment = this.localEnvironment();
+      for (const [key, value] of Object.entries(access.env))
+        if (
+          /^(?:GIT_|SSH_ASKPASS|SSH_ASKPASS_REQUIRE|SSH_SK_HELPER|DISPLAY$|(?:https?|all|no)_proxy$)/i.test(
+            key,
+          )
+        )
+          environment[key] = value;
+      return await this.supervised([], options, (run) =>
+        action(
+          (args, cwd, allowFailure = false) =>
+            run(args, cwd, environment, allowFailure),
+          access.remote,
+        ),
+      );
+    } finally {
+      await access.cleanup();
+    }
+  }
+
   private async supervised<T>(
     leases: WorkspaceLease[],
     options: WorkspaceGitOptions,

@@ -10,7 +10,8 @@ import type { FaultHook, GitWorkspaceRow, WorkspaceRow } from './types';
 import { inspectGitWorkspace } from './gitStorage';
 import { acquireBackendLease, BackupPaths, backupId } from '../backup/paths';
 import { PlatformBackupBarrier } from '../backup/barrier';
-import { backupFailure } from './manifest';
+import { backupFailure, backupMode } from './manifest';
+import { LightweightGitService, LightweightGitOptions } from './lightweightGit';
 import { RuntimeRestoreReconciler } from '../backup/runtimeRestore';
 import { reconcileRepositoryAssets } from './repositoryAssets';
 import { copyInventory, inventoryLines } from '../backup/inventory';
@@ -126,7 +127,10 @@ export class WorkspaceRestoreService {
   readonly fault: FaultHook;
   constructor(
     readonly backup: WorkspaceBackupService,
-    options: { fault?: FaultHook } = {},
+    readonly options: {
+      fault?: FaultHook;
+      lightweightGit?: LightweightGitOptions;
+    } = {},
   ) {
     this.fault = options.fault || (async () => undefined);
   }
@@ -607,6 +611,28 @@ export class WorkspaceRestoreService {
         await this.fault('restore-after-copy', {
           operation_id: j.operation_id,
         });
+        if (backupMode(source.manifest) === 'LIGHTWEIGHT') {
+          if (!source.manifest.lightweight_git)
+            fail('BACKUP_SOURCE_INCOMPLETE');
+          const candidateStore = await WorkspaceStore.open(
+            path.join(j.candidate, 'db/database.sqlite'),
+            j.candidate,
+          );
+          try {
+            await new LightweightGitService(
+              candidateStore,
+              this.options.lightweightGit,
+            ).rebuild(
+              path.join(j.candidate, 'tmp/backup-lightweight'),
+              source.manifest.lightweight_git,
+            );
+          } finally {
+            await candidateStore.close();
+          }
+          await fs.rm(path.join(j.candidate, 'tmp/backup-lightweight'), {
+            recursive: true,
+          });
+        }
         await this.reconcile(j.candidate);
         if (
           !same(j.old_identity, await identity(j.target)) ||

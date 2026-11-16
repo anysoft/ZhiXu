@@ -3,6 +3,7 @@ import path from 'path';
 import { randomBytes } from 'crypto';
 import { assertV2BackendNode } from './applicationV2/backendNode';
 import { openRegular } from './services/backup/files';
+import type { BackupMode } from './services/workspaceV2/manifest';
 
 const HELP = `ZhiXu v2 offline backup management
 
@@ -11,7 +12,7 @@ Usage: node /app/static/build/backupCliV2.js <command> [options]
   list                         List local snapshots, independently of the live database
   info <id>                    Show a snapshot manifest
   verify <id>                  Verify manifest, SQLite, hashes and Workspace/Git data
-  create                       Create a full snapshot of a healthy, stopped instance
+  create [--mode full|lightweight] Create a snapshot of a healthy, stopped instance
   restore --snapshot <id>      Restore a local snapshot; preserve the old data root
   restore --file <path>        Import and restore an encrypted Portable backup
   restore --resume             Resume an interrupted restore using its existing journal
@@ -20,6 +21,7 @@ Usage: node /app/static/build/backupCliV2.js <command> [options]
 Options:
   --data-root <absolute path>   Defaults to ZHIXU_V2_DATA_ROOT
   --backup-root <absolute path> Defaults to ZHIXU_V2_BACKUP_ROOT, or <data-root>-backups
+  --mode full|lightweight       Create only; defaults to full. Lightweight Git recovery needs the remote.
   --passphrase-file <path>      Private, service-user-owned file for restore --file
   --passphrase-stdin            Read the passphrase from stdin for restore --file
   --help                       Show this help without opening storage
@@ -33,6 +35,7 @@ interface BackupCliArguments {
   command: 'list' | 'info' | 'verify' | 'create' | 'restore' | 'status';
   dataRoot: string;
   backupRoot: string;
+  mode: BackupMode;
   id?: string;
   snapshot?: string;
   file?: string;
@@ -62,6 +65,7 @@ export function parseBackupCliArguments(
       ![
         '--data-root',
         '--backup-root',
+        '--mode',
         '--snapshot',
         '--file',
         '--resume',
@@ -84,6 +88,12 @@ export function parseBackupCliArguments(
   )
     usageError();
   if (positional.length !== (['info', 'verify'].includes(command) ? 2 : 1))
+    usageError();
+  if (
+    values['--mode'] !== undefined &&
+    (command !== 'create' ||
+      !['full', 'lightweight'].includes(values['--mode'] as string))
+  )
     usageError();
   const restoreOptions = ['--snapshot', '--file', '--resume'],
     phraseOptions = ['--passphrase-file', '--passphrase-stdin'];
@@ -120,6 +130,7 @@ export function parseBackupCliArguments(
     command,
     dataRoot,
     backupRoot: backupRoot as string,
+    mode: values['--mode'] === 'lightweight' ? 'LIGHTWEIGHT' : 'FULL',
     id: positional[1],
     snapshot: values['--snapshot'] as string | undefined,
     file: values['--file']
@@ -234,7 +245,7 @@ export async function runBackupCliV2(args = process.argv.slice(2)) {
         result = await manager.verify(options.id!);
         break;
       case 'create':
-        result = await manager.create();
+        result = await manager.create(options.mode);
         break;
       case 'status':
         result = await manager.status();
@@ -256,6 +267,18 @@ export async function runBackupCliV2(args = process.argv.slice(2)) {
 }
 
 function backupCliHint(code: string): string {
+  if (code === 'BACKUP_LIGHTWEIGHT_EXTERNAL_GIT_UNSUPPORTED')
+    return 'Lightweight backup does not support this external Git data layout. Use FULL and review LFS/submodule backup warnings.';
+  if (
+    code === 'RESTORE_LIGHTWEIGHT_REMOTE_UNAVAILABLE_USE_FULL' ||
+    code === 'RESTORE_LIGHTWEIGHT_BASE_MISSING_USE_FULL'
+  )
+    return 'Restore access to the original Git remote and required objects, check credentials/proxy, then run restore --resume. A pending journal blocks another restore on this data root; alternatively restore a FULL backup to a separate fresh data root or volume. Keep the original data and journal.';
+  if (
+    code.startsWith('BACKUP_LIGHTWEIGHT_') ||
+    code.startsWith('RESTORE_LIGHTWEIGHT_')
+  )
+    return 'The lightweight data could not be validated or reconstructed. Keep the original data and journal, verify the backup and run status. If using a FULL backup while a restore is pending, restore it to a separate fresh data root or volume.';
   if (code === 'RESTORE_BACKEND_ACTIVE')
     return 'Stop the normal ZhiXu backend, then retry this offline command.';
   if (

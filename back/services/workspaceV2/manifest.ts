@@ -20,6 +20,12 @@ import {
 import { collectManifestReferences } from './manifestReferences';
 import { verifyRepositoryAssets } from './repositoryAssets';
 import { hashFile, privateDirectory, relativeName } from '../backup/files';
+import type { LightweightGitMetadata } from './lightweightGit';
+
+export type BackupMode = 'FULL' | 'LIGHTWEIGHT';
+export const backupMode = (
+  manifest: Pick<WorkspaceBackupManifest, 'backup_mode'>,
+): BackupMode => manifest.backup_mode ?? 'FULL';
 
 export interface SourceReference {
   task_id: number;
@@ -71,7 +77,11 @@ export interface WorkspaceManifestEntry {
 }
 export interface WorkspaceBackupManifest {
   format_family: 'zhixu-workspace-backup';
-  format_version: 2;
+  format_version: 2 | 3;
+  backup_mode?: BackupMode;
+  restore_requires_remote?: boolean;
+  warnings?: string[];
+  lightweight_git?: LightweightGitMetadata;
   backup_id: string;
   created_at: string;
   schema_identity: string;
@@ -131,7 +141,7 @@ export function manifestValue(value: unknown): WorkspaceBackupManifest {
   if (
     !record ||
     record.format_family !== 'zhixu-workspace-backup' ||
-    record.format_version !== 2 ||
+    (record.format_version !== 2 && record.format_version !== 3) ||
     record.schema_identity !== WORKSPACE_SCHEMA_IDENTITY ||
     record.schema_signature !== WORKSPACE_SCHEMA_SIGNATURE ||
     typeof record.backup_id !== 'string' ||
@@ -140,6 +150,26 @@ export function manifestValue(value: unknown): WorkspaceBackupManifest {
     !Array.isArray(record.preserved_snapshots) ||
     !Number.isSafeInteger(record.total_bytes) ||
     !Number.isSafeInteger(record.file_count)
+  )
+    fail('BACKUP_SOURCE_INCOMPLETE');
+  if (
+    (record.backup_mode !== undefined &&
+      !['FULL', 'LIGHTWEIGHT'].includes(String(record.backup_mode))) ||
+    (record.format_version === 2 && record.backup_mode === 'LIGHTWEIGHT') ||
+    (record.format_version === 3 &&
+      (record.backup_mode !== 'LIGHTWEIGHT' ||
+        !object(record.lightweight_git))) ||
+    (record.format_version === 2 && record.lightweight_git !== undefined) ||
+    (record.restore_requires_remote !== undefined &&
+      typeof record.restore_requires_remote !== 'boolean') ||
+    (record.warnings !== undefined &&
+      (!Array.isArray(record.warnings) ||
+        record.warnings.length > 1000 ||
+        record.warnings.some(
+          (warning) =>
+            typeof warning !== 'string' ||
+            !/^[A-Z][A-Z0-9_]{0,100}$/.test(warning),
+        )))
   )
     fail('BACKUP_SOURCE_INCOMPLETE');
   for (const key of ['database', 'inventory']) {
@@ -312,6 +342,7 @@ export class WorkspaceBackupDomain {
     store: WorkspaceStore,
     row: WorkspaceRow,
     root: string,
+    virtualEntries?: InventoryEntry[],
   ): Promise<SourceReference[]> {
     const sources = await store.all<SourceRow>(
       `SELECT s.task_id,s.relative_entrypoint,s.language,s.cwd_mode,s.cwd_relative_path,
@@ -325,26 +356,32 @@ export class WorkspaceBackupDomain {
       relativeName(source.relative_entrypoint);
       const file = path.join(root, source.relative_entrypoint);
       let available = false;
-      try {
-        const handle = await fs.open(
-          file,
-          constants.O_RDONLY | constants.O_NOFOLLOW | constants.O_NONBLOCK,
+      if (virtualEntries) {
+        available = virtualEntries.some(
+          (entry) =>
+            entry.path === source.relative_entrypoint && entry.kind === 'file',
         );
+      } else
         try {
-          const stat = await handle.stat();
-          if (
-            !stat.isFile() ||
-            stat.nlink !== 1 ||
-            (process.getuid && stat.uid !== process.getuid())
-          )
-            fail('BACKUP_SOURCE_INCOMPLETE');
-          available = true;
-        } finally {
-          await handle.close();
+          const handle = await fs.open(
+            file,
+            constants.O_RDONLY | constants.O_NOFOLLOW | constants.O_NONBLOCK,
+          );
+          try {
+            const stat = await handle.stat();
+            if (
+              !stat.isFile() ||
+              stat.nlink !== 1 ||
+              (process.getuid && stat.uid !== process.getuid())
+            )
+              fail('BACKUP_SOURCE_INCOMPLETE');
+            available = true;
+          } finally {
+            await handle.close();
+          }
+        } catch (error) {
+          if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error;
         }
-      } catch (error) {
-        if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error;
-      }
       if (!available) {
         let definition: Record<string, unknown> | null = null;
         try {
@@ -391,7 +428,7 @@ export class WorkspaceBackupDomain {
 
   async collect(
     store: WorkspaceStore,
-    mode: 'live' | 'snapshot' = 'live',
+    mode: 'live' | 'snapshot' | 'lightweight' = 'live',
     expected?: WorkspaceManifestEntry[],
     sourceModes?: Map<string, number>,
   ) {
@@ -404,14 +441,17 @@ export class WorkspaceBackupDomain {
 
   private async collectUnchecked(
     store: WorkspaceStore,
-    mode: 'live' | 'snapshot',
+    mode: 'live' | 'snapshot' | 'lightweight',
     expected?: WorkspaceManifestEntry[],
     sourceModes?: Map<string, number>,
   ) {
     await store.verifySchema();
     if (!(await this.assertIdle(store))) fail('BACKUP_RECOVERY_REQUIRED');
     await this.assertConfigAssets(store);
-    await verifyRepositoryAssets(store, { relocated: mode === 'snapshot' });
+    // Lightweight payloads authenticate Git recipes; actual objects are proved in
+    // the separate candidate before publication. LOCAL/config proofs stay physical.
+    if (mode !== 'lightweight')
+      await verifyRepositoryAssets(store, { relocated: mode === 'snapshot' });
     const rows = await store.all<WorkspaceRow>(
       'SELECT * FROM Workspaces ORDER BY id',
     );
@@ -421,6 +461,10 @@ export class WorkspaceBackupDomain {
     for (const row of rows) {
       const prior = expected?.find((item) => item.workspace_id === row.id);
       const root = roots.path(row);
+      const deferredGit =
+        mode === 'lightweight' &&
+        row.type === 'GIT' &&
+        row.storage_state === 'PRESENT';
       let entries: InventoryEntry[] = [],
         fileCount = 0,
         totalBytes = 0;
@@ -430,11 +474,50 @@ export class WorkspaceBackupDomain {
           (await fs.lstat(root).catch(() => null))
         )
           fail('BACKUP_SOURCE_INCOMPLETE');
+      } else if (deferredGit) {
+        if (
+          !prior ||
+          !Array.isArray(prior.content_inventory) ||
+          prior.content_inventory.length > this.limits.maxWorkspaceEntries
+        )
+          fail('BACKUP_SOURCE_INCOMPLETE');
+        entries = prior.content_inventory.map((entry) => ({ ...entry }));
+        const names = new Set<string>();
+        for (const entry of entries) {
+          relativeName(entry.path);
+          if (
+            names.has(entry.path) ||
+            ['.git', OWNER_MARKER].some(
+              (name) =>
+                entry.path === name || entry.path.startsWith(name + '/'),
+            ) ||
+            !['file', 'directory'].includes(entry.kind) ||
+            !Number.isInteger(entry.mode) ||
+            entry.mode < 0 ||
+            entry.mode > 0o777 ||
+            !Number.isSafeInteger(entry.size) ||
+            entry.size < 0 ||
+            (entry.kind === 'file'
+              ? !/^[a-f0-9]{64}$/.test(entry.sha256 ?? '')
+              : entry.size !== 0)
+          )
+            fail('BACKUP_SOURCE_INCOMPLETE');
+          names.add(entry.path);
+        }
+        fileCount = entries.filter((entry) => entry.kind === 'file').length;
+        totalBytes = entries.reduce((sum, entry) => sum + entry.size, 0);
+        if (
+          hashWorkspaceRecords(entries) !== row.content_inventory_hash ||
+          row.file_count !== fileCount ||
+          row.total_bytes !== totalBytes ||
+          totalBytes > this.limits.maxWorkspaceBytes
+        )
+          fail('BACKUP_SOURCE_INCOMPLETE');
       } else {
         await roots.verifyAt(row, root, mode === 'live');
         const scanned = await scanWorkspace(root, row.type, this.limits);
         entries = scanned.entries.map((entry) => ({ ...entry }));
-        if (mode === 'snapshot') {
+        if (mode !== 'live') {
           if (!prior || !sourceModes || !Array.isArray(prior.content_inventory))
             fail('BACKUP_SOURCE_INCOMPLETE');
           for (const entry of entries) {
@@ -483,11 +566,29 @@ export class WorkspaceBackupDomain {
       );
       let git: GitWorkspaceSummary | ReclaimedGitSummary | null =
         row.type === 'GIT' && row.storage_state === 'PRESENT'
-          ? await inspectGitWorkspace(store, store.dataRoot, row, gitRow, {
-              repair: false,
-              relocated: mode === 'snapshot',
-            })
+          ? deferredGit
+            ? prior?.git ?? null
+            : await inspectGitWorkspace(store, store.dataRoot, row, gitRow, {
+                repair: false,
+                relocated: mode === 'snapshot',
+              })
           : null;
+      if (deferredGit) {
+        if (
+          !git ||
+          !('head' in git) ||
+          !/^(?:[a-f0-9]{40}|[a-f0-9]{64})$/.test(git.head) ||
+          git.repository_id !== gitRow.repository_id ||
+          git.storage_key !== `git/repository-${gitRow.repository_id}.git` ||
+          git.ref_type !== gitRow.ref_type ||
+          git.ref_name !== gitRow.ref_name ||
+          git.private_branch !== gitRow.private_branch ||
+          git.resolved_commit !== gitRow.resolved_commit ||
+          git.applied_commit !== gitRow.applied_commit ||
+          git.last_verified_commit !== gitRow.last_verified_commit
+        )
+          fail('BACKUP_SOURCE_INCOMPLETE');
+      }
       if (row.type === 'GIT' && row.storage_state === 'RECLAIMED') {
         const repository = (
           await store.all<{
@@ -563,7 +664,12 @@ export class WorkspaceBackupDomain {
         content_inventory: entries,
         source_references:
           row.storage_state === 'PRESENT'
-            ? await this.sourceReferences(store, row, root)
+            ? await this.sourceReferences(
+                store,
+                row,
+                root,
+                deferredGit ? entries : undefined,
+              )
             : [],
         git,
         environment_config_references: refs,

@@ -619,5 +619,15 @@
   "v2.maintenanceAutomaticFailed": "最近一次自动清理未全部完成，请查看错误并重试。",
   "v2.cleanupErrorCount": "错误数量",
   "v2.maintenanceLastAutomatic": "最近自动清理时间",
-  "v2.maintenanceUsagePartial": "统计不完整，部分数据未计入"
+  "v2.maintenanceUsagePartial": "统计不完整，部分数据未计入",
+  "v2.backupMode": "备份模式",
+  "v2.backupMode.FULL": "全量备份 · FULL",
+  "v2.backupMode.LIGHTWEIGHT": "轻量备份 · LIGHTWEIGHT",
+  "v2.backupFullHelp": "完整保存本地数据和 Git 代码，备份较大，适合重要备份及已保存在本地数据的离线恢复。",
+  "v2.backupLightweightHelp": "保存本地增量和必要的 Git 信息。恢复 Git Workspace 需要访问原远程仓库及基础对象；远程不可用时，请使用 FULL 备份。",
+  "v2.backupRecoveryDependency": "恢复依赖",
+  "v2.backupRecoveryRemote": "原 Git 远程仓库、所需对象及有效凭据／代理",
+  "v2.backupRecoveryLocal": "恢复备份中已包含的本地数据；托管 Runtime 需要重建",
+  "v2.backupFullLfsWarning": "检测到 Git LFS 配置。本备份保留已下载到本地的 LFS 数据；请检查未下载的外部对象是否需要单独备份。",
+  "v2.backupFullSubmoduleWarning": "检测到 Git Submodule 配置。请确认所需子模块文件及对象已保存在本地；未下载的外部数据需要单独备份。"
 }

@@ -619,5 +619,15 @@
   "v2.maintenanceAutomaticFailed": "The latest automatic cleanup did not complete fully. Review the error and retry.",
   "v2.cleanupErrorCount": "Error count",
   "v2.maintenanceLastAutomatic": "Last automatic cleanup attempt",
-  "v2.maintenanceUsagePartial": "Partial scan; some data is not included"
+  "v2.maintenanceUsagePartial": "Partial scan; some data is not included",
+  "v2.backupMode": "Backup mode",
+  "v2.backupMode.FULL": "Full backup · FULL",
+  "v2.backupMode.LIGHTWEIGHT": "Lightweight backup · LIGHTWEIGHT",
+  "v2.backupFullHelp": "Saves local data and Git code completely. Larger backups are suited to important backups and offline recovery of data already present locally.",
+  "v2.backupLightweightHelp": "Saves local changes and necessary Git metadata. Restoring Git workspaces requires the original remote repository and its base objects; if unavailable, use a FULL backup.",
+  "v2.backupRecoveryDependency": "Recovery requirements",
+  "v2.backupRecoveryRemote": "Original Git remote, required objects and valid credentials / proxy",
+  "v2.backupRecoveryLocal": "Restore the local data included in this backup; managed runtimes need rebuilding",
+  "v2.backupFullLfsWarning": "Git LFS configuration was detected. This backup preserves locally downloaded LFS data; check whether external objects that were never downloaded need a separate backup.",
+  "v2.backupFullSubmoduleWarning": "Git submodule configuration was detected. Check that required submodule files and objects are present locally; external data that was never downloaded needs a separate backup."
 }

@@ -29,12 +29,14 @@ import { StorageStatus } from '../features/StorageStatus';
 import { StorageMaintenance } from '../features/StorageMaintenance';
 import { SecuritySettings } from '../features/SecuritySettings';
 import { ProxyManagement } from '../features/Proxy';
-import { BackupManifest } from '../features/BackupManifest';
+import { BackupManifest, backupMode } from '../features/BackupManifest';
+import { formatStorageBytes } from '../features/History';
 function BackupRestore() {
   const t = useText(),
     data = useResource('/backups'),
     restore = useResource('/restore/status', 3000),
     action = useAction(),
+    [mode, setMode] = useState<'FULL' | 'LIGHTWEIGHT'>('FULL'),
     [operationId, setOperationId] = useState<string>(),
     operation = useResource(
       operationId ? '/backups/operations/' + operationId : null,
@@ -78,10 +80,21 @@ function BackupRestore() {
       <Alert type="info" showIcon message={t('restoreHelp')} />
       <div className="v2-toolbar v2-section">
         <Space wrap>
+          <Select
+            aria-label={t('backupMode')}
+            value={mode}
+            disabled={active}
+            style={{ width: 230 }}
+            onChange={setMode}
+            options={['FULL', 'LIGHTWEIGHT'].map((value) => ({
+              value,
+              label: t(`backupMode.${value}`),
+            }))}
+          />
           <Button
             type="primary"
             disabled={active || restore.data?.stage === 'PENDING'}
-            onClick={() => void action.run(() => start('/backups'))}
+            onClick={() => void action.run(() => start('/backups', { mode }))}
           >
             {t('newBackup')}
           </Button>
@@ -99,6 +112,9 @@ function BackupRestore() {
           />
         </Space>
       </div>
+      <Typography.Paragraph type="secondary">
+        {t(mode === 'LIGHTWEIGHT' ? 'backupLightweightHelp' : 'backupFullHelp')}
+      </Typography.Paragraph>
       <ErrorPanel
         error={data.error || restore.error || operation.error || action.error}
       />
@@ -215,6 +231,10 @@ function BackupRestore() {
         columns={[
           { title: t('id'), dataIndex: 'id' },
           {
+            title: t('backupMode'),
+            render: (_, r: any) => t(`backupMode.${backupMode(r)}`),
+          },
+          {
             title: t('createdAt'),
             render: (_, r: any) => <Time value={r.created_at || r.createdAt} />,
           },
@@ -225,7 +245,9 @@ function BackupRestore() {
           {
             title: t('size'),
             render: (_, r: any) =>
-              r.bytes ?? r.size ?? r.total_bytes ?? r.size_bytes,
+              formatStorageBytes(
+                r.bytes ?? r.size ?? r.total_bytes ?? r.size_bytes,
+              ),
           },
           {
             title: t('actions'),

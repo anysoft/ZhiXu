@@ -32,6 +32,7 @@ function phrase(body: Record<string, unknown>) {
   return Buffer.from(input, 'utf8');
 }
 function publicManifest(manifest: WorkspaceBackupManifest, held = false) {
+  const mode = manifest.backup_mode ?? 'FULL';
   return {
     id: manifest.backup_id,
     created_at: v.utcTimestamp(manifest.created_at),
@@ -42,6 +43,9 @@ function publicManifest(manifest: WorkspaceBackupManifest, held = false) {
       signature: manifest.schema_signature,
     },
     mode: 'FULL_PORTABLE',
+    backup_mode: mode,
+    restore_requires_remote:
+      manifest.restore_requires_remote ?? mode === 'LIGHTWEIGHT',
     size: manifest.total_bytes,
     file_count: manifest.file_count,
     source_os: null,
@@ -63,7 +67,11 @@ function publicManifest(manifest: WorkspaceBackupManifest, held = false) {
         0,
       ),
     },
-    validation: { status: 'PASS', warnings: [], historical_missing_log: 0 },
+    validation: {
+      status: 'PASS',
+      warnings: manifest.warnings ?? [],
+      historical_missing_log: 0,
+    },
     held,
     workspaces: manifest.workspaces.map((entry) => ({
       workspace_id: entry.workspace_id,
@@ -228,12 +236,16 @@ export function registerBackupApi(
   app.post(
     '/api/backups',
     handle(async (req) => {
-      const input = body(req, ['timeout_ms']);
+      const input = body(req, ['timeout_ms', 'mode']);
       const timeout =
         input.timeout_ms === undefined
           ? 600000
           : v.number(input.timeout_ms, 1, 3600000);
-      return operations.start('SNAPSHOT', () => s.backup.create(timeout));
+      const mode =
+        input.mode === undefined
+          ? 'FULL'
+          : v.choice(input.mode, ['FULL', 'LIGHTWEIGHT']);
+      return operations.start('SNAPSHOT', () => s.backup.create(timeout, mode));
     }),
   );
   app.get(
