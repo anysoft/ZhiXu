@@ -258,6 +258,7 @@
   "v2.productionOnly": "Production dependencies only",
   "v2.installScripts": "Install scripts policy",
   "v2.operations": "Operations",
+  "v2.providerInstalled": "Installed pyenv {version}",
   "v2.providerSetup": "Set up Python provider",
   "v2.refreshCatalog": "Refresh catalog",
   "v2.newEnvironment": "New environment",

@@ -241,7 +241,7 @@ function LanguageRuntime({
     runtimes = useResource(base + '/installations', 4000),
     environments = useResource(base + '/environments', 4000),
     catalog = useResource(base + '/catalog'),
-    provider = useResource(kind === 'python' ? base + '/provider' : null),
+    provider = useResource(kind === 'python' ? base + '/provider' : null, 4000),
     tools = useResource(kind === 'node' ? base + '/toolchains' : null),
     action = useAction(),
     [dialog, setDialog] = useState<string>(),
@@ -280,11 +280,22 @@ function LanguageRuntime({
             <State value={provider.data?.state || provider.data?.status} />
             <Button
               loading={action.busy}
+              disabled={
+                provider.loading ||
+                !provider.data ||
+                ['READY', 'INSTALLING', 'UPDATING'].includes(
+                  provider.data.state,
+                )
+              }
               onClick={() =>
                 void action.run(() => launch(base + '/provider/setup'))
               }
             >
-              {t('providerSetup')}
+              {provider.data?.state === 'READY'
+                ? t('providerInstalled', {
+                    version: provider.data.provider_version || '',
+                  })
+                : t('providerSetup')}
             </Button>
             <Button
               loading={action.busy}

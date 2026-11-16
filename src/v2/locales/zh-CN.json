@@ -258,6 +258,7 @@
   "v2.productionOnly": "仅生产依赖",
   "v2.installScripts": "安装脚本策略",
   "v2.operations": "操作记录",
+  "v2.providerInstalled": "已安装 pyenv {version}",
   "v2.providerSetup": "安装 Python 提供方",
   "v2.refreshCatalog": "刷新版本目录",
   "v2.newEnvironment": "新建托管环境",
