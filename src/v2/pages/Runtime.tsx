@@ -240,7 +240,7 @@ function LanguageRuntime({
     base = `/runtime/${kind}`,
     runtimes = useResource(base + '/installations', 4000),
     environments = useResource(base + '/environments', 4000),
-    catalog = useResource(base + '/catalog'),
+    catalog = useResource(base + '/catalog', 4000),
     provider = useResource(kind === 'python' ? base + '/provider' : null, 4000),
     tools = useResource(kind === 'node' ? base + '/toolchains' : null),
     action = useAction(),
@@ -335,6 +335,14 @@ function LanguageRuntime({
                   onClick={() => setDialog('environment')}
                 >
                   {t('newEnvironment')}
+                </Button>
+                <Button
+                  className="v2-section"
+                  onClick={() => setDialog('install')}
+                >
+                  {t('installLanguage', {
+                    language: kind === 'python' ? 'Python' : 'Node.js',
+                  })}
                 </Button>
                 <Table
                   rowKey="id"
@@ -498,7 +506,15 @@ function LanguageRuntime({
       )}
       {dialog && (
         <FormDialog
-          title={t(dialog === 'environment' ? 'newEnvironment' : 'install')}
+          key={dialog}
+          submitText={dialog === 'install' ? t('install') : undefined}
+          title={
+            dialog === 'install'
+              ? t('installLanguage', {
+                  language: kind === 'python' ? 'Python' : 'Node.js',
+                })
+              : t(dialog === 'environment' ? 'newEnvironment' : 'install')
+          }
           initial={{
             name: '',
             description: '',
@@ -546,21 +562,62 @@ function LanguageRuntime({
           }}
         >
           {dialog === 'install' ? (
-            <Form.Item
-              name="version"
-              label={t('runtimeVersion')}
-              rules={[required()]}
-            >
-              <Select
-                showSearch
-                options={versions.map((value: string) => ({
-                  value,
-                  label: value,
-                }))}
-              />
-            </Form.Item>
+            <>
+              {!catalog.loading && !versions.length && (
+                <Alert
+                  type="info"
+                  showIcon
+                  message={t('runtimeCatalogEmpty')}
+                  action={
+                    <Button
+                      onClick={() =>
+                        void action.run(() =>
+                          launch(
+                            base +
+                              (kind === 'python'
+                                ? '/provider/catalog'
+                                : '/catalog'),
+                          ),
+                        )
+                      }
+                    >
+                      {t('refreshCatalog')}
+                    </Button>
+                  }
+                />
+              )}
+              <Form.Item
+                name="version"
+                label={t('runtimeVersion')}
+                rules={[required()]}
+              >
+                <Select
+                  showSearch
+                  loading={catalog.loading}
+                  options={versions.map((value: string) => ({
+                    value,
+                    label: value,
+                  }))}
+                />
+              </Form.Item>
+            </>
           ) : (
             <>
+              {!runtimes.loading &&
+                !list(runtimes.data).some((r: any) => r.state === 'READY') && (
+                  <Alert
+                    type="info"
+                    showIcon
+                    message={t('runtimeInstallationRequired')}
+                    action={
+                      <Button onClick={() => setDialog('install')}>
+                        {t('installLanguage', {
+                          language: kind === 'python' ? 'Python' : 'Node.js',
+                        })}
+                      </Button>
+                    }
+                  />
+                )}
               <Form.Item
                 name="runtime_id"
                 label={t('runtime')}
