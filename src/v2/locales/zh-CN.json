@@ -524,5 +524,19 @@
   "v2.status.RESOURCE_UNAVAILABLE": "资源不可用",
   "v2.status.COMMITTED": "已提交",
   "v2.status.ACCEPTED": "已受理",
-  "v2.status.REJECTED": "已拒绝"
+  "v2.status.REJECTED": "已拒绝",
+  "v2.syncResolution": "选择处理方式",
+  "v2.syncResolutionHelp": "本地与远端历史不一致。自动同步已停止，本地文件保留。请检查提交后选择处理方式。",
+  "v2.syncKeepLocal": "保留本地，暂不更新",
+  "v2.syncRemoteCopy": "备份后创建远端副本",
+  "v2.syncManualMerge": "导出后人工合并",
+  "v2.syncKeepHelp": "关闭向导后仍保留同步受阻提示。现有任务继续使用本地代码；这不表示远端更新已成功。",
+  "v2.syncRemoteHelp": "先创建完整备份，再按当前分支创建新的 Git 工作区。原工作区、文件和任务绑定不会被覆盖。新副本验证通过后，请人工切换任务。",
+  "v2.syncManualHelp": "先创建完整备份，再到系统设置 → 备份与恢复导出该备份（设置导出口令）。在独立 Git 环境比较并合并本地与远端提交，保留原工作区，验证后再切换任务。不要直接对托管目录执行 reset --hard。",
+  "v2.syncBackupFirst": "先创建完整备份",
+  "v2.syncExportBackup": "前往系统设置 → 备份与恢复，导出此备份",
+  "v2.syncCopyConfirm": "我确认创建新工作区，并在验证后人工切换任务；原工作区和任务绑定保留。",
+  "v2.syncCreateRemote": "确认创建远端副本",
+  "v2.syncOpenCopy": "查看新工作区",
+  "v2.syncTaskSwitchHelp": "等待新工作区就绪后，检查文件和运行环境，再在任务编辑页选择新工作区；本向导不会自动迁移或重复启用任务。"
 }

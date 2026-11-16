@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link } from '@umijs/max';
 import {
   Alert,
@@ -30,6 +30,7 @@ import {
 } from '../components';
 import { useText, diagnostic } from '../i18n';
 import { Logs } from './Logs';
+import { SyncResolution, needsSyncResolution } from './SyncResolution';
 
 export function GitPanel({
   workspace,
@@ -48,7 +49,30 @@ export function GitPanel({
     [preview, setPreview] = useState<any>(),
     [sync, setSync] = useState<any>(),
     [diff, setDiff] = useState<any>(),
-    syncKey = useRef(requestKey());
+    syncKey = useRef(requestKey()),
+    finishedSync = useRef<number>();
+  const recent = useResource(base + '/sync-history?size=1', 5000);
+  const tracked = useResource(
+    sync?.id ? `${base}/sync-runs/${sync.id}` : null,
+    sync && ['QUEUED', 'RUNNING'].includes(sync.status) ? 1500 : 0,
+  );
+  const [resolution, setResolution] = useState<any>();
+  const latestSync = list(recent.data)[0];
+  const visibleSync =
+    sync && (!latestSync || sync.id >= latestSync.id) ? sync : latestSync;
+  useEffect(() => {
+    if (!tracked.data) return;
+    setSync(tracked.data);
+    if (
+      !['QUEUED', 'RUNNING'].includes(tracked.data.status) &&
+      finishedSync.current !== tracked.data.id
+    ) {
+      finishedSync.current = tracked.data.id;
+      void status.reload();
+      void policy.reload();
+      onChanged();
+    }
+  }, [tracked.data, status.reload, policy.reload, onChanged]);
   const writable = workspace.capabilities.write_files;
   const request = () => ({
     expected_version: workspace.version,
@@ -59,6 +83,8 @@ export function GitPanel({
       <ErrorPanel
         error={
           status.error ||
+          tracked.error ||
+          recent.error ||
           policy.error ||
           action.error ||
           (dialog === 'identity' ? identity.error : undefined)
@@ -242,6 +268,11 @@ export function GitPanel({
             <Space>
               <State value={preview.readiness} />
               {preview.error_code && diagnostic(preview.error_code)}
+              {needsSyncResolution(preview.error_code) && (
+                <Button onClick={() => setResolution(preview)}>
+                  {t('syncResolution')}
+                </Button>
+              )}
             </Space>
           }
           description={
@@ -256,22 +287,50 @@ export function GitPanel({
           onClose={() => setPreview(undefined)}
         />
       )}
-      {sync && (
+      {visibleSync && (
         <Alert
           className="v2-section"
-          type="info"
           showIcon
+          type={
+            ['FAILED', 'BLOCKED', 'RECOVERY_REQUIRED', 'INTERRUPTED'].includes(
+              visibleSync.status,
+            )
+              ? 'warning'
+              : ['SUCCESS', 'NO_CHANGE'].includes(visibleSync.status)
+              ? 'success'
+              : 'info'
+          }
           message={
             <Space>
-              {t('syncHistory')} #{sync.id}
-              <State value={sync.status} />
+              {t('syncHistory')} #{visibleSync.id}
+              <State value={visibleSync.status} />
               <Link to={`/workspaces/${workspace.id}?tab=sync-history`}>
                 {t('details')}
               </Link>
+              {needsSyncResolution(visibleSync.error_code) && (
+                <Button onClick={() => setResolution(visibleSync)}>
+                  {t('syncResolution')}
+                </Button>
+              )}
             </Space>
           }
-          closable
-          onClose={() => setSync(undefined)}
+          description={
+            visibleSync.error_code ? (
+              <>
+                <div>{diagnostic(visibleSync.error_code)}</div>
+                <code>{visibleSync.error_code}</code>
+              </>
+            ) : (
+              visibleSync.phase
+            )
+          }
+        />
+      )}
+      {resolution && (
+        <SyncResolution
+          workspace={workspace}
+          run={resolution}
+          onClose={() => setResolution(undefined)}
         />
       )}
       {diff && (
@@ -480,7 +539,8 @@ export function SyncHistory({ workspace }: { workspace: any }) {
     base = `/workspaces/${workspace.id}`,
     data = useResource(base + '/sync-history?size=50', 2500),
     action = useAction(),
-    [selected, setSelected] = useState<any>();
+    [selected, setSelected] = useState<any>(),
+    [resolution, setResolution] = useState<any>();
   const detail = useResource(
       selected ? `${base}/sync-runs/${selected.id}` : null,
       2000,
@@ -572,6 +632,11 @@ export function SyncHistory({ workspace }: { workspace: any }) {
               description={row.error_code}
             />
           )}
+          {needsSyncResolution(row.error_code) && (
+            <Button onClick={() => setResolution(row)}>
+              {t('syncResolution')}
+            </Button>
+          )}
           {['QUEUED', 'RUNNING'].includes(row.status) && (
             <Button
               danger
@@ -594,6 +659,13 @@ export function SyncHistory({ workspace }: { workspace: any }) {
             <Logs path={`${base}/sync-runs/${row.id}/log`} />
           </div>
         </Drawer>
+      )}
+      {resolution && (
+        <SyncResolution
+          workspace={workspace}
+          run={resolution}
+          onClose={() => setResolution(undefined)}
+        />
       )}
     </>
   );

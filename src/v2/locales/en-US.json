@@ -524,5 +524,19 @@
   "v2.status.RESOURCE_UNAVAILABLE": "Resource unavailable",
   "v2.status.COMMITTED": "Committed",
   "v2.status.ACCEPTED": "Accepted",
-  "v2.status.REJECTED": "Rejected"
+  "v2.status.REJECTED": "Rejected",
+  "v2.syncResolution": "Choose resolution",
+  "v2.syncResolutionHelp": "Local and remote history differ. Automatic sync is blocked and local files are preserved. Review commits before choosing a resolution.",
+  "v2.syncKeepLocal": "Keep local for now",
+  "v2.syncRemoteCopy": "Back up and create remote copy",
+  "v2.syncManualMerge": "Export and merge manually",
+  "v2.syncKeepHelp": "The blocked warning remains. Existing tasks keep using local code; this does not mean remote updates succeeded.",
+  "v2.syncRemoteHelp": "Create a full backup, then a new Git workspace from the current branch. Existing files and task bindings are preserved. Verify the copy before switching tasks manually.",
+  "v2.syncManualHelp": "Create a full backup, then export it with a passphrase in Settings → Backup and restore. Compare and merge commits in an independent Git checkout. Keep the original workspace until verified, then switch tasks. Do not run reset --hard in managed directories.",
+  "v2.syncBackupFirst": "Create full backup first",
+  "v2.syncExportBackup": "Open Settings → Backup and restore to export this backup",
+  "v2.syncCopyConfirm": "I confirm a new workspace will be created; I will verify it and switch tasks manually. Original files and task bindings are preserved.",
+  "v2.syncCreateRemote": "Confirm remote copy",
+  "v2.syncOpenCopy": "View new workspace",
+  "v2.syncTaskSwitchHelp": "Wait for the new workspace to become ready, verify files and runtime settings, then select it in each task editor. This wizard does not migrate or duplicate scheduled tasks."
 }
