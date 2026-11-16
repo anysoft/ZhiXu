@@ -325,6 +325,59 @@ function LanguageRuntime({
         destroyInactiveTabPane
         items={[
           {
+            key: 'installations',
+            label: t('installations'),
+            children: (
+              <>
+                <Button
+                  className="v2-section"
+                  type="primary"
+                  onClick={() => setDialog('install')}
+                >
+                  {t('install')}
+                </Button>
+                <Table
+                  rowKey="id"
+                  dataSource={list(runtimes.data)}
+                  columns={[
+                    { title: t('id'), dataIndex: 'id' },
+                    { title: t('runtimeVersion'), dataIndex: 'version' },
+                    {
+                      title: t('status'),
+                      dataIndex: 'state',
+                      render: (v) => <State value={v} />,
+                    },
+                    {
+                      title: t('health'),
+                      dataIndex: 'health',
+                      render: (v) => <State value={v} />,
+                    },
+                    {
+                      title: t('actions'),
+                      render: (_, r: any) => (
+                        <Space>
+                          {['verify', 'repair'].map((op) => (
+                            <Button
+                              key={op}
+                              loading={action.busy}
+                              onClick={() =>
+                                void action.run(() =>
+                                  launch(base + `/installations/${r.id}/${op}`),
+                                )
+                              }
+                            >
+                              {t(op)}
+                            </Button>
+                          ))}
+                        </Space>
+                      ),
+                    },
+                  ]}
+                />
+              </>
+            ),
+          },
+          {
             key: 'environments',
             label: t('environments'),
             children: (
@@ -400,59 +453,6 @@ function LanguageRuntime({
               </>
             ),
           },
-          {
-            key: 'installations',
-            label: t('installations'),
-            children: (
-              <>
-                <Button
-                  className="v2-section"
-                  type="primary"
-                  onClick={() => setDialog('install')}
-                >
-                  {t('install')}
-                </Button>
-                <Table
-                  rowKey="id"
-                  dataSource={list(runtimes.data)}
-                  columns={[
-                    { title: t('id'), dataIndex: 'id' },
-                    { title: t('runtimeVersion'), dataIndex: 'version' },
-                    {
-                      title: t('status'),
-                      dataIndex: 'state',
-                      render: (v) => <State value={v} />,
-                    },
-                    {
-                      title: t('health'),
-                      dataIndex: 'health',
-                      render: (v) => <State value={v} />,
-                    },
-                    {
-                      title: t('actions'),
-                      render: (_, r: any) => (
-                        <Space>
-                          {['verify', 'repair'].map((op) => (
-                            <Button
-                              key={op}
-                              loading={action.busy}
-                              onClick={() =>
-                                void action.run(() =>
-                                  launch(base + `/installations/${r.id}/${op}`),
-                                )
-                              }
-                            >
-                              {t(op)}
-                            </Button>
-                          ))}
-                        </Space>
-                      ),
-                    },
-                  ]}
-                />
-              </>
-            ),
-          },
           ...(kind === 'node'
             ? [
                 {
@@ -507,7 +507,7 @@ function LanguageRuntime({
       {dialog && (
         <FormDialog
           key={dialog}
-          submitText={dialog === 'install' ? t('install') : undefined}
+          submitText={dialog !== 'environment' ? t('install') : undefined}
           title={
             dialog === 'install'
               ? t('installLanguage', {
