@@ -1,7 +1,8 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs/promises');
-const { createSyncFixture } = require('./sync-fixture.cjs');
+const { createSyncFixture, syncServices } = require('./sync-fixture.cjs');
+const { createGitFixture } = require('./git-fixture.cjs');
 test('S3-SCHEDULE-009 Cron/Interval and pinned-ref policy constraints reject without mutating canonical policy or history', async (t) => {
   const f = await createSyncFixture(t, { caseId: 'S3-SCHEDULE-009' });
   const before = await f.policies.get(f.row.id);
@@ -60,7 +61,7 @@ test('S3-SCHEDULE-009 Cron/Interval and pinned-ref policy constraints reject wit
     f.policies.save(pinned.id, { ...write(interval), expected_version: 1 }),
     (error) => error.error_code === 'SYNC_POLICY_INVALID',
   );
-  assert.equal((await f.policies.get(pinned.id)).enabled, 0);
+  assert.equal((await f.policies.get(pinned.id)).enabled, 1);
   assert.equal((await f.policies.get(pinned.id)).update_mode, 'MANUAL');
   const disabled = await f.policies.save(f.row.id, {
     expected_version: before.version,
@@ -222,5 +223,39 @@ test('S3-SCHEDULE-010 actual archived Git Workspace permits CAS disable only and
     rejects_enable_and_schedule_change: true,
     source_identity_preserved: true,
     no_new_sync_or_outbox: true,
+  });
+});
+
+test('new Git workspace permits manual sync by default without scheduling and preserves explicit disable', async (t) => {
+  const f = await createGitFixture(t, { caseId: 'DEFAULT-MANUAL-SYNC' });
+  Object.assign(f, await syncServices(f));
+  const initial = await f.policies.get(f.row.id);
+  assert.equal(initial.enabled, 1);
+  assert.equal(initial.update_mode, 'MANUAL');
+  assert.equal(initial.next_due_at, null);
+  const run = await f.sync.wait(
+    (
+      await f.sync.submit(f.row.id, { requestKey: 'default-manual' })
+    ).id,
+  );
+  assert.equal(run.status, 'SUCCESS', run.error_code);
+  const persisted = await f.policies.get(f.row.id);
+  assert.equal(persisted.enabled, 1);
+  assert.equal(persisted.update_mode, 'MANUAL');
+  await f.scheduler.tick();
+  assert.equal(
+    (await f.store.all('SELECT id FROM WorkspaceSyncRuns')).length,
+    1,
+  );
+  const disabled = await f.policies.save(f.row.id, {
+    expected_version: persisted.version,
+    enabled: false,
+    mode: 'MANUAL',
+    schedule: null,
+  });
+  await f.store.transaction((tx) => f.policies.ensure(tx, f.row.id));
+  assert.deepEqual(await f.policies.get(f.row.id), disabled);
+  await assert.rejects(f.sync.submit(f.row.id), {
+    error_code: 'SYNC_POLICY_DISABLED',
   });
 });

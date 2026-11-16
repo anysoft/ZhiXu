@@ -38,7 +38,7 @@ export class WorkspaceSyncPolicies {
     const ws = await tx.workspace(positiveId(id));
     if (ws.type !== 'GIT') fail('WORKSPACE_TYPE_INVALID');
     await tx.run(
-      'INSERT OR IGNORE INTO WorkspaceSyncPolicies(workspace_id) VALUES(?)',
+      "INSERT OR IGNORE INTO WorkspaceSyncPolicies(workspace_id,enabled,update_mode) VALUES(?,1,'MANUAL')",
       [id],
     );
     return (
@@ -59,7 +59,7 @@ export class WorkspaceSyncPolicies {
         )
       )[0] ?? {
         workspace_id: id,
-        enabled: 0,
+        enabled: 1,
         update_mode: 'MANUAL',
         schedule_kind: 'NONE',
         cron_expression: null,

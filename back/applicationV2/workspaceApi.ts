@@ -288,7 +288,7 @@ export function workspaceApiRoutes(s: V2Services): RouteMap {
           refName: v.text(git.ref_name, 1024),
           initialization: {
             sync_policy: input.sync_policy ?? {
-              enabled: false,
+              enabled: true,
               mode: 'MANUAL',
               schedule: null,
             },
