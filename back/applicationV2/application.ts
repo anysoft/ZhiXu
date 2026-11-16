@@ -287,6 +287,15 @@ export class V2Application {
   private async wireHttp() {
     if (this.routesWired) return;
     this.routesWired = true;
+    const { version: applicationVersion } = JSON.parse(
+      await fs.readFile(
+        path.join(
+          this.options.projectRoot ?? path.resolve(__dirname, '../..'),
+          'package.json',
+        ),
+        'utf8',
+      ),
+    );
     const app = this.app;
     app.use(this.httpLifetime.admission);
     app.disable('x-powered-by');
@@ -395,7 +404,7 @@ export class V2Application {
               schema_identity: 'zhixu.workspace.v2.s0.1',
               schema_version: 'S0-2026-11-13',
               build_id: this.admission?.build_id ?? null,
-              version: '1.0.0-rc.6',
+              version: applicationVersion,
               storage: {
                 ...usage,
                 status: this.localWrites ? 'READY' : 'RECOVERY_REQUIRED',
