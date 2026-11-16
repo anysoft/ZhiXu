@@ -1,4 +1,4 @@
-name: Linux CI Foundation
+name: ZhiXu Linux CI
 
 on:
   workflow_dispatch:

@@ -112,7 +112,19 @@ async function until(fn){const deadline=Date.now()+60000;let last;while(Date.now
  await operation('/runtime/python/provider/setup');await operation('/runtime/python/installations',{version:'3.13.15'});
  const pyRuntime=(await checked('/runtime/python/installations'))[0];
  const pyEnv=await checked('/runtime/python/environments','POST',{name:'Task Python Environment',runtime_id:pyRuntime.id,requirements:['ql-phase7-root==1.0.0']});await operation(`/runtime/python/environments/${pyEnv.id}/build`,{expected_version:pyEnv.version});
- await operation('/runtime/node/catalog');await operation('/runtime/node/installations',{version:require('./managed-node/result.json').runtime.version});const nodeRuntime=(await checked('/runtime/node/installations'))[0];await operation('/runtime/node/toolchains',{runtime_id:nodeRuntime.id,manager_type:'NPM'});const tool=(await checked('/runtime/node/toolchains'))[0];
+ const nodeCatalogOperation = await operation('/runtime/node/catalog');
+ const preparedNode = require(require('./node-catalog-fixture.cjs').manifestFile());
+ const requestedNodeVersion = preparedNode.runtime.version;
+ const persistedCatalog = await checked('/runtime/node/catalog');
+ const expectedArtifact = process.platform === 'darwin' ? `osx-${process.arch}-tar` : `${process.platform}-${process.arch}`;
+ const selectedEntry = persistedCatalog.versions.find(entry => entry.version === requestedNodeVersion);
+ const catalogEvidence = { requested_version: requestedNodeVersion, platform: process.platform, arch: process.arch,
+   node_platform: `${process.platform}-${process.arch}`, provider_id: nodeCatalogOperation.provider_id,
+   catalog: persistedCatalog.versions, selected_entry: selectedEntry || null, expected_artifact: expectedArtifact };
+ evidence.node_catalog = catalogEvidence;
+ console.log('BROWSER_NODE_CATALOG', JSON.stringify(catalogEvidence));
+ assert.ok(selectedEntry && selectedEntry.files.includes(expectedArtifact), 'Browser persisted catalog must admit requested version/platform');
+ await operation('/runtime/node/installations',{version:requestedNodeVersion});const nodeRuntime=(await checked('/runtime/node/installations'))[0];await operation('/runtime/node/toolchains',{runtime_id:nodeRuntime.id,manager_type:'NPM'});const tool=(await checked('/runtime/node/toolchains'))[0];
  const nodeEnv=await checked('/runtime/node/environments','POST',{name:'Task Node Environment',runtime_id:nodeRuntime.id,toolchain_id:tool.id,dependencies:[{name:'ql-phase8-foo',specifier:'1.0.0',type:'DEPENDENCY'}],install_scripts_policy:'IGNORE'});await operation(`/runtime/node/environments/${nodeEnv.id}/build`,{expected_version:nodeEnv.version});mark('real-python-venv-and-node-dependency-environments');
  const dialog=()=>page.locator('.ant-modal:visible').filter({has:page.locator('.ant-modal-title').filter({hasText:(locale === 'zh-CN' ? /^(任务：|创建任务)/ : /^(Task:|Create Task)/)})});
  async function taskTab(name){return activateTab(dialog(),ui(name));}

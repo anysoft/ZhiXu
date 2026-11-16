@@ -27623,5 +27623,15 @@
     "classification": "TEST_FIXTURE_REVIEW",
     "action": "KEEP",
     "reason": "Recorded isolated test environment/root/protocol assertion in tests/workspace-v2/s5r/runtime-tree-loader.test.cjs; retain exact legacy identifier to test rejection or isolation, not a product label."
+  },
+  "9aa4ad7d12d6bcb41c9eca2c858983b9a61c60eee0cd4b29b0a0b26bf827a0fa": {
+    "classification": "TEST_FIXTURE_REVIEW",
+    "action": "KEEP",
+    "reason": "Exact current-job managed manifest environment key used only by the Browser catalog fixture and its isolation regression; not a displayed product brand."
+  },
+  "afa2c51827c1d38c3e8d96dd876ce14dac1cf093398113d6601851d9d633256f": {
+    "classification": "TEST_FIXTURE_REVIEW",
+    "action": "KEEP",
+    "reason": "Exact current-job managed manifest environment key used only by the Browser catalog fixture and its isolation regression; not a displayed product brand."
   }
 }

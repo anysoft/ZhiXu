@@ -152,7 +152,8 @@ async function port() {
   await page
     .getByLabel(ui('确认密码'), { exact: true })
     .fill(acceptance.secret('focused-browser-password'));
-  await page.getByRole('button', { name: pattern('提交') }).click();
+  await page.getByRole('button', { name: ui('ui.setup.next'), exact: true }).click();
+  await page.getByRole('button', { name: ui('ui.setup.confirm'), exact: true }).click();
   await page.getByRole('button', { name: ui('去登录'), exact: true }).click();
   await page.getByLabel(ui('用户名'), { exact: true }).waitFor();
   await verify('login');

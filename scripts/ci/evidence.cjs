@@ -43,7 +43,7 @@ function collect(s) {
   const previous = path.join(
     repository,
     'ci-packages',
-    `phase16a-${safeName(s.job)}-${safeName(s.run)}-${execFileSync(
+    `zhixu-linux-ci-${safeName(s.job)}-${safeName(s.run)}-${execFileSync(
       'git',
       ['rev-parse', '--short=12', 'HEAD'],
       { cwd: repository, encoding: 'utf8' },
@@ -177,7 +177,7 @@ function collect(s) {
       fs.writeFileSync(target, data, { mode: 0o600 });
     }
   const summary = {
-    phase: '16A',
+    phase: 'LINUX_CI',
     job: s.job,
     status: failure ? 'FAIL' : s.status || 'UNKNOWN',
     collection: failure ? 'BLOCKED' : 'PASS',
@@ -211,7 +211,7 @@ function pack(s) {
   const output = path.join(repository, 'ci-packages');
   fs.mkdirSync(output, { recursive: true });
   assert.ok(!fs.lstatSync(output).isSymbolicLink());
-  const name = `phase16a-${safeName(s.job)}-${safeName(
+  const name = `zhixu-linux-ci-${safeName(s.job)}-${safeName(
     s.run,
   )}-${summary.commit.slice(0, 12)}.tar.gz`;
   const target = path.join(output, name);
@@ -260,7 +260,7 @@ function summarize(needs, artifacts = {}) {
     !needs.core ||
     (needs.core.result === 'success' && (!core.tests || !core.typecheck));
   return {
-    phase: '16A',
+    phase: 'LINUX_CI',
     commit: process.env.CI_COMMIT || null,
     runner: { os: 'ubuntu-24.04', arch: core.preflight?.arch || 'UNKNOWN' },
     jobs,
@@ -286,7 +286,7 @@ function summarize(needs, artifacts = {}) {
       )
         ? 'FAIL'
         : 'PASS',
-    qualification: 'NOT_PHASE15_QUALIFICATION',
+    qualification: 'NOT_RELEASE_QUALIFICATION',
   };
 }
 module.exports = {

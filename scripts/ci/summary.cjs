@@ -31,7 +31,7 @@ fs.writeFileSync(
   JSON.stringify(result, null, 2) + '\n',
 );
 const lines = [
-  '# Phase16A Linux CI Summary',
+  '# ZhiXu Linux CI Summary',
   '',
   `Commit: ${result.commit || 'unknown'}`,
   '',
@@ -53,7 +53,7 @@ lines.push(
     result.typecheck.errors ?? 'unavailable'
   }, raw failed ${result.typecheck.raw_failed ?? 'unavailable'}`,
   '',
-  'This run establishes CI infrastructure; it is not Phase15 qualification.',
+  'This report summarizes Linux CI results. It is not a release qualification report.',
 );
 if (process.env.GITHUB_STEP_SUMMARY)
   fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, lines.join('\n') + '\n');

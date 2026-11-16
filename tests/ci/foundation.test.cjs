@@ -44,7 +44,7 @@ function fixture(t) {
     for (const f of fs.existsSync('ci-packages')
       ? fs.readdirSync('ci-packages')
       : [])
-      if (f.startsWith('phase16a-' + s.job + '-'))
+      if (f.startsWith('zhixu-linux-ci-' + s.job + '-'))
         fs.rmSync(path.join('ci-packages', f));
   });
   fs.mkdirSync(path.join(output, 'logs'));
@@ -62,7 +62,9 @@ test('failed test still collects and packages bounded diagnostics with machine s
     JSON.parse(fs.readFileSync(path.join(dir, 'ci-summary.json'))).status,
     'FAIL',
   );
-  assert.ok(fs.statSync(pack(s)).size > 0);
+  const archive = pack(s);
+  assert.match(path.basename(archive), /^zhixu-linux-ci-/);
+  assert.ok(fs.statSync(archive).size > 0);
 });
 test('canary rejects publication and invalidates a previous archive', (t) => {
   const s = fixture(t);

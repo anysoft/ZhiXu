@@ -365,6 +365,7 @@ async function browser(s) {
         {},
         1200,
       );
+    await run(s, 'browser-runtime-catalog', [process.execPath, '--test', 'tests/ci/browser-node-catalog.test.cjs'], extra, 240);
     await run(s, 'browser-tab-tests', [process.execPath, '--test', 'tests/ci/browser-tab.test.cjs'], extra, 120);
     for (const [phase, file] of [
       ['phase12', 'browser-e2e.cjs'],
@@ -407,6 +408,7 @@ async function browser(s) {
       status: failure ? 'FAIL' : 'PASS',
       failed_stage: failure ? failure.stage || 'browser' : null,
       failure_detail: failureDetail || null,
+      runtime_catalog: stageEvidence(s, 'browser-runtime-catalog', true),
       tab_interaction: stageEvidence(s, 'browser-tab-tests'),
       backend_build: stageEvidence(s, 'backend-build'),
       frontend_build: stageEvidence(s, 'frontend-build'),
