@@ -1,3 +1,4 @@
+import { hasHistoryQuery } from '../shared/historyQuery';
 import nodeEnvironmentRoutes from './nodeEnvironment';
 import pythonEnvironmentRoutes from './pythonEnvironment';
 import { Router, Request, Response } from 'express';
@@ -38,6 +39,10 @@ export function operationDto(row: RuntimeOperation) {
     exit_code: row.exit_code,
     error_code: row.error_code,
     error_summary: row.error_summary,
+    submitted_at:
+      (row as RuntimeOperation & { createdAt?: Date | string }).createdAt ??
+      null,
+    log_cleaned: row.metadata.log_cleaned === true,
   };
 }
 export function endpoint(
@@ -168,7 +173,15 @@ export default function runtimeRoutes(
   );
   app.get(
     base + '/operations',
-    endpoint(async () => (await runtime.operations()).map(operationDto)),
+    endpoint(async (req) => {
+      if (!hasHistoryQuery(req.query))
+        return (await runtime.operations()).map(operationDto);
+      const result = await runtime.operations({
+        ...req.query,
+        language: 'PYTHON',
+      });
+      return { ...result, items: result.items.map(operationDto) };
+    }),
   );
   app.get(
     base + '/operations/:id',
@@ -180,7 +193,7 @@ export default function runtimeRoutes(
     base + '/operations/:id/log',
     endpoint(async (req) => {
       const row = await runtime.operation(runtimeId(req.params.id));
-      return RuntimeOperationLog.read(runtime.paths, row.id);
+      return runtime.operationLog(row.id);
     }),
   );
   app.post(

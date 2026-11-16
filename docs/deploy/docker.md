@@ -59,6 +59,12 @@ Restore through the application's import, validation/preview and confirmation fl
 
 There is no v9-to-v2 upgrade path. Future v2 upgrades require an explicitly compatible schema and a verified backup. Arbitrary downgrade is not guaranteed; restore a compatible backup into a separate installation for rollback.
 
+## Logs and storage maintenance
+
+Compose keeps Docker stdout/stderr on the `json-file` driver with `max-size: 10m` and `max-file: '3'`. Equivalent standalone Docker options are `--log-driver json-file --log-opt max-size=10m --log-opt max-file=3`. The application never deletes Docker Engine log files and requires no cron or logrotate package.
+
+Settings → Storage maintenance manages application-owned history and logs in the data volume. Daily maintenance defaults to 90 days for Task history, 30 days for Runtime operation history and 30 unused days for rebuildable download caches. Each retention can be set to keep forever. Running/recovering or referenced records are skipped; installed runtimes, environments, verified artifact stores, Workspaces, repositories and backups are preserved. Scans show counts and bytes before manual confirmation. Large cleanups are bounded batches and may require another scan.
+
 ## Release checks
 
 The release workflow validates the repository's default Compose configuration and the exact Compose/environment assets attached to the release. Native AMD64/ARM64 image checks cover explicit initialization, the v2 system endpoint and frontend, owner login, real Shell execution and persisted state after restart. `HEALTHCHECK` reads `/api/system` and validates the fresh-v2 schema identity. Full CVE clearance remains deferred under the [accepted release scope](../architecture/v2/V2_RELEASE_SCOPE_DECISION.md).

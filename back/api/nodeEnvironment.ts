@@ -1,3 +1,4 @@
+import { hasHistoryQuery } from '../shared/historyQuery';
 import { runtimeProxySelection } from './runtimeProxy';
 import { Router, Request } from 'express';
 import { Joi } from 'celebrate';
@@ -273,8 +274,12 @@ export default function nodeEnvironmentRoutes(
   // One operation model/log/cancel API shared by both languages.
   app.get(
     '/runtime/operations',
-    endpoint(async (req) =>
-      (await operations.operations())
+    endpoint(async (req) => {
+      if (hasHistoryQuery(req.query)) {
+        const result = await operations.operations(req.query);
+        return { ...result, items: result.items.map(operationDto) };
+      }
+      return (await operations.operations())
         .filter((x) =>
           req.query.language === 'NODE'
             ? x.operation_type.startsWith('NODE_')
@@ -282,8 +287,8 @@ export default function nodeEnvironmentRoutes(
             ? !x.operation_type.startsWith('NODE_')
             : true,
         )
-        .map(operationDto),
-    ),
+        .map(operationDto);
+    }),
   );
   app.get(
     '/runtime/operations/:id',
@@ -293,9 +298,7 @@ export default function nodeEnvironmentRoutes(
   );
   app.get(
     '/runtime/operations/:id/log',
-    endpoint(async (req) =>
-      RuntimeOperationLog.read(operations.paths, runtimeId(req.params.id)),
-    ),
+    endpoint(async (req) => operations.operationLog(runtimeId(req.params.id))),
   );
   app.post(
     '/runtime/operations/:id/cancel',

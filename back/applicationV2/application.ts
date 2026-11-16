@@ -28,6 +28,8 @@ import { triggerApiRoutes, CandidateTaskTriggers } from './triggerApi';
 import { createRuntimeDomain, CandidateRuntimeDomain } from './runtimeDomain';
 import { runtimeApiRoutes } from './runtimeApi';
 import { proxyApiRoutes } from './proxyApi';
+import { maintenanceApiRoutes } from './maintenanceApi';
+import { StorageMaintenance } from '../services/storageMaintenance';
 import { registerBackupApi } from './backupApi';
 import { RestoreRebuildService } from '../services/backup/rebuild';
 import { BackupOperations } from '../services/backup/operations';
@@ -94,6 +96,7 @@ export class V2Application {
   private closedPromise: Promise<void>;
   private closing?: Promise<void>;
   private routesWired = false;
+  private maintenance?: StorageMaintenance;
   private readonly lifetime: Promise<void>;
   private resolveLifetime!: () => void;
   private backupApi?: ReturnType<typeof registerBackupApi>;
@@ -148,6 +151,7 @@ export class V2Application {
             await instance.closedPromise;
           });
         } catch (e) {
+          await instance.maintenance?.close().catch(() => undefined);
           await instance.notifications?.close().catch(() => undefined);
           await instance.runtime?.close().catch(() => undefined);
           await instance.services?.close().catch(() => undefined);
@@ -208,6 +212,10 @@ export class V2Application {
     const key = await sessionSigningKey(store.dataRoot + '.platform-control');
     this.auth = new V2PanelAuth(() => this.services.store, key);
     await this.auth.info();
+    this.maintenance = new StorageMaintenance(
+      this.services.store,
+      this.services.leases,
+    );
     const resources = this.options.createGitResources?.(this.services);
     const modules: Array<[string, RouteMap]> = [
       ['workspaceApiRoutes', workspaceApiRoutes(this.services)],
@@ -219,6 +227,10 @@ export class V2Application {
       ],
       ['resourceApiRoutes', resourceApiRoutes(this.services)],
       ['proxyApiRoutes', proxyApiRoutes(this.services)],
+      [
+        'maintenanceApiRoutes',
+        maintenanceApiRoutes(this.services, this.maintenance),
+      ],
       ['triggerApiRoutes', triggerApiRoutes(this.services)],
       ['runtimeApiRoutes', runtimeApiRoutes(this.services, this.runtime)],
       ['CandidateNotificationDomain.routes', this.notifications.routes()],
@@ -276,6 +288,7 @@ export class V2Application {
         this.services.start();
         this.runtime.startRecovery();
         this.notifications.start();
+        this.maintenance.start();
         this.phases.push('SCHEDULERS_ENABLED');
       }
     }
@@ -682,6 +695,7 @@ export class V2Application {
       const httpClosed = this.httpLifetime.close(this.server);
       // Observe an early transport error while producers drain, then propagate it.
       void httpClosed.catch(() => undefined);
+      await this.maintenance?.close();
       this.httpLifetime.diagnostic('PRODUCERS_STOP_BEGIN');
       await this.services?.pause();
       this.httpLifetime.diagnostic('PRODUCERS_STOPPED');

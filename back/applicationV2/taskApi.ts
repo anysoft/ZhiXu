@@ -1,3 +1,4 @@
+import { parseHistoryQuery, historyWhere } from '../shared/historyQuery';
 import {
   ProxyManagement,
   validateProxySelection,
@@ -309,10 +310,19 @@ export function taskApiRoutes(
     .map((root) => Buffer.from(root));
   const maximumRootLength = Math.max(0, ...logRoots.map((root) => root.length));
   const listRuns = async (query: Record<string, unknown>, taskId?: number) => {
-    object(query, ['page', 'size', 'task_id', 'workspace_id', 'status']);
-    const page = pagination(query),
-      where: string[] = [],
-      values: any[] = [];
+    object(query, [
+      'page',
+      'size',
+      'task_id',
+      'workspace_id',
+      'status',
+      'from',
+      'to',
+    ]);
+    const page = parseHistoryQuery(query, { statuses: STATES }),
+      filter = historyWhere(page, 'COALESCE(started_at,submitted_at)'),
+      where: string[] = [...filter.clauses],
+      values: any[] = [...filter.values];
     for (const key of ['task_id', 'workspace_id'])
       if (query[key] !== undefined) {
         where.push(`${key}=?`);
@@ -321,10 +331,6 @@ export function taskApiRoutes(
     if (taskId !== undefined) {
       where.push('task_id=?');
       values.push(taskId);
-    }
-    if (query.status !== undefined) {
-      where.push('status=?');
-      values.push(choice(query.status, STATES));
     }
     const clause = where.length ? ' WHERE ' + where.join(' AND ') : '';
     const total = (

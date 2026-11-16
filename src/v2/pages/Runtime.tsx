@@ -13,7 +13,7 @@ import {
   Tabs,
   Typography,
 } from 'antd';
-import { ApiError, call, list, useAction, useResource } from '../api';
+import { ApiError, call, list, query, useAction, useResource } from '../api';
 import {
   Details,
   ErrorPanel,
@@ -29,6 +29,14 @@ import {
 import { useText } from '../i18n';
 import { RuntimeRevision } from '../features/RuntimeRevision';
 import { ProxySelect, ProxySelection, inheritedProxy } from '../features/Proxy';
+import {
+  HistoryFilters,
+  HistoryCleanup,
+  historyPagination,
+  historyTerminal,
+  recentHistory,
+  HistoryWindow,
+} from '../features/History';
 function RuntimeOperation({ id }: { id: number }) {
   const t = useText(),
     data = useResource(`/runtime/python/operations/${id}`, 1500),
@@ -63,9 +71,13 @@ function RuntimeOperation({ id }: { id: number }) {
           {t('cancel')}
         </Button>
       )}
-      <pre className="v2-log">
-        {typeof log.data === 'string' ? log.data : log.data?.text || ''}
-      </pre>
+      {data.data?.log_cleaned || log.data?.log_cleaned ? (
+        <Alert type="info" showIcon message={t('historyLogCleaned')} />
+      ) : (
+        <pre className="v2-log">
+          {typeof log.data === 'string' ? log.data : log.data?.text || ''}
+        </pre>
+      )}
     </>
   );
 }
@@ -711,7 +723,21 @@ function LanguageRuntime({
 }
 export default function RuntimePage() {
   const t = useText(),
-    operations = useResource('/runtime/python/operations', 2500),
+    [page, setPage] = useState(1),
+    [size, setSize] = useState(20),
+    [window, setWindow] = useState<HistoryWindow>(() => recentHistory()),
+    [operationStatus, setOperationStatus] = useState<string>(),
+    [selectedRows, setSelectedRows] = useState<React.Key[]>([]),
+    operations = useResource(
+      query('/runtime/operations', {
+        page,
+        size,
+        from: window.from,
+        to: window.to,
+        status: operationStatus,
+      }),
+      2500,
+    ),
     [selected, setSelected] = useState<number>();
   const onOperation = (op: any) => {
     setSelected(op.id);
@@ -739,9 +765,63 @@ export default function RuntimePage() {
             label: t('operations'),
             children: (
               <>
+                <HistoryFilters
+                  value={window}
+                  onChange={(value) => {
+                    setWindow(value);
+                    setPage(1);
+                    setSelectedRows([]);
+                  }}
+                  status={operationStatus}
+                  onStatus={(value) => {
+                    setOperationStatus(value);
+                    setPage(1);
+                    setSelectedRows([]);
+                  }}
+                  statuses={[
+                    'QUEUED',
+                    'RUNNING',
+                    'SUCCESS',
+                    'FAILED',
+                    'CANCELLED',
+                    'INTERRUPTED',
+                  ]}
+                />
+                <HistoryCleanup
+                  kind="runtime"
+                  filters={{
+                    from: window.from,
+                    to: window.to,
+                    status: operationStatus,
+                  }}
+                  selected={selectedRows}
+                  onClean={async () => {
+                    setSelectedRows([]);
+                    setSelected(undefined);
+                    setPage(1);
+                    await operations.reload();
+                  }}
+                />
                 <ErrorPanel error={operations.error} />
                 <Table
                   rowKey="id"
+                  rowSelection={{
+                    selectedRowKeys: selectedRows,
+                    onChange: setSelectedRows,
+                    getCheckboxProps: (row: any) => ({
+                      disabled: !historyTerminal('runtime', row.status),
+                    }),
+                  }}
+                  pagination={historyPagination(
+                    page,
+                    size,
+                    operations.data?.total || 0,
+                    (p, n) => {
+                      setPage(p);
+                      setSize(n);
+                      setSelectedRows([]);
+                    },
+                  )}
                   dataSource={list(operations.data)}
                   columns={[
                     {
@@ -760,6 +840,16 @@ export default function RuntimePage() {
                       render: (v) => <State value={v} />,
                     },
                     { title: t('phase'), dataIndex: 'stage' },
+                    {
+                      title: t('started'),
+                      dataIndex: 'started_at',
+                      render: (value) => <Time value={value} />,
+                    },
+                    {
+                      title: t('logs'),
+                      dataIndex: 'log_cleaned',
+                      render: (value) => (value ? t('historyLogCleaned') : '—'),
+                    },
                     { title: t('diagnostics'), dataIndex: 'error_code' },
                   ]}
                 />

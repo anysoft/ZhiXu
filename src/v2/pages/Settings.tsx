@@ -26,6 +26,7 @@ import {
 } from '../components';
 import { getLanguagePreference, setLanguagePreference, useText } from '../i18n';
 import { StorageStatus } from '../features/StorageStatus';
+import { StorageMaintenance } from '../features/StorageMaintenance';
 import { SecuritySettings } from '../features/SecuritySettings';
 import { ProxyManagement } from '../features/Proxy';
 import { BackupManifest } from '../features/BackupManifest';
@@ -444,6 +445,11 @@ export default function SettingsPage() {
             key: 'storage',
             label: t('storage'),
             children: <StorageStatus system={system.data} />,
+          },
+          {
+            key: 'maintenance',
+            label: t('storageMaintenance'),
+            children: <StorageMaintenance />,
           },
           {
             key: 'security',

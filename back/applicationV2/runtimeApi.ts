@@ -1,3 +1,4 @@
+import { hasHistoryQuery, historyQueryKeys } from '../shared/historyQuery';
 import type { ProxySelection } from '../services/proxyManagement';
 import type { Router } from 'express';
 import pythonEnvironmentRoutes from '../api/pythonEnvironment';
@@ -95,13 +96,14 @@ export function runtimeApiRoutes(
           const allowed = path.endsWith('/diff')
             ? ['from', 'to']
             : path === '/runtime/operations'
-            ? ['language']
+            ? ['language', ...historyQueryKeys]
             : [];
           object(call.query, allowed);
           if (call.query.language !== undefined)
             choice(call.query.language, ['PYTHON', 'NODE']);
-          for (const name of ['from', 'to'])
-            if (call.query[name] !== undefined) pathId(call.query[name]);
+          if (path.endsWith('/diff'))
+            for (const name of ['from', 'to'])
+              if (call.query[name] !== undefined) pathId(call.query[name]);
           let status = 200,
             payload: any;
           const response: any = {
@@ -162,7 +164,10 @@ export function runtimeApiRoutes(
       handle: (c) =>
         domain.run(async () => {
           for (const value of Object.values(c.params)) pathId(value);
-          object(c.query, []);
+          object(
+            c.query,
+            key === 'GET /runtime/python/operations' ? historyQueryKeys : [],
+          );
           if (accepted)
             (
               c as ApiCall & { setStatus?: (status: 200 | 202) => void }
@@ -240,14 +245,17 @@ export function runtimeApiRoutes(
       ),
     true,
   );
-  expose(`GET ${base}/operations`, async () =>
-    (await runtime.operations()).map(operationDto),
-  );
+  expose(`GET ${base}/operations`, async (c) => {
+    if (!hasHistoryQuery(c.query))
+      return (await runtime.operations()).map(operationDto);
+    const result = await runtime.operations({ ...c.query, language: 'PYTHON' });
+    return { ...result, items: result.items.map(operationDto) };
+  });
   expose(`GET ${base}/operations/:id`, async (c) =>
     operationDto(await runtime.operation(pathId(c.params.id))),
   );
   expose(`GET ${base}/operations/:id/log`, async (c) =>
-    RuntimeOperationLog.read(runtime.paths, pathId(c.params.id)),
+    runtime.operationLog(pathId(c.params.id)),
   );
   expose(`POST ${base}/operations/:id/cancel`, async (c) => {
     options(c.body);

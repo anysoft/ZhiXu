@@ -1,3 +1,4 @@
+import { parseHistoryQuery, historyWhere } from '../shared/historyQuery';
 import { resolveRuntimeProxy, RuntimeProxySnapshot } from './runtimeProxy';
 import type { ProxySelection } from './proxyManagement';
 import { ScopedRuntimeMutation as PlatformMutation } from './runtimeDomainScope';
@@ -12,7 +13,7 @@ import {
 import fs from 'fs/promises';
 import path from 'path';
 import { randomUUID } from 'crypto';
-import { Op, Transaction } from 'sequelize';
+import { Op, Transaction, QueryTypes } from 'sequelize';
 import PythonEnvironmentBuildService from './pythonEnvironmentBuild';
 import {
   pythonEnvironmentOperationTypes,
@@ -66,6 +67,50 @@ type Active = {
   command?: RuntimeCommand;
   done?: Promise<void>;
 };
+type SqlRuntimeOperation = Omit<
+  RuntimeOperation,
+  'started_at' | 'finished_at' | 'metadata' | 'cancel_requested'
+> & {
+  started_at: string | Date | null;
+  finished_at: string | Date | null;
+  metadata: string | Record<string, unknown>;
+  cancel_requested: number | boolean;
+  createdAt: string | Date;
+  updatedAt: string | Date;
+};
+/** SQLite permits ISO and Sequelize timestamp encodings; read both as UTC. */
+function operationFromSql(row: SqlRuntimeOperation): RuntimeOperation {
+  const date = (value: unknown) => {
+    if (value === null || value === undefined) return null;
+    let text = String(value);
+    if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}(?:\.\d+)?$/.test(text))
+      text = text.replace(' ', 'T') + 'Z';
+    const result = value instanceof Date ? value : new Date(text);
+    if (!Number.isFinite(result.getTime()))
+      throw new RuntimeError('RUNTIME_OPERATION_INVALID', 503);
+    return result;
+  };
+  let metadata: Record<string, unknown>;
+  try {
+    metadata =
+      typeof row.metadata === 'string'
+        ? JSON.parse(row.metadata)
+        : row.metadata;
+  } catch {
+    throw new RuntimeError('RUNTIME_OPERATION_INVALID', 503);
+  }
+  if (!metadata || typeof metadata !== 'object' || Array.isArray(metadata))
+    throw new RuntimeError('RUNTIME_OPERATION_INVALID', 503);
+  return {
+    ...row,
+    cancel_requested: !!row.cancel_requested,
+    metadata,
+    started_at: date(row.started_at),
+    finished_at: date(row.finished_at),
+    createdAt: date(row.createdAt),
+    updatedAt: date(row.updatedAt),
+  } as RuntimeOperation;
+}
 /** Database-tracked resource operations; leases and inherited FDs prove ownership. */
 export default class RuntimeOperationService {
   readonly paths: RuntimePathResolver;
@@ -108,9 +153,14 @@ export default class RuntimeOperationService {
     return model.get({ plain: true });
   }
   async operation(id: number) {
-    const row = await RuntimeOperationModel.findByPk(runtimeId(id));
+    const row = (
+      await sequelize.query<any>('SELECT * FROM RuntimeOperations WHERE id=?', {
+        replacements: [runtimeId(id)],
+        type: QueryTypes.SELECT,
+      })
+    )[0];
     if (!row) throw new RuntimeError('RUNTIME_OPERATION_NOT_FOUND', 404);
-    return row.get({ plain: true });
+    return operationFromSql(row);
   }
   async filesystemDiagnostics() {
     const provider = await this.getProvider();
@@ -161,13 +211,91 @@ export default class RuntimeOperationService {
       }
     return { ...provider, health };
   }
-  async operations() {
-    return (
-      await RuntimeOperationModel.findAll({
-        order: [['id', 'DESC']],
-        limit: 100,
-      })
-    ).map((x) => x.get({ plain: true }));
+  async operations(): Promise<RuntimeOperation[]>;
+  async operations(query: Record<string, unknown>): Promise<{
+    items: RuntimeOperation[];
+    total: number;
+    page: number;
+    size: number;
+  }>;
+  async operations(
+    query?: Record<string, unknown>,
+  ): Promise<
+    | RuntimeOperation[]
+    | { items: RuntimeOperation[]; total: number; page: number; size: number }
+  > {
+    // Keep established internal/no-query consumers compatible. History pages
+    // opt into the server-side range/count/limit query below.
+    if (!query)
+      return (
+        await sequelize.query<any>(
+          'SELECT * FROM RuntimeOperations ORDER BY id DESC LIMIT 100',
+          { type: QueryTypes.SELECT },
+        )
+      ).map(operationFromSql);
+    let selected;
+    try {
+      selected = parseHistoryQuery(query, {
+        statuses: [
+          'QUEUED',
+          'RUNNING',
+          'SUCCESS',
+          'FAILED',
+          'CANCELLED',
+          'INTERRUPTED',
+        ],
+      });
+    } catch {
+      throw new RuntimeError('RUNTIME_REQUEST_INVALID', 400);
+    }
+    if (
+      query.language !== undefined &&
+      (typeof query.language !== 'string' ||
+        !['PYTHON', 'NODE'].includes(query.language))
+    )
+      throw new RuntimeError('RUNTIME_REQUEST_INVALID', 400);
+    const { clauses, values } = historyWhere(
+      selected,
+      'COALESCE(started_at,createdAt)',
+    );
+    if (query.language)
+      clauses.push(
+        query.language === 'NODE'
+          ? "substr(operation_type,1,5)='NODE_'"
+          : "substr(operation_type,1,5)<>'NODE_'",
+      );
+    const where = clauses.length ? ' WHERE ' + clauses.join(' AND ') : '';
+    const total = (
+      await sequelize.query<{ count: number }>(
+        'SELECT COUNT(*) count FROM RuntimeOperations' + where,
+        { replacements: values, type: QueryTypes.SELECT },
+      )
+    )[0].count;
+    const rows = await sequelize.query<any>(
+      'SELECT * FROM RuntimeOperations' +
+        where +
+        ' ORDER BY id DESC LIMIT ? OFFSET ?',
+      {
+        replacements: [...values, selected.size, selected.offset],
+        type: QueryTypes.SELECT,
+      },
+    );
+    const items = rows.map(operationFromSql);
+    return {
+      items,
+      total: Number(total),
+      page: selected.page,
+      size: selected.size,
+    };
+  }
+  async operationLog(id: number) {
+    const row = await this.operation(id);
+    if (row.metadata.log_cleaned === true)
+      return { text: '', size: 0, truncated: false, log_cleaned: true };
+    return {
+      ...(await RuntimeOperationLog.read(this.paths, id)),
+      log_cleaned: false,
+    };
   }
   async runtime(id: number) {
     const row = await RuntimeInstallationModel.findByPk(runtimeId(id));
