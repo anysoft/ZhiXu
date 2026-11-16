@@ -16,7 +16,7 @@ export default class PipPackageManager {
     args: string[],
     capture = false,
   ) {
-    const environment = {
+    const environment: NodeJS.ProcessEnv = {
       ...ctx.environment,
       PIP_CONFIG_FILE: '/dev/null',
       PIP_DISABLE_PIP_VERSION_CHECK: '1',
@@ -29,6 +29,37 @@ export default class PipPackageManager {
         ? { PIP_NO_INDEX: '1' }
         : {}),
     };
+    if (
+      args[0] === 'install' &&
+      ['https_proxy', 'HTTPS_PROXY', 'all_proxy', 'ALL_PROXY'].some((key) =>
+        /^socks5h?:\/\//i.test(environment[key] || ''),
+      )
+    ) {
+      // pip's HTTP stack needs PySocks in this exact managed venv. Fail
+      // explicitly rather than bypassing the selected SOCKS proxy.
+      try {
+        await ctx.command.run(
+          python,
+          [
+            '-I',
+            '-B',
+            '-c',
+            "import sys,warnings\nwith warnings.catch_warnings():\n warnings.simplefilter('ignore')\n try:\n  from pip._vendor.urllib3.contrib.socks import SOCKSProxyManager\n except ImportError:\n  sys.exit(1)",
+          ],
+          ctx.directory,
+          environment,
+          true,
+        );
+      } catch (error) {
+        if (
+          error instanceof RuntimeError &&
+          error.error_code === 'RUNTIME_COMMAND_FAILED' &&
+          error.exit_code === 1
+        )
+          throw new RuntimeError('RUNTIME_PROXY_SOCKS_SUPPORT_REQUIRED');
+        throw error;
+      }
+    }
     return ctx.command.run(
       python,
       [

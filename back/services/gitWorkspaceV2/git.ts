@@ -1,3 +1,4 @@
+import { applyGitProxy } from '../gitProxy';
 import fs from 'fs/promises';
 import path from 'path';
 import { spawn, ChildProcessWithoutNullStreams } from 'child_process';
@@ -82,6 +83,7 @@ export interface WorkspaceGitPlan {
   proof: WorkspaceGitProof;
 }
 export interface WorkspaceGitOptions {
+  workspaceId?: number;
   signal?: {
     readonly aborted: boolean;
     addEventListener?: (
@@ -270,7 +272,11 @@ export class WorkspaceGitAdapter {
                 ...args,
               ],
               cwd,
-              { ...environment, PATH: tools.binPath + ':/usr/bin:/bin', GIT_EXEC_PATH: tools.execPath },
+              {
+                ...environment,
+                PATH: tools.binPath + ':/usr/bin:/bin',
+                GIT_EXEC_PATH: tools.execPath,
+              },
               timeout,
               'git',
               4 * 1024 * 1024,
@@ -441,11 +447,7 @@ export class WorkspaceGitAdapter {
       return await new GitCredentialResolver({
         requireBundledSsh: true,
         gitToolsRoot: this.options.gitToolsRoot,
-      }).resolve(
-        credential,
-        secret,
-        repository.remote_url,
-      );
+      }).resolve(credential, secret, repository.remote_url);
     } catch {
       stop('AUTH_FAILED');
     }
@@ -459,13 +461,22 @@ export class WorkspaceGitAdapter {
   ) {
     const repository = await this.repository(repositoryId, repositoryLease);
     await this.strictConfiguration(repository.bare, repositoryLease);
-    const access = await this.access(repository.row);
+    const access = await applyGitProxy(
+      await this.access(repository.row),
+      this.store,
+      repositoryId,
+      options.workspaceId,
+    );
     try {
       const environment = this.localEnvironment();
       // The existing resolver owns credential helpers. Unrelated host loaders,
       // proxy settings and executable search paths are not inherited by Git.
       for (const [key, value] of Object.entries(access.env))
-        if (/^(?:GIT_|SSH_ASKPASS|SSH_ASKPASS_REQUIRE|SSH_SK_HELPER|DISPLAY$)/.test(key))
+        if (
+          /^(?:GIT_|SSH_ASKPASS|SSH_ASKPASS_REQUIRE|SSH_SK_HELPER|DISPLAY$|(?:https?|all|no)_proxy$)/i.test(
+            key,
+          )
+        )
           environment[key] = value;
       await this.supervised([repositoryLease], options, async (run) => {
         const operation = run(

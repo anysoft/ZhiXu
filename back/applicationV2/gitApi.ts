@@ -333,7 +333,7 @@ export function gitApiRoutes(
         const branch = v.text(input.remote_branch, 1024);
         validateWorkspaceRef('branch', branch);
         const repository = await resources.repository(git.repository_id),
-          access = await resources.access(repository, 'push');
+          access = await resources.access(repository, 'push', workspaceId);
         try {
           const result = await run(
             [

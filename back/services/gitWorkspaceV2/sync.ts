@@ -499,6 +499,7 @@ export class GitWorkspaceSyncService {
               row = await this.get(id);
               await this.point('BEFORE_FETCH', row);
               await this.git.fetch(admitted.git.repository_id, repoLease, {
+                workspaceId: row.workspace_id,
                 signal: abort.signal,
                 timeoutMs: Math.min(remaining, 1800000),
               });

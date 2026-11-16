@@ -1,3 +1,5 @@
+import { ProxyManagement } from '../services/proxyManagement';
+import { applyGitProxy } from '../services/gitProxy';
 import fs from 'fs/promises';
 import path from 'path';
 import { randomUUID } from 'crypto';
@@ -315,6 +317,10 @@ export class CandidateGitResources {
       last_known_remote_head: r.last_known_remote_head,
       remote_refs_count: r.remote_refs_count,
       tags_count: r.tags_count,
+      proxy: await new ProxyManagement(this.s.store).getSelection(
+        'repository',
+        r.id,
+      ),
       used_by: { workspaces: count, total: count },
     };
   }
@@ -324,6 +330,7 @@ export class CandidateGitResources {
       'name',
       'remote_url',
       'default_credential_id',
+      'proxy',
     ]);
     if (update !== 'id' in input) fail('INVALID_REQUEST', 400);
     const old = update ? await this.repository(v.number(input.id)) : undefined;
@@ -386,13 +393,24 @@ export class CandidateGitResources {
               values,
             )
           ).lastID;
+        if (input.proxy !== undefined)
+          await new ProxyManagement(this.s.store).setSelectionInTransaction(
+            tx,
+            'repository',
+            id,
+            input.proxy,
+          );
         return this.repositoryDto(id);
       });
     return old
       ? this.s.leases.withRepository(old.id, 'REPOSITORY_SAVE', save)
       : this.s.leases.barrier.mutation(save);
   }
-  async access(row: CandidateRepository, operation: 'read' | 'push' = 'read') {
+  async access(
+    row: CandidateRepository,
+    operation: 'read' | 'push' = 'read',
+    workspaceId?: number,
+  ) {
     const credential = row.default_credential_id
       ? await this.credential(row.default_credential_id)
       : null;
@@ -404,10 +422,11 @@ export class CandidateGitResources {
         await access.cleanup();
         fail('INVALID_REQUEST', 400);
       }
-      return access;
+      return applyGitProxy(access, this.s.store, row.id, workspaceId);
     }
+    let access: GitAccessContext;
     try {
-      return await this.credentialResolver.resolve(
+      access = await this.credentialResolver.resolve(
         credential,
         credential ? this.secret(credential) : {},
         row.remote_url,
@@ -416,6 +435,7 @@ export class CandidateGitResources {
     } catch {
       fail('GIT_CREDENTIAL_INVALID', 403);
     }
+    return applyGitProxy(access!, this.s.store, row.id, workspaceId);
   }
   environment(
     access: GitAccessContext,
@@ -432,7 +452,11 @@ export class CandidateGitResources {
       GIT_ATTR_NOSYSTEM: '1',
     };
     for (const [key, value] of Object.entries(access.env))
-      if (/^(?:GIT_|SSH_ASKPASS|SSH_ASKPASS_REQUIRE|SSH_SK_HELPER|DISPLAY$)/.test(key))
+      if (
+        /^(?:GIT_|SSH_ASKPASS|SSH_ASKPASS_REQUIRE|SSH_SK_HELPER|DISPLAY$|(?:https?|all|no)_proxy$)/i.test(
+          key,
+        )
+      )
         env[key] = value;
     if (identity)
       Object.assign(env, {
@@ -491,6 +515,7 @@ export class CandidateGitResources {
       const access = await this.credentialResolver
         .resolve(credential, this.secret(credential), remote)
         .catch(() => fail('GIT_CREDENTIAL_INVALID', 403));
+      await applyGitProxy(access, this.s.store);
       try {
         // A private candidate repository lock supplies the inherited admission FD.
         success = await this.s.leases.withRepository(

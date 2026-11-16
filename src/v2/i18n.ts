@@ -26,6 +26,14 @@ export function label(value: unknown) {
 }
 export function diagnostic(code?: string, status?: number) {
   const value = code || 'REQUEST_FAILED';
+  const proxyErrors: Record<string, string> = {
+    PROXY_PROFILE_IN_USE: 'proxyErrorInUse',
+    PROXY_PROFILE_DISABLED: 'proxyErrorDisabled',
+    PROXY_PROFILE_NOT_FOUND: 'proxyErrorNotFound',
+    PROXY_SSH_UNSUPPORTED: 'proxyErrorSsh',
+    RUNTIME_PROXY_SOCKS_SUPPORT_REQUIRED: 'proxyErrorSocks',
+  };
+  if (proxyErrors[value]) return text(proxyErrors[value]);
   if (value === 'V2_BACKEND_REQUIRED') return text('v2BackendRequired');
   if (value === 'TWO_FACTOR_REQUIRED') return text('twoFactorRequired');
   if (value === 'SOURCE_SUPERSEDED') return text('error.superseded');

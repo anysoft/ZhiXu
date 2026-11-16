@@ -28,6 +28,7 @@ import {
 } from '../components';
 import { useText } from '../i18n';
 import { RuntimeRevision } from '../features/RuntimeRevision';
+import { ProxySelect, ProxySelection, inheritedProxy } from '../features/Proxy';
 function RuntimeOperation({ id }: { id: number }) {
   const t = useText(),
     data = useResource(`/runtime/python/operations/${id}`, 1500),
@@ -85,13 +86,20 @@ function ManagedEnvironment({
     revisions = useResource(base + '/revisions'),
     builds = useResource(base + '/builds', 3000),
     action = useAction(),
-    [editing, setEditing] = useState(false);
+    [editing, setEditing] = useState(false),
+    [operationProxy, setOperationProxy] =
+      useState<ProxySelection>(inheritedProxy);
   const current = data.data || row;
   const operation = async (path: string) => {
     onOperation(
       await call(path, {
         method: 'POST',
-        body: { expected_version: current.version },
+        body: {
+          expected_version: current.version,
+          ...(/\/(?:rebuild|build)$/.test(path)
+            ? { proxy: operationProxy }
+            : {}),
+        },
       }),
     );
     await data.reload();
@@ -103,6 +111,11 @@ function ManagedEnvironment({
       <ErrorPanel
         error={data.error || revisions.error || builds.error || action.error}
       />
+      <Form layout="vertical">
+        <Form.Item label={t('proxyOperation')}>
+          <ProxySelect value={operationProxy} onChange={setOperationProxy} />
+        </Form.Item>
+      </Form>
       <Details
         values={[
           ['name', current.name],
@@ -245,7 +258,9 @@ function LanguageRuntime({
     tools = useResource(kind === 'node' ? base + '/toolchains' : null),
     action = useAction(),
     [dialog, setDialog] = useState<string>(),
-    [selected, setSelected] = useState<any>();
+    [selected, setSelected] = useState<any>(),
+    [operationProxy, setOperationProxy] =
+      useState<ProxySelection>(inheritedProxy);
   const reload = async () => {
     await Promise.all([
       runtimes.reload(),
@@ -256,7 +271,12 @@ function LanguageRuntime({
     ]);
   };
   const launch = async (path: string, body: any = {}) => {
-    onOperation(await call(path, { method: 'POST', body }));
+    onOperation(
+      await call(path, {
+        method: 'POST',
+        body: { ...body, proxy: operationProxy },
+      }),
+    );
     await reload();
   };
   const versions = list(catalog.data?.versions)
@@ -274,6 +294,11 @@ function LanguageRuntime({
           action.error
         }
       />
+      <Form layout="vertical">
+        <Form.Item label={t('proxyOperation')}>
+          <ProxySelect value={operationProxy} onChange={setOperationProxy} />
+        </Form.Item>
+      </Form>
       <Space wrap className="v2-section">
         {kind === 'python' && (
           <>

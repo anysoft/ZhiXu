@@ -28,6 +28,7 @@ import {
   required,
 } from '../components';
 import { useText } from '../i18n';
+import { ProxySelect, inheritedProxy } from '../features/Proxy';
 function RepositoryDetail({
   row,
   onChanged,
@@ -426,7 +427,7 @@ export default function RepositoriesPage() {
       {editing && (
         <FormDialog
           title={t(editing.id ? 'edit' : 'newRepository')}
-          initial={editing}
+          initial={{ ...editing, proxy: editing.proxy || inheritedProxy }}
           onClose={() => setEditing(undefined)}
           onSubmit={async (v) => {
             await call('/repositories', {
@@ -435,6 +436,7 @@ export default function RepositoriesPage() {
                 name: v.name,
                 remote_url: v.remote_url,
                 default_credential_id: v.default_credential_id || null,
+                proxy: v.proxy || inheritedProxy,
                 ...(editing.id ? { id: editing.id } : {}),
               },
             });
@@ -451,7 +453,27 @@ export default function RepositoriesPage() {
           >
             <Input />
           </Form.Item>
-          <ErrorPanel error={credentials.error} reload={() => void credentials.reload()} />
+          <Form.Item
+            name="proxy"
+            label={t('networkProxy')}
+            rules={[
+              {
+                validator: (_, v) =>
+                  v?.mode !== 'PROFILE' || v.profile_id
+                    ? Promise.resolve()
+                    : Promise.reject(new Error(t('required'))),
+              },
+            ]}
+          >
+            <ProxySelect />
+          </Form.Item>
+          <Typography.Paragraph type="secondary">
+            {t('proxySshHelp')}
+          </Typography.Paragraph>
+          <ErrorPanel
+            error={credentials.error}
+            reload={() => void credentials.reload()}
+          />
           <Form.Item name="default_credential_id" label={t('credential')}>
             <Select
               loading={credentials.loading}

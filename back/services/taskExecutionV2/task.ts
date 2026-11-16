@@ -1,3 +1,4 @@
+import { ProxyManagement, ProxySelection } from '../proxyManagement';
 import { WorkspaceStore } from '../workspaceV2/store';
 import { WorkspaceRootResolver } from '../workspaceV2/roots';
 import { WorkspaceLeaseService } from '../workspaceV2/lease';
@@ -91,6 +92,7 @@ export interface TaskDefinition {
   hooks: HookRow[];
 }
 export interface TaskWrite {
+  proxy?: ProxySelection;
   name: string;
   description?: string;
   enabled?: boolean;
@@ -373,6 +375,13 @@ export class TaskService {
           fail('TASK_IDENTITY_INVALID', 400);
         const id = await this.store.transaction(async (tx) => {
           const id = await this.insertTask(tx, input, discovered);
+          if (input.proxy !== undefined)
+            await new ProxyManagement(this.store).setSelectionInTransaction(
+              tx,
+              'task',
+              id,
+              input.proxy,
+            );
           if (verified.git)
             await tx.run(
               'UPDATE GitWorkspaces SET last_verified_commit=? WHERE workspace_id=?',
@@ -506,6 +515,13 @@ export class TaskService {
           ],
         );
         await this.saveChildren(tx, id, v.runtime, v.settings);
+        if (patch.proxy !== undefined)
+          await new ProxyManagement(this.store).setSelectionInTransaction(
+            tx,
+            'task',
+            id,
+            patch.proxy,
+          );
         if (verifiedGitHead)
           await tx.run(
             'UPDATE GitWorkspaces SET last_verified_commit=? WHERE workspace_id=?',

@@ -6,6 +6,7 @@ export default async function runtimeBuildEnvironment(
   operation: number,
   jobs = 4,
   provider = 1,
+  proxyEnvironment: Readonly<Record<string, string>> = {},
 ) {
   if (!Number.isSafeInteger(jobs) || jobs < 1 || jobs > 16)
     throw new RuntimeError('RUNTIME_REQUEST_INVALID', 400);
@@ -20,6 +21,7 @@ export default async function runtimeBuildEnvironment(
   );
   const providerRoot = await paths.provider(false, provider);
   const environment: NodeJS.ProcessEnv = {
+    ...proxyEnvironment,
     PATH: RUNTIME_TOOL_PATH,
     HOME: home,
     TMPDIR: temporary,

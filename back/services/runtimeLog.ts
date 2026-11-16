@@ -34,6 +34,7 @@ export default class RuntimeOperationLog {
     id: number,
     privateHome: string,
     base: NodeJS.ProcessEnv = process.env,
+    additionalSecrets: readonly string[] = [],
   ) {
     // Values are used only for redaction; never passed to provider/build children.
     const secrets = Object.entries(base)
@@ -53,7 +54,11 @@ export default class RuntimeOperationLog {
         constants.O_NOFOLLOW,
       0o600,
     );
-    return new RuntimeOperationLog(handle, [privateHome, ...secrets]);
+    return new RuntimeOperationLog(handle, [
+      privateHome,
+      ...secrets,
+      ...additionalSecrets,
+    ]);
   }
   write(text: string) {
     this.queue = this.queue.then(() => this.redactor.write(text));

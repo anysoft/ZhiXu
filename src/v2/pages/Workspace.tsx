@@ -27,6 +27,7 @@ import {
   RuntimeDefaults,
 } from '../features/Resources';
 import { Discovery, GitPanel, SyncHistory, SyncPolicy } from '../features/Git';
+import { ProxyScopeEditor } from '../features/Proxy';
 export default function WorkspacePage() {
   const id = Number(useParams().id),
     t = useText(),
@@ -216,6 +217,17 @@ export default function WorkspacePage() {
               key: 'runtime',
               label: t('runtime'),
               children: <RuntimeDefaults workspace={ws} onChanged={changed} />,
+            },
+            {
+              key: 'proxy',
+              label: t('networkProxy'),
+              children: (
+                <ProxyScopeEditor
+                  scope="workspace"
+                  id={id}
+                  editable={ws.capabilities.write_files}
+                />
+              ),
             },
             {
               key: 'environment',

@@ -1,3 +1,4 @@
+import { runtimeProxySelection } from './runtimeProxy';
 import { Router, Request } from 'express';
 import { Joi } from 'celebrate';
 import RuntimeOperationService from '../services/runtimeOperations';
@@ -66,13 +67,17 @@ export default function nodeEnvironmentRoutes(
       endpoint(async (req) => {
         const input = body(req, {
           ...fields,
+          proxy: runtimeProxySelection,
           timeout_seconds: Joi.number().integer().min(1).max(7200),
         });
+        const proxy = input.proxy;
+        delete input.proxy;
         if (key) input[key] = runtimeId(req.params.id);
         if (req.params.build) input.build_id = runtimeId(req.params.build);
         return operationDto(
           await operations.request(type, {
             node: input,
+            proxy,
             timeout_seconds: input.timeout_seconds,
           }),
         );

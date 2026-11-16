@@ -1,3 +1,4 @@
+import { proxyEnvironmentKeys } from './proxyManagement';
 import fs from 'fs/promises';
 import path from 'path';
 import { load as yamlLoad, dump as yamlDump } from 'js-yaml';
@@ -74,6 +75,11 @@ export default class NodePackageManager {
       root,
       node,
       env: {
+        ...Object.fromEntries(
+          proxyEnvironmentKeys
+            .filter((key) => ctx.environment[key] !== undefined)
+            .map((key) => [key, ctx.environment[key]]),
+        ),
         PATH: path.join(root, 'bin') + ':/usr/bin:/bin:/usr/sbin:/sbin',
         HOME: home,
         TMPDIR: ctx.directory,

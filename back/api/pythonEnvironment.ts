@@ -1,3 +1,4 @@
+import { runtimeProxySelection } from './runtimeProxy';
 import { Request, Router } from 'express';
 import { Joi } from 'celebrate';
 import RuntimeOperationService from '../services/runtimeOperations';
@@ -159,6 +160,7 @@ export default function pythonEnvironmentRoutes(
       endpoint(async (req) => {
         const data = payload(req, {
           expected_version,
+          proxy: runtimeProxySelection,
           timeout_seconds: Joi.number().integer().min(1).max(7200),
         });
         return operationDto(
@@ -169,6 +171,7 @@ export default function pythonEnvironmentRoutes(
               expected_version: data.expected_version,
             },
             timeout_seconds: data.timeout_seconds ?? 1800,
+            proxy: data.proxy,
           }),
         );
       }, true),

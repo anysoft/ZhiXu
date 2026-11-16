@@ -27,6 +27,7 @@ import { resourceApiRoutes } from './resourceApi';
 import { triggerApiRoutes, CandidateTaskTriggers } from './triggerApi';
 import { createRuntimeDomain, CandidateRuntimeDomain } from './runtimeDomain';
 import { runtimeApiRoutes } from './runtimeApi';
+import { proxyApiRoutes } from './proxyApi';
 import { registerBackupApi } from './backupApi';
 import { RestoreRebuildService } from '../services/backup/rebuild';
 import { BackupOperations } from '../services/backup/operations';
@@ -217,6 +218,7 @@ export class V2Application {
         taskApiRoutes(this.services, [this.options.projectRoot]),
       ],
       ['resourceApiRoutes', resourceApiRoutes(this.services)],
+      ['proxyApiRoutes', proxyApiRoutes(this.services)],
       ['triggerApiRoutes', triggerApiRoutes(this.services)],
       ['runtimeApiRoutes', runtimeApiRoutes(this.services, this.runtime)],
       ['CandidateNotificationDomain.routes', this.notifications.routes()],

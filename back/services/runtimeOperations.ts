@@ -1,3 +1,5 @@
+import { resolveRuntimeProxy, RuntimeProxySnapshot } from './runtimeProxy';
+import type { ProxySelection } from './proxyManagement';
 import { ScopedRuntimeMutation as PlatformMutation } from './runtimeDomainScope';
 import NodeEnvironmentService from './nodeEnvironment';
 import NodeDistributionProvider from './nodeDistributionProvider';
@@ -58,6 +60,7 @@ const kinds: OperationType[] = [
   'RUNTIME_REPAIR',
 ];
 type Active = {
+  proxy: RuntimeProxySnapshot;
   lease: RuntimeLease;
   resourceLeases?: RuntimeLease[];
   command?: RuntimeCommand;
@@ -205,6 +208,7 @@ export default class RuntimeOperationService {
   async request(
     type: OperationType,
     input: {
+      proxy?: ProxySelection;
       runtime_id?: number;
       version?: string;
       jobs?: number;
@@ -226,14 +230,24 @@ export default class RuntimeOperationService {
       timeout > 7200
     )
       throw new RuntimeError('RUNTIME_REQUEST_INVALID', 400);
+    const proxy = await resolveRuntimeProxy(input.proxy);
     if (type.startsWith('NODE_'))
       return this.requestNode(
         type as NodeOperationType,
         input.node ?? {},
         timeout,
+        proxy,
       );
-    const initial = await this.getProvider(),
-      lease = await RuntimeLease.acquire(this.paths, initial.id);
+    const initial = await this.getProvider().catch((error) => {
+        proxy.release?.();
+        throw error;
+      }),
+      lease = await RuntimeLease.acquire(this.paths, initial.id).catch(
+        (error) => {
+          proxy.release?.();
+          throw error;
+        },
+      );
     try {
       await this.recoverLocked(initial.id);
       const provider = (await RuntimeProviderModel.findByPk(initial.id))!.get({
@@ -248,6 +262,7 @@ export default class RuntimeOperationService {
           provider,
           lease,
           timeout,
+          proxy,
         );
       }
       let runtime: RuntimeInstallation | null = null;
@@ -354,6 +369,7 @@ export default class RuntimeOperationService {
             log_identity: 'pending-' + token,
             metadata: {
               jobs,
+              ...(proxy.profileId ? { proxy_profile_id: proxy.profileId } : {}),
               timeout_seconds: timeout,
               requested_version: runtime?.version ?? input.version ?? null,
               target_revision: this.provider.revision,
@@ -367,7 +383,7 @@ export default class RuntimeOperationService {
         );
         return row.get({ plain: true });
       });
-      const active: Active = { lease };
+      const active: Active = { lease, proxy };
       this.active.set(operation.id, active);
       active.done = new Promise<void>((resolve) =>
         setImmediate(() => {
@@ -379,6 +395,7 @@ export default class RuntimeOperationService {
       );
       return operation;
     } catch (error) {
+      proxy.release?.();
       await lease.release();
       throw error;
     }
@@ -387,12 +404,13 @@ export default class RuntimeOperationService {
     type: NodeOperationType,
     input: NodeOperationInput,
     timeout: number,
+    proxy: RuntimeProxySnapshot,
   ) {
-    await this.recoverNode();
-    await this.node.getProvider();
     const resources: RuntimeLease[] = [];
     let lease: RuntimeLease | undefined;
     try {
+      await this.recoverNode();
+      await this.node.getProvider();
       const operation = await sequelize.transaction(async (transaction) => {
         const prepared = await this.node.prepare(
           type,
@@ -415,6 +433,7 @@ export default class RuntimeOperationService {
             log_identity: 'pending-' + token,
             metadata: {
               ...prepared.metadata,
+              ...(proxy.profileId ? { proxy_profile_id: proxy.profileId } : {}),
               timeout_seconds: timeout,
               jobs: 4,
             },
@@ -428,7 +447,11 @@ export default class RuntimeOperationService {
         );
         return row.get({ plain: true });
       });
-      const active: Active = { lease: lease!, resourceLeases: resources };
+      const active: Active = {
+        lease: lease!,
+        resourceLeases: resources,
+        proxy,
+      };
       this.active.set(operation.id, active);
       const provider = await this.node.getProvider();
       active.done = new Promise<void>((resolve) =>
@@ -441,6 +464,7 @@ export default class RuntimeOperationService {
       );
       return operation;
     } catch (error) {
+      proxy.release?.();
       await lease?.release();
       for (const item of resources.reverse()) await item.release();
       throw error;
@@ -496,6 +520,7 @@ export default class RuntimeOperationService {
     provider: RuntimeProvider,
     lease: RuntimeLease,
     timeout: number,
+    proxy: RuntimeProxySnapshot,
   ) {
     const resourceLeases: RuntimeLease[] = [];
     try {
@@ -520,6 +545,7 @@ export default class RuntimeOperationService {
             log_identity: 'pending-' + token,
             metadata: {
               ...resource.metadata,
+              ...(proxy.profileId ? { proxy_profile_id: proxy.profileId } : {}),
               timeout_seconds: timeout,
               jobs: 4,
             },
@@ -532,7 +558,7 @@ export default class RuntimeOperationService {
         );
         return row.get({ plain: true });
       });
-      const active: Active = { lease, resourceLeases };
+      const active: Active = { lease, resourceLeases, proxy };
       this.active.set(operation.id, active);
       active.done = new Promise<void>((resolve) =>
         setImmediate(() => {
@@ -587,7 +613,13 @@ export default class RuntimeOperationService {
         }/home`,
         true,
       );
-      log = await RuntimeOperationLog.open(this.paths, operation.id, home);
+      log = await RuntimeOperationLog.open(
+        this.paths,
+        operation.id,
+        home,
+        process.env,
+        active.proxy.secretValues,
+      );
       if (!nodeOperation)
         await this.paths.provider(
           ['PROVIDER_INSTALL', 'PROVIDER_REPAIR'].includes(
@@ -607,6 +639,7 @@ export default class RuntimeOperationService {
               npm_config_userconfig: path.join(home, 'user.npmrc'),
               npm_config_globalconfig: path.join(home, 'global.npmrc'),
               npm_config_update_notifier: 'false',
+              ...active.proxy.env,
             },
           }
         : await runtimeBuildEnvironment(
@@ -614,6 +647,7 @@ export default class RuntimeOperationService {
             operation.id,
             Number(operation.metadata.jobs),
             provider.id,
+            active.proxy.env,
           );
       active.command = new RuntimeCommand(
         active.lease,
@@ -854,10 +888,14 @@ export default class RuntimeOperationService {
             { where: { id: operation.id } },
           ).catch(() => {});
         }
-      for (const lease of [...(active.resourceLeases ?? [])].reverse())
-        await lease.release();
-      await active.lease.release();
-      this.active.delete(operation.id);
+      try {
+        for (const lease of [...(active.resourceLeases ?? [])].reverse())
+          await lease.release();
+        await active.lease.release();
+      } finally {
+        active.proxy.release?.();
+        this.active.delete(operation.id);
+      }
     }
   }
   private async recoverLocked(provider: number) {

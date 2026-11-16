@@ -1,3 +1,4 @@
+import type { ProxySelection } from '../services/proxyManagement';
 import type { Router } from 'express';
 import pythonEnvironmentRoutes from '../api/pythonEnvironment';
 import nodeEnvironmentRoutes from '../api/nodeEnvironment';
@@ -63,10 +64,11 @@ export function publicRuntimeValue(value: unknown, dataRoot: string): any {
 function options(body: unknown, install = false) {
   const b = object(
     body ?? {},
-    ['jobs', 'timeout_seconds', ...(install ? ['version'] : [])],
+    ['jobs', 'timeout_seconds', 'proxy', ...(install ? ['version'] : [])],
     install ? ['version'] : [],
   );
   return {
+    ...(b.proxy === undefined ? {} : { proxy: b.proxy as ProxySelection }),
     ...(b.jobs === undefined ? {} : { jobs: number(b.jobs, 1, 16) }),
     ...(b.timeout_seconds === undefined
       ? {}

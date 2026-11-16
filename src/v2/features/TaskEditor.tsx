@@ -15,6 +15,7 @@ import { call, list, useResource } from '../api';
 import { ErrorPanel, FormDialog, enumOptions, required } from '../components';
 import { label, useText } from '../i18n';
 import { EnvironmentPicker } from './Resources';
+import { ProxySelect, inheritedProxy } from './Proxy';
 function EntrypointFields({ id, form }: { id: number; form: any }) {
   const t = useText(),
     entries = useResource(id ? `/workspaces/${id}/entries` : null),
@@ -79,6 +80,7 @@ export function TaskEditor({
   const initial = task
     ? {
         ...task,
+        proxy: task.proxy || inheritedProxy,
         arguments: task.arguments || [],
         runtime_environment_id:
           task.runtime?.python_environment_id ||
@@ -88,6 +90,7 @@ export function TaskEditor({
     : {
         name: '',
         description: '',
+        proxy: inheritedProxy,
         enabled: true,
         arguments: [],
         source: {
@@ -150,6 +153,7 @@ export function TaskEditor({
               kind === 'NODE' ? values.runtime_environment_id || null : null,
           },
           env_profile_id: values.env_profile_id || null,
+          proxy: values.proxy || inheritedProxy,
           execution: {
             ...values.execution,
             timeout_seconds: values.execution.timeout_seconds || null,
@@ -176,6 +180,20 @@ export function TaskEditor({
               <>
                 <Form.Item name="name" label={t('name')} rules={[required()]}>
                   <Input maxLength={255} />
+                </Form.Item>
+                <Form.Item
+                  name="proxy"
+                  label={t('networkProxy')}
+                  rules={[
+                    {
+                      validator: (_, v) =>
+                        v?.mode !== 'PROFILE' || v.profile_id
+                          ? Promise.resolve()
+                          : Promise.reject(new Error(t('required'))),
+                    },
+                  ]}
+                >
+                  <ProxySelect />
                 </Form.Item>
                 <Form.Item name="description" label={t('description')}>
                   <Input.TextArea rows={2} />

@@ -1,3 +1,8 @@
+import {
+  ProxyManagement,
+  proxyEnvironmentKeys,
+  holdResolvedProxy,
+} from '../proxyManagement';
 import path from 'path';
 import fs from 'fs/promises';
 import { freezeExecutionSnapshot } from '../../shared/execution';
@@ -181,6 +186,7 @@ export class WorkspaceExecutionResolver {
       selected.runtime,
       selected.source.language,
     );
+    let releaseProxy = () => {};
     try {
       const ids =
         pinned.runtime.kind === 'PYTHON'
@@ -206,9 +212,24 @@ export class WorkspaceExecutionResolver {
       const afterPin = await this.admission(run.task_id);
       if (JSON.stringify(expected) !== JSON.stringify(afterPin))
         throw new SupersededError(changed(expected, afterPin));
+      const proxy = await new ProxyManagement(this.store).resolve({
+        workspaceId: selected.workspace.id,
+        taskId: selected.task.id,
+      });
+      releaseProxy = holdResolvedProxy(this.store, proxy.profileId);
+      const variables = { ...selected.environment.variables };
+      const origins = { ...selected.environment.origins };
+      if (proxy.configured)
+        for (const key of proxyEnvironmentKeys) {
+          delete variables[key];
+          delete origins[key];
+        }
+      Object.assign(variables, proxy.env);
+      for (const key of Object.keys(proxy.env)) origins[key] = 'SYSTEM';
       const secrets = selected.environment.secretNames
         .map((name) => selected.environment.variables[name])
         .filter(Boolean);
+      secrets.push(...proxy.secretValues);
       const reader = new WorkspaceRevisionReader(this.store, this.roots);
       for (const config of selected.configs)
         if (config.is_secret)
@@ -224,6 +245,7 @@ export class WorkspaceExecutionResolver {
           }
         : null;
       const source: SourceSnapshot = {
+        proxy_profile_id: proxy.profileId,
         workspace_id: selected.workspace.id,
         workspace_type: selected.workspace.type,
         source_generation: selected.workspace.source_generation,
@@ -260,7 +282,28 @@ export class WorkspaceExecutionResolver {
         },
         runtime: pinned.runtime,
         args: JSON.parse(selected.task.arguments) as string[],
-        environmentSnapshot: selected.environment,
+        environmentSnapshot: {
+          ...selected.environment,
+          variables,
+          origins,
+          unsetVariables: [
+            ...new Set([
+              ...selected.environment.unsetVariables.filter(
+                (key) => !Object.prototype.hasOwnProperty.call(proxy.env, key),
+              ),
+              ...(proxy.configured
+                ? proxyEnvironmentKeys.filter(
+                    (key) =>
+                      !Object.prototype.hasOwnProperty.call(proxy.env, key),
+                  )
+                : []),
+            ]),
+          ],
+          secretNames: [
+            ...selected.environment.secretNames,
+            ...(proxy.secretValues.length ? Object.keys(proxy.env) : []),
+          ],
+        },
         configSnapshot: selected.configs,
         hookSnapshot: selected.hooks,
         settings: selected.settings,
@@ -272,8 +315,20 @@ export class WorkspaceExecutionResolver {
         },
         secretValues: [...new Set(secrets.filter(Boolean))],
       });
-      return { context, source, pins: pinned.leases, release: pinned.release };
+      return {
+        context,
+        source,
+        pins: pinned.leases,
+        release: async () => {
+          try {
+            await pinned.release();
+          } finally {
+            releaseProxy();
+          }
+        },
+      };
     } catch (error) {
+      releaseProxy();
       await pinned.release();
       throw error;
     }

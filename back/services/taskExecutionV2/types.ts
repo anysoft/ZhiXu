@@ -89,6 +89,7 @@ export interface AdmissionSnapshot {
   cwd_relative_path: string | null;
 }
 export interface SourceSnapshot {
+  proxy_profile_id?: string | null;
   workspace_id: number;
   workspace_type: WorkspaceRow['type'];
   source_generation: number;

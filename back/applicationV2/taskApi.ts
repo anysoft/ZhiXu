@@ -1,3 +1,7 @@
+import {
+  ProxyManagement,
+  validateProxySelection,
+} from '../services/proxyManagement';
 import type { ApiCall, RouteMap, V2Services } from './types';
 import type {
   TaskDefinition,
@@ -50,7 +54,7 @@ export function taskWrite(
   ];
   const b = object(
     value,
-    [...fields, ...(update ? ['expected_version'] : [])],
+    [...fields, 'proxy', ...(update ? ['expected_version'] : [])],
     [...fields, ...(update ? ['expected_version'] : [])],
   );
   const source = object(
@@ -97,6 +101,9 @@ export function taskWrite(
     ],
   );
   return {
+    ...(b.proxy === undefined
+      ? {}
+      : { proxy: validateProxySelection(b.proxy) }),
     name: text(b.name, 255),
     description: text(b.description, 65536, true),
     enabled: boolean(b.enabled),
@@ -278,6 +285,13 @@ export function taskApiRoutes(
   privateRoots: readonly (string | undefined)[] = [],
 ): RouteMap {
   const id = (c: ApiCall) => pathId(c.params.id);
+  const dto = async (definition: TaskDefinition) => ({
+    ...taskDto(definition),
+    proxy: await new ProxyManagement(s.store).getSelection(
+      'task',
+      definition.task.id,
+    ),
+  });
   const logRoots = [
     ...new Set(
       [
@@ -466,25 +480,24 @@ export function taskApiRoutes(
       );
       return {
         items: await Promise.all(
-          rows.map(async (r) => taskDto(await s.tasks.get(r.id))),
+          rows.map(async (r) => dto(await s.tasks.get(r.id))),
         ),
         page: page.page,
         size: page.size,
         total,
       };
     },
-    'POST /tasks': async (c) =>
-      taskDto(await s.tasks.create(taskWrite(c.body))),
+    'POST /tasks': async (c) => dto(await s.tasks.create(taskWrite(c.body))),
     'POST /tasks/:id/restore-discovered': async (c) =>
-      taskDto(await s.discovery.restoreRetired(id(c), expected(c.body))),
+      dto(await s.discovery.restoreRetired(id(c), expected(c.body))),
     'GET /tasks/:id': async (c) => {
       object(c.query, []);
-      return taskDto(await s.tasks.get(id(c)));
+      return dto(await s.tasks.get(id(c)));
     },
     'PUT /tasks/:id': async (c) => {
       const b = taskWrite(c.body, true);
       const { expected_version, ...write } = b;
-      return taskDto(await s.tasks.update(id(c), expected_version!, write));
+      return dto(await s.tasks.update(id(c), expected_version!, write));
     },
     'DELETE /tasks/:id': async (c) => {
       await s.tasks.remove(id(c), expected(c.body));
@@ -496,7 +509,7 @@ export function taskApiRoutes(
         ['name', 'expected_version'],
         ['name', 'expected_version'],
       );
-      return taskDto(
+      return dto(
         await s.tasks.clone(
           id(c),
           text(b.name, 255),
@@ -510,7 +523,7 @@ export function taskApiRoutes(
         ['enabled', 'expected_version'],
         ['enabled', 'expected_version'],
       );
-      return taskDto(
+      return dto(
         await s.tasks.setEnabled(
           id(c),
           number(b.expected_version),

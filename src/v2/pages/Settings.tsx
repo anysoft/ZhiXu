@@ -27,6 +27,7 @@ import {
 import { getLanguagePreference, setLanguagePreference, useText } from '../i18n';
 import { StorageStatus } from '../features/StorageStatus';
 import { SecuritySettings } from '../features/SecuritySettings';
+import { ProxyManagement } from '../features/Proxy';
 import { BackupManifest } from '../features/BackupManifest';
 function BackupRestore() {
   const t = useText(),
@@ -433,6 +434,11 @@ export default function SettingsPage() {
                 />
               </Card>
             ),
+          },
+          {
+            key: 'proxies',
+            label: t('proxyManagement'),
+            children: <ProxyManagement />,
           },
           {
             key: 'storage',
