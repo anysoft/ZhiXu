@@ -193,6 +193,7 @@ function Credentials() {
       {test && (
         <FormDialog
           title={t('test')}
+          submitText={t('test')}
           initial={{ remote_url: '' }}
           onClose={() => setTest(undefined)}
           onSubmit={async (v) =>
