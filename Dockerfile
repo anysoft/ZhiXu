@@ -29,6 +29,10 @@ FROM toolchain AS dependencies
 # pnpm root lifecycle TMPDIR contains patch_hash=; gyp needs a protected path without it.
 RUN mkdir -m 0700 /build/.sqlite-build-tmp
 ENV ZHIXU_SQLITE_BUILD_TMPDIR=/build/.sqlite-build-tmp
+# Fetch the pinned source once with BuildKit; lifecycle rebuilds reuse the same
+# archive and retain the installer's independent SHA-256/SHA3 identity checks.
+ADD --checksum=sha256:926ef8d3eab93fbf6e06011901273eec076b25594a4e1cdadd50c987f4f6d64e https://sqlite.org/2026/sqlite-autoconf-3540100.tar.gz /build/.sqlite-source/sqlite-autoconf-3540100.tar.gz
+ENV ZHIXU_SQLITE_SOURCE_ARCHIVE=/build/.sqlite-source/sqlite-autoconf-3540100.tar.gz
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
 COPY patches ./patches
 COPY scripts/native/verify-sqlite.cjs scripts/native/sqlite-core.json ./scripts/native/

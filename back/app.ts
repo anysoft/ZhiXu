@@ -19,7 +19,6 @@ import { type HttpServerService } from './services/http';
 import cronClient from './schedule/client';
 import { platformPaths, platformBarrier } from './services/backup/platform';
 import { acquireBackendLease } from './services/backup/paths';
-import { RestoreService } from './services/backup/restore';
 import { BackupOperations } from './services/backup/operations';
 import { RuntimeLease } from './services/runtimeProcess';
 
@@ -63,7 +62,6 @@ class Application {
         const paths = await platformPaths();
         this.backendLease = await acquireBackendLease(paths);
         setBackendLeaseFd(this.backendLease!.handle.fd);
-        await new RestoreService(paths).apply(true);
         await (await platformBarrier()).recoverAbandonedSnapshot();
         await new BackupOperations(paths).recover();
         cluster.setupPrimary({ stdio: ['inherit', 'inherit', 'inherit', 'ipc', this.backendLease!.handle.fd] });

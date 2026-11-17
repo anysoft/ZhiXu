@@ -11,7 +11,7 @@ const suites = {
   execution: ['tests/phase15/convergence.test.cjs', 'tests/phase15/formal-lifecycle.test.cjs', 'tests/phase15/formal-environment.test.cjs', 'tests/phase10/execution.test.cjs', 'tests/phase10/recovery.test.cjs', 'tests/phase10/hardening.test.cjs', 'tests/phase10/entrypoints.test.cjs'],
   triggers: ['tests/phase15/disabled-cron.test.cjs', 'tests/phase11/cron.test.cjs', 'tests/phase11/recovery.test.cjs', 'tests/phase11/scale.test.cjs'],
   workspace: ['tests/phase12/files.test.cjs', 'tests/phase12/git.test.cjs', 'tests/phase12/discovery.test.cjs', 'tests/phase12/api.test.cjs'],
-  backup: ['tests/phase14/barrier.test.cjs', 'tests/phase14/portable.test.cjs', 'tests/phase14/production.test.cjs', 'tests/phase14/sqlite.test.cjs'],
+  backup: ['tests/phase14/barrier.test.cjs', 'tests/phase14/portable.test.cjs', 'tests/backup-v2-cli/runtime-restore.test.cjs', 'tests/phase14/sqlite.test.cjs'],
   observability: ['tests/phase13/scale.test.cjs', 'tests/phase13/security.test.cjs', 'tests/phase13/recovery.test.cjs'],
 };
 async function qualify() {

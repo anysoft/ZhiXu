@@ -1,6 +1,5 @@
 import { protectApiMutations } from '../services/backup/apiLifetime';
 import observabilityRoutes from './observability';
-import backupRoutes from './backups';
 import { Router } from 'express';
 import user from './user';
 import runtimeRoutes from './runtime';
@@ -18,7 +17,6 @@ import workspaceRoutes from './workspace';
 
 export default () => {
   const app = Router();
-  backupRoutes(app);
   user(app);
   runtimeRoutes(app);
   observabilityRoutes(app);

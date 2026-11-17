@@ -30,7 +30,6 @@ import SecuritySettings from './security';
 import LoginLog from './loginLog';
 import NotificationSetting from '../notifications';
 import Other from './other';
-import BackupSettings from './backup';
 import About from './about';
 import { useOutletContext } from '@umijs/max';
 import { SharedContext } from '@/layouts';
@@ -336,11 +335,6 @@ const Setting = () => {
               key: 'client-ip',
               label: intl.get('客户端 IP'),
               children: <ClientIp />,
-            },
-            {
-              key: 'backup',
-              label: tr('ui.backupAndRestore'),
-              children: <BackupSettings />,
             },
             {
               key: 'other',

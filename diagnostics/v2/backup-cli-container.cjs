@@ -29,6 +29,14 @@ async function backupCliContainerScenario() {
   };
   const digest = (value) => crypto.createHash('sha256').update(value).digest('hex');
   const secrets = [];
+  for (const oldEntry of [
+    'backupCli.js', 'backupCandidate.js', 'api/backups.js',
+    'services/backup/coordinator.js', 'services/backup/restore.js',
+    'services/backup/validator.js', 'services/backup/git.js',
+    'services/backup/materializations.js',
+  ]) {
+    await assert.rejects(fs.lstat('/app/static/build/' + oldEntry), {code:'ENOENT'});
+  }
   let app;
   async function command(args, input, expectedError) {
     const child = spawn(process.execPath, ['/app/static/build/backupCliV2.js', ...args], {
@@ -62,6 +70,70 @@ async function backupCliContainerScenario() {
       assert.equal(value.code, 200);
     }
     return value.data;
+  }
+  async function checkRemoteCli(snapshot, portable) {
+    const http = require('node:http');
+    const { createReadStream } = require('node:fs');
+    const { remoteBackupKey } = require('/app/static/build/services/backup/remoteKeys');
+    const manifest = JSON.parse(await fs.readFile(path.join(backupRoot, 'snapshots', snapshot, 'manifest.json'), 'utf8'));
+    const key = remoteBackupKey(manifest, 'MANUAL');
+    const size = (await fs.stat(portable)).size;
+    const keySecret = 'image-secret-' + crypto.randomUUID();
+    const davPassword = 'image-dav-' + crypto.randomUUID();
+    secrets.push(keySecret, davPassword);
+    const s3Key = 'external/' + key;
+    const davFile = '/dav/' + key;
+    const folders = ['/dav/', '/dav/zhixu-v2/', '/dav/zhixu-v2/MANUAL/', '/dav/zhixu-v2/MANUAL/FULL/'];
+    const server = http.createServer((request, response) => {
+      const url = new URL(request.url, 'http://fixture');
+      const location = decodeURIComponent(url.pathname);
+      const dav = location.startsWith('/dav/');
+      const authorized = dav
+        ? request.headers.authorization === 'Basic ' + Buffer.from('image-user:' + davPassword).toString('base64')
+        : /^AWS4-HMAC-SHA256 Credential=image-access\//.test(request.headers.authorization || '');
+      if (!authorized) { response.writeHead(403).end(); return; }
+      if (!dav && request.method === 'GET' && url.searchParams.get('list-type') === '2') {
+        response.writeHead(200, {'content-type':'application/xml'}).end(`<ListBucketResult xmlns="http://s3.amazonaws.com/doc/2006-03-01/"><IsTruncated>false</IsTruncated><Contents><Key>${s3Key}</Key><Size>${size}</Size><LastModified>${manifest.created_at}</LastModified></Contents></ListBucketResult>`);
+        return;
+      }
+      if (dav && request.method === 'PROPFIND' && folders.includes(location)) {
+        const child = folders.find((entry) => entry.startsWith(location) && entry !== location && !entry.slice(location.length).replace(/\/$/, '').includes('/'));
+        const name = child || davFile;
+        const properties = child ? '<d:resourcetype><d:collection/></d:resourcetype>' : `<d:resourcetype/><d:getcontentlength>${size}</d:getcontentlength>`;
+        response.writeHead(207, {'content-type':'application/xml'}).end(`<d:multistatus xmlns:d="DAV:"><d:response><d:href>${name}</d:href><d:propstat><d:prop>${properties}</d:prop><d:status>HTTP/1.1 200 OK</d:status></d:propstat></d:response></d:multistatus>`);
+        return;
+      }
+      if (request.method === 'GET' && (location === '/backup-bucket/' + s3Key || location === davFile)) {
+        response.writeHead(200, {'content-length':size});
+        createReadStream(portable).on('error', () => response.destroy()).pipe(response);
+        return;
+      }
+      response.writeHead(404).end();
+    });
+    await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
+    try {
+      const endpoint = 'http://127.0.0.1:' + server.address().port;
+      for (const target of [
+        {type:'S3',endpoint,region:'us-east-1',bucket:'backup-bucket',prefix:'external',access_key_id:'image-access',secret_access_key:keySecret,path_style:true},
+        {type:'WEBDAV',endpoint:endpoint+'/dav/',username:'image-user',password:davPassword},
+      ]) {
+        const config = '/backup/remote-smoke-' + target.type + '.json';
+        const output = '/backup/remote-smoke-' + target.type + '.encrypted';
+        await fs.writeFile(config, JSON.stringify(target), {mode:0o600});
+        try {
+          const listing = await command(['remote','list','--config',config]);
+          assert.equal(listing.objects[0].backup_id, snapshot);
+          await command(['remote','download',snapshot,'--config',config,'--output',output]);
+          assert.equal(digest(await fs.readFile(output)), digest(await fs.readFile(portable)));
+        } finally {
+          await fs.unlink(config).catch(() => {});
+          await fs.unlink(output).catch(() => {});
+        }
+      }
+    } finally {
+      server.closeAllConnections();
+      await new Promise((resolve) => server.close(resolve));
+    }
   }
   function git(args, cwd) {
     return execFileSync('git', args, {
@@ -171,7 +243,8 @@ async function backupCliContainerScenario() {
       await fs.writeFile('/backup/container-passphrase', phrase, { mode: 0o600 });
       await fs.writeFile('/backup/container-fixture.json', JSON.stringify(expected), { mode: 0o600 });
       await app.close(); app = undefined;
-      process.stdout.write(JSON.stringify({ phase: 'source', status: 'PASS', runtime: { platform: process.platform, architecture: process.arch, node: process.versions.node }, checks: ['production-cli', 'offline-create-list-info-verify', 'live-owner-refusal', 'corrupt-sqlite-web-refusal', 'snapshot-disaster-restore', 'damaged-root-preserved', 'workspace-git-task-config-restored', 'portable-export'] }) + '\n');
+      await checkRemoteCli(snapshot, expected.portable_file);
+      process.stdout.write(JSON.stringify({ phase: 'source', status: 'PASS', runtime: { platform: process.platform, architecture: process.arch, node: process.versions.node }, checks: ['production-cli', 'offline-create-list-info-verify', 'live-owner-refusal', 'corrupt-sqlite-web-refusal', 'snapshot-disaster-restore', 'damaged-root-preserved', 'workspace-git-task-config-restored', 'portable-export', 'packaged-s3-webdav-remote-cli-download'] }) + '\n');
     } else {
       const expected = JSON.parse(await fs.readFile('/backup/container-fixture.json', 'utf8'));
       const phrase = await fs.readFile('/backup/container-passphrase', 'utf8');
@@ -241,6 +314,35 @@ async function runBackupCliContainerVerification() {
       ], `(${backupCliContainerScenario.toString()})().catch((error) => { process.stderr.write(String(error.stack || error.message)); process.exitCode = 1; });`);
       process.stdout.write(result.stdout);
       assert.match(result.stdout, /"status":"PASS"/);
+      if (phase === 'source') {
+        const service = prefix + '-entrypoint';
+        containers.push(service);
+        await docker([
+          'run', '--detach', '--name', service, '--label', label, '--read-only',
+          '--user', '10001:10001', '--network', 'none', '--cap-drop', 'ALL',
+          '--security-opt', 'no-new-privileges:true', '--pids-limit', '256',
+          '--tmpfs', '/tmp:rw,nosuid,nodev,exec,size=64m,mode=1777',
+          '--mount', `type=volume,src=${prefix}-source-data,dst=/data`,
+          '--mount', `type=volume,src=${prefix}-backup,dst=/backup`,
+          '--mount', `type=volume,src=${prefix}-scratch,dst=/scratch`,
+          '--env', 'ZHIXU_V2_PUBLIC_ORIGIN=http://127.0.0.1:5600', image,
+        ]);
+        let ready = false;
+        for (let attempt = 0; attempt < 90; attempt++) {
+          const health = await docker(['exec', service, 'node', 'scripts/release-v2/healthcheck.cjs'], undefined, true);
+          if (health.code === 0) { ready = true; break; }
+          const state = await docker(['inspect', '--format', '{{.State.Running}}', service], undefined, true);
+          if (state.code !== 0 || state.stdout.trim() !== 'true') break;
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+        }
+        if (!ready) {
+          const logs = await docker(['logs', '--tail', '80', service], undefined, true);
+          throw Error('Formal entrypoint startup rejected: ' + (logs.stderr + logs.stdout).slice(-4000));
+        }
+        await docker(['stop', '--time', '30', service]);
+        await docker(['rm', service]);
+        process.stdout.write(JSON.stringify({ phase:'entrypoint', status:'PASS', checks:['formal-entrypoint-starts-v2', 'production-healthcheck-ready', 'normal-signal-stop'] })+'\n');
+      }
     }
   } catch (error) {
     failed = true;

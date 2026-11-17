@@ -681,69 +681,6 @@ async function until(fn) {
   );
   assert.ok(!forbidden.some((value) => documentSnapshot.includes(value)));
 
-  // Backup takes editor-created local-only history and unsaved-to-Git source to another DATA root.
-  await checked(ws + '/git/stage', 'POST', { paths: ['edit.txt'] });
-  const localCommit = (
-    await checked(ws + '/git/commit', 'POST', {
-      message: 'local-only editor commit',
-    })
-  ).sha;
-  await checked(ws + '/files', 'POST', {
-    path: 'untracked-backup',
-    content: 'workspace backup content',
-    must_not_exist: true,
-  });
-  const old = await checked(ws + '/files?path=edit.txt');
-  await checked(ws + '/files', 'PUT', {
-    path: 'edit.txt',
-    content: 'dirty backed up\n',
-    expected_hash: old.hash,
-  });
-  await page.goto(base + '/setting');
-  await page.getByRole('tab', { name: ui('备份与恢复'), exact: true }).click();
-  await page.getByRole('button', { name: buttonName('创建备份'), exact: true }).click();
-  await until(async () =>
-    (await checked('/backups')).some((b) => b.status === 'READY'),
-  );
-  const backup = (await checked('/backups'))[0];
-  mark('browser-backup-includes-editor-state');
-  await stop();
-  const backupPhrase=acceptance.secret('workspace-backup-private-passphrase');
-  const cli = (...args) =>
-    JSON.parse(
-      execFileSync(
-        process.execPath,
-        [path.join(root, 'static/build/backupCli.js'), ...args],
-        { env, cwd: root, stdio: ['pipe', 'pipe', 'pipe'], input: backupPhrase },
-      ).toString(),
-    );
-  const exported = cli('export', backup.id, );
-  const portable = path.join(tmp, 'portable.backup');
-  const exportsDir = path.join(env.QL_DATA_DIR + '-backups', 'exports');
-  const exportedFiles = fs.readdirSync(exportsDir);
-  assert.equal(exportedFiles.length, 1);
-  fs.copyFileSync(path.join(exportsDir, exportedFiles[0]), portable);
-  const original = env.QL_DATA_DIR;
-  env.QL_DATA_DIR = path.join(tmp, 'restored-B');
-  const imported = cli('import', portable, ).data
-    .import_id;
-  cli('stage', imported, '--import');
-  await start();
-  await page.evaluate(() => localStorage.removeItem('token'));
-  await page.goto(base + '/login');
-  await login();
-  assert.equal((await checked('/restore/status')).stage, 'COMPLETE');
-  assert.equal((await checked(ws)).head, localCommit);
-  assert.equal(
-    (await checked(ws + '/files?path=edit.txt')).content,
-    'dirty backed up\n',
-  );
-  assert.equal(
-    (await checked(ws + '/files?path=untracked-backup')).content,
-    'workspace backup content',
-  );
-  assert.notEqual(env.QL_DATA_DIR, original);
-  mark('different-root-restore-preserves-editor-local-commit-dirty-untracked');
   await page.goto(base + `/workspace?id=${wt.id}`);
   await page.getByRole('button', { name: buttonName('edit.txt'), exact: true }).click();
   await page.screenshot({

@@ -607,7 +607,7 @@
     "classification": "PLATFORM_CORE"
   },
   {
-    "path": "tests/phase14/production.test.cjs",
+    "path": "tests/backup-v2-cli/runtime-restore.test.cjs",
     "classification": "PLATFORM_CORE"
   },
   {
