@@ -54,6 +54,14 @@ docker compose run --rm --no-deps --entrypoint node platform-v2 \
 
 `LIGHTWEIGHT` keeps the database, configuration and LOCAL Workspaces in full, and saves Git references, exact commit IDs and local deltas instead of complete Git repositories and checkouts. Git restoration needs the original remote repository, required base objects and working credentials/proxy. The candidate is rebuilt and checked before publication; if the remote is unavailable, keep the original data and use a `FULL` backup. Both modes use the same encrypted Portable format and restore commands below. `list`, `info` and `verify` report the mode and recovery dependencies.
 
+### Daily automatic backups
+
+Settings → Backup / Restore includes automatic backups. The default is enabled at 03:00 every day in the platform timezone, falling back to `Asia/Shanghai`, with the latest three successful automatic snapshots retained. The timezone is explicit and independent of the container's clock display. The page shows the next execution/retry time, supports changing the retention count or disabling the schedule, and can run one automatic LIGHTWEIGHT backup immediately.
+
+Automatic backups and retries always use LIGHTWEIGHT; manual Web and CLI backups still default to FULL. After downtime, startup catches up at most one missed daily cycle. Busy operations are not terminated; failures retry at most twice, about 15 minutes apart. Recent execution results and any disk-space or cleanup error appear on the same page.
+
+Retention starts only after a new automatic snapshot succeeds and passes validation. It never deletes manual or legacy snapshots, Preservation-held snapshots or backups referenced by an active Restore Journal. Protected backups may leave more files than the configured count. Keep sufficient room for a new snapshot: an existing valid backup is not deleted to make the next attempt fit. Automatic settings and scheduling do not replace the offline CLI recovery flow below.
+
 ## Restore a local snapshot
 
 ```sh

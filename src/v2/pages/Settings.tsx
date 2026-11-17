@@ -31,6 +31,7 @@ import { SecuritySettings } from '../features/SecuritySettings';
 import { ProxyManagement } from '../features/Proxy';
 import { BackupManifest, backupMode } from '../features/BackupManifest';
 import { formatStorageBytes } from '../features/History';
+import { ScheduledBackups } from '../features/ScheduledBackups';
 function BackupRestore() {
   const t = useText(),
     data = useResource('/backups'),
@@ -78,6 +79,11 @@ function BackupRestore() {
   return (
     <>
       <Alert type="info" showIcon message={t('restoreHelp')} />
+      <ScheduledBackups
+        busy={active}
+        onOperation={(operation) => setOperationId(operation.id)}
+        onRefreshSnapshots={data.reload}
+      />
       <div className="v2-toolbar v2-section">
         <Space wrap>
           <Select
@@ -230,6 +236,15 @@ function BackupRestore() {
         dataSource={list(data.data)}
         columns={[
           { title: t('id'), dataIndex: 'id' },
+          {
+            title: t('backupSource'),
+            render: (_, r: any) =>
+              t(
+                r.source === 'SCHEDULED'
+                  ? 'backupSource.SCHEDULED'
+                  : 'backupSource.MANUAL',
+              ),
+          },
           {
             title: t('backupMode'),
             render: (_, r: any) => t(`backupMode.${backupMode(r)}`),

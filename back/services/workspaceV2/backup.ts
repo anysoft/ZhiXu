@@ -11,6 +11,8 @@ import {
   backupFailure,
   backupMode,
   BackupMode,
+  BackupProvenance,
+  backupSource,
 } from './manifest';
 import { LightweightGitService } from './lightweightGit';
 import { WorkspaceLimits, workspaceLimits } from './limits';
@@ -280,8 +282,20 @@ export class WorkspaceBackupService {
     }
   }
 
-  async create(timeoutMs = 600000, mode: BackupMode = 'FULL') {
+  async create(
+    timeoutMs = 600000,
+    mode: BackupMode = 'FULL',
+    provenance: BackupProvenance = { source: 'MANUAL' },
+  ) {
     if (!['FULL', 'LIGHTWEIGHT'].includes(mode)) fail('INVALID_REQUEST', 400);
+    if (
+      !provenance ||
+      !['MANUAL', 'SCHEDULED'].includes(provenance.source) ||
+      (provenance.source === 'SCHEDULED' &&
+        (mode !== 'LIGHTWEIGHT' || !provenance.scheduled)) ||
+      (provenance.source === 'MANUAL' && provenance.scheduled !== undefined)
+    )
+      fail('BACKUP_SOURCE_INVALID', 400);
     if (this.store.dataRoot !== this.paths.data)
       fail('WORKSPACE_RECOVERY_REQUIRED');
     return this.withCatalogLock(() =>
@@ -436,6 +450,10 @@ export class WorkspaceBackupService {
               format_family: 'zhixu-workspace-backup',
               format_version: lightweight ? 3 : 2,
               backup_mode: mode,
+              source: provenance.source,
+              ...(provenance.scheduled
+                ? { scheduled: { ...provenance.scheduled } }
+                : {}),
               restore_requires_remote: !!lightweightGit?.repositories.length,
               warnings: lightweight
                 ? lightweightGit?.repositories.length
@@ -845,10 +863,35 @@ export class WorkspaceBackupService {
     return names.length > 0;
   }
 
-  async delete(id: string) {
+  async delete(id: string, options: { scheduledOnly?: boolean } = {}) {
     return this.withCatalogLock(() =>
       this.barrier.mutation(async () => {
-        await this.snapshot(id);
+        const snapshot = await this.snapshot(id);
+        if (options.scheduledOnly) {
+          if (backupSource(snapshot.manifest) !== 'SCHEDULED')
+            fail('BACKUP_NOT_SCHEDULED');
+          const { readWorkspaceRestoreJournal } = await import('./restore');
+          const journal = await readWorkspaceRestoreJournal(this.paths);
+          if (journal?.source === 'snapshots' && journal.snapshot_id === id)
+            fail('BACKUP_RESTORE_REFERENCED');
+          if (journal?.source === 'imports') {
+            const imported = await this.paths.bucket(
+              'imports',
+              journal.snapshot_id,
+            );
+            await this.paths.assertOwned(imported, journal.snapshot_id);
+            const manifest = manifestValue(
+              await readJson(path.join(imported, 'snapshot/manifest.json')),
+            );
+            if (
+              manifest.backup_id === id ||
+              manifest.preserved_snapshots.some(
+                (entry) => entry.backup_id === id,
+              )
+            )
+              fail('BACKUP_RESTORE_REFERENCED');
+          }
+        }
         if (
           (await this.catalogHeld(id)) ||
           (

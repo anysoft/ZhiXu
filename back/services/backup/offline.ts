@@ -6,7 +6,7 @@ import { WorkspaceRestoreService } from '../workspaceV2/restore';
 import { WorkspaceRootResolver } from '../workspaceV2/roots';
 import { WorkspaceLeaseService } from '../workspaceV2/lease';
 import type { FaultHook } from '../workspaceV2/types';
-import { backupFailure } from '../workspaceV2/manifest';
+import { backupFailure, backupSource } from '../workspaceV2/manifest';
 import type { BackupMode } from '../workspaceV2/manifest';
 import type { WorkspaceGitAccessResolver } from '../gitWorkspaceV2/git';
 import { backupId, acquireBackendLease } from './paths';
@@ -56,6 +56,7 @@ export class OfflineBackupManager {
             bytes: manifest.total_bytes,
             files: manifest.file_count,
             backup_mode: manifest.backup_mode ?? 'FULL',
+            source: backupSource(manifest),
             restore_requires_remote:
               manifest.restore_requires_remote ??
               manifest.backup_mode === 'LIGHTWEIGHT',
@@ -87,6 +88,7 @@ export class OfflineBackupManager {
         id,
         verified: true,
         backup_mode: snapshot.manifest.backup_mode ?? 'FULL',
+        source: backupSource(snapshot.manifest),
         restore_requires_remote:
           snapshot.manifest.restore_requires_remote ??
           snapshot.manifest.backup_mode === 'LIGHTWEIGHT',
@@ -103,6 +105,7 @@ export class OfflineBackupManager {
         id,
         verified: true,
         backup_mode: snapshot.manifest.backup_mode ?? 'FULL',
+        source: backupSource(snapshot.manifest),
         restore_requires_remote:
           snapshot.manifest.restore_requires_remote ??
           snapshot.manifest.backup_mode === 'LIGHTWEIGHT',

@@ -3,12 +3,16 @@ import multer from 'multer';
 import fs from 'fs/promises';
 import path from 'path';
 import { BackupOperations } from '../services/backup/operations';
+import { ScheduledBackupService } from '../services/backup/scheduled';
 import { backupId } from '../services/backup/paths';
 import { BackupError, openRegular } from '../services/backup/files';
 import { RuntimeRestoreReconciler } from '../services/backup/runtimeRestore';
 import { WorkspacePreservationService } from '../services/workspaceV2/preservation';
 import { fail } from '../services/workspaceV2/errors';
-import type { WorkspaceBackupManifest } from '../services/workspaceV2/manifest';
+import {
+  backupSource,
+  WorkspaceBackupManifest,
+} from '../services/workspaceV2/manifest';
 import type { V2Services } from './types';
 import * as v from './workspaceValidation';
 import type { V2HttpLifetime } from './httpLifetime';
@@ -44,6 +48,7 @@ function publicManifest(manifest: WorkspaceBackupManifest, held = false) {
     },
     mode: 'FULL_PORTABLE',
     backup_mode: mode,
+    source: backupSource(manifest),
     restore_requires_remote:
       manifest.restore_requires_remote ?? mode === 'LIGHTWEIGHT',
     size: manifest.total_bytes,
@@ -120,7 +125,8 @@ export function registerBackupApi(
   lifetime?: V2HttpLifetime,
 ) {
   const paths = s.backup.paths,
-    operations = new BackupOperations(paths);
+    operations = new BackupOperations(paths),
+    scheduled = new ScheduledBackupService(s.backup, operations);
   const handle = (action: Action) =>
     (lifetime?.handle ?? ((action) => action))(
       async (req: Request, res: Response, next: NextFunction) => {
@@ -191,6 +197,45 @@ export function registerBackupApi(
     );
 
   app.get(
+    '/api/backups/schedule',
+    handle(async (req) => {
+      v.object(req.query, []);
+      return scheduled.getSettings();
+    }),
+  );
+  app.put(
+    '/api/backups/schedule',
+    handle(async (req) => {
+      try {
+        return await scheduled.saveSettings(
+          body(req, ['enabled', 'time', 'timezone', 'retain_count']),
+        );
+      } catch (error) {
+        if (
+          error instanceof BackupError &&
+          error.code === 'BACKUP_SCHEDULE_SETTINGS_INVALID'
+        )
+          fail('BACKUP_SCHEDULE_SETTINGS_INVALID', 400);
+        throw error;
+      }
+    }),
+  );
+  app.post(
+    '/api/backups/schedule/run',
+    handle(async (req) => {
+      body(req);
+      return scheduled.runNow();
+    }),
+  );
+  app.get(
+    '/api/backups/history',
+    handle(async (req) => {
+      v.object(req.query, []);
+      return scheduled.history();
+    }),
+  );
+
+  app.get(
     '/api/backups',
     handle(async () => {
       const list = await s.backup.list();
@@ -245,7 +290,7 @@ export function registerBackupApi(
         input.mode === undefined
           ? 'FULL'
           : v.choice(input.mode, ['FULL', 'LIGHTWEIGHT']);
-      return operations.start('SNAPSHOT', () => s.backup.create(timeout, mode));
+      return scheduled.runManual(mode, timeout);
     }),
   );
   app.get(
@@ -518,5 +563,9 @@ export function registerBackupApi(
       return operations.start('REBUILD', () => hooks.rebuildRuntime!());
     }),
   );
-  return { operations, recoverOperations: () => operations.recover() };
+  return {
+    operations,
+    scheduled,
+    recoverOperations: () => operations.recover(),
+  };
 }

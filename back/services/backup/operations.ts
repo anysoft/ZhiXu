@@ -12,6 +12,7 @@ class OperationPaths extends RuntimePathResolver {
 }
 export class BackupOperations {
   private readonly pending = new Set<Promise<void>>();
+  private readonly completion = new Map<string, Promise<void>>();
   private closing = false;
   private readonly starting = new Set<Promise<void>>();
   constructor(readonly paths: BackupPaths) {}
@@ -78,6 +79,7 @@ export class BackupOperations {
         settled = resolve;
       });
       this.pending.add(pending);
+      this.completion.set(id, pending);
       setImmediate(() => {
         void (async () => {
           let timer: NodeJS.Timeout | undefined;
@@ -112,6 +114,7 @@ export class BackupOperations {
           .catch(() => {})
           .finally(() => {
             this.pending.delete(pending);
+            this.completion.delete(id);
             settled();
           });
       });
@@ -127,6 +130,10 @@ export class BackupOperations {
       undefined,
       true, // Progress updates atomically replace this operation's JSON file.
     );
+  }
+  /** Same-process callers wait through terminal journal fsync and owner release. */
+  async wait(id: string) {
+    await this.completion.get(backupId(id));
   }
   /** Wait through the operation's terminal journal fsync and lease release. */
   async close() {

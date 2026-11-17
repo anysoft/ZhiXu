@@ -23,6 +23,14 @@ import { hashFile, privateDirectory, relativeName } from '../backup/files';
 import type { LightweightGitMetadata } from './lightweightGit';
 
 export type BackupMode = 'FULL' | 'LIGHTWEIGHT';
+export type BackupSource = 'MANUAL' | 'SCHEDULED';
+export interface BackupProvenance {
+  source: BackupSource;
+  scheduled?: { cycle_key: string; scheduled_at: string; attempt: number };
+}
+export const backupSource = (
+  manifest: Pick<WorkspaceBackupManifest, 'source'>,
+): BackupSource => (manifest.source === 'SCHEDULED' ? 'SCHEDULED' : 'MANUAL');
 export const backupMode = (
   manifest: Pick<WorkspaceBackupManifest, 'backup_mode'>,
 ): BackupMode => manifest.backup_mode ?? 'FULL';
@@ -79,6 +87,8 @@ export interface WorkspaceBackupManifest {
   format_family: 'zhixu-workspace-backup';
   format_version: 2 | 3;
   backup_mode?: BackupMode;
+  source?: BackupSource;
+  scheduled?: BackupProvenance['scheduled'];
   restore_requires_remote?: boolean;
   warnings?: string[];
   lightweight_git?: LightweightGitMetadata;
@@ -152,6 +162,25 @@ export function manifestValue(value: unknown): WorkspaceBackupManifest {
     !Number.isSafeInteger(record.file_count)
   )
     fail('BACKUP_SOURCE_INCOMPLETE');
+  if (record.source !== undefined && typeof record.source !== 'string')
+    fail('BACKUP_SOURCE_INCOMPLETE');
+  if (record.source === 'SCHEDULED') {
+    const scheduled = object(record.scheduled);
+    if (
+      record.backup_mode !== 'LIGHTWEIGHT' ||
+      !scheduled ||
+      typeof scheduled.cycle_key !== 'string' ||
+      !scheduled.cycle_key.length ||
+      scheduled.cycle_key.length > 300 ||
+      /[\x00-\x20\x7f]/.test(scheduled.cycle_key) ||
+      typeof scheduled.scheduled_at !== 'string' ||
+      !Number.isFinite(Date.parse(scheduled.scheduled_at)) ||
+      !Number.isInteger(scheduled.attempt) ||
+      Number(scheduled.attempt) < 1 ||
+      Number(scheduled.attempt) > 3
+    )
+      fail('BACKUP_SOURCE_INCOMPLETE');
+  } else if (record.scheduled !== undefined) fail('BACKUP_SOURCE_INCOMPLETE');
   if (
     (record.backup_mode !== undefined &&
       !['FULL', 'LIGHTWEIGHT'].includes(String(record.backup_mode))) ||

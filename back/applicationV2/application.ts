@@ -151,6 +151,8 @@ export class V2Application {
             await instance.closedPromise;
           });
         } catch (e) {
+          await instance.backupApi?.scheduled.close().catch(() => undefined);
+          await instance.backupApi?.operations.close().catch(() => undefined);
           await instance.maintenance?.close().catch(() => undefined);
           await instance.notifications?.close().catch(() => undefined);
           await instance.runtime?.close().catch(() => undefined);
@@ -289,6 +291,7 @@ export class V2Application {
         this.runtime.startRecovery();
         this.notifications.start();
         this.maintenance.start();
+        this.backupApi?.scheduled.start();
         this.phases.push('SCHEDULERS_ENABLED');
       }
     }
@@ -695,6 +698,8 @@ export class V2Application {
       const httpClosed = this.httpLifetime.close(this.server);
       // Observe an early transport error while producers drain, then propagate it.
       void httpClosed.catch(() => undefined);
+      const scheduledClosed = this.backupApi?.scheduled.close();
+      void scheduledClosed?.catch(() => undefined);
       await this.maintenance?.close();
       this.httpLifetime.diagnostic('PRODUCERS_STOP_BEGIN');
       await this.services?.pause();
@@ -707,6 +712,7 @@ export class V2Application {
       this.httpLifetime.diagnostic('TASK_RUNNER_STOP_BEGIN');
       await this.services?.execution.close();
       this.httpLifetime.diagnostic('TASK_RUNNER_STOPPED');
+      await scheduledClosed;
       await this.backupApi?.operations.close();
       this.httpLifetime.diagnostic('BACKUP_OPERATIONS_DRAINED');
       await this.notifications?.close();

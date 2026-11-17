@@ -21,6 +21,14 @@ export function BackupManifest({ value }: { value: any }) {
         values={[
           ['id', value.id],
           ['createdAt', <Time value={value.created_at} />],
+          [
+            'backupSource',
+            t(
+              value.source === 'SCHEDULED'
+                ? 'backupSource.SCHEDULED'
+                : 'backupSource.MANUAL',
+            ),
+          ],
           ['backupMode', t(`backupMode.${backupMode(value)}`)],
           [
             'backupRecoveryDependency',
