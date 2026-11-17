@@ -126,3 +126,64 @@ docker compose run --rm --no-deps --entrypoint node platform-v2 \
 If LIGHTWEIGHT Git reconstruction fails because the remote or required base objects are unavailable, the existing Journal/candidate may remain at `PREPARING` while the original data stays unchanged. Restore remote access (including credentials/proxy), then use `restore --resume`. A pending Journal blocks selecting another backup on the same data root. To use a `FULL` backup instead, restore it to a separate fresh data root (`--data-root /absolute/new/root`) or a new data volume, retaining the original root and Journal; verify that recovery before changing the deployment to use it.
 
 Preserve the candidate, quarantine and failed directories; do not delete journals or guess which SQLite file to copy. If `status` reports a rejected journal, a busy owner, insufficient space or failed validation, resolve the reported issue before starting the service.
+
+## Remote S3 / WebDAV backups
+
+Settings → Backup / Restore → Remote backups manages S3-compatible and WebDAV targets. Remote automatic upload defaults to **off**, uses the existing daily LIGHTWEIGHT schedule and retains 14 successful automatic remote files. Local automatic retention remains three. Manual FULL and LIGHTWEIGHT uploads are never removed by automatic remote retention. Upload success confirms object existence and encrypted file size; authenticated decryption and content validation happen during restore.
+
+Set your own recovery passphrase before uploading. **Save it independently, outside this server and its database**, along with the remote endpoint, bucket/directory and recovery credentials. The UI never returns stored passwords or the recovery passphrase. Losing the passphrase makes encrypted backups unrecoverable. Changing it affects future uploads; retain every passphrase needed by older files. Use HTTPS for remote services; HTTP is available for isolated testing or explicitly trusted local deployments. HTTP/HTTPS proxy selections reuse platform proxy settings; SOCKS proxies are explicitly rejected for remote backup traffic.
+
+If both the original data and local backup volumes are lost, prepare the normal Compose file and new empty volumes on the replacement machine. Do not start or initialize the Web backend yet. Remote CLI commands require only an external private JSON configuration, independently of SQLite. Example S3 configuration (`remote-config.json`):
+
+```json
+{
+  "type": "S3",
+  "endpoint": "https://s3.example.com",
+  "region": "us-east-1",
+  "bucket": "zhixu-backups",
+  "prefix": "my-instance",
+  "access_key_id": "REPLACE_LOCALLY",
+  "secret_access_key": "REPLACE_LOCALLY",
+  "path_style": true
+}
+```
+
+For AWS S3 use the appropriate regional endpoint; session credentials may include `session_token`. R2/MinIO use their service endpoint and region, with `path_style` as required by the provider. For WebDAV replace the configuration with:
+
+```json
+{
+  "type": "WEBDAV",
+  "endpoint": "https://nas.example.com/dav/",
+  "directory": "backups/zhixu",
+  "username": "backup-user",
+  "password": "REPLACE_LOCALLY"
+}
+```
+
+Give each ZhiXu deployment its own prefix/directory, then use that same location during recovery. Retention recognizes automatic backups from their managed names even after the local upload catalog is lost. Keep this file private (`chmod 600 remote-config.json`) and transfer it into the maintenance volume as the service user. Do not put credentials in command arguments. An optional wrapper `{ "target": { ... }, "proxy_url": "http://proxy.example.com:8080" }` explicitly selects an HTTP/HTTPS proxy without relying on the lost platform configuration.
+
+```sh
+docker compose stop platform-v2
+docker compose run --rm --no-deps -T --entrypoint sh platform-v2 \
+  -c 'umask 077; cat > /backup/remote-config.json' < ./remote-config.json
+docker compose run --rm --no-deps --entrypoint node platform-v2 \
+  /app/static/build/backupCliV2.js remote list --config /backup/remote-config.json
+docker compose run --rm --no-deps --entrypoint node platform-v2 \
+  /app/static/build/backupCliV2.js remote download BACKUP_ID \
+  --config /backup/remote-config.json --output /backup/recovery.encrypted
+```
+
+The self-describing `zhixu-v2/` object names identify time, source, mode and backup ID without a local catalog. If the same ID has multiple uploads, supply the exact `key` returned by `remote list` as the download argument, or add `--key KEY`. Downloads refuse to replace an existing output file. These two remote commands do not open or initialize a business database.
+
+Create `/backup/recovery.passphrase` using the private interactive command in the Portable recovery section, then run:
+
+```sh
+docker compose run --rm --no-deps --entrypoint node platform-v2 \
+  /app/static/build/backupCliV2.js restore --file /backup/recovery.encrypted \
+  --passphrase-file /backup/recovery.passphrase
+docker compose run --rm --no-deps --entrypoint node platform-v2 \
+  /app/static/build/backupCliV2.js status
+docker compose up -d --wait platform-v2
+```
+
+A FULL backup restores its saved Git data even if the original Git remote has disappeared. A LIGHTWEIGHT backup still requires its Git remotes/base objects and credentials. After checking Workspaces, Tasks and settings, rebuild managed Runtime/dependency environments as needed. Remove the temporary credential/passphrase files from the maintenance volume; keep the independent recovery copy safely. Remote storage test objects and incomplete download files are removed by their respective operations. Failed uploads remain visible and can be retried without recreating the local snapshot.

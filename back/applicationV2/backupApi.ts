@@ -4,6 +4,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import { BackupOperations } from '../services/backup/operations';
 import { ScheduledBackupService } from '../services/backup/scheduled';
+import { registerRemoteBackupApi } from './remoteBackupApi';
 import { backupId } from '../services/backup/paths';
 import { BackupError, openRegular } from '../services/backup/files';
 import { RuntimeRestoreReconciler } from '../services/backup/runtimeRestore';
@@ -126,7 +127,8 @@ export function registerBackupApi(
 ) {
   const paths = s.backup.paths,
     operations = new BackupOperations(paths),
-    scheduled = new ScheduledBackupService(s.backup, operations);
+    remote = registerRemoteBackupApi(app, s, operations, lifetime),
+    scheduled = new ScheduledBackupService(s.backup, operations, { remote });
   const handle = (action: Action) =>
     (lifetime?.handle ?? ((action) => action))(
       async (req: Request, res: Response, next: NextFunction) => {
@@ -566,6 +568,7 @@ export function registerBackupApi(
   return {
     operations,
     scheduled,
+    remote,
     recoverOperations: () => operations.recover(),
   };
 }

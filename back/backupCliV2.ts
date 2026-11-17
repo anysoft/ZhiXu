@@ -17,6 +17,9 @@ Usage: node /app/static/build/backupCliV2.js <command> [options]
   restore --file <path>        Import and restore an encrypted Portable backup
   restore --resume             Resume an interrupted restore using its existing journal
   status                       Show the restore journal and required follow-up
+  remote list --config <file>  List remote backups without the original database
+  remote download <id> --config <file> --output <file>
+                               Download an encrypted backup; then use restore --file
 
 Options:
   --data-root <absolute path>   Defaults to ZHIXU_V2_DATA_ROOT
@@ -211,6 +214,12 @@ export async function runBackupCliV2(args = process.argv.slice(2)) {
     return;
   }
   assertV2BackendNode(process.versions.node);
+  if (args[0] === 'remote') {
+    const { runRemoteBackupCli } = await import('./services/backup/remoteCli');
+    const result = await runRemoteBackupCli(args.slice(1));
+    process.stdout.write(JSON.stringify({ code: 200, data: result }) + '\n');
+    return;
+  }
   const options = parseBackupCliArguments(args),
     projectRoot = await backupProjectRoot(),
     originalLegacyRoot = process.env.QL_DATA_DIR;
@@ -267,6 +276,8 @@ export async function runBackupCliV2(args = process.argv.slice(2)) {
 }
 
 function backupCliHint(code: string): string {
+  if (code.startsWith('BACKUP_REMOTE_'))
+    return 'Check the private --config file, endpoint, credentials and network. Keep the independent recovery passphrase. Downloaded files still require restore --file authentication and integrity validation; use --key for ambiguous IDs.';
   if (code === 'BACKUP_LIGHTWEIGHT_EXTERNAL_GIT_UNSUPPORTED')
     return 'Lightweight backup does not support this external Git data layout. Use FULL and review LFS/submodule backup warnings.';
   if (

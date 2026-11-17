@@ -32,6 +32,8 @@ export interface BackupHistoryEntry {
   error_code?: string;
   retention_errors?: { id?: string; error_code: string }[];
   retention_error_count?: number;
+  remote_enqueued?: boolean;
+  remote_error_code?: string;
 }
 interface PendingCycle {
   cycle_key: string;
@@ -96,6 +98,12 @@ export class ScheduledBackupService {
       now?: () => Date;
       waitTimeoutMs?: number;
       retryDelayMs?: number;
+      remote?: {
+        enqueueScheduled(snapshotId: string): Promise<unknown>;
+        pendingSnapshotIds(): Promise<string[]>;
+        tick(): Promise<unknown>;
+        close(): Promise<void>;
+      };
       fault?: (
         point: string,
         detail: { cycle_key: string; snapshot_id: string },
@@ -471,6 +479,7 @@ export class ScheduledBackupService {
     // snapshot whose successful verification authorized this cleanup.
     const keep = new Set([
       newestId,
+      ...((await this.options.remote?.pendingSnapshotIds()) ?? []),
       ...snapshots
         .filter((snapshot) => snapshot.id !== newestId)
         .slice(0, settings.retain_count - 1)
@@ -500,12 +509,22 @@ export class ScheduledBackupService {
     state.pending = null;
     await this.writeState(state);
     try {
+      // Persist upload intent before local retention can remove this snapshot.
+      // Upload admission itself happens after the local operation releases its lock.
+      if (this.options.remote) {
+        await this.options.remote.enqueueScheduled(snapshot.id);
+        entry.remote_enqueued = true;
+        delete entry.remote_error_code;
+        await this.writeState(state);
+      }
       const errors = await this.retention(settings, snapshot.id);
       if (errors.length) {
         entry.retention_error_count = errors.length;
         entry.retention_errors = errors.slice(0, 20);
       }
     } catch (error) {
+      if (this.options.remote && !entry.remote_enqueued)
+        entry.remote_error_code = failureCode(error);
       entry.retention_error_count = 1;
       entry.retention_errors = [{ error_code: failureCode(error) }];
     }
@@ -701,6 +720,27 @@ export class ScheduledBackupService {
           const settings = await this.configuration(),
             state = await this.initialized(settings);
           await this.reconcile(state, settings);
+          // A crash after local publication or a transient queue-write failure
+          // must not require creating the same local snapshot again.
+          if (this.options.remote) {
+            for (const entry of state.history) {
+              if (
+                entry.source !== 'SCHEDULED' ||
+                entry.status !== 'SUCCESS' ||
+                !entry.snapshot_id ||
+                entry.remote_enqueued
+              )
+                continue;
+              try {
+                await this.options.remote.enqueueScheduled(entry.snapshot_id);
+                entry.remote_enqueued = true;
+                delete entry.remote_error_code;
+              } catch (error) {
+                entry.remote_error_code = failureCode(error);
+              }
+            }
+            await this.writeState(state);
+          }
           if (!settings.enabled) return false;
           if (state.pending)
             return (
@@ -727,6 +767,7 @@ export class ScheduledBackupService {
       return await this.ticking;
     } finally {
       this.ticking = undefined;
+      if (!this.closed) await this.options.remote?.tick();
     }
   }
   private wake() {
@@ -764,5 +805,6 @@ export class ScheduledBackupService {
     if (this.timer) clearTimeout(this.timer);
     await this.ticking;
     while (this.active.size) await Promise.all([...this.active]);
+    await this.options.remote?.close();
   }
 }

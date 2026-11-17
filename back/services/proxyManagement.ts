@@ -273,6 +273,25 @@ export class ProxyManagement {
         }
       }
     }
+    const remote = await this.store.all<{ id: number; info: string }>(
+      "SELECT id,info FROM Auths WHERE type='remoteBackup'",
+    );
+    for (const row of remote) {
+      try {
+        const targets = JSON.parse(row.info).targets;
+        if (!Array.isArray(targets)) fail('PROXY_CONFIGURATION_CORRUPTED', 503);
+        if (
+          targets.some(
+            (target) =>
+              target.proxy?.mode === 'PROFILE' &&
+              target.proxy.profile_id === profileId,
+          )
+        )
+          refs.push({ scope: 'remote_backup', id: row.id });
+      } catch {
+        fail('PROXY_CONFIGURATION_CORRUPTED', 503);
+      }
+    }
     return refs;
   }
   private async dto(p: Profile, c: Configuration) {
